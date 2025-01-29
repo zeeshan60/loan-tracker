@@ -34,7 +34,7 @@ class QueryFriendsService : Query<PaginationDto, Mono<FriendsDto>> {
                 FriendDto(
                     photoUrl = "https://example.com/photo.jpg",
                     name = "Noman Tufail",
-                    loanAmount = LoanAmountDto(amount = BigDecimal("50.00"), isOwed = true)
+                    loanAmount = LoanAmountDto(amount = BigDecimal("50.00"), isOwed = false)
                 ),
                 FriendDto(
                     photoUrl = "https://example.com/photo.jpg",
