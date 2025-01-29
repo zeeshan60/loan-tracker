@@ -35,8 +35,9 @@ class FriendsControllerSpec extends Specification {
                 null
         )
         Mockito.doReturn(Mono.just(friendsResponse)).when(queryFriendsService).execute(Mockito.any())
+
         expect:
-        webTestClient.get().uri("/friends")
+        webTestClient.get().uri("api/v1/friends")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
