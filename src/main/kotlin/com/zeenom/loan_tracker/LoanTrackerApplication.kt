@@ -1,13 +1,13 @@
-package com.zeenom.java_springboot_template
+package com.zeenom.loan_tracker
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class JavaSpringBootTemplateApplication
+class LoanTrackerApplication
 
 fun main(args: Array<String>) {
-	runApplication<JavaSpringBootTemplateApplication>(*args)
+	runApplication<LoanTrackerApplication>(*args)
 }
 
 

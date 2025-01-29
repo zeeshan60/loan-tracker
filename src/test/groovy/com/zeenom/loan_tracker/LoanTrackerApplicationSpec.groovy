@@ -1,4 +1,4 @@
-package com.zeenom.java_springboot_template
+package com.zeenom.loan_tracker
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -7,8 +7,8 @@ import org.springframework.test.context.ContextConfiguration
 import spock.lang.Specification
 
 @SpringBootTest
-@ContextConfiguration(classes = JavaSpringBootTemplateApplication)
-class JavaSpringBootTemplateApplicationSpec extends Specification {
+@ContextConfiguration(classes = LoanTrackerApplication)
+class LoanTrackerApplicationSpec extends Specification {
 
     @Autowired
     ApplicationContext applicationContext

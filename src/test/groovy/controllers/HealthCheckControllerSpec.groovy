@@ -1,6 +1,6 @@
 package controllers
 
-import com.zeenom.java_springboot_template.JavaSpringBootTemplateApplication
+import com.zeenom.loan_tracker.LoanTrackerApplication
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ContextConfiguration
@@ -9,7 +9,7 @@ import spock.lang.Specification
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ContextConfiguration(classes = JavaSpringBootTemplateApplication)
+@ContextConfiguration(classes = LoanTrackerApplication)
 class HealthCheckControllerSpec extends Specification {
 
     @Autowired

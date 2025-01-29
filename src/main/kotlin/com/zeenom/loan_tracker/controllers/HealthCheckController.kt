@@ -1,4 +1,4 @@
-package com.zeenom.java_springboot_template.controllers
+package com.zeenom.loan_tracker.controllers
 
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController

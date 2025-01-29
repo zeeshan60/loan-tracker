@@ -1,1 +1,1 @@
-rootProject.name = "java-springboot-template"
+rootProject.name = "loan-tracker"
