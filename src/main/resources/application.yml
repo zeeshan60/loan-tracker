@@ -20,5 +20,3 @@ management:
   endpoint:
     health:
       show-details: always
-self:
-  api-url: "http://52.74.229.194:8080"
