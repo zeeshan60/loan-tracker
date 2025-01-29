@@ -5,3 +5,9 @@ spring:
     name: loan-tracker
   main:
       web-application-type: reactive
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /api-docs

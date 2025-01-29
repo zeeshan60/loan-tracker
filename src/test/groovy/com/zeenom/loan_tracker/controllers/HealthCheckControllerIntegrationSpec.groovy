@@ -1,4 +1,4 @@
-package controllers
+package com.zeenom.loan_tracker.controllers
 
 import com.zeenom.loan_tracker.LoanTrackerApplication
 import org.springframework.beans.factory.annotation.Autowired
@@ -7,10 +7,9 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.reactive.server.WebTestClient
 import spock.lang.Specification
 
-
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(classes = LoanTrackerApplication)
-class HealthCheckControllerSpec extends Specification {
+class HealthCheckControllerIntegrationSpec extends Specification {
 
     @Autowired
     private WebTestClient webTestClient
@@ -24,3 +23,4 @@ class HealthCheckControllerSpec extends Specification {
                 .jsonPath('$.message').isEqualTo("I'm alive!")
     }
 }
+
