@@ -22,5 +22,19 @@ class HealthCheckControllerIntegrationSpec extends Specification {
                 .expectBody()
                 .jsonPath('$.message').isEqualTo("I'm alive!")
     }
+
+    def "test cors configuration"() {
+        when:
+        def response = webTestClient.options()
+                .uri("/health")
+                .header("Origin", "http://any-origin.com")
+                .header("Access-Control-Request-Method", "GET")
+                .exchange()
+
+        then:
+        response.expectHeader().valueEquals("Access-Control-Allow-Origin", "*")
+        response.expectHeader().valueEquals("Access-Control-Allow-Methods", "GET")
+        response.expectHeader().exists("Access-Control-Max-Age")
+    }
 }
 
