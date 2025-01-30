@@ -1,5 +1,6 @@
 # loan-tracker
 
+## Some handy commands to setup docker and run service on ec2
 quick ec2 setup:
 
 - sudo su
