@@ -20,3 +20,6 @@ management:
   endpoint:
     health:
       show-details: always
+auth:
+  secret-key: ${SECRET_KEY}
+  jwt-expiry-days: 30
