@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.Parameter
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Mono
 
-@CrossOrigin
 @RestController
 @RequestMapping("/api/v1")
 class FriendsController(val queryFriendsService: QueryFriendsService) {
