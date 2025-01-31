@@ -1,7 +1,5 @@
 package com.zeenom.loan_tracker.dtos
 
-import com.zeenom.loan_tracker.controllers.Paginated
-
 fun FriendsDto.toResponse() = FriendsResponse(
     friends = this.friends.map { it.toResponse() }
 )
