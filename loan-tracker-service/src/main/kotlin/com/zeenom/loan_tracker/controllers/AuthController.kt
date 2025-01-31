@@ -1,7 +1,7 @@
 package com.zeenom.loan_tracker.controllers
 
+import com.zeenom.loan_tracker.dtos.JWTTokenResponse
 import com.zeenom.loan_tracker.services.FirebaseService
-import com.zeenom.loan_tracker.services.JWTToken
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestHeader
@@ -14,20 +14,17 @@ import reactor.core.publisher.Mono
 class AuthController(val firebaseService: FirebaseService) {
 
     @PostMapping("/login")
-    fun login(@RequestHeader("Authorization") authHeader: String?): Mono<ResponseEntity<JWTToken>> {
+    fun login(@RequestHeader("Authorization") authHeader: String?): Mono<ResponseEntity<JWTTokenResponse>> {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return Mono.error(IllegalArgumentException("Invalid Authorization header"))
         }
         val firebaseIdToken = authHeader.substring(7)
         return firebaseService.generateJwtUsingIdToken(firebaseIdToken)
             .map { decodedToken ->
-                ResponseEntity.ok(decodedToken)
+                ResponseEntity.ok(JWTTokenResponse(token = decodedToken))
             }
             .onErrorResume {
                 Mono.error(IllegalArgumentException("Invalid Firebase ID token"))
             }
     }
 }
-
-
-

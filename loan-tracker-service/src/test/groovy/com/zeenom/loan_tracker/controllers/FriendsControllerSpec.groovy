@@ -1,9 +1,9 @@
 package com.zeenom.loan_tracker.controllers
 
 import com.zeenom.loan_tracker.LoanTrackerApplication
-import com.zeenom.loan_tracker.services.FriendDto
-import com.zeenom.loan_tracker.services.FriendsDto
-import com.zeenom.loan_tracker.services.LoanAmountDto
+import com.zeenom.loan_tracker.dtos.FriendDto
+import com.zeenom.loan_tracker.dtos.FriendsDto
+import com.zeenom.loan_tracker.dtos.LoanAmountDto
 import com.zeenom.loan_tracker.services.QueryFriendsService
 import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired

@@ -1,5 +1,6 @@
 package com.zeenom.loan_tracker.services
 
+import com.zeenom.loan_tracker.dtos.PaginationDto
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ContextConfiguration
 import spock.lang.Specification

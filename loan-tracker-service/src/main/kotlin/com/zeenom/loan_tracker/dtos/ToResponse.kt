@@ -1,9 +1,8 @@
-package com.zeenom.loan_tracker.services
+package com.zeenom.loan_tracker.dtos
 
-import com.zeenom.loan_tracker.controllers.FriendResponse
 import com.zeenom.loan_tracker.controllers.Paginated
 
-fun FriendsDto.toResponse() = com.zeenom.loan_tracker.controllers.FriendsResponse(
+fun FriendsDto.toResponse() = FriendsResponse(
     friends = this.friends.map { it.toResponse() }
 )
 
@@ -13,7 +12,7 @@ fun FriendDto.toResponse() = FriendResponse(
     loanAmount = this.loanAmount.toResponse()
 )
 
-fun LoanAmountDto.toResponse() = com.zeenom.loan_tracker.controllers.LoanAmountResponse(
+fun LoanAmountDto.toResponse() = LoanAmountResponse(
     amount = this.amount,
     isOwed = this.isOwed
 )

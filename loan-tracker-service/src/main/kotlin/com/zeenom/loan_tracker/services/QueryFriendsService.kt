@@ -1,25 +1,13 @@
 package com.zeenom.loan_tracker.services
 
+import com.zeenom.loan_tracker.dtos.FriendDto
+import com.zeenom.loan_tracker.dtos.FriendsDto
+import com.zeenom.loan_tracker.dtos.LoanAmountDto
+import com.zeenom.loan_tracker.dtos.PaginationDto
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 import java.math.BigDecimal
-
-interface Query<IN, OUT> {
-    fun execute(input: IN): OUT
-}
-
-data class FriendsDto(val friends: List<FriendDto>, val next: String? = null)
-
-data class FriendDto(
-    val photoUrl: String?,
-    val name: String,
-    val loanAmount: LoanAmountDto,
-)
-
-data class LoanAmountDto(val amount: BigDecimal, val isOwed: Boolean)
-
-data class PaginationDto(val next: String?)
 
 @Service
 class QueryFriendsService : Query<PaginationDto, Mono<FriendsDto>> {
