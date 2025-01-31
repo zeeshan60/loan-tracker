@@ -16,7 +16,8 @@ class JwtFilter(val authProperties: AuthProperties) : WebFilter {
 
     override fun filter(exchange: ServerWebExchange, chain: WebFilterChain): Mono<Void> {
         val request: ServerHttpRequest = exchange.request
-        if (request.uri.path == "/api/auth/login") {
+        val publicPaths = listOf("/api")
+        if (publicPaths.none { request.uri.path.startsWith(it) }) {
             return chain.filter(exchange)
         }
 

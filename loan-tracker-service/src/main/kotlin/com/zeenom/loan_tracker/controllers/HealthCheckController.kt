@@ -8,6 +8,7 @@ import reactor.kotlin.core.publisher.toMono
 
 @RestController
 class HealthCheckController {
+
     @GetMapping("/health")
     fun healthCheck(): Mono<MessageResponse> {
         return MessageResponse(message = "I'm alive!").toMono()

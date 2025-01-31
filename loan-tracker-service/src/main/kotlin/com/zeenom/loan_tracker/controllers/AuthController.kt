@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Mono
 
 @RestController
-@RequestMapping("/api/auth")
 class AuthController(val firebaseService: AuthService) {
 
     val logger = LoggerFactory.getLogger(AuthController::class.java)

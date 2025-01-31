@@ -9,18 +9,22 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import java.io.FileInputStream
 
+
 @Configuration
 class FirebaseConfig {
 
     @Bean
     fun firebaseApp(authProperties: AuthProperties): FirebaseApp {
-        val serviceAccount = FileInputStream(authProperties.firebaseSecretJson)
+        if (FirebaseApp.getApps().isEmpty()) {
+            val serviceAccount = FileInputStream(authProperties.firebaseSecretJson)
 
-        val options = FirebaseOptions.builder()
-            .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-            .build()
+            val options = FirebaseOptions.builder()
+                .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                .build()
 
-        return FirebaseApp.initializeApp(options)
+            return FirebaseApp.initializeApp(options)
+        }
+        return FirebaseApp.getInstance()
     }
 
     @Bean

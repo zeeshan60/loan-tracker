@@ -30,7 +30,7 @@ class AuthControllerSpec extends Specification {
         Mockito.doReturn("jwt-token").when(firebaseService).verifyIdToken(idToken)
 
         when:
-        def response = webTestClient.post().uri("/api/auth/login")
+        def response = webTestClient.post().uri("/login")
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer $idToken")
                 .exchange()
