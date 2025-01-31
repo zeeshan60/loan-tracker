@@ -2,4 +2,3 @@ self:
   api-url: "http://localhost:8080"
 auth:
   secret-key: "this is a secret that should be replaced with environment variable"
-  firebase-secret-json: "firebase-secret.json"
