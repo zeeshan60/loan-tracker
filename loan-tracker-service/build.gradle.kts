@@ -28,7 +28,6 @@ dependencies {
 	implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.8.4")
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	implementation("com.google.firebase:firebase-admin:9.2.0")
-	implementation("io.jsonwebtoken:jjwt:0.11.5")
 	implementation("io.jsonwebtoken:jjwt-api:0.11.5")
 	implementation("io.jsonwebtoken:jjwt-impl:0.11.5")
 	implementation("io.jsonwebtoken:jjwt-jackson:0.11.5")

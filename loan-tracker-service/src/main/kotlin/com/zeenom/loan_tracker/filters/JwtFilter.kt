@@ -1,5 +1,6 @@
 package com.zeenom.loan_tracker.filters
 
+import com.zeenom.loan_tracker.properties.AuthProperties
 import io.jsonwebtoken.Jwts
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -11,9 +12,7 @@ import org.springframework.web.server.WebFilterChain
 import reactor.core.publisher.Mono
 
 @Component
-class JwtFilter : WebFilter {
-
-    private val secretKey = "your-secret-key"
+class JwtFilter(val authProperties: AuthProperties) : WebFilter {
 
     override fun filter(exchange: ServerWebExchange, chain: WebFilterChain): Mono<Void> {
         val request: ServerHttpRequest = exchange.request
@@ -39,7 +38,7 @@ class JwtFilter : WebFilter {
     private fun validateToken(token: String): Mono<String> {
         return try {
             val claims = Jwts.parserBuilder()
-                .setSigningKey(secretKey.toByteArray())
+                .setSigningKey(authProperties.secretKey.toByteArray())
                 .build()
                 .parseClaimsJws(token)
                 .body

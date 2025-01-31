@@ -53,3 +53,5 @@ gradle-app.setting
 /*.pem
 *.jar
 *.tar
+
+*firebase-secret.json

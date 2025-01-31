@@ -1,5 +1,6 @@
 package com.zeenom.loan_tracker.controllers
 
+
 import com.zeenom.loan_tracker.LoanTrackerApplication
 import com.zeenom.loan_tracker.dtos.FriendDto
 import com.zeenom.loan_tracker.dtos.FriendsDto
@@ -61,3 +62,4 @@ class FriendsControllerSpec extends Specification {
         response.expectHeader().exists("Access-Control-Max-Age")
     }
 }
+

@@ -4,16 +4,18 @@ import com.google.auth.oauth2.GoogleCredentials
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
+import com.zeenom.loan_tracker.properties.AuthProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Lazy
 import java.io.FileInputStream
 
 @Configuration
 class FirebaseConfig {
 
     @Bean
-    fun firebaseApp(): FirebaseApp {
-        val serviceAccount = FileInputStream("path/to/serviceAccountKey.json")
+    fun firebaseApp(authProperties: AuthProperties): FirebaseApp {
+        val serviceAccount = FileInputStream("firebase-secret.json")
 
         val options = FirebaseOptions.builder()
             .setCredentials(GoogleCredentials.fromStream(serviceAccount))
