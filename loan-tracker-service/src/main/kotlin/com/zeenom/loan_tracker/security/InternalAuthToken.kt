@@ -3,13 +3,24 @@ package com.zeenom.loan_tracker.security
 import org.springframework.security.authentication.AbstractAuthenticationToken
 import org.springframework.security.core.authority.AuthorityUtils
 
-class InternalAuthToken(private val token: String) : AbstractAuthenticationToken(AuthorityUtils.NO_AUTHORITIES) {
+data class InternalAuthToken(private val token: String, val action: Action, private val authenticated: Boolean = false) : AbstractAuthenticationToken(AuthorityUtils.NO_AUTHORITIES) {
 
-    override fun getCredentials(): Any {
+    override fun isAuthenticated(): Boolean {
+        return authenticated
+    }
+    override fun getCredentials(): String {
         return token
     }
 
-    override fun getPrincipal(): Any {
+    override fun getPrincipal(): String {
         return token
     }
+}
+
+enum class Action {
+    CREATE,
+    READ,
+    UPDATE,
+    DELETE,
+    UNKNOWN
 }
