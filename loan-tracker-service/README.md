@@ -11,6 +11,7 @@ quick ec2 setup:
 - usermod -aG docker ec2-user
 - docker build . -t zeeshan60/loan-tracker-service
 - docker push zeeshan60/loan-tracker-service:latest
+- docker build . -t zeeshan60/loan-tracker-service && docker push zeeshan60/loan-tracker-service:latest
 - docker tag loan-tracker-service:latest zeeshan60/loan-tracker-service:latest
 
 another way to send image because building is expensive
@@ -28,3 +29,6 @@ on your local machine
 - sudo docker image prune -f
 - sudo docker rmi loantracker
 - sudo docker logs -f loantracker
+
+- docker build . -t zeeshan60/loan-tracker-service && docker push zeeshan60/loan-tracker-service:latest
+- sudo docker pull zeeshan60/loan-tracker-service:latest && sudo docker stop loantracker && sudo docker container prune -f && sudo docker run -d -p 8080:8080 -e SPRING_PROFILES_ACTIVE=dev --name loantracker zeeshan60/loan-tracker-service:latest && sudo docker image prune -f
