@@ -32,8 +32,10 @@ class SwaggerConfig {
             .addSecurityItem(SecurityRequirement().addList("bearerAuth"))
             .servers(
                 listOf(
-                    Server().url(selfProperties.apiUrl).description("Production server")
+                    Server().url(selfProperties.apiUrl).description("Server")
                 )
             )
     }
 }
+
+

@@ -13,6 +13,8 @@ quick ec2 setup:
 - docker push zeeshan60/loan-tracker-service:latest
 - docker build . -t zeeshan60/loan-tracker-service && docker push zeeshan60/loan-tracker-service:latest
 - docker tag loan-tracker-service:latest zeeshan60/loan-tracker-service:latest
+- docker run -d -p 8000:8000 --name dynamo  amazon/dynamodb-local:latest -jar DynamoDBLocal.jar -sharedDb
+
 
 another way to send image because building is expensive
 

@@ -36,6 +36,11 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 
+	implementation("software.amazon.awssdk:dynamodb:2.25.28") // Use the latest version
+	implementation("software.amazon.awssdk:netty-nio-client:2.25.28") // Non-blocking Netty HTTP client
+	implementation("io.projectreactor:reactor-core:3.5.10") // Reactor for WebFlux integration (if not already included)
+
+
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("io.projectreactor:reactor-test")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
