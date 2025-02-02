@@ -5,3 +5,6 @@
 ### running the service using image
 - docker pull zeeshan60/loan-tracker-service:latest
 - docker run -d -p 8080:8080 -e SPRING_PROFILES_ACTIVE=dev --name loantracker zeeshan60/loan-tracker-service:latest
+### running the Ui mobile application using image
+- docker pull nomantufail/loan-tracker-ui-repo:latest
+- docker run -p 8080:80 nomantufail/loan-tracker-ui-repo

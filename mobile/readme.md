@@ -23,7 +23,7 @@ Follow these steps to set up the Loan Tracker application on your local machine:
    git clone https://github.com/zeeshan60/loan-tracker.git
    cd loan-tracker/mobile  # Navigate to the mobile project directory
 
-2. **Clone the Repository:**
+2. **Install the dependencies:**
 
    ```bash
    npm install
