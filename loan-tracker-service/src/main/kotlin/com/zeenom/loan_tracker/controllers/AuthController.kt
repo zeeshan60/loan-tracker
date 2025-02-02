@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class AuthController(val firebaseService: AuthService) {
+class AuthController(val authService: AuthService) {
 
     val logger = LoggerFactory.getLogger(AuthController::class.java)
 
@@ -20,7 +20,7 @@ class AuthController(val firebaseService: AuthService) {
         }
         val firebaseIdToken = authHeader.substring(7)
         return try {
-            val decodedToken = firebaseService.generateJwtUsingIdToken(firebaseIdToken)
+            val decodedToken = authService.generateJwtUsingIdToken(firebaseIdToken)
             ResponseEntity.ok(JWTTokenResponse(token = decodedToken))
         } catch (e: Exception) {
             logger.error("Error generating JWT token", e)

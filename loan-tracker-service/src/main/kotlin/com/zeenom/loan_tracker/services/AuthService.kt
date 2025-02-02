@@ -17,7 +17,7 @@ class AuthService(private val firebaseService: FirebaseService, private val auth
         return firebaseService.verifyIdToken(idToken)
     }
 
-    private fun generateJwt(uid: String): String {
+    fun generateJwt(uid: String): String {
         val expirationTime = Calendar.getInstance().apply {
             add(Calendar.DATE, authProperties.jwtExpiryDays)
         }.time

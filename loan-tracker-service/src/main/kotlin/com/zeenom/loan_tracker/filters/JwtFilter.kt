@@ -2,6 +2,7 @@ package com.zeenom.loan_tracker.filters
 
 import com.zeenom.loan_tracker.properties.AuthProperties
 import io.jsonwebtoken.Jwts
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.server.reactive.ServerHttpRequest
@@ -14,6 +15,7 @@ import reactor.core.publisher.Mono
 @Component
 class JwtFilter(val authProperties: AuthProperties) : WebFilter {
 
+    val logger = LoggerFactory.getLogger(JwtFilter::class.java)
     override fun filter(exchange: ServerWebExchange, chain: WebFilterChain): Mono<Void> {
         val request: ServerHttpRequest = exchange.request
         val publicPaths = listOf("/api")
@@ -31,6 +33,7 @@ class JwtFilter(val authProperties: AuthProperties) : WebFilter {
                     chain.filter(exchange)
                 }
                 .onErrorResume {
+                    logger.error("Error validating token", it)
                     exchange.response.statusCode = HttpStatus.UNAUTHORIZED
                     exchange.response.setComplete()
                 }
