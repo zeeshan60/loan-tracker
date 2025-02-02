@@ -28,3 +28,4 @@ class AuthController(val authService: AuthService) {
         }
     }
 }
+

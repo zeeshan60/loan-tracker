@@ -12,7 +12,7 @@ import org.springframework.web.server.WebFilter
 import org.springframework.web.server.WebFilterChain
 import reactor.core.publisher.Mono
 
-@Component
+//@Component
 class JwtFilter(val authProperties: AuthProperties) : WebFilter {
 
     val logger = LoggerFactory.getLogger(JwtFilter::class.java)
