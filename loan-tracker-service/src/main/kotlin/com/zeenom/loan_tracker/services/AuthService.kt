@@ -4,22 +4,13 @@ import com.zeenom.loan_tracker.properties.AuthProperties
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import org.springframework.stereotype.Service
-import reactor.core.publisher.Mono
-import reactor.core.scheduler.Schedulers
 import java.util.*
 import javax.crypto.spec.SecretKeySpec
 
 @Service
 class AuthService(private val firebaseService: FirebaseService, private val authProperties: AuthProperties) {
-    fun generateJwtUsingIdToken(idToken: String): Mono<String> {
-        return Mono.fromCallable {
-            verifyIdToken(idToken)
-        }.subscribeOn(Schedulers.boundedElastic()).map { decodedToken ->
-            decodedToken
-        }
-            .map { decodedToken ->
-                generateJwt(decodedToken)
-            }
+    suspend fun generateJwtUsingIdToken(idToken: String): String {
+        return generateJwt(verifyIdToken(idToken))
     }
 
     fun verifyIdToken(idToken: String): String {

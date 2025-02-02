@@ -5,13 +5,11 @@ import com.zeenom.loan_tracker.dtos.FriendsDto
 import com.zeenom.loan_tracker.dtos.LoanAmountDto
 import com.zeenom.loan_tracker.dtos.PaginationDto
 import org.springframework.stereotype.Service
-import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toMono
 import java.math.BigDecimal
 
 @Service
-class QueryFriendsService : Query<PaginationDto, Mono<FriendsDto>> {
-    override fun execute(input: PaginationDto): Mono<FriendsDto> {
+class QueryFriendsService : Query<PaginationDto, FriendsDto> {
+    override suspend fun execute(input: PaginationDto): FriendsDto {
         return FriendsDto(
             friends = listOf(
                 FriendDto(
@@ -30,7 +28,7 @@ class QueryFriendsService : Query<PaginationDto, Mono<FriendsDto>> {
                     loanAmount = LoanAmountDto(amount = BigDecimal("200.00"), isOwed = true)
                 )
             )
-        ).toMono()
+        )
     }
 }
 

@@ -32,6 +32,7 @@ dependencies {
 	implementation("io.jsonwebtoken:jjwt-impl:0.11.5")
 	implementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
 	implementation("org.aspectj:aspectjweaver:1.9.7")
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("io.projectreactor:reactor-test")
@@ -41,6 +42,7 @@ dependencies {
 	testImplementation("org.spockframework:spock-core:2.3-groovy-3.0")
 	testImplementation("org.spockframework:spock-spring:2.3-groovy-3.0")
 	testImplementation("org.codehaus.groovy:groovy-all:3.0.9")
+	testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.1")
 }
 
 kotlin {
