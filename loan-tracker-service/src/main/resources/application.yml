@@ -24,3 +24,7 @@ auth:
   firebase-secret-json: "firebase-secret.json"
   secret-key: ${SECRET_KEY}
   jwt-expiry-days: 30
+
+logging:
+    level:
+        org.springframework.security: DEBUG
