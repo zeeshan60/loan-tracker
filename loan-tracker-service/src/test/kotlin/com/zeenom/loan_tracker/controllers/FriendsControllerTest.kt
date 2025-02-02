@@ -2,6 +2,7 @@ package com.zeenom.loan_tracker.controllers
 
 import com.zeenom.loan_tracker.services.AuthService
 import com.zeenom.loan_tracker.services.FirebaseService
+import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito
@@ -22,7 +23,7 @@ class FriendsControllerTest(@LocalServerPort private val port: Int) {
     private lateinit var firebaseService: FirebaseService
 
     @Test
-    fun `friends endpoint returns friends`() {
+    fun `friends endpoint returns friends`(): Unit = runBlocking {
         Mockito.doReturn("uid").`when`(firebaseService).verifyIdToken("verified-id-token")
         webTestClient.get()
             .uri("/api/v1/friends")

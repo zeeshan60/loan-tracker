@@ -1,6 +1,7 @@
 package com.zeenom.loan_tracker.controllers
 
 import com.zeenom.loan_tracker.services.FirebaseService
+import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito
@@ -18,8 +19,8 @@ class AuthControllerTest(@LocalServerPort private val port: Int) {
     private lateinit var firebaseService: FirebaseService
 
     @Test
-    fun `given verified id token generates jwt token with expiry successfully`() {
-        // Given
+    fun `given verified id token generates jwt token with expiry successfully`(): Unit = runBlocking {
+
         val idToken = "verified-id-token"
         Mockito.`when`(firebaseService.verifyIdToken(idToken)).thenReturn("jwt-token")
 
