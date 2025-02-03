@@ -29,14 +29,16 @@ class EventEntityAdapter(
             eventId = eventDto.eventId,
             userId = eventDto.userId,
             createdAt = secondInstant.now(),
-            payload = eventDto.payload?.let { toJsonB(it) }
+            payload = eventDto.payload?.let { toJsonB(it) },
+            source = eventDto.source
         )
 
     fun toDto(entity: EventEntity) = EventDto(
         eventId = entity.eventId,
         event = entity.event,
         payload = entity.payload?.let { fromJsonB(it) },
-        userId = entity.userId
+        userId = entity.userId,
+        source = entity.source,
     )
 }
 
@@ -47,5 +49,10 @@ data class EventEntity(
     val eventId: String,
     val userId: String,
     val createdAt: Instant,
-    val payload: Json?
+    val payload: Json?,
+    val source: EventSource
 )
+
+enum class EventSource {
+    DIRECT, INDIRECT
+}

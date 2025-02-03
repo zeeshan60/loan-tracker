@@ -5,7 +5,8 @@ CREATE TABLE events
     event_id   VARCHAR(255) NOT NULL,
     user_id    VARCHAR(255) NOT NULL,
     created_at TIMESTAMP    NOT NULL,
-    payload    JSONB
+    payload    JSONB,
+    source     VARCHAR(255)
 );
 
 CREATE INDEX idx_events_created_at ON events (created_at);

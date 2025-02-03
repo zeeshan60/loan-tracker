@@ -8,6 +8,7 @@ data class EventDto(
     val event: EventType,
     val payload: EventPayloadDto?,
     val userId: String,
+    val source: EventSource
 )
 
 data class EventPayloadDto(

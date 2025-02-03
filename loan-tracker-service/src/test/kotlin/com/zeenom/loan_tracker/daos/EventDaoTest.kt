@@ -41,7 +41,8 @@ class EventDaoTest {
                 ),
                 eventReceivers = EventUsersDto(listOf("123")),
             ),
-            userId = "123"
+            userId = "123",
+            source = EventSource.DIRECT
         )
         eventDao.saveEvent(eventDto)
 
