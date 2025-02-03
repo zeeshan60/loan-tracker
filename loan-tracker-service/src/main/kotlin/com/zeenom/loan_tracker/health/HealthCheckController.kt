@@ -1,6 +1,6 @@
 package com.zeenom.loan_tracker.health
 
-import com.zeenom.loan_tracker.dtos.MessageResponse
+import com.zeenom.loan_tracker.common.MessageResponse
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 

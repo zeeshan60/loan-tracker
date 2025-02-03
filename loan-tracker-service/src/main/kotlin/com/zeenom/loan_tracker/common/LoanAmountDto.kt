@@ -1,4 +1,4 @@
-package com.zeenom.loan_tracker.dtos
+package com.zeenom.loan_tracker.common
 
 import java.math.BigDecimal
 

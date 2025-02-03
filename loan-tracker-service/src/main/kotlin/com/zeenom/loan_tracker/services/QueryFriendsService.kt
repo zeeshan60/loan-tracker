@@ -2,8 +2,8 @@ package com.zeenom.loan_tracker.services
 
 import com.zeenom.loan_tracker.friends.dtos.FriendDto
 import com.zeenom.loan_tracker.friends.dtos.FriendsDto
-import com.zeenom.loan_tracker.dtos.LoanAmountDto
-import com.zeenom.loan_tracker.dtos.PaginationDto
+import com.zeenom.loan_tracker.common.LoanAmountDto
+import com.zeenom.loan_tracker.common.PaginationDto
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 
