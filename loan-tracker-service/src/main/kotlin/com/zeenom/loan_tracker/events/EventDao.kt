@@ -9,9 +9,8 @@ class EventDao(
     private val eventRepository: EventRepository,
     private val eventEntityAdapter: EventEntityAdapter
 ) {
-    suspend fun saveEvent(eventDto: EventDto): String {
+    suspend fun saveEvent(eventDto: EventDto) {
         eventRepository.save(eventEntityAdapter.fromDto(eventDto)).awaitSingle()
-        return "Event saved"
     }
 
     suspend fun findEventByTransactionId(eventId: String): EventDto? {
@@ -19,3 +18,5 @@ class EventDao(
             ?.let { eventEntityAdapter.toDto(it) }
     }
 }
+
+

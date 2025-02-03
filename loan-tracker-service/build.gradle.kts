@@ -58,6 +58,7 @@ dependencies {
 	testImplementation("org.springframework.security:spring-security-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
+	testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
 	testImplementation("org.spockframework:spock-core:2.3-groovy-3.0")
 	testImplementation("org.spockframework:spock-spring:2.3-groovy-3.0")
 	testImplementation("org.codehaus.groovy:groovy-all:3.0.9")
