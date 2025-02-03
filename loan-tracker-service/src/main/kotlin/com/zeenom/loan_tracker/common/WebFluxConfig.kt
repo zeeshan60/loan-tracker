@@ -1,4 +1,4 @@
-package com.zeenom.loan_tracker.configurations
+package com.zeenom.loan_tracker.common
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

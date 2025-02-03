@@ -1,4 +1,4 @@
-package com.zeenom.loan_tracker.properties
+package com.zeenom.loan_tracker.security
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Component

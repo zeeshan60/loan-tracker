@@ -1,6 +1,5 @@
 package com.zeenom.loan_tracker.security
 
-import com.zeenom.loan_tracker.properties.AuthProperties
 import io.jsonwebtoken.Jwts
 import kotlinx.coroutines.reactor.mono
 import org.springframework.security.authentication.ReactiveAuthenticationManager

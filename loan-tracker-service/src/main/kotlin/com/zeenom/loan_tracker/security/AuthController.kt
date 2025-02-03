@@ -1,6 +1,5 @@
 package com.zeenom.loan_tracker.security
 
-import com.zeenom.loan_tracker.services.AuthService
 import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping

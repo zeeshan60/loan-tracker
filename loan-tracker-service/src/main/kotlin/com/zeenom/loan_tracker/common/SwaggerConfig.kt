@@ -1,6 +1,5 @@
-package com.zeenom.loan_tracker.configurations
+package com.zeenom.loan_tracker.common
 
-import com.zeenom.loan_tracker.properties.SelfProperties
 import io.swagger.v3.oas.models.Components
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.info.Info

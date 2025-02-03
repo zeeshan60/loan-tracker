@@ -1,7 +1,6 @@
-package com.zeenom.loan_tracker.services
+package com.zeenom.loan_tracker.security
 
 import com.zeenom.loan_tracker.firebase.FirebaseService
-import com.zeenom.loan_tracker.properties.AuthProperties
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import org.springframework.stereotype.Service

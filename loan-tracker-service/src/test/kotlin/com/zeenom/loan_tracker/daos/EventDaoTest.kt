@@ -1,7 +1,7 @@
 package com.zeenom.loan_tracker.daos
 
 import com.zeenom.loan_tracker.events.*
-import com.zeenom.loan_tracker.helpers.looseNanonSeconds
+import com.zeenom.loan_tracker.common.looseNanonSeconds
 import io.swagger.v3.core.util.Json
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat

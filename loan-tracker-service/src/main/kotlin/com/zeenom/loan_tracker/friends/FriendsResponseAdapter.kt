@@ -2,10 +2,6 @@ package com.zeenom.loan_tracker.friends
 
 import com.zeenom.loan_tracker.common.LoanAmountResponseAdapter
 import com.zeenom.loan_tracker.common.Paginated
-import com.zeenom.loan_tracker.friends.dtos.FriendDto
-import com.zeenom.loan_tracker.friends.dtos.FriendResponse
-import com.zeenom.loan_tracker.friends.dtos.FriendsDto
-import com.zeenom.loan_tracker.friends.dtos.FriendsResponse
 import org.springframework.stereotype.Service
 
 @Service

@@ -1,4 +1,4 @@
-package com.zeenom.loan_tracker.helpers
+package com.zeenom.loan_tracker.common
 
 import java.net.URI
 import java.time.Instant
@@ -6,7 +6,6 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoField
-import java.time.temporal.TemporalField
 
 fun String.toInstant(): Instant {
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
