@@ -14,7 +14,8 @@ class AuthService(private val firebaseService: FirebaseService, private val auth
     }
 
     suspend fun verifyIdToken(idToken: String): String {
-        return firebaseService.verifyIdToken(idToken)
+        firebaseService.verifyIdToken(idToken)
+        return "Token is valid"
     }
 
     fun generateJwt(uid: String): String {
