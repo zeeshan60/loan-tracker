@@ -13,11 +13,11 @@ import java.time.Instant
 @Component
 class EventEntityAdapter(private val objectMapper: ObjectMapper) {
 
-    fun toJsonB(payload: EventPayloadDto): Json {
+    private fun toJsonB(payload: EventPayloadDto): Json {
         return Json.of(objectMapper.writeValueAsString(payload))
     }
 
-    fun fromJsonB(json: Json?): EventPayloadDto? {
+    private fun fromJsonB(json: Json?): EventPayloadDto? {
         return json?.let { objectMapper.readValue(it.asString(), EventPayloadDto::class.java) }
     }
 
