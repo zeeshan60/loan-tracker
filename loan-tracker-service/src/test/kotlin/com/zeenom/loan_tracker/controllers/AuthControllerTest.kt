@@ -1,7 +1,7 @@
 package com.zeenom.loan_tracker.controllers
 
-import com.zeenom.loan_tracker.security.LoginRequest
 import com.zeenom.loan_tracker.firebase.FirebaseService
+import com.zeenom.loan_tracker.security.LoginRequest
 import com.zeenom.loan_tracker.users.UserDto
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions
@@ -28,10 +28,11 @@ class AuthControllerTest(@LocalServerPort private val port: Int) {
 
         Mockito.`when`(firebaseService.verifyIdToken(idToken)).thenReturn(
             UserDto(
-                "123",
-                "sample@gmail.com",
-                "Zeeshan Tufail",
-                "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl2"
+                uid = "123",
+                email = "sample@gmail.com",
+                displayName = "Zeeshan Tufail",
+                photoUrl = "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl2",
+                emailVerified = true
             )
         )
 
