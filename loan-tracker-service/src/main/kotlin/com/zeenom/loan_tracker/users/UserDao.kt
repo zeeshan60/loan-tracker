@@ -1,14 +1,43 @@
 package com.zeenom.loan_tracker.users
 
 import com.zeenom.loan_tracker.common.SecondInstant
-import com.zeenom.loan_tracker.common.looseNanonSeconds
 import kotlinx.coroutines.reactive.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.stereotype.Service
-import java.time.Instant
 
 @Service
 class UserDao(private val userRepository: UserRepository, private val secondInstant: SecondInstant) {
+
+    suspend fun loginUser(userDto: UserDto): String {
+        val existingUser = userRepository.findByUid(userDto.uid).awaitSingleOrNull()
+        if (existingUser != null) {
+            userRepository.save(
+                existingUser.copy(
+                    email = userDto.email,
+                    displayName = userDto.displayName,
+                    photoUrl = userDto.photoUrl,
+                    emailVerified = userDto.emailVerified,
+                    updatedAt = secondInstant.now(),
+                    lastLoginAt = secondInstant.now()
+                )
+            ).awaitSingle()
+            return "User updated ${userDto.uid}"
+        }
+        userRepository.save(
+            UserEntity(
+                uid = userDto.uid,
+                email = userDto.email,
+                displayName = userDto.displayName,
+                photoUrl = userDto.photoUrl,
+                emailVerified = userDto.emailVerified,
+                createdAt = secondInstant.now(),
+                updatedAt = secondInstant.now(),
+                lastLoginAt = secondInstant.now()
+            )
+        ).awaitSingle()
+        return "User logged in ${userDto.uid}"
+    }
+
     suspend fun createUser(userDto: UserDto): String {
         userRepository.save(
             UserEntity(
@@ -17,8 +46,9 @@ class UserDao(private val userRepository: UserRepository, private val secondInst
                 displayName = userDto.displayName,
                 photoUrl = userDto.photoUrl,
                 emailVerified = userDto.emailVerified,
-                createdAt = userDto.updatedAt ?: secondInstant.now(),
-                updatedAt = userDto.updatedAt ?: secondInstant.now()
+                createdAt = secondInstant.now(),
+                updatedAt = secondInstant.now(),
+                lastLoginAt = null
             )
         ).awaitSingle()
         return "User created ${userDto.uid}"
@@ -31,14 +61,8 @@ class UserDao(private val userRepository: UserRepository, private val secondInst
                 email = it.email,
                 displayName = it.displayName,
                 photoUrl = it.photoUrl,
-                emailVerified = it.emailVerified,
-                updatedAt = it.updatedAt
+                emailVerified = it.emailVerified
             )
         }
-    }
-
-    suspend fun deleteUserById(uid: String): String {
-        userRepository.deleteAllByUid(uid).awaitSingleOrNull()
-        return "User $uid deleted"
     }
 }

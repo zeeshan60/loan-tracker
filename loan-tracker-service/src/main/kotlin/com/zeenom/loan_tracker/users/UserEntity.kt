@@ -17,7 +17,8 @@ data class UserEntity(
     val photoUrl: String,
     val emailVerified: Boolean,
     val createdAt: Instant,
-    val updatedAt: Instant
+    val updatedAt: Instant,
+    val lastLoginAt: Instant?
 )
 
 @Repository

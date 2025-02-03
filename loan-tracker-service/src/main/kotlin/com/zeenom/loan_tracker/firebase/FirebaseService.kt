@@ -3,8 +3,12 @@ package com.zeenom.loan_tracker.firebase
 import com.google.api.core.ApiFuture
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseToken
+import com.zeenom.loan_tracker.users.UserDao
 import com.zeenom.loan_tracker.users.UserDto
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.awaitSingle
+import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
@@ -12,11 +16,17 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
 
 @Service
-class FirebaseService(private val firebaseAuth: FirebaseAuth, private val firebaseAdapter: FirebaseAdapter) {
+class FirebaseService(
+    private val firebaseAuth: FirebaseAuth,
+    private val firebaseAdapter: FirebaseAdapter,
+    private val userDao: UserDao
+) {
 
-    suspend fun verifyIdToken(idToken: String): UserDto {
+    suspend fun verifyIdToken(idToken: String): UserDto = withContext(Dispatchers.IO) {
         val firebaseToken = firebaseAuth.verifyIdTokenAsync(idToken).await()
-        return firebaseAdapter.tokenToUser(firebaseToken)
+        val user = firebaseAdapter.tokenToUser(firebaseToken)
+        launch { userDao.loginUser(user) }
+        user
     }
 }
 

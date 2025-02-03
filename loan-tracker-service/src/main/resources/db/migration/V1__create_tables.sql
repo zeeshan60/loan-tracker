@@ -19,6 +19,7 @@ CREATE TABLE users
     photo_url      TEXT,
     email_verified BOOLEAN             NOT NULL,
     created_at     TIMESTAMP           NOT NULL,
-    updated_at     TIMESTAMP           NOT NULL
+    updated_at     TIMESTAMP           NOT NULL,
+    last_login_at  TIMESTAMP
 );
 CREATE INDEX idx_users_uid ON users (uid);
