@@ -1,4 +1,4 @@
-package com.zeenom.loan_tracker.controllers
+package com.zeenom.loan_tracker.health
 
 import com.zeenom.loan_tracker.dtos.MessageResponse
 import org.springframework.web.bind.annotation.GetMapping

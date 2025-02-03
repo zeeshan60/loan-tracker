@@ -1,6 +1,7 @@
-package com.zeenom.loan_tracker.controllers
+package com.zeenom.loan_tracker.friends
 
 import com.zeenom.loan_tracker.dtos.*
+import com.zeenom.loan_tracker.friends.dtos.FriendsResponse
 import com.zeenom.loan_tracker.services.QueryFriendsService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter

@@ -1,5 +1,10 @@
 package com.zeenom.loan_tracker.dtos
 
+import com.zeenom.loan_tracker.friends.dtos.FriendDto
+import com.zeenom.loan_tracker.friends.dtos.FriendResponse
+import com.zeenom.loan_tracker.friends.dtos.FriendsDto
+import com.zeenom.loan_tracker.friends.dtos.FriendsResponse
+
 fun FriendsDto.toResponse() = FriendsResponse(
     friends = this.friends.map { it.toResponse() }
 )

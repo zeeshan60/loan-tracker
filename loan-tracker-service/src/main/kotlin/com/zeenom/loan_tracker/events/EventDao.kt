@@ -1,4 +1,4 @@
-package com.zeenom.loan_tracker.daos
+package com.zeenom.loan_tracker.events
 
 import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull

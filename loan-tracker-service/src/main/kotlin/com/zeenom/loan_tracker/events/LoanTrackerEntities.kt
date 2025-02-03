@@ -1,4 +1,4 @@
-package com.zeenom.loan_tracker.daos
+package com.zeenom.loan_tracker.events
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.r2dbc.postgresql.codec.Json

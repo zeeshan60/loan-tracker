@@ -1,18 +1,13 @@
-package com.zeenom.loan_tracker.configurations
+package com.zeenom.loan_tracker.firebase
 
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.zeenom.loan_tracker.properties.AuthProperties
-import io.r2dbc.spi.ConnectionFactory
-import org.flywaydb.core.Flyway
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.jdbc.datasource.DriverManagerDataSource
-import reactor.core.publisher.Mono
 import java.io.FileInputStream
-import javax.sql.DataSource
 
 
 @Configuration

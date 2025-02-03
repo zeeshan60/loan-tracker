@@ -1,4 +1,4 @@
-package com.zeenom.loan_tracker.daos
+package com.zeenom.loan_tracker.events
 
 import java.math.BigDecimal
 import java.time.Instant

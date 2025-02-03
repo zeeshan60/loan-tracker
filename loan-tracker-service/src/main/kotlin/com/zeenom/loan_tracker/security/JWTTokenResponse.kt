@@ -1,3 +1,3 @@
-package com.zeenom.loan_tracker.dtos
+package com.zeenom.loan_tracker.security
 
 data class JWTTokenResponse(val token: String)

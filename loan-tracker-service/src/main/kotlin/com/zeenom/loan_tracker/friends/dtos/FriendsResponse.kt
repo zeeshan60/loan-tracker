@@ -1,3 +1,3 @@
-package com.zeenom.loan_tracker.dtos
+package com.zeenom.loan_tracker.friends.dtos
 
 data class FriendsResponse(val friends: List<FriendResponse>)

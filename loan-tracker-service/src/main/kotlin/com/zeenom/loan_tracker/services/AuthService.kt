@@ -1,5 +1,6 @@
 package com.zeenom.loan_tracker.services
 
+import com.zeenom.loan_tracker.firebase.FirebaseService
 import com.zeenom.loan_tracker.properties.AuthProperties
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
