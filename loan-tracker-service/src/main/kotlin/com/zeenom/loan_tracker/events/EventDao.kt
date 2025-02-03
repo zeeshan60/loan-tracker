@@ -18,9 +18,4 @@ class EventDao(
         return eventRepository.findEventEntityByEventId(eventId).awaitSingleOrNull()
             ?.let { eventEntityAdapter.toDto(it) }
     }
-
-    suspend fun deleteEventsByTransactionId(eventId: String): String {
-        eventRepository.deleteAllByEventId(eventId).awaitSingleOrNull()
-        return "Event $eventId deleted"
-    }
 }

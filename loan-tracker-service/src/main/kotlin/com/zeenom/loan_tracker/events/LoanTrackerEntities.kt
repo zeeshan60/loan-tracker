@@ -1,6 +1,7 @@
 package com.zeenom.loan_tracker.events
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.zeenom.loan_tracker.common.SecondInstant
 import io.r2dbc.postgresql.codec.Json
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
@@ -8,7 +9,10 @@ import org.springframework.stereotype.Component
 import java.time.Instant
 
 @Component
-class EventEntityAdapter(private val objectMapper: ObjectMapper) {
+class EventEntityAdapter(
+    private val objectMapper: ObjectMapper,
+    private val secondInstant: SecondInstant
+) {
 
     private fun toJsonB(payload: EventPayloadDto): Json {
         return Json.of(objectMapper.writeValueAsString(payload))
@@ -24,7 +28,7 @@ class EventEntityAdapter(private val objectMapper: ObjectMapper) {
             event = eventDto.event,
             eventId = eventDto.eventId,
             userId = eventDto.userId,
-            createdAt = eventDto.createdAt,
+            createdAt = secondInstant.now(),
             payload = eventDto.payload?.let { toJsonB(it) }
         )
 
@@ -32,7 +36,6 @@ class EventEntityAdapter(private val objectMapper: ObjectMapper) {
         eventId = entity.eventId,
         event = entity.event,
         payload = entity.payload?.let { fromJsonB(it) },
-        createdAt = entity.createdAt,
         userId = entity.userId
     )
 }

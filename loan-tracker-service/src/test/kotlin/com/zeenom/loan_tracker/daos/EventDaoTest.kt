@@ -1,15 +1,16 @@
 package com.zeenom.loan_tracker.daos
 
+import com.zeenom.loan_tracker.common.SecondInstant
 import com.zeenom.loan_tracker.events.*
-import com.zeenom.loan_tracker.common.looseNanonSeconds
 import io.swagger.v3.core.util.Json
+import kotlinx.coroutines.reactor.awaitSingle
+import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
-import java.time.Instant
 import java.util.*
 
 @SpringBootTest
@@ -17,12 +18,18 @@ import java.util.*
 class EventDaoTest {
 
     @Autowired
+    private lateinit var secondInstant: SecondInstant
+
+    @Autowired
+    private lateinit var eventRepository: EventRepository
+
+    @Autowired
     lateinit var eventDao: EventDao
 
     @Test
     fun `successfully saves event and reads it back`(): Unit = runBlocking {
         val eventId = "some great transaction id"
-        eventDao.deleteEventsByTransactionId(eventId)
+        eventRepository.deleteAllByEventId(eventId).awaitSingleOrNull()
         val eventDto = EventDto(
             eventId = eventId,
             event = EventType.CREATE_TRANSACTION,
@@ -34,7 +41,6 @@ class EventDaoTest {
                 ),
                 eventReceivers = EventUsersDto(listOf("123")),
             ),
-            createdAt = Instant.now().looseNanonSeconds(),
             userId = "123"
         )
         eventDao.saveEvent(eventDto)
@@ -43,5 +49,8 @@ class EventDaoTest {
         Json.prettyPrint(createdDto)
         assertThat(createdDto).isNotNull
         assertThat(createdDto).isEqualTo(eventDto)
+
+        val entity = eventRepository.findEventEntityByEventId(eventId).awaitSingle()
+        assertThat(entity.createdAt).isBeforeOrEqualTo(secondInstant.now())
     }
 }

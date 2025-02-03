@@ -1,14 +1,12 @@
 package com.zeenom.loan_tracker.events
 
 import java.math.BigDecimal
-import java.time.Instant
 import java.util.*
 
 data class EventDto(
     val eventId: String,
     val event: EventType,
     val payload: EventPayloadDto?,
-    val createdAt: Instant,
     val userId: String,
 )
 
