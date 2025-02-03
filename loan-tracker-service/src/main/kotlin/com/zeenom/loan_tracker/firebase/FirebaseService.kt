@@ -5,10 +5,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseToken
 import com.zeenom.loan_tracker.users.UserDao
 import com.zeenom.loan_tracker.users.UserDto
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.awaitSingle
-import kotlinx.coroutines.withContext
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
@@ -22,11 +20,14 @@ class FirebaseService(
     private val userDao: UserDao
 ) {
 
-    suspend fun verifyIdToken(idToken: String): UserDto = withContext(Dispatchers.IO) {
+    val logger = LoggerFactory.getLogger(FirebaseService::class.java)
+    suspend fun verifyIdToken(idToken: String) {
+        logger.info("Verifying id token")
         val firebaseToken = firebaseAuth.verifyIdTokenAsync(idToken).await()
+        logger.info("Token verified: {}", firebaseToken)
         val user = firebaseAdapter.tokenToUser(firebaseToken)
-        launch { userDao.loginUser(user) }
-        user
+        userDao.loginUser(user)
+        logger.info("User logged in: {}", user)
     }
 }
 
