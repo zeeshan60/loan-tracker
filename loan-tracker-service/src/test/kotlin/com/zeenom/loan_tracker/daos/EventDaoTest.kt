@@ -24,7 +24,7 @@ class EventDaoTest {
         eventDao.deleteEventsByTransactionId(eventId)
         val eventDto = EventDto(
             eventId = eventId,
-            event = "test",
+            event = EventType.CREATE_TRANSACTION,
             payload = EventPayloadDto(
                 amount = AmountDto(
                     currency = Currency.getInstance("USD"),

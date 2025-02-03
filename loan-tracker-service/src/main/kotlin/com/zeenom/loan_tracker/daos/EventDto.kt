@@ -6,7 +6,7 @@ import java.util.*
 
 data class EventDto(
     val eventId: String,
-    val event: String,
+    val event: EventType,
     val payload: EventPayloadDto?,
     val createdAt: Instant,
     val userId: String,
@@ -26,3 +26,7 @@ data class AmountDto(
     val currency: Currency,
     val amountReceivable: Boolean
 )
+
+enum class EventType {
+    CREATE_TRANSACTION, UPDATE_TRANSACTION, DELETE_TRANSACTION, ADD_NOTES, ADD_FRIEND
+}

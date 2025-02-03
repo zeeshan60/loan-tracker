@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.r2dbc.postgresql.codec.Json
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
-import org.springframework.data.repository.reactive.ReactiveCrudRepository
 import org.springframework.stereotype.Component
-import org.springframework.stereotype.Repository
-import reactor.core.publisher.Mono
 import java.time.Instant
 
 @Component
@@ -43,17 +40,9 @@ class EventEntityAdapter(private val objectMapper: ObjectMapper) {
 @Table("events")
 data class EventEntity(
     @Id val id: String?,
-    val event: String,
+    val event: EventType,
     val eventId: String,
     val userId: String,
     val createdAt: Instant,
     val payload: Json?
 )
-
-
-@Repository
-interface EventRepository : ReactiveCrudRepository<EventEntity, String> {
-    fun findEventEntityByEventId(eventId: String): Mono<EventEntity>
-    fun deleteAllByEventId(eventId: String): Mono<Void>
-}
-
