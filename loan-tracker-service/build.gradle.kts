@@ -42,7 +42,6 @@ dependencies {
 	implementation("org.postgresql:r2dbc-postgresql:1.0.7.RELEASE")
 	runtimeOnly("io.r2dbc:r2dbc-pool")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-	implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
 
 	// Flyway database migration setup
 	implementation("org.flywaydb:flyway-core")

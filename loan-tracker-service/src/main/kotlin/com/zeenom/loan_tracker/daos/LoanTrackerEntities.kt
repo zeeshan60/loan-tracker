@@ -3,7 +3,6 @@ package com.zeenom.loan_tracker.daos
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.r2dbc.postgresql.codec.Json
 import org.springframework.data.annotation.Id
-import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
 import org.springframework.data.repository.reactive.ReactiveCrudRepository
 import org.springframework.stereotype.Component
@@ -48,7 +47,6 @@ data class EventEntity(
     val eventId: String,
     val userId: String,
     val createdAt: Instant,
-    @Column("payload")
     val payload: Json?
 )
 
