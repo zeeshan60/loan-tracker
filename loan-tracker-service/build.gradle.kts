@@ -3,6 +3,7 @@ plugins {
 	kotlin("plugin.spring") version "1.9.25"
 	id("org.springframework.boot") version "3.4.2"
 	id("io.spring.dependency-management") version "1.1.7"
+	kotlin("plugin.serialization") version "1.9.22" // Use the latest version
 	groovy
 }
 
@@ -35,6 +36,22 @@ dependencies {
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
 	implementation("org.springframework.boot:spring-boot-starter-security")
+
+	// R2DBC reactive database setup
+	implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
+	implementation("org.postgresql:r2dbc-postgresql:1.0.7.RELEASE")
+	runtimeOnly("io.r2dbc:r2dbc-pool")
+	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+	implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+
+	// Flyway database migration setup
+	implementation("org.flywaydb:flyway-core")
+	implementation("org.flywaydb:flyway-database-postgresql")
+	implementation("org.postgresql:postgresql")
+
+	//This is to mute some validator warnings
+	implementation("org.hibernate.validator:hibernate-validator:8.0.1.Final")
+	implementation("org.glassfish:jakarta.el:4.0.2")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("io.projectreactor:reactor-test")
