@@ -1,7 +1,8 @@
 package com.zeenom.loan_tracker.events
 
-import java.math.BigDecimal
-import java.util.*
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.zeenom.loan_tracker.common.TransactionDto
 
 data class EventDto(
     val eventId: String,
@@ -11,20 +12,11 @@ data class EventDto(
     val source: EventSource
 )
 
-data class EventPayloadDto(
-    val amount: AmountDto,
-    val eventReceivers: EventUsersDto,
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
+@JsonSubTypes(
+    JsonSubTypes.Type(value = TransactionDto::class, name = "transaction")
 )
-
-data class EventUsersDto(
-    val userId: List<String>
-)
-
-data class AmountDto(
-    val amount: BigDecimal,
-    val currency: Currency,
-    val amountReceivable: Boolean
-)
+interface EventPayloadDto
 
 enum class EventType {
     LOGIN, CREATE_TRANSACTION, UPDATE_TRANSACTION, DELETE_TRANSACTION, ADD_NOTES, ADD_FRIEND

@@ -1,6 +1,8 @@
 package com.zeenom.loan_tracker.daos
 
+import com.zeenom.loan_tracker.common.AmountDto
 import com.zeenom.loan_tracker.common.SecondInstant
+import com.zeenom.loan_tracker.common.TransactionDto
 import com.zeenom.loan_tracker.events.*
 import io.swagger.v3.core.util.Json
 import kotlinx.coroutines.reactor.awaitSingle
@@ -33,13 +35,13 @@ class EventDaoTest {
         val eventDto = EventDto(
             eventId = eventId,
             event = EventType.CREATE_TRANSACTION,
-            payload = EventPayloadDto(
+            payload = TransactionDto(
                 amount = AmountDto(
                     currency = Currency.getInstance("USD"),
                     amount = 100.0.toBigDecimal(),
                     amountReceivable = true
                 ),
-                eventReceivers = EventUsersDto(listOf("123")),
+                recipientId = "123",
             ),
             userId = "123",
             source = EventSource.DIRECT
