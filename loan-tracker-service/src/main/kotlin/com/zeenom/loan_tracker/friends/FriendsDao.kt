@@ -5,8 +5,9 @@ import com.zeenom.loan_tracker.common.AmountDto
 import com.zeenom.loan_tracker.common.SecondInstant
 import com.zeenom.loan_tracker.common.r2dbc.fromJson
 import com.zeenom.loan_tracker.common.r2dbc.toJson
-import com.zeenom.loan_tracker.users.UserEntity
 import com.zeenom.loan_tracker.users.UserRepository
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.stereotype.Service
@@ -19,14 +20,21 @@ class FriendsDao(
     private val secondInstant: SecondInstant
 ) {
 
-    suspend fun findAllByUserId(userId: String): FriendsDto {
-        return friendRepository.findAllFriendsByUid(userId).map {
+    suspend fun findAllByUserId(userId: String): FriendsDto = coroutineScope {
+        val friendsEntities = async { friendRepository.findAllFriendsByUid(userId).collectList().awaitSingle() }
+        val friendPhotoEntitiesByFriendId =
+            async {
+                friendRepository.findFriendUidsAndPhotoUrlsByUserId(userId).collectList()
+                    .map { it.associateBy({ it.friendId }, { it.photoUrl }) }.awaitSingle()
+            }
+
+        friendsEntities.await().map {
             FriendDto(
-                userId = it.uid,
-                photoUrl = it.photoUrl,
-                name = it.displayName,
-                email = it.email,
-                phoneNumber = it.phoneNumber,
+                userId = it.friendId,
+                photoUrl = friendPhotoEntitiesByFriendId.await()[it.friendId],
+                name = it.friendDisplayName,
+                email = it.friendEmail,
+                phoneNumber = it.friendPhoneNumber,
                 loanAmount = it.friendTotalAmountsDto?.let {
                     val totalAmounts = it.fromJson(
                         objectMapper = objectMapper,
@@ -42,32 +50,23 @@ class FriendsDao(
                     }
                 }
             )
-        }.collectList().awaitSingle().let {
-            FriendsDto(friends = it)
-        }
+        }.let { FriendsDto(friends = it) }
     }
 
-    suspend fun saveFriend(uid: String, friendDto: FriendDto) {
-        val user = userRepository.findByUid(uid).awaitSingle()
-        val friend = userRepository.findByUid(friendDto.userId).awaitSingleOrNull() ?: userRepository.save(
-            UserEntity(
-                uid = friendDto.userId,
-                email = friendDto.email,
-                phoneNumber = friendDto.phoneNumber,
-                displayName = friendDto.name,
-                photoUrl = friendDto.photoUrl,
-                emailVerified = false,
-                createdAt = secondInstant.now(),
-                updatedAt = secondInstant.now(),
-                lastLoginAt = null
-            )
-        ).awaitSingle()
+    suspend fun saveFriend(uid: String, friendDto: FriendDto): Unit = coroutineScope {
+
+        if (friendDto.userId == null && friendDto.email == null && friendDto.phoneNumber == null) {
+            throw IllegalArgumentException("At least one of userId, email or phoneNumber must be provided")
+        }
+
+        val user = async { userRepository.findByUid(uid).awaitSingle() }
+        val friend = async { friendDto.userId?.let { userRepository.findByUid(it).awaitSingleOrNull() } }
 
 
         friendRepository.save(
             UserFriendEntity(
-                userId = user.id!!,
-                friendId = friend?.id!!,
+                userId = user.await().id!!,
+                friendId = friend.await()?.id,
                 friendTotalAmountsDto = friendDto.loanAmount?.let {
                     FriendTotalAmountsDto(
                         amountsPerCurrency = listOf(
@@ -80,7 +79,10 @@ class FriendsDao(
                     ).toJson(objectMapper)
                 },
                 createdAt = secondInstant.now(),
-                updatedAt = secondInstant.now()
+                updatedAt = secondInstant.now(),
+                friendDisplayName = friendDto.name,
+                friendEmail = friendDto.email,
+                friendPhoneNumber = friendDto.phoneNumber
             )
         ).awaitSingle()
     }

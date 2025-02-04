@@ -7,6 +7,7 @@ import com.zeenom.loan_tracker.users.UserRepository
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -40,11 +41,11 @@ class FriendsDaoTest {
             )
         )
         val friendDto = FriendDto(
-            userId = "124",
-            photoUrl = "https://www.google.com",
+            userId = null,
+            photoUrl = null,
             name = "John Doe",
             email = "friend@gmail.com",
-            phoneNumber = "+1234567890",
+            phoneNumber = null,
             loanAmount = AmountDto(
                 amount = 100.0.toBigDecimal(),
                 currency = Currency.getInstance("USD"),
@@ -56,5 +57,38 @@ class FriendsDaoTest {
         val friendsDto = friendsDao.findAllByUserId("123")
         assertThat(friendsDto.friends).hasSize(1)
         assertThat(friendsDto.friends[0]).isEqualTo(friendDto)
+    }
+
+    @Test
+    fun `throws error if none of the userId, email, or phoneNumber provided for friend`(): Unit = runBlocking {
+
+        userRepository.deleteAll().awaitSingleOrNull()
+        userDao.createUser(
+            UserDto(
+                uid = "123",
+                email = "example@gmail.com",
+                phoneNumber = "+1234567890",
+                displayName = "John Doe",
+                photoUrl = "https://example.com/photo.jpg",
+                emailVerified = true
+            )
+        )
+        val friendDto = FriendDto(
+            userId = null,
+            photoUrl = null,
+            name = "John Doe",
+            email = null,
+            phoneNumber = null,
+            loanAmount = AmountDto(
+                amount = 100.0.toBigDecimal(),
+                currency = Currency.getInstance("USD"),
+                isOwed = true
+            ),
+        )
+
+        assertThatThrownBy {
+            runBlocking { friendsDao.saveFriend("123", friendDto) }
+        }.isInstanceOf(IllegalArgumentException::class.java)
+            .hasMessage("At least one of userId, email or phoneNumber must be provided")
     }
 }

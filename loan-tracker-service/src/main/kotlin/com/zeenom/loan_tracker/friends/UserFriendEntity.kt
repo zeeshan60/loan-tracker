@@ -14,7 +14,10 @@ import java.util.*
 data class UserFriendEntity(
     @Id val id: UUID? = null,
     val userId: UUID,
-    val friendId: UUID,
+    val friendId: UUID?,
+    val friendEmail: String?,
+    val friendPhoneNumber: String?,
+    val friendDisplayName: String,
     val friendTotalAmountsDto: Json?,
     val createdAt: Instant,
     val updatedAt: Instant
@@ -24,22 +27,36 @@ data class UserFriendEntity(
 interface FriendRepository : ReactiveCrudRepository<UserFriendEntity, UUID> {
     @Query(
         """
-        SELECT u.uid, u.display_name, u.phone_number, u.email, u.photo_url, uf.friend_total_amounts_dto, uf.updated_at 
+        SELECT uf.friend_id, uf.friend_display_name, uf.friend_phone_number, uf.friend_email, uf.friend_total_amounts_dto, uf.updated_at 
         FROM user_friends uf
-        INNER JOIN users u ON uf.friend_id = u.id
         INNER JOIN users owner ON uf.user_id = owner.id
         WHERE owner.uid = :uid
     """
     )
     fun findAllFriendsByUid(uid: String): Flux<FriendSelectEntity>
+
+    @Query(
+        """
+        SELECT u.uid, u.photo_url
+        FROM user_friends uf
+        INNER JOIN users u ON uf.friend_id = u.id
+        INNER JOIN users owner ON uf.user_id = owner.id
+        WHERE owner.uid = :userId
+    """
+    )
+    fun findFriendUidsAndPhotoUrlsByUserId(userId: String): Flux<FriendSelectUidAndPhotoUrlEntity>
 }
 
+data class FriendSelectUidAndPhotoUrlEntity(
+    val friendId: String,
+    val photoUrl: String
+)
+
 data class FriendSelectEntity(
-    val uid: String,
-    val displayName: String,
-    val email: String,
-    val phoneNumber: String,
-    val photoUrl: String,
+    val friendId: String?,
+    val friendDisplayName: String,
+    val friendEmail: String?,
+    val friendPhoneNumber: String?,
     val friendTotalAmountsDto: Json?,
     val updatedAt: Instant
 )
