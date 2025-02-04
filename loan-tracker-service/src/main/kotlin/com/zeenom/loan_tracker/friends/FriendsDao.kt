@@ -5,8 +5,10 @@ import com.zeenom.loan_tracker.common.AmountDto
 import com.zeenom.loan_tracker.common.SecondInstant
 import com.zeenom.loan_tracker.common.r2dbc.toClass
 import com.zeenom.loan_tracker.common.r2dbc.toJson
+import com.zeenom.loan_tracker.users.UserEntity
 import com.zeenom.loan_tracker.users.UserRepository
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
@@ -21,9 +23,9 @@ class FriendsDao(
 ) {
 
     suspend fun findAllByUserId(userId: String): FriendsDto = coroutineScope {
-        val friendsEntities = async { friendRepository.findAllFriendsByUid(userId).collectList().awaitSingle() }
+        val friendsEntities = friendRepository.findAllFriendsByUid(userId).collectList().awaitSingle()
 
-        friendsEntities.await().map {
+        friendsEntities.map {
             FriendDto(
                 photoUrl = it.photoUrl,
                 name = it.friendDisplayName,
@@ -47,33 +49,26 @@ class FriendsDao(
         }.let { FriendsDto(friends = it) }
     }
 
-    suspend fun saveFriend(uid: String, friendDto: FriendDto): Unit = coroutineScope {
+    suspend fun saveFriend(uid: String, friendDto: CreateFriendDto): Unit = coroutineScope {
 
         if (friendDto.email == null && friendDto.phoneNumber == null) {
             throw IllegalArgumentException("At least one of userId, email or phoneNumber must be provided")
         }
 
-        val user = async { userRepository.findByUid(uid).awaitSingle() }
-        val friend = async {
+        val userDef = async { userRepository.findByUid(uid).awaitSingle() }
+        val friendDef = async {
             friendDto.email?.let { userRepository.findByEmail(it).awaitSingleOrNull() }
                 ?: friendDto.phoneNumber?.let { userRepository.findByPhoneNumber(it).awaitSingleOrNull() }
         }
 
+        val defs = awaitAll(userDef, friendDef)
+        val user = defs[0] as UserEntity
+        val friend = defs[1]
         friendRepository.save(
             UserFriendEntity(
-                userId = user.await().id!!,
-                friendId = friend.await()?.id,
-                friendTotalAmountsDto = friendDto.loanAmount?.let {
-                    FriendTotalAmountsDto(
-                        amountsPerCurrency = listOf(
-                            AmountDto(
-                                amount = it.amount,
-                                currency = it.currency,
-                                isOwed = it.isOwed
-                            )
-                        )
-                    ).toJson(objectMapper)
-                },
+                userId = user.id!!,
+                friendId = friend?.id,
+                friendTotalAmountsDto = null,
                 createdAt = secondInstant.now(),
                 updatedAt = secondInstant.now(),
                 friendDisplayName = friendDto.name,

@@ -1,10 +1,12 @@
 package com.zeenom.loan_tracker.security
 
 import org.springframework.security.authentication.AbstractAuthenticationToken
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.authority.AuthorityUtils
 
 data class InternalAuthToken(
     private val token: String,
+    private val principal: String,
     val action: Action,
     private val authenticated: Boolean = false
 ) : AbstractAuthenticationToken(AuthorityUtils.NO_AUTHORITIES) {
@@ -18,7 +20,7 @@ data class InternalAuthToken(
     }
 
     override fun getPrincipal(): String {
-        return token
+        return principal
     }
 }
 

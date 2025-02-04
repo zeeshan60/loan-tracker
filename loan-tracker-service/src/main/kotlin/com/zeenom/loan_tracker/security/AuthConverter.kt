@@ -1,5 +1,6 @@
 package com.zeenom.loan_tracker.security
 
+import io.jsonwebtoken.Jwts
 import kotlinx.coroutines.reactor.mono
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -10,7 +11,7 @@ import org.springframework.web.server.ServerWebExchange
 import reactor.core.publisher.Mono
 
 @Component
-class AuthConverter : ServerAuthenticationConverter {
+class AuthConverter(private val authProperties: AuthProperties) : ServerAuthenticationConverter {
     override fun convert(exchange: ServerWebExchange): Mono<Authentication> {
         val authHeader = exchange.request.headers.getFirst(HttpHeaders.AUTHORIZATION)
         val action = when (exchange.request.method) {
@@ -23,10 +24,22 @@ class AuthConverter : ServerAuthenticationConverter {
         return if (authHeader != null && authHeader.startsWith("Bearer ")) {
             val token = authHeader.substring(7)
             mono {
-                InternalAuthToken(token, action)
+                InternalAuthToken(
+                    token = token,
+                    principal = validateToken(token),
+                    action = action
+                )
             }
         } else {
             Mono.empty()
         }
+    }
+
+    fun validateToken(token: String): String {
+        return Jwts.parserBuilder()
+            .setSigningKey(authProperties.secretKey.toByteArray())
+            .build()
+            .parseClaimsJws(token)
+            .body.subject
     }
 }

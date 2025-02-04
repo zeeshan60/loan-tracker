@@ -5,7 +5,7 @@ import com.zeenom.loan_tracker.common.Paginated
 import org.springframework.stereotype.Service
 
 @Service
-class FriendsResponseAdapter(val loanAmountResponseAdapter: LoanAmountResponseAdapter) {
+class FriendsControllerAdapter(val loanAmountResponseAdapter: LoanAmountResponseAdapter) {
     fun FriendsDto.toResponse() = FriendsResponse(
         friends = this.friends.map { it.toResponse() }
     )
@@ -16,7 +16,21 @@ class FriendsResponseAdapter(val loanAmountResponseAdapter: LoanAmountResponseAd
         loanAmount = this.loanAmount?.let { loanAmountResponseAdapter.fromDto(it) }
     )
 
-    fun fromDto(friendsDto: FriendsDto): Paginated<FriendsResponse> {
+    fun CreateFriendRequest.toDto() = CreateFriendDto(
+        email = this.email,
+        phoneNumber = this.phoneNumber,
+        name = this.name,
+    )
+
+    fun fromRequestToDto(createFriendRequest: CreateFriendRequest): CreateFriendDto {
+        return CreateFriendDto(
+            email = createFriendRequest.email,
+            phoneNumber = createFriendRequest.phoneNumber,
+            name = createFriendRequest.name
+        )
+    }
+
+    fun fromDtoToPaginatedResponse(friendsDto: FriendsDto): Paginated<FriendsResponse> {
         return Paginated(
             data = friendsDto.toResponse(),
             next = friendsDto.next

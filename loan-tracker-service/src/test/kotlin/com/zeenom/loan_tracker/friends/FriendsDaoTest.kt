@@ -46,22 +46,24 @@ class FriendsDaoTest {
                 emailVerified = true
             )
         )
-        val friendDto = FriendDto(
-            photoUrl = null,
+        val friendDto = CreateFriendDto(
             name = "John Doe",
             email = "friend@gmail.com",
-            phoneNumber = null,
-            loanAmount = AmountDto(
-                amount = 100.0.toBigDecimal(),
-                currency = Currency.getInstance("USD"),
-                isOwed = true
-            ),
+            phoneNumber = null
         )
 
         friendsDao.saveFriend("123", friendDto)
         val friendsDto = friendsDao.findAllByUserId("123")
         assertThat(friendsDto.friends).hasSize(1)
-        assertThat(friendsDto.friends[0]).isEqualTo(friendDto)
+        assertThat(friendsDto.friends[0]).isEqualTo(
+            FriendDto(
+                photoUrl = null,
+                name = "John Doe",
+                email = "friend@gmail.com",
+                phoneNumber = null,
+                loanAmount = null
+            )
+        )
     }
 
 
@@ -89,16 +91,10 @@ class FriendsDaoTest {
                     emailVerified = true
                 )
             )
-            val friendDto = FriendDto(
-                photoUrl = null,
+            val friendDto = CreateFriendDto(
                 name = "Noman pola",
                 email = null,
-                phoneNumber = "+923001234567",
-                loanAmount = AmountDto(
-                    amount = 100.0.toBigDecimal(),
-                    currency = Currency.getInstance("USD"),
-                    isOwed = true
-                ),
+                phoneNumber = "+923001234567"
             )
 
             friendsDao.saveFriend("123", friendDto)
@@ -110,11 +106,7 @@ class FriendsDaoTest {
                     name = "Noman pola",
                     email = null,
                     phoneNumber = "+923001234567",
-                    loanAmount = AmountDto(
-                        amount = 100.0.toBigDecimal(),
-                        currency = Currency.getInstance("USD"),
-                        isOwed = true
-                    ),
+                    loanAmount = null
                 )
             )
         }
@@ -133,16 +125,10 @@ class FriendsDaoTest {
                 emailVerified = true
             )
         )
-        val friendDto = FriendDto(
-            photoUrl = null,
+        val friendDto = CreateFriendDto(
             name = "John Doe",
             email = null,
-            phoneNumber = null,
-            loanAmount = AmountDto(
-                amount = 100.0.toBigDecimal(),
-                currency = Currency.getInstance("USD"),
-                isOwed = true
-            ),
+            phoneNumber = null
         )
 
         assertThatThrownBy {
@@ -177,30 +163,18 @@ class FriendsDaoTest {
             )
 
             friendsDao.saveFriend(
-                "123", FriendDto(
-                    photoUrl = null,
+                "123", CreateFriendDto(
                     name = "Noman pola",
                     email = null,
-                    phoneNumber = "+923001234567",
-                    loanAmount = AmountDto(
-                        amount = 100.0.toBigDecimal(),
-                        currency = Currency.getInstance("USD"),
-                        isOwed = true
-                    ),
+                    phoneNumber = "+923001234567"
                 )
             )
 
             friendsDao.saveFriend(
-                "123", FriendDto(
-                    photoUrl = null,
+                "123", CreateFriendDto(
                     name = "Noman 3",
                     email = null,
-                    phoneNumber = "+923001234568",
-                    loanAmount = AmountDto(
-                        amount = 100.0.toBigDecimal(),
-                        currency = Currency.getInstance("USD"),
-                        isOwed = true
-                    ),
+                    phoneNumber = "+923001234568"
                 )
             )
 
@@ -212,11 +186,7 @@ class FriendsDaoTest {
                     name = "Noman pola",
                     email = null,
                     phoneNumber = "+923001234567",
-                    loanAmount = AmountDto(
-                        amount = 100.0.toBigDecimal(),
-                        currency = Currency.getInstance("USD"),
-                        isOwed = true
-                    ),
+                    loanAmount = null,
                 )
             )
             assertThat(friendsDto.friends[1]).isEqualTo(
@@ -225,11 +195,7 @@ class FriendsDaoTest {
                     name = "Noman 3",
                     email = null,
                     phoneNumber = "+923001234568",
-                    loanAmount = AmountDto(
-                        amount = 100.0.toBigDecimal(),
-                        currency = Currency.getInstance("USD"),
-                        isOwed = true
-                    ),
+                    loanAmount = null,
                 )
             )
         }

@@ -46,7 +46,7 @@ class AuthControllerTest(@LocalServerPort private val port: Int) {
         )
         Mockito.doReturn(
             userDto
-        ).whenever(firebaseService).getUserByVerifyingToken(idToken)
+        ).whenever(firebaseService).userByVerifyingIdToken(idToken)
 
         Mockito.doReturn(Unit).whenever(eventDao).saveEvent(any())
 

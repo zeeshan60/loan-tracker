@@ -17,5 +17,5 @@ data class EventDto(
 interface EventPayloadDto
 
 enum class EventType {
-    LOGIN, CREATE_TRANSACTION
+    LOGIN, CREATE_TRANSACTION, ADD_FRIEND
 }

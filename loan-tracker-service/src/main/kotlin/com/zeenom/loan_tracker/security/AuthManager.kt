@@ -1,6 +1,5 @@
 package com.zeenom.loan_tracker.security
 
-import io.jsonwebtoken.Jwts
 import kotlinx.coroutines.reactor.mono
 import org.springframework.security.authentication.ReactiveAuthenticationManager
 import org.springframework.security.core.Authentication
@@ -8,7 +7,7 @@ import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
 
 @Component
-class AuthManager(val authProperties: AuthProperties) : ReactiveAuthenticationManager {
+class AuthManager : ReactiveAuthenticationManager {
     override fun authenticate(authentication: Authentication): Mono<Authentication> {
         return mono {
             doAuthenticate(authentication)
@@ -17,9 +16,7 @@ class AuthManager(val authProperties: AuthProperties) : ReactiveAuthenticationMa
 
     suspend fun doAuthenticate(authentication: Authentication): Authentication {
         if (authentication is InternalAuthToken) {
-            val token = authentication.credentials
-            val uid = validateToken(token)
-            val result = authorizeUser(authentication.action, uid)
+            val result = authorizeUser(authentication.action, authentication.principal)
             return authentication.copy(authenticated = result)
         }
         return authentication
@@ -27,13 +24,5 @@ class AuthManager(val authProperties: AuthProperties) : ReactiveAuthenticationMa
 
     suspend fun authorizeUser(action: Action, userId: String): Boolean {
         return true
-    }
-
-    fun validateToken(token: String): String {
-        return Jwts.parserBuilder()
-            .setSigningKey(authProperties.secretKey.toByteArray())
-            .build()
-            .parseClaimsJws(token)
-            .body.subject
     }
 }

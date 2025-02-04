@@ -3,9 +3,6 @@ package com.zeenom.loan_tracker.firebase
 import com.google.api.core.ApiFuture
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseToken
-import com.zeenom.loan_tracker.events.CommandEventService
-import com.zeenom.loan_tracker.events.EventDto
-import com.zeenom.loan_tracker.events.EventType
 import com.zeenom.loan_tracker.users.UserDto
 import kotlinx.coroutines.reactive.awaitSingle
 import org.slf4j.LoggerFactory
@@ -18,26 +15,18 @@ import java.util.concurrent.Executors
 @Service
 class FirebaseService(
     private val firebaseAuth: FirebaseAuth,
-    private val firebaseAdapter: FirebaseAdapter,
-    private val commandEventService: CommandEventService
+    private val firebaseAdapter: FirebaseAdapter
 ) {
 
     val logger = LoggerFactory.getLogger(FirebaseService::class.java)
-    suspend fun verifyIdToken(idToken: String) {
+    suspend fun userByVerifyingIdToken(idToken: String): UserDto {
         logger.info("Verifying id token")
-        val user = getUserByVerifyingToken(idToken)
-        logger.info("Token verified: {}", user)
-        commandEventService.execute(
-            EventDto(
-                event = EventType.LOGIN,
-                payload = user,
-                userId = user.uid
-            )
-        )
-        logger.info("User logged in: {}", user)
+        return getUserByVerifyingToken(idToken).also {
+            logger.info("Token verified: {}", it)
+        }
     }
 
-    suspend fun getUserByVerifyingToken(idToken: String): UserDto {
+    private suspend fun getUserByVerifyingToken(idToken: String): UserDto {
         val firebaseToken = firebaseAuth.verifyIdTokenAsync(idToken).await()
         val user = firebaseAdapter.tokenToUser(firebaseToken)
         return user
