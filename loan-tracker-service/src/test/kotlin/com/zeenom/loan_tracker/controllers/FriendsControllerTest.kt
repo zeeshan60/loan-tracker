@@ -1,7 +1,7 @@
 package com.zeenom.loan_tracker.controllers
 
-import com.zeenom.loan_tracker.security.AuthService
 import com.zeenom.loan_tracker.firebase.FirebaseService
+import com.zeenom.loan_tracker.security.AuthService
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test

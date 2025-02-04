@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono
 class AuthConverter : ServerAuthenticationConverter {
     override fun convert(exchange: ServerWebExchange): Mono<Authentication> {
         val authHeader = exchange.request.headers.getFirst(HttpHeaders.AUTHORIZATION)
-        val action = when(exchange.request.method) {
+        val action = when (exchange.request.method) {
             HttpMethod.GET -> Action.READ
             HttpMethod.POST -> Action.CREATE
             HttpMethod.PUT -> Action.UPDATE

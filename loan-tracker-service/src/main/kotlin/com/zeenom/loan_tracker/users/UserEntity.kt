@@ -1,6 +1,5 @@
 package com.zeenom.loan_tracker.users
 
-import com.google.type.PhoneNumber
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import org.springframework.data.repository.reactive.ReactiveCrudRepository

@@ -80,6 +80,7 @@ fun String.toFullName(lastName: String?): String {
         this
     }
 }
+
 fun Instant.looseNanonSeconds(): Instant {
     return this.with(ChronoField.NANO_OF_SECOND, 0)
 }
