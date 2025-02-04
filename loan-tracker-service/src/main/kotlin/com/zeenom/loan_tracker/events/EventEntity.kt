@@ -2,6 +2,8 @@ package com.zeenom.loan_tracker.events
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.zeenom.loan_tracker.common.SecondInstant
+import com.zeenom.loan_tracker.common.r2dbc.fromJson
+import com.zeenom.loan_tracker.common.r2dbc.toJson
 import io.r2dbc.postgresql.codec.Json
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
@@ -14,29 +16,21 @@ class EventEntityAdapter(
     private val secondInstant: SecondInstant
 ) {
 
-    private fun toJsonB(payload: EventPayloadDto): Json {
-        return Json.of(objectMapper.writeValueAsString(payload))
-    }
-
-    private fun fromJsonB(json: Json?): EventPayloadDto? {
-        return json?.let { objectMapper.readValue(it.asString(), EventPayloadDto::class.java) }
-    }
-
-    fun fromDto(eventDto: EventDto, id: String? = null) =
+    fun fromDto(eventDto: EventDto, id: String? = null, createdAt: Instant? = null) =
         EventEntity(
             id = id,
             event = eventDto.event,
             eventId = eventDto.eventId,
             userId = eventDto.userId,
-            createdAt = secondInstant.now(),
-            payload = eventDto.payload?.let { toJsonB(it) },
+            createdAt = createdAt ?: secondInstant.now(),
+            payload = eventDto.payload?.toJson(objectMapper),
             source = eventDto.source
         )
 
     fun toDto(entity: EventEntity) = EventDto(
         eventId = entity.eventId,
         event = entity.event,
-        payload = entity.payload?.let { fromJsonB(it) },
+        payload = entity.payload?.fromJson(objectMapper, EventPayloadDto::class.java),
         userId = entity.userId,
         source = entity.source,
     )

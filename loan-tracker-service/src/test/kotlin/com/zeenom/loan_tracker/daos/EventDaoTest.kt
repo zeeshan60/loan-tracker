@@ -39,7 +39,7 @@ class EventDaoTest {
                 amount = AmountDto(
                     currency = Currency.getInstance("USD"),
                     amount = 100.0.toBigDecimal(),
-                    amountReceivable = true
+                    isOwed = true
                 ),
                 recipientId = "123",
             ),

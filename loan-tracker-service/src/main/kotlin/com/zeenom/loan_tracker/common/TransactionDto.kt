@@ -12,5 +12,5 @@ data class TransactionDto(
 data class AmountDto(
     val amount: BigDecimal,
     val currency: Currency,
-    val amountReceivable: Boolean
+    val isOwed: Boolean
 )
