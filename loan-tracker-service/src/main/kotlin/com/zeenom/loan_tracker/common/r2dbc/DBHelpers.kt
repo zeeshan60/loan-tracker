@@ -8,6 +8,6 @@ fun Any.toJson(objectMapper: ObjectMapper): Json {
     return Json.of(objectMapper.writeValueAsString(this))
 }
 
-fun <T> Json.fromJson(objectMapper: ObjectMapper, clazz: Class<T>): T {
+fun <T> Json.toClass(objectMapper: ObjectMapper, clazz: Class<T>): T {
     return objectMapper.readValue(this.asString(), clazz)
 }

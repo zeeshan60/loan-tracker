@@ -3,7 +3,7 @@ package com.zeenom.loan_tracker.friends
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.zeenom.loan_tracker.common.AmountDto
 import com.zeenom.loan_tracker.common.SecondInstant
-import com.zeenom.loan_tracker.common.r2dbc.fromJson
+import com.zeenom.loan_tracker.common.r2dbc.toClass
 import com.zeenom.loan_tracker.common.r2dbc.toJson
 import com.zeenom.loan_tracker.users.UserRepository
 import kotlinx.coroutines.async
@@ -30,7 +30,7 @@ class FriendsDao(
                 email = it.friendEmail,
                 phoneNumber = it.friendPhoneNumber,
                 loanAmount = it.friendTotalAmountsDto?.let {
-                    val totalAmounts = it.fromJson(
+                    val totalAmounts = it.toClass(
                         objectMapper = objectMapper,
                         FriendTotalAmountsDto::class.java
                     )

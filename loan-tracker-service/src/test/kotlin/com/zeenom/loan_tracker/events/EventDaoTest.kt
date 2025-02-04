@@ -1,10 +1,11 @@
-package com.zeenom.loan_tracker.daos
+package com.zeenom.loan_tracker.events
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.zeenom.loan_tracker.common.AmountDto
 import com.zeenom.loan_tracker.common.SecondInstant
 import com.zeenom.loan_tracker.common.TransactionDto
-import com.zeenom.loan_tracker.events.*
-import io.swagger.v3.core.util.Json
+import com.zeenom.loan_tracker.common.r2dbc.toClass
+import com.zeenom.loan_tracker.test_configs.TestSecondInstantConfig
 import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.runBlocking
@@ -12,11 +13,13 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import java.util.*
 
 @SpringBootTest
 @ActiveProfiles("local")
+@Import(TestSecondInstantConfig::class)
 class EventDaoTest {
 
     @Autowired
@@ -28,12 +31,13 @@ class EventDaoTest {
     @Autowired
     lateinit var eventDao: EventDao
 
+    @Autowired
+    lateinit var objectMapper: ObjectMapper
+
     @Test
     fun `successfully saves event and reads it back`(): Unit = runBlocking {
-        val eventId = "some great transaction id"
-        eventRepository.deleteAllByEventId(eventId).awaitSingleOrNull()
+        eventRepository.deleteAll().awaitSingleOrNull()
         val eventDto = EventDto(
-            eventId = eventId,
             event = EventType.CREATE_TRANSACTION,
             payload = TransactionDto(
                 amount = AmountDto(
@@ -44,16 +48,14 @@ class EventDaoTest {
                 recipientId = "123",
             ),
             userId = "123",
-            source = EventSource.DIRECT
         )
         eventDao.saveEvent(eventDto)
 
-        val createdDto = eventDao.findEventByTransactionId(eventId)
-        Json.prettyPrint(createdDto)
-        assertThat(createdDto).isNotNull
-        assertThat(createdDto).isEqualTo(eventDto)
 
-        val entity = eventRepository.findEventEntityByEventId(eventId).awaitSingle()
+        val entity = eventRepository.findAll().collectList().awaitSingle().first()
+        assertThat(entity.event).isEqualTo(eventDto.event)
+        assertThat(entity.userId).isEqualTo(eventDto.userId)
+        assertThat(entity.payload?.toClass(objectMapper, EventPayloadDto::class.java)).isEqualTo(eventDto.payload)
         assertThat(entity.createdAt).isBeforeOrEqualTo(secondInstant.now())
     }
 }

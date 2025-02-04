@@ -5,7 +5,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseToken
 import com.zeenom.loan_tracker.events.CommandEventService
 import com.zeenom.loan_tracker.events.EventDto
-import com.zeenom.loan_tracker.events.EventSource
 import com.zeenom.loan_tracker.events.EventType
 import com.zeenom.loan_tracker.users.UserDto
 import kotlinx.coroutines.reactive.awaitSingle
@@ -13,7 +12,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
-import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
 
@@ -33,9 +31,7 @@ class FirebaseService(
             EventDto(
                 event = EventType.LOGIN,
                 payload = user,
-                userId = user.uid,
-                source = EventSource.INDIRECT,
-                eventId = UUID.randomUUID().toString()
+                userId = user.uid
             )
         )
         logger.info("User logged in: {}", user)

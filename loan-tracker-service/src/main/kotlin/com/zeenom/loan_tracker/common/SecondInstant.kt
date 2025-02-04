@@ -6,6 +6,6 @@ import java.time.Instant
 @Component
 class SecondInstant {
     fun now(): Instant {
-        return Instant.now().looseNanonSeconds()
+        return Instant.now()
     }
 }

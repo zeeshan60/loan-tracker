@@ -5,11 +5,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.zeenom.loan_tracker.common.TransactionDto
 
 data class EventDto(
-    val eventId: String,
     val event: EventType,
     val payload: EventPayloadDto?,
-    val userId: String,
-    val source: EventSource
+    val userId: String
 )
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
@@ -19,5 +17,5 @@ data class EventDto(
 interface EventPayloadDto
 
 enum class EventType {
-    LOGIN, CREATE_TRANSACTION, UPDATE_TRANSACTION, DELETE_TRANSACTION, ADD_NOTES, ADD_FRIEND
+    LOGIN, CREATE_TRANSACTION
 }

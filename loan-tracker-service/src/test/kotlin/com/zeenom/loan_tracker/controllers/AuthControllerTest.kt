@@ -2,7 +2,6 @@ package com.zeenom.loan_tracker.controllers
 
 import com.zeenom.loan_tracker.events.EventDao
 import com.zeenom.loan_tracker.events.EventDto
-import com.zeenom.loan_tracker.events.EventSource
 import com.zeenom.loan_tracker.events.EventType
 import com.zeenom.loan_tracker.firebase.FirebaseService
 import com.zeenom.loan_tracker.security.LoginRequest
@@ -65,14 +64,11 @@ class AuthControllerTest(@LocalServerPort private val port: Int) {
 
         argumentCaptor<EventDto>().apply {
             Mockito.verify(eventDao, Mockito.times(1)).saveEvent(capture())
-            assertThat(firstValue.eventId).isNotEmpty()
             assertThat(firstValue).isEqualTo(
                 EventDto(
-                    eventId = firstValue.eventId,
                     event = EventType.LOGIN,
                     payload = userDto,
                     userId = "123",
-                    source = EventSource.INDIRECT
                 )
             )
         }
