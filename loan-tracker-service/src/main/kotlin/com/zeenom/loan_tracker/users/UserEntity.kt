@@ -25,5 +25,7 @@ data class UserEntity(
 @Repository
 interface UserRepository : ReactiveCrudRepository<UserEntity, String> {
     fun findByUid(uid: String): Mono<UserEntity>
+    fun findByEmail(email: String): Mono<UserEntity>
+    fun findByPhoneNumber(phoneNumber: String): Mono<UserEntity>
     fun deleteAllByUid(uid: String): Mono<Void>
 }

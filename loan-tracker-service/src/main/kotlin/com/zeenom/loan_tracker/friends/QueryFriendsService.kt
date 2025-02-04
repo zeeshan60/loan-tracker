@@ -20,7 +20,6 @@ class QueryFriendsService : Query<PaginationDto, FriendsDto> {
                         isOwed = true,
                         currency = Currency.getInstance("USD")
                     ),
-                    userId = "124",
                     email = "friend1@gmail.com",
                     phoneNumber = "+1234567890"
                 ),
@@ -31,7 +30,6 @@ class QueryFriendsService : Query<PaginationDto, FriendsDto> {
                         amount = BigDecimal("50.00"), isOwed = false,
                         currency = Currency.getInstance("USD")
                     ),
-                    userId = "125",
                     email = "friend2@gmail.com",
                     phoneNumber = "+1234567891"
                 ),
@@ -42,7 +40,6 @@ class QueryFriendsService : Query<PaginationDto, FriendsDto> {
                         amount = BigDecimal("200.00"), isOwed = true,
                         currency = Currency.getInstance("USD")
                     ),
-                    userId = "126",
                     email = "friend3@gmail.com",
                     phoneNumber = "+1234567892"
                 )

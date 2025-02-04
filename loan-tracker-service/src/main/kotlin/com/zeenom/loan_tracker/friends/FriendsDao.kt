@@ -22,16 +22,10 @@ class FriendsDao(
 
     suspend fun findAllByUserId(userId: String): FriendsDto = coroutineScope {
         val friendsEntities = async { friendRepository.findAllFriendsByUid(userId).collectList().awaitSingle() }
-        val friendPhotoEntitiesByFriendId =
-            async {
-                friendRepository.findFriendUidsAndPhotoUrlsByUserId(userId).collectList()
-                    .map { it.associateBy({ it.friendId }, { it.photoUrl }) }.awaitSingle()
-            }
 
         friendsEntities.await().map {
             FriendDto(
-                userId = it.friendId,
-                photoUrl = friendPhotoEntitiesByFriendId.await()[it.friendId],
+                photoUrl = it.photoUrl,
                 name = it.friendDisplayName,
                 email = it.friendEmail,
                 phoneNumber = it.friendPhoneNumber,
@@ -55,13 +49,15 @@ class FriendsDao(
 
     suspend fun saveFriend(uid: String, friendDto: FriendDto): Unit = coroutineScope {
 
-        if (friendDto.userId == null && friendDto.email == null && friendDto.phoneNumber == null) {
+        if (friendDto.email == null && friendDto.phoneNumber == null) {
             throw IllegalArgumentException("At least one of userId, email or phoneNumber must be provided")
         }
 
         val user = async { userRepository.findByUid(uid).awaitSingle() }
-        val friend = async { friendDto.userId?.let { userRepository.findByUid(it).awaitSingleOrNull() } }
-
+        val friend = async {
+            friendDto.email?.let { userRepository.findByEmail(it).awaitSingleOrNull() }
+                ?: friendDto.phoneNumber?.let { userRepository.findByPhoneNumber(it).awaitSingleOrNull() }
+        }
 
         friendRepository.save(
             UserFriendEntity(

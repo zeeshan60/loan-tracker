@@ -28,7 +28,7 @@ class FriendsDaoTest {
     private lateinit var friendsDao: FriendsDao
 
     @Test
-    fun `save friend also creates a friend if none exists`(): Unit = runBlocking {
+    fun `save friend adds a friend info in user friends even if friend itself dont exists`(): Unit = runBlocking {
         userRepository.deleteAll().awaitSingleOrNull()
         userDao.createUser(
             UserDto(
@@ -41,7 +41,6 @@ class FriendsDaoTest {
             )
         )
         val friendDto = FriendDto(
-            userId = null,
             photoUrl = null,
             name = "John Doe",
             email = "friend@gmail.com",
@@ -59,6 +58,61 @@ class FriendsDaoTest {
         assertThat(friendsDto.friends[0]).isEqualTo(friendDto)
     }
 
+
+    @Test
+    fun `save friend adds a friend info in user friends when friend exists and uses friends photo url`(): Unit =
+        runBlocking {
+            userRepository.deleteAll().awaitSingleOrNull()
+            userDao.createUser(
+                UserDto(
+                    uid = "123",
+                    email = "sample@gmail.com",
+                    phoneNumber = null,
+                    displayName = "Zeeshan Tufail",
+                    photoUrl = "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl2",
+                    emailVerified = true
+                )
+            )
+            userDao.createUser(
+                UserDto(
+                    uid = "124",
+                    email = null,
+                    phoneNumber = "+923001234567",
+                    displayName = "Noman Tufail",
+                    photoUrl = "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl3",
+                    emailVerified = true
+                )
+            )
+            val friendDto = FriendDto(
+                photoUrl = null,
+                name = "Noman pola",
+                email = null,
+                phoneNumber = "+923001234567",
+                loanAmount = AmountDto(
+                    amount = 100.0.toBigDecimal(),
+                    currency = Currency.getInstance("USD"),
+                    isOwed = true
+                ),
+            )
+
+            friendsDao.saveFriend("123", friendDto)
+            val friendsDto = friendsDao.findAllByUserId("123")
+            assertThat(friendsDto.friends).hasSize(1)
+            assertThat(friendsDto.friends[0]).isEqualTo(
+                FriendDto(
+                    photoUrl = "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl3",
+                    name = "Noman pola",
+                    email = null,
+                    phoneNumber = "+923001234567",
+                    loanAmount = AmountDto(
+                        amount = 100.0.toBigDecimal(),
+                        currency = Currency.getInstance("USD"),
+                        isOwed = true
+                    ),
+                )
+            )
+        }
+
     @Test
     fun `throws error if none of the userId, email, or phoneNumber provided for friend`(): Unit = runBlocking {
 
@@ -74,7 +128,6 @@ class FriendsDaoTest {
             )
         )
         val friendDto = FriendDto(
-            userId = null,
             photoUrl = null,
             name = "John Doe",
             email = null,
