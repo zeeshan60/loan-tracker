@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { GoogleAuthProvider } from "firebase/auth";
 import { Auth, signInWithPopup } from '@angular/fire/auth';
 import { Router } from '@angular/router';
@@ -17,16 +17,13 @@ import {
   styleUrls: ['./login.component.scss'],
   standalone: true,
   imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonIcon, IonIcon],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LoginComponent  implements OnInit {
+export class LoginComponent {
   public auth = inject(Auth);
   public router = inject(Router);
 
   constructor() { }
-
-  ngOnInit() {
-    console.log('login...')
-  }
 
   loginWithGoogle() {
     signInWithPopup(this.auth, new GoogleAuthProvider())

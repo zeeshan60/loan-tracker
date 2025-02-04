@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { IonApp, IonButton, IonLoading, IonRouterOutlet, LoadingController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   ellipse,
@@ -19,10 +19,13 @@ import {
   imports: [
     IonApp,
     IonRouterOutlet,
+    IonLoading,
+    IonButton,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent {
-  constructor() {
+  constructor(private loadingController: LoadingController) {
     addIcons({
       triangle,
       ellipse,
@@ -33,5 +36,18 @@ export class AppComponent {
       addCircleOutline,
       logOutOutline
     });
+    this.showLoading();
+  }
+
+  async showLoading() {
+    const loading = await this.loadingController.create({
+      message: 'Dismissing after 3 seconds...',
+    });
+
+    loading.present();
+    setTimeout(() => {
+      loading.dismiss();
+    }, 4000)
+    // loading.dismiss();
   }
 }
