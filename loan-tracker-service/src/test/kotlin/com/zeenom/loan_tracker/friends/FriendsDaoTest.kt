@@ -19,6 +19,9 @@ import java.util.*
 class FriendsDaoTest {
 
     @Autowired
+    private lateinit var friendRepository: FriendRepository
+
+    @Autowired
     private lateinit var userRepository: UserRepository
 
     @Autowired
@@ -29,7 +32,7 @@ class FriendsDaoTest {
 
     @Test
     fun `save friend adds a friend info in user friends even if friend itself dont exists`(): Unit = runBlocking {
-        userRepository.deleteAll().awaitSingleOrNull()
+        cleanup()
         userDao.createUser(
             UserDto(
                 uid = "123",
@@ -62,7 +65,7 @@ class FriendsDaoTest {
     @Test
     fun `save friend adds a friend info in user friends when friend exists and uses friends photo url`(): Unit =
         runBlocking {
-            userRepository.deleteAll().awaitSingleOrNull()
+            cleanup()
             userDao.createUser(
                 UserDto(
                     uid = "123",
@@ -116,7 +119,7 @@ class FriendsDaoTest {
     @Test
     fun `throws error if none of the userId, email, or phoneNumber provided for friend`(): Unit = runBlocking {
 
-        userRepository.deleteAll().awaitSingleOrNull()
+        cleanup()
         userDao.createUser(
             UserDto(
                 uid = "123",
@@ -143,5 +146,93 @@ class FriendsDaoTest {
             runBlocking { friendsDao.saveFriend("123", friendDto) }
         }.isInstanceOf(IllegalArgumentException::class.java)
             .hasMessage("At least one of userId, email or phoneNumber must be provided")
+    }
+
+    @Test
+    fun `user has two friends one is existing and one is not should return both friends with photo url of existing one`(): Unit =
+        runBlocking {
+            cleanup()
+            userDao.createUser(
+                UserDto(
+                    uid = "123",
+                    email = "sample@gmail.com",
+                    phoneNumber = null,
+                    displayName = "Zeeshan Tufail",
+                    photoUrl = "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl2",
+                    emailVerified = true
+                )
+            )
+            userDao.createUser(
+                UserDto(
+                    uid = "124",
+                    email = null,
+                    phoneNumber = "+923001234567",
+                    displayName = "Noman Tufail",
+                    photoUrl = "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl3",
+                    emailVerified = true
+                )
+            )
+
+            friendsDao.saveFriend(
+                "123", FriendDto(
+                    photoUrl = null,
+                    name = "Noman pola",
+                    email = null,
+                    phoneNumber = "+923001234567",
+                    loanAmount = AmountDto(
+                        amount = 100.0.toBigDecimal(),
+                        currency = Currency.getInstance("USD"),
+                        isOwed = true
+                    ),
+                )
+            )
+
+            friendsDao.saveFriend(
+                "123", FriendDto(
+                    photoUrl = null,
+                    name = "Noman 3",
+                    email = null,
+                    phoneNumber = "+923001234568",
+                    loanAmount = AmountDto(
+                        amount = 100.0.toBigDecimal(),
+                        currency = Currency.getInstance("USD"),
+                        isOwed = true
+                    ),
+                )
+            )
+
+            val friendsDto = friendsDao.findAllByUserId("123")
+            assertThat(friendsDto.friends).hasSize(2)
+            assertThat(friendsDto.friends[0]).isEqualTo(
+                FriendDto(
+                    photoUrl = "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl3",
+                    name = "Noman pola",
+                    email = null,
+                    phoneNumber = "+923001234567",
+                    loanAmount = AmountDto(
+                        amount = 100.0.toBigDecimal(),
+                        currency = Currency.getInstance("USD"),
+                        isOwed = true
+                    ),
+                )
+            )
+            assertThat(friendsDto.friends[1]).isEqualTo(
+                FriendDto(
+                    photoUrl = null,
+                    name = "Noman 3",
+                    email = null,
+                    phoneNumber = "+923001234568",
+                    loanAmount = AmountDto(
+                        amount = 100.0.toBigDecimal(),
+                        currency = Currency.getInstance("USD"),
+                        isOwed = true
+                    ),
+                )
+            )
+        }
+
+    private suspend fun cleanup() {
+        userRepository.deleteAll().awaitSingleOrNull()
+        friendRepository.deleteAll().awaitSingleOrNull()
     }
 }
