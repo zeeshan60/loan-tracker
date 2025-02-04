@@ -1,4 +1,7 @@
-import { signalStore, withState } from '@ngrx/signals';
+import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
+import { inject } from '@angular/core';
+import { FriendsService } from '../friends/friends.service';
+import { firstValueFrom } from 'rxjs';
 
 type FriendsState = {
   friends: any[],
@@ -12,5 +15,12 @@ const initialState: FriendsState = {
 
 export const FriendsStore = signalStore(
   { providedIn: 'root' },
-  withState(initialState)
+  withState(initialState),
+  withMethods((store, friendsService = inject(FriendsService)) => ({
+    async loadFriends(): Promise<void> {
+      patchState(store, { loading: true });
+      const friends = await firstValueFrom(friendsService.loadAllFriends());
+      patchState(store, { loading: false, friends })
+    }
+  }))
 );

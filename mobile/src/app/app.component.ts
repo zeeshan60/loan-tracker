@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { IonApp, IonButton, IonLoading, IonRouterOutlet, LoadingController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -11,6 +11,8 @@ import {
   addCircleOutline,
   logOutOutline
 } from 'ionicons/icons';
+import { signalMethod } from '@ngrx/signals';
+import { FriendsStore } from './store/friends.store';
 
 @Component({
   selector: 'app-root',
@@ -19,13 +21,28 @@ import {
   imports: [
     IonApp,
     IonRouterOutlet,
-    IonLoading,
-    IonButton,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent {
-  constructor(private loadingController: LoadingController) {
+  readonly loadingCtrl = inject(LoadingController);
+
+  private loader: HTMLIonLoadingElement | null = null;
+
+  readonly activateLoaderWhen = signalMethod<boolean>((isLoading) => {
+    if (!this.loader) {
+      return;
+    }
+    if (isLoading) {
+      this.loader.present();
+    } else {
+      this.loader.dismiss();
+    }
+  });
+
+  readonly friendsStore = inject(FriendsStore);
+
+  constructor() {
     addIcons({
       triangle,
       ellipse,
@@ -36,18 +53,13 @@ export class AppComponent {
       addCircleOutline,
       logOutOutline
     });
-    this.showLoading();
+
+    this.loadDependencies().then(() => {
+      this.activateLoaderWhen(this.friendsStore.loading);
+    });
   }
 
-  async showLoading() {
-    const loading = await this.loadingController.create({
-      message: 'Dismissing after 3 seconds...',
-    });
-
-    loading.present();
-    setTimeout(() => {
-      loading.dismiss();
-    }, 4000)
-    // loading.dismiss();
+  async loadDependencies() {
+    this.loader = await this.loadingCtrl.create();
   }
 }

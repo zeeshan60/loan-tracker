@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/angular/standalone';
+import { FriendsStore } from '../store/friends.store';
 
 @Component({
   selector: 'app-friends',
@@ -10,5 +11,8 @@ import { IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/angular/stan
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FriendsPage {
-  constructor() {}
+  readonly friendsStore = inject(FriendsStore);
+  constructor() {
+    this.friendsStore.loadFriends().then();
+  }
 }
