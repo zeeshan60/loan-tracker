@@ -1,6 +1,5 @@
 package com.zeenom.loan_tracker.friends
 
-import com.zeenom.loan_tracker.common.AmountDto
 import com.zeenom.loan_tracker.test_configs.TestSecondInstantConfig
 import com.zeenom.loan_tracker.users.UserDao
 import com.zeenom.loan_tracker.users.UserDto
@@ -14,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
-import java.util.*
 
 @SpringBootTest
 @Import(TestSecondInstantConfig::class)
