@@ -6,5 +6,5 @@ data class FriendsResponse(val friends: List<FriendResponse>)
 data class FriendResponse(
     val photoUrl: String?,
     val name: String,
-    val loanAmount: LoanAmountResponse,
+    val loanAmount: LoanAmountResponse?,
 )

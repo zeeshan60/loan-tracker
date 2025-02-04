@@ -1,5 +1,6 @@
 package com.zeenom.loan_tracker.users
 
+import com.google.type.PhoneNumber
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import org.springframework.data.repository.reactive.ReactiveCrudRepository
@@ -13,8 +14,9 @@ data class UserEntity(
     @Id val id: UUID? = null,
     val uid: String,
     val email: String?,
+    val phoneNumber: String?,
     val displayName: String,
-    val photoUrl: String,
+    val photoUrl: String?,
     val emailVerified: Boolean,
     val createdAt: Instant,
     val updatedAt: Instant,

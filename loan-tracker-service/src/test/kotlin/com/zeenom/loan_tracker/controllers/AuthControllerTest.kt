@@ -40,6 +40,7 @@ class AuthControllerTest(@LocalServerPort private val port: Int) {
         val userDto = UserDto(
             uid = "123",
             email = "sample@gmail.com",
+            phoneNumber = "+923001234567",
             displayName = "Zeeshan Tufail",
             photoUrl = "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl2",
             emailVerified = true

@@ -6,10 +6,10 @@ import org.springframework.stereotype.Service
 @Service
 class LoanAmountResponseAdapter {
 
-    fun LoanAmountDto.toResponse() = LoanAmountResponse(
+    fun AmountDto.toResponse() = LoanAmountResponse(
         amount = this.amount,
         isOwed = this.isOwed
     )
 
-    fun fromDto(loanAmountDto: LoanAmountDto) = loanAmountDto.toResponse()
+    fun fromDto(loanAmountDto: AmountDto) = loanAmountDto.toResponse()
 }

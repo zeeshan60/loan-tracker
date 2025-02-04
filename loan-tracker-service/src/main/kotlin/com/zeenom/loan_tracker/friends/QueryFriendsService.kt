@@ -1,10 +1,11 @@
 package com.zeenom.loan_tracker.friends
 
-import com.zeenom.loan_tracker.common.LoanAmountDto
+import com.zeenom.loan_tracker.common.AmountDto
 import com.zeenom.loan_tracker.common.PaginationDto
 import com.zeenom.loan_tracker.common.Query
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
+import java.util.*
 
 @Service
 class QueryFriendsService : Query<PaginationDto, FriendsDto> {
@@ -14,17 +15,36 @@ class QueryFriendsService : Query<PaginationDto, FriendsDto> {
                 FriendDto(
                     photoUrl = "https://example.com/photo.jpg",
                     name = "John Doe",
-                    loanAmount = LoanAmountDto(amount = BigDecimal("100.00"), isOwed = true)
+                    loanAmount = AmountDto(
+                        amount = BigDecimal("100.00"),
+                        isOwed = true,
+                        currency = Currency.getInstance("USD")
+                    ),
+                    userId = "124",
+                    email = "friend1@gmail.com",
+                    phoneNumber = "+1234567890"
                 ),
                 FriendDto(
                     photoUrl = "https://example.com/photo.jpg",
                     name = "Noman Tufail",
-                    loanAmount = LoanAmountDto(amount = BigDecimal("50.00"), isOwed = false)
+                    loanAmount = AmountDto(
+                        amount = BigDecimal("50.00"), isOwed = false,
+                        currency = Currency.getInstance("USD")
+                    ),
+                    userId = "125",
+                    email = "friend2@gmail.com",
+                    phoneNumber = "+1234567891"
                 ),
                 FriendDto(
                     photoUrl = "https://example.com/photo.jpg",
                     name = "Zeeshan Tufail",
-                    loanAmount = LoanAmountDto(amount = BigDecimal("200.00"), isOwed = true)
+                    loanAmount = AmountDto(
+                        amount = BigDecimal("200.00"), isOwed = true,
+                        currency = Currency.getInstance("USD")
+                    ),
+                    userId = "126",
+                    email = "friend3@gmail.com",
+                    phoneNumber = "+1234567892"
                 )
             )
         )

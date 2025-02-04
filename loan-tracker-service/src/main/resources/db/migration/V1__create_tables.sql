@@ -16,6 +16,7 @@ CREATE TABLE users
     id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     uid            VARCHAR(255) UNIQUE NOT NULL,
     email          VARCHAR(255),
+    phone_number   VARCHAR(255),
     display_name   VARCHAR(255)        NOT NULL,
     photo_url      TEXT,
     email_verified BOOLEAN             NOT NULL,
@@ -27,14 +28,14 @@ CREATE INDEX idx_users_uid ON users (uid);
 
 CREATE TABLE user_friends
 (
-    id                   UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id              UUID      NOT NULL
-        CONSTRAINT fk_user_friends_user_id REFERENCES users (id),
-    friend_id            UUID      NOT NULL
-        CONSTRAINT fk_user_friends_friend_id REFERENCES users (id),
-    friend_total_amounts JSONB,
-    created_at           TIMESTAMP NOT NULL,
-    updated_at           TIMESTAMP NOT NULL
+    id                       UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id                  UUID      NOT NULL
+        CONSTRAINT fk_user_friends_user_id REFERENCES users (id) ON DELETE CASCADE,
+    friend_id                UUID      NOT NULL
+        CONSTRAINT fk_user_friends_friend_id REFERENCES users (id) ON DELETE CASCADE,
+    friend_total_amounts_dto JSONB,
+    created_at               TIMESTAMP NOT NULL,
+    updated_at               TIMESTAMP NOT NULL
 );
 
 CREATE INDEX idx_user_friends_user_id ON user_friends (user_id);

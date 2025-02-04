@@ -30,6 +30,7 @@ class UserDaoTest {
         val userDto = UserDto(
             uid = uid,
             email = "example@gmail.com",
+            phoneNumber = "+1234567890",
             displayName = "John Doe",
             photoUrl = "https://example.com/photo.jpg",
             emailVerified = true
@@ -52,6 +53,7 @@ class UserDaoTest {
         val userDto = UserDto(
             uid = uid,
             email = "example@gmail.com",
+            phoneNumber = "+1234567890",
             displayName = "John Doe",
             photoUrl = "https://example.com/photo.jpg",
             emailVerified = true

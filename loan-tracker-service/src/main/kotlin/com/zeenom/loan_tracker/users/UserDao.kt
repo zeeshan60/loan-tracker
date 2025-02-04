@@ -27,6 +27,7 @@ class UserDao(private val userRepository: UserRepository, private val secondInst
             UserEntity(
                 uid = userDto.uid,
                 email = userDto.email,
+                phoneNumber = userDto.phoneNumber,
                 displayName = userDto.displayName,
                 photoUrl = userDto.photoUrl,
                 emailVerified = userDto.emailVerified,
@@ -43,6 +44,7 @@ class UserDao(private val userRepository: UserRepository, private val secondInst
             UserEntity(
                 uid = userDto.uid,
                 email = userDto.email,
+                phoneNumber = userDto.phoneNumber,
                 displayName = userDto.displayName,
                 photoUrl = userDto.photoUrl,
                 emailVerified = userDto.emailVerified,
@@ -59,6 +61,7 @@ class UserDao(private val userRepository: UserRepository, private val secondInst
             UserDto(
                 uid = it.uid,
                 email = it.email,
+                phoneNumber = it.phoneNumber,
                 displayName = it.displayName,
                 photoUrl = it.photoUrl,
                 emailVerified = it.emailVerified

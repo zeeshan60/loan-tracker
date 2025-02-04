@@ -13,7 +13,7 @@ class FriendsResponseAdapter(val loanAmountResponseAdapter: LoanAmountResponseAd
     fun FriendDto.toResponse() = FriendResponse(
         photoUrl = this.photoUrl,
         name = this.name,
-        loanAmount = loanAmountResponseAdapter.fromDto(this.loanAmount)
+        loanAmount = this.loanAmount?.let { loanAmountResponseAdapter.fromDto(it) }
     )
 
     fun fromDto(friendsDto: FriendsDto): Paginated<FriendsResponse> {

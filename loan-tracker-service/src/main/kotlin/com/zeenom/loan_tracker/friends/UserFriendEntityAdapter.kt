@@ -9,7 +9,7 @@ import java.time.Instant
 import java.util.*
 
 @Component
-class FriendEntityAdapter(private val objectMapper: ObjectMapper, private val secondInstant: SecondInstant) {
+class UserFriendEntityAdapter(private val objectMapper: ObjectMapper, private val secondInstant: SecondInstant) {
     fun fromDto(friendDto: UserFriendDto, id: UUID? = null, createdAt: Instant? = null, updatedAt: Instant? = null) =
         UserFriendEntity(
             id = id,

@@ -23,7 +23,7 @@ data class UserFriendEntity(
 @Repository
 interface FriendRepository : ReactiveCrudRepository<UserFriendEntity, UUID> {
     @Query("""
-        SELECT u.uid, u.name, uf.friend_total_amounts_dto, uf.updated_at 
+        SELECT u.uid, u.display_name, u.phone_number, u.email, u.photo_url, uf.friend_total_amounts_dto, uf.updated_at 
         FROM user_friends uf
         INNER JOIN users u ON uf.friend_id = u.id
         INNER JOIN users owner ON uf.user_id = owner.id
@@ -34,7 +34,10 @@ interface FriendRepository : ReactiveCrudRepository<UserFriendEntity, UUID> {
 
 data class FriendSelectEntity(
     val uid: String,
-    val name: String,
+    val displayName: String,
+    val email: String,
+    val phoneNumber: String,
+    val photoUrl: String,
     val friendTotalAmountsDto: Json?,
     val updatedAt: Instant
 )
