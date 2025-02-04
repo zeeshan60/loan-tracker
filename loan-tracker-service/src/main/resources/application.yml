@@ -21,7 +21,7 @@ spring:
   application:
     name: loan-tracker-service
   main:
-      web-application-type: reactive
+    web-application-type: reactive
 
 springdoc:
   swagger-ui:
@@ -43,6 +43,6 @@ auth:
   jwt-expiry-days: 30
 
 logging:
-    level:
-        org.springframework.security: DEBUG
-        org.flywaydb: DEBUG
+  level:
+    org.springframework.security: DEBUG
+    org.flywaydb: DEBUG
