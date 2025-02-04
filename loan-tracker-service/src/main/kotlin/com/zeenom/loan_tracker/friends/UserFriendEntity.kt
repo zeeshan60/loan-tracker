@@ -22,13 +22,15 @@ data class UserFriendEntity(
 
 @Repository
 interface FriendRepository : ReactiveCrudRepository<UserFriendEntity, UUID> {
-    @Query("""
+    @Query(
+        """
         SELECT u.uid, u.display_name, u.phone_number, u.email, u.photo_url, uf.friend_total_amounts_dto, uf.updated_at 
         FROM user_friends uf
         INNER JOIN users u ON uf.friend_id = u.id
         INNER JOIN users owner ON uf.user_id = owner.id
         WHERE owner.uid = :uid
-    """)
+    """
+    )
     fun findAllFriendsByUid(uid: String): Flux<FriendSelectEntity>
 }
 
