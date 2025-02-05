@@ -1,11 +1,9 @@
 package com.zeenom.loan_tracker.controllers
 
-import com.zeenom.loan_tracker.firebase.FirebaseService
 import com.zeenom.loan_tracker.friends.CreateFriendDto
 import com.zeenom.loan_tracker.friends.CreateFriendRequest
 import com.zeenom.loan_tracker.friends.FriendsDao
 import com.zeenom.loan_tracker.security.AuthService
-import com.zeenom.loan_tracker.users.UserDto
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -24,9 +22,6 @@ class FriendsControllerTest(@LocalServerPort private val port: Int) {
     @Autowired
     private lateinit var authService: AuthService
     private val webTestClient = WebTestClient.bindToServer().baseUrl("http://localhost:$port").build()
-
-    @MockitoBean
-    private lateinit var firebaseService: FirebaseService
 
     @MockitoBean
     private lateinit var friendsDao: FriendsDao

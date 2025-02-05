@@ -12,7 +12,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/friends")
 class FriendsController(
     val queryFriendsService: QueryFriendsService,
     val friendsAdapter: FriendsControllerAdapter,
@@ -22,7 +22,7 @@ class FriendsController(
     val logger = LoggerFactory.getLogger(FriendsController::class.java)
 
     @Operation(summary = "Get friends", description = "Retrieve a list of friends with pagination")
-    @GetMapping("/friends")
+    @GetMapping
     suspend fun getFriends(
         @Parameter(description = "Pagination token for the next set of results")
         @RequestParam next: String? = null,
@@ -35,7 +35,7 @@ class FriendsController(
     }
 
     @Operation(summary = "Add friend", description = "Add a friend")
-    @PostMapping("/friends/add")
+    @PostMapping("/add")
     suspend fun addFriend(
         @RequestBody friendRequest: CreateFriendRequest,
         @AuthenticationPrincipal userId: String
