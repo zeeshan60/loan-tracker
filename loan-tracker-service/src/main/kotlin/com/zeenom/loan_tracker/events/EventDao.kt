@@ -8,7 +8,7 @@ class EventDao(
     private val eventRepository: EventRepository,
     private val eventEntityAdapter: EventEntityAdapter
 ) {
-    suspend fun saveEvent(eventDto: EventDto) {
+    suspend fun <T : EventPayloadDto?> saveEvent(eventDto: EventDto<T>) {
         eventRepository.save(eventEntityAdapter.fromDto(eventDto)).awaitSingle()
     }
 }

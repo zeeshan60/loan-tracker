@@ -17,7 +17,7 @@ class EventEntityAdapter(
     private val secondInstant: SecondInstant
 ) {
 
-    fun fromDto(eventDto: EventDto, id: UUID? = null, createdAt: Instant? = null) =
+    fun fromDto(eventDto: EventDto<*>, id: UUID? = null, createdAt: Instant? = null) =
         EventEntity(
             id = id,
             event = eventDto.event,

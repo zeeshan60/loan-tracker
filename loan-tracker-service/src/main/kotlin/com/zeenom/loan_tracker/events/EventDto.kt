@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.zeenom.loan_tracker.common.TransactionDto
 
-data class EventDto(
+data class EventDto<T: EventPayloadDto?>(
     val event: EventType,
-    val payload: EventPayloadDto?,
+    val payload: T,
     val userId: String
 )
 

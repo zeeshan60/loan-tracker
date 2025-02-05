@@ -3,7 +3,6 @@ package com.zeenom.loan_tracker.friends
 import com.zeenom.loan_tracker.common.MessageResponse
 import com.zeenom.loan_tracker.common.Paginated
 import com.zeenom.loan_tracker.common.PaginationDto
-import com.zeenom.loan_tracker.events.CommandEventService
 import com.zeenom.loan_tracker.events.EventDto
 import com.zeenom.loan_tracker.events.EventType
 import io.swagger.v3.oas.annotations.Operation
@@ -16,8 +15,8 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/v1")
 class FriendsController(
     val queryFriendsService: QueryFriendsService,
-    val eventService: CommandEventService,
-    val friendsAdapter: FriendsControllerAdapter
+    val friendsAdapter: FriendsControllerAdapter,
+    private val commandCreateFriends: CommandCreateFriends
 ) {
 
     val logger = LoggerFactory.getLogger(FriendsController::class.java)
@@ -42,7 +41,7 @@ class FriendsController(
         @AuthenticationPrincipal userId: String
     ): MessageResponse {
         logger.info("Adding friend for user $userId")
-        eventService.execute(
+        commandCreateFriends.execute(
             EventDto(
                 event = EventType.ADD_FRIEND,
                 payload = friendsAdapter.fromRequestToDto(friendRequest),

@@ -5,12 +5,12 @@ import com.zeenom.loan_tracker.events.EventDto
 import com.zeenom.loan_tracker.events.EventType
 import com.zeenom.loan_tracker.firebase.FirebaseService
 import com.zeenom.loan_tracker.security.LoginRequest
+import com.zeenom.loan_tracker.users.UserDao
 import com.zeenom.loan_tracker.users.UserDto
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito
-import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.whenever
 import org.springframework.boot.test.context.SpringBootTest
@@ -30,6 +30,9 @@ class AuthControllerTest(@LocalServerPort private val port: Int) {
     @MockitoBean
     private lateinit var eventDao: EventDao
 
+    @MockitoBean
+    private lateinit var userDao: UserDao
+
     @Test
     fun `given verified id token generates jwt token with expiry successfully`(): Unit = runBlocking {
 
@@ -48,7 +51,15 @@ class AuthControllerTest(@LocalServerPort private val port: Int) {
             userDto
         ).whenever(firebaseService).userByVerifyingIdToken(idToken)
 
-        Mockito.doReturn(Unit).whenever(eventDao).saveEvent(any())
+        Mockito.doReturn(Unit).whenever(userDao).createUser(userDto)
+
+        Mockito.doReturn(Unit).whenever(eventDao).saveEvent(
+            EventDto(
+                event = EventType.LOGIN,
+                payload = userDto,
+                userId = "123",
+            )
+        )
 
         // When
         val response = webTestClient.post()
@@ -62,7 +73,7 @@ class AuthControllerTest(@LocalServerPort private val port: Int) {
             .expectBody()
             .jsonPath("$.token").value { it: String? -> assertThat(it).isNotEmpty() }
 
-        argumentCaptor<EventDto>().apply {
+        argumentCaptor<EventDto<UserDto>>().apply {
             Mockito.verify(eventDao, Mockito.times(1)).saveEvent(capture())
             assertThat(firstValue).isEqualTo(
                 EventDto(
@@ -72,6 +83,10 @@ class AuthControllerTest(@LocalServerPort private val port: Int) {
                 )
             )
         }
+
+        val userDaoCaptor = argumentCaptor<UserDto>()
+        Mockito.verify(userDao, Mockito.times(1)).createUser(userDaoCaptor.capture())
+        assertThat(userDaoCaptor.firstValue).isEqualTo(userDto)
     }
 }
 
