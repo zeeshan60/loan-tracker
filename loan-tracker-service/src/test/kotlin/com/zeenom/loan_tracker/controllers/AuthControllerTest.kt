@@ -4,6 +4,7 @@ import com.zeenom.loan_tracker.events.EventDao
 import com.zeenom.loan_tracker.events.EventDto
 import com.zeenom.loan_tracker.events.EventType
 import com.zeenom.loan_tracker.firebase.FirebaseService
+import com.zeenom.loan_tracker.friends.FriendsDao
 import com.zeenom.loan_tracker.security.LoginRequest
 import com.zeenom.loan_tracker.users.UserDao
 import com.zeenom.loan_tracker.users.UserDto
@@ -32,6 +33,8 @@ class AuthControllerTest(@LocalServerPort private val port: Int) {
 
     @MockitoBean
     private lateinit var userDao: UserDao
+    @MockitoBean
+    private lateinit var friendsDao: FriendsDao
 
     @Test
     fun `given verified id token generates jwt token with expiry successfully`(): Unit = runBlocking {
@@ -52,6 +55,7 @@ class AuthControllerTest(@LocalServerPort private val port: Int) {
         ).whenever(firebaseService).userByVerifyingIdToken(idToken)
 
         Mockito.doReturn(Unit).whenever(userDao).createUser(userDto)
+        Mockito.doReturn(Unit).whenever(friendsDao).makeMyOwnersMyFriends("123")
 
         Mockito.doReturn(Unit).whenever(eventDao).saveEvent(
             EventDto(
@@ -87,6 +91,8 @@ class AuthControllerTest(@LocalServerPort private val port: Int) {
         val userDaoCaptor = argumentCaptor<UserDto>()
         Mockito.verify(userDao, Mockito.times(1)).createUser(userDaoCaptor.capture())
         assertThat(userDaoCaptor.firstValue).isEqualTo(userDto)
+
+        Mockito.verify(friendsDao, Mockito.times(1)).makeMyOwnersMyFriends("123")
     }
 }
 

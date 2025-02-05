@@ -49,7 +49,7 @@ interface FriendRepository : ReactiveCrudRepository<UserFriendEntity, UUID> {
 
     @Query(
         """
-        SELECT u
+        SELECT u.*
         FROM users u
         INNER JOIN user_friends uf ON u.id = uf.user_id
         WHERE (uf.friend_email = :email AND :email IS NOT NULL) OR (uf.friend_phone_number = :phone AND :phone IS NOT NULL)

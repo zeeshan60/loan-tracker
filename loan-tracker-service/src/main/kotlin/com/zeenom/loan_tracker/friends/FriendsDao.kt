@@ -60,11 +60,11 @@ class FriendsDao(
         val user = userRepository.findByUid(uid).awaitSingleOrNull() ?: throw IllegalArgumentException("User not found")
         val friendId = friendDto.email?.let { userRepository.findByEmail(it).awaitSingleOrNull()?.id }
             ?: friendDto.phoneNumber?.let { userRepository.findByPhoneNumber(it).awaitSingleOrNull()?.id }
-        addUserFriend(user, friendId, friendDto)
-        friendId?.let { makeUserAFriendsFriend(it, user) }
+        addFriendToUser(user = user, friendId = friendId, friendDto = friendDto)
+        friendId?.let { addUserToFriend(friendId = it, user = user) }
     }
 
-    private suspend fun addUserFriend(
+    private suspend fun addFriendToUser(
         user: UserEntity,
         friendId: UUID?,
         friendDto: CreateFriendDto
@@ -83,7 +83,7 @@ class FriendsDao(
         ).awaitSingle()
     }
 
-    private suspend fun makeUserAFriendsFriend(friendId: UUID, user: UserEntity) {
+    private suspend fun addUserToFriend(friendId: UUID, user: UserEntity) {
         val existing = friendRepository.findByUserIdAndFriendId(
             friendId,
             user.id ?: throw IllegalArgumentException("User Not found")
