@@ -9,4 +9,4 @@
 - docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=postgres --name postgres postgres:latest
 ### running the Ui mobile application using image
 - docker pull nomantufail/loan-tracker-ui-repo:latest
-- docker run -p 8080:80 nomantufail/loan-tracker-ui-repo
+- docker run -d -p 80:80 --name loan-tracker-ui nomantufail/loan-tracker-ui-repo:latest

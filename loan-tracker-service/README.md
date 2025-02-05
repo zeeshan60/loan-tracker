@@ -28,9 +28,14 @@ on your local machine
 - sudo docker container prune -f
 - sudo docker pull zeeshan60/loan-tracker-service:latest
 - sudo docker run -d -p 8080:8080 -e SPRING_PROFILES_ACTIVE=dev --name loantracker zeeshan60/loan-tracker-service:latest
+- sudo docker run --network host -d -p 8080:8080 -e SPRING_PROFILES_ACTIVE=dev --name loantracker zeeshan60/loan-tracker-service:latest
 - sudo docker image prune -f
 - sudo docker rmi loantracker
 - sudo docker logs -f loantracker
+- sudo docker pull postgres:latest
+- sudo docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=postgres --name postgres postgres:latest
 
 - docker build . -t zeeshan60/loan-tracker-service && docker push zeeshan60/loan-tracker-service:latest
 - sudo docker pull zeeshan60/loan-tracker-service:latest && sudo docker stop loantracker && sudo docker container prune -f && sudo docker run -d -p 8080:8080 -e SPRING_PROFILES_ACTIVE=dev --name loantracker zeeshan60/loan-tracker-service:latest && sudo docker image prune -f
+- sudo docker pull zeeshan60/loan-tracker-service:latest && sudo docker stop loantracker && sudo docker container prune -f && sudo docker run --network host -d -p 8080:8080 -e SPRING_PROFILES_ACTIVE=dev --name loantracker zeeshan60/loan-tracker-service:latest && sudo docker image prune -f
+- sudo docker pull nomantufail/loan-tracker-ui-repo:latest && sudo docker stop loan-tracker-ui && sudo docker container prune -f && sudo docker run -d -p 80:80 --name loan-tracker-ui nomantufail/loan-tracker-ui-repo:latest && sudo docker image prune -f
