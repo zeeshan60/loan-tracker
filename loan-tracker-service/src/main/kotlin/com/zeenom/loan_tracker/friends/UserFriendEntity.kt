@@ -1,5 +1,6 @@
 package com.zeenom.loan_tracker.friends
 
+import com.google.type.PhoneNumber
 import com.zeenom.loan_tracker.users.UserEntity
 import io.r2dbc.postgresql.codec.Json
 import org.springframework.data.annotation.Id
@@ -38,6 +39,8 @@ interface FriendRepository : ReactiveCrudRepository<UserFriendEntity, UUID> {
     )
     fun findAllFriendsByUid(uid: String): Flux<FriendSelectEntity>
 
+    fun findUserFriendEntitiesByUserId(userId: UUID): Flux<UserFriendEntity>
+
     @Query(
         """
         SELECT * 
@@ -49,15 +52,23 @@ interface FriendRepository : ReactiveCrudRepository<UserFriendEntity, UUID> {
 
     @Query(
         """
-        SELECT u.*
+        SELECT u.id as owner_id, u.phone_number as owner_phone_number, u.email as owner_email, u.display_name as owner_display_name, uf.friend_total_amounts_dto
         FROM users u
         INNER JOIN user_friends uf ON u.id = uf.user_id
         WHERE (uf.friend_email = :email AND :email IS NOT NULL) OR (uf.friend_phone_number = :phone AND :phone IS NOT NULL)
     """
     )
-    fun findOwnersByMyEmailOrPhone(email: String?, phone: String?): Flux<UserEntity>
+    fun findOwnersByMyEmailOrPhone(email: String?, phone: String?): Flux<UserEntityWithFriendAmountEntity>
     fun findByUserIdAndFriendId(id: UUID, friendId: UUID): Mono<UserFriendEntity>
 }
+
+data class UserEntityWithFriendAmountEntity(
+    val ownerId: UUID,
+    val ownerPhoneNumber: String?,
+    val ownerEmail: String?,
+    val ownerDisplayName: String,
+    val friendTotalAmountsDto: Json?
+)
 
 data class FriendSelectEntity(
     val photoUrl: String?,

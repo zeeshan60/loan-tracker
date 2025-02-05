@@ -1,5 +1,6 @@
 package com.zeenom.loan_tracker.friends
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.zeenom.loan_tracker.test_configs.TestSecondInstantConfig
 import com.zeenom.loan_tracker.users.UserDao
 import com.zeenom.loan_tracker.users.UserDto
@@ -18,6 +19,9 @@ import org.springframework.test.context.ActiveProfiles
 @Import(TestSecondInstantConfig::class)
 @ActiveProfiles("local")
 class FriendsDaoTest {
+
+    @Autowired
+    private lateinit var objectMapper: ObjectMapper
 
     @Autowired
     private lateinit var friendRepository: FriendRepository

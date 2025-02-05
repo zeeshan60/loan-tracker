@@ -4,13 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.zeenom.loan_tracker.common.AmountDto
 import com.zeenom.loan_tracker.common.SecondInstant
 import com.zeenom.loan_tracker.common.r2dbc.toClass
+import com.zeenom.loan_tracker.common.r2dbc.toJson
 import com.zeenom.loan_tracker.users.UserEntity
 import com.zeenom.loan_tracker.users.UserRepository
-import kotlinx.coroutines.Dispatchers
+import io.r2dbc.postgresql.codec.Json
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
-import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
@@ -105,7 +105,7 @@ class FriendsDao(
     }
 
     @Transactional
-    suspend fun makeMyOwnersMyFriends(uid: String) = withContext(Dispatchers.IO) {
+    suspend fun makeMyOwnersMyFriends(uid: String) {
         val userEntity = userRepository.findByUid(uid).awaitSingleOrNull()
             ?: throw IllegalArgumentException("User not found")
 
@@ -122,11 +122,11 @@ class FriendsDao(
         val newUserFriends = owners.mapNotNull { owner ->
             UserFriendEntity(
                 userId = userEntity.id ?: throw IllegalArgumentException("User not found"),
-                friendId = owner.id,
-                friendEmail = owner.email,
-                friendPhoneNumber = owner.phoneNumber,
-                friendDisplayName = owner.displayName,
-                friendTotalAmountsDto = null,
+                friendId = owner.ownerId,
+                friendEmail = owner.ownerEmail,
+                friendPhoneNumber = owner.ownerPhoneNumber,
+                friendDisplayName = owner.ownerDisplayName,
+                friendTotalAmountsDto = owner.friendTotalAmountsDto?.let { revertAmount(it) },
                 createdAt = secondInstant.now(),
                 updatedAt = secondInstant.now()
             )
@@ -134,6 +134,21 @@ class FriendsDao(
         if (newUserFriends.isEmpty()) return
         friendRepository.saveAll(newUserFriends).collectList().awaitSingle()
     }
+
+    private fun revertAmount(friendAmountsDtoJson: Json) =
+        friendAmountsDtoJson.let {
+            val amountDto = it.toClass(
+                objectMapper = objectMapper,
+                FriendTotalAmountsDto::class.java
+            )
+            FriendTotalAmountsDto(amountsPerCurrency = amountDto.amountsPerCurrency.map {
+                AmountDto(
+                    amount = it.amount,
+                    currency = it.currency,
+                    isOwed = !it.isOwed
+                )
+            })
+        }?.toJson(objectMapper = objectMapper)
 
     private suspend fun updateMyIdInMyOwnersRecord(userEntity: UserEntity) {
         val userFriendEntities = friendRepository.findAllByEmailOrPhone(userEntity.email, userEntity.phoneNumber)
