@@ -3,7 +3,8 @@ package com.zeenom.loan_tracker.friends
 import com.zeenom.loan_tracker.common.Command
 import com.zeenom.loan_tracker.events.EventDao
 import com.zeenom.loan_tracker.events.EventDto
-import kotlinx.coroutines.*
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 

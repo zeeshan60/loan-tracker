@@ -33,6 +33,7 @@ class AuthControllerTest(@LocalServerPort private val port: Int) {
 
     @MockitoBean
     private lateinit var userDao: UserDao
+
     @MockitoBean
     private lateinit var friendsDao: FriendsDao
 

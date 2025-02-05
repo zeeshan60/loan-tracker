@@ -1,7 +1,6 @@
 package com.zeenom.loan_tracker.security
 
 import org.springframework.security.authentication.AbstractAuthenticationToken
-import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.authority.AuthorityUtils
 
 data class InternalAuthToken(

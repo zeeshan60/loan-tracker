@@ -142,7 +142,7 @@ class UserDaoTest {
                 )
             )
         }
-        
+
         private suspend fun assertUserHasNoFriendsYet(userDto: UserDto) {
             friendsDao.findAllByUserId(userDto.uid).let {
                 assertThat(it.friends).isEmpty()

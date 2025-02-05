@@ -1,7 +1,5 @@
 package com.zeenom.loan_tracker.friends
 
-import com.google.type.PhoneNumber
-import com.zeenom.loan_tracker.users.UserEntity
 import io.r2dbc.postgresql.codec.Json
 import org.springframework.data.annotation.Id
 import org.springframework.data.r2dbc.repository.Query
