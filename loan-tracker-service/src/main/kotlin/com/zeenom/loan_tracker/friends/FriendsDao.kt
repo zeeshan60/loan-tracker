@@ -4,15 +4,16 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.zeenom.loan_tracker.common.AmountDto
 import com.zeenom.loan_tracker.common.SecondInstant
 import com.zeenom.loan_tracker.common.r2dbc.toClass
-import com.zeenom.loan_tracker.common.r2dbc.toJson
 import com.zeenom.loan_tracker.users.UserEntity
 import com.zeenom.loan_tracker.users.UserRepository
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
+import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import java.util.*
 
 @Service
 class FriendsDao(
@@ -49,25 +50,29 @@ class FriendsDao(
         }.let { FriendsDto(friends = it) }
     }
 
-    suspend fun saveFriend(uid: String, friendDto: CreateFriendDto): Unit = coroutineScope {
+    @Transactional
+    suspend fun saveFriend(uid: String, friendDto: CreateFriendDto) {
 
         if (friendDto.email == null && friendDto.phoneNumber == null) {
             throw IllegalArgumentException("At least one of userId, email or phoneNumber must be provided")
         }
 
-        val userDef = async { userRepository.findByUid(uid).awaitSingle() }
-        val friendDef = async {
-            friendDto.email?.let { userRepository.findByEmail(it).awaitSingleOrNull() }
-                ?: friendDto.phoneNumber?.let { userRepository.findByPhoneNumber(it).awaitSingleOrNull() }
-        }
+        val user = userRepository.findByUid(uid).awaitSingleOrNull() ?: throw IllegalArgumentException("User not found")
+        val friendId = friendDto.email?.let { userRepository.findByEmail(it).awaitSingleOrNull()?.id }
+            ?: friendDto.phoneNumber?.let { userRepository.findByPhoneNumber(it).awaitSingleOrNull()?.id }
+        addUserFriend(user, friendId, friendDto)
+        friendId?.let { makeUserAFriendsFriend(it, user) }
+    }
 
-        val defs = awaitAll(userDef, friendDef)
-        val user = defs[0] as UserEntity
-        val friend = defs[1]
+    private suspend fun addUserFriend(
+        user: UserEntity,
+        friendId: UUID?,
+        friendDto: CreateFriendDto
+    ) {
         friendRepository.save(
             UserFriendEntity(
-                userId = user.id!!,
-                friendId = friend?.id,
+                userId = user.id ?: throw IllegalArgumentException("User not found"),
+                friendId = friendId,
                 friendTotalAmountsDto = null,
                 createdAt = secondInstant.now(),
                 updatedAt = secondInstant.now(),
@@ -76,5 +81,71 @@ class FriendsDao(
                 friendPhoneNumber = friendDto.phoneNumber
             )
         ).awaitSingle()
+    }
+
+    private suspend fun makeUserAFriendsFriend(friendId: UUID, user: UserEntity) {
+        val existing = friendRepository.findByUserIdAndFriendId(
+            friendId,
+            user.id ?: throw IllegalArgumentException("User Not found")
+        ).awaitSingleOrNull()
+        if (existing == null) {
+            friendRepository.save(
+                UserFriendEntity(
+                    userId = friendId,
+                    friendId = user.id,
+                    friendTotalAmountsDto = null,
+                    createdAt = secondInstant.now(),
+                    updatedAt = secondInstant.now(),
+                    friendDisplayName = user.displayName,
+                    friendEmail = user.email,
+                    friendPhoneNumber = user.phoneNumber
+                )
+            ).awaitSingle()
+        }
+    }
+
+    @Transactional
+    suspend fun makeMyOwnersMyFriends(uid: String) = withContext(Dispatchers.IO) {
+        val userEntity = userRepository.findByUid(uid).awaitSingleOrNull()
+            ?: throw IllegalArgumentException("User not found")
+
+        updateMyIdInMyOwnersRecord(userEntity)
+        addMyOwnersAsMyFriends(userEntity)
+    }
+
+    private suspend fun addMyOwnersAsMyFriends(
+        userEntity: UserEntity
+    ) {
+        val owners = friendRepository.findOwnersByMyEmailOrPhone(userEntity.email, userEntity.phoneNumber)
+            .collectList()
+            .awaitSingle()
+        val newUserFriends = owners.mapNotNull { owner ->
+            UserFriendEntity(
+                userId = userEntity.id ?: throw IllegalArgumentException("User not found"),
+                friendId = owner.id,
+                friendEmail = owner.email,
+                friendPhoneNumber = owner.phoneNumber,
+                friendDisplayName = owner.displayName,
+                friendTotalAmountsDto = null,
+                createdAt = secondInstant.now(),
+                updatedAt = secondInstant.now()
+            )
+        }
+        if (newUserFriends.isEmpty()) return
+        friendRepository.saveAll(newUserFriends).collectList().awaitSingle()
+    }
+
+    private suspend fun updateMyIdInMyOwnersRecord(userEntity: UserEntity) {
+        val userFriendEntities = friendRepository.findAllByEmailOrPhone(userEntity.email, userEntity.phoneNumber)
+            .collectList()
+            .awaitSingle()
+
+        val updatedFriends = userFriendEntities.mapNotNull {
+            if (it.friendId == null && it.id != null) {
+                it.copy(friendId = userEntity.id)
+            } else null
+        }
+        if (updatedFriends.isEmpty()) return
+        friendRepository.saveAll(updatedFriends).collectList().awaitSingle()
     }
 }

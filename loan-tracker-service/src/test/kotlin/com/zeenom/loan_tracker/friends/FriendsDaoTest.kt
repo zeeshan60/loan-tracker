@@ -66,7 +66,7 @@ class FriendsDaoTest {
 
 
     @Test
-    fun `save friend adds a friend info in user friends when friend exists and uses friends photo url`(): Unit =
+    fun `save friend adds a friend info in user friends when friend exists and uses friends photo url also makes user his friend`(): Unit =
         runBlocking {
             cleanup()
             userDao.createUser(
@@ -104,6 +104,18 @@ class FriendsDaoTest {
                     name = "Noman pola",
                     email = null,
                     phoneNumber = "+923001234567",
+                    loanAmount = null
+                )
+            )
+
+            val friendsDto2 = friendsDao.findAllByUserId("124")
+            assertThat(friendsDto2.friends).hasSize(1)
+            assertThat(friendsDto2.friends[0]).isEqualTo(
+                FriendDto(
+                    photoUrl = "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl2",
+                    name = "Zeeshan Tufail",
+                    email = "sample@gmail.com",
+                    phoneNumber = null,
                     loanAmount = null
                 )
             )
