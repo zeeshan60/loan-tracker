@@ -55,7 +55,7 @@ class AuthControllerTest(@LocalServerPort private val port: Int) {
             userDto
         ).whenever(firebaseService).userByVerifyingIdToken(idToken)
 
-        Mockito.doReturn(Unit).whenever(userDao).createUser(userDto)
+        Mockito.doReturn(Unit).whenever(userDao).loginUser(userDto)
         Mockito.doReturn(Unit).whenever(friendsDao).makeMyOwnersMyFriends("123")
 
         Mockito.doReturn(Unit).whenever(eventDao).saveEvent(
@@ -90,7 +90,7 @@ class AuthControllerTest(@LocalServerPort private val port: Int) {
         }
 
         val userDaoCaptor = argumentCaptor<UserDto>()
-        Mockito.verify(userDao, Mockito.times(1)).createUser(userDaoCaptor.capture())
+        Mockito.verify(userDao, Mockito.times(1)).loginUser(userDaoCaptor.capture())
         assertThat(userDaoCaptor.firstValue).isEqualTo(userDto)
 
         Mockito.verify(friendsDao, Mockito.times(1)).makeMyOwnersMyFriends("123")
