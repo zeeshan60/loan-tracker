@@ -10,6 +10,7 @@ quick ec2 setup:
 - systemctl enable docker
 - usermod -aG docker ec2-user
 - docker build . -t zeeshan60/loan-tracker-service
+- docker save -o image.tar zeeshan60/loan-tracker-service:latest
 - docker push zeeshan60/loan-tracker-service:latest
 - docker build . -t zeeshan60/loan-tracker-service && docker push zeeshan60/loan-tracker-service:latest
 - docker tag loan-tracker-service:latest zeeshan60/loan-tracker-service:latest
