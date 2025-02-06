@@ -1,8 +1,9 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      Friends
-    </ion-title>
+    <ion-title slot="start">Friends</ion-title>
+    <ion-buttons slot="primary" routerLink="/add-friend">
+      <ion-button> Add </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -12,5 +13,4 @@
       <ion-title size="large">Friends</ion-title>
     </ion-toolbar>
   </ion-header>
-
 </ion-content>
