@@ -1,8 +1,7 @@
 package com.zeenom.loan_tracker.controllers
 
-import com.zeenom.loan_tracker.friends.CreateFriendDto
-import com.zeenom.loan_tracker.friends.CreateFriendRequest
-import com.zeenom.loan_tracker.friends.FriendsDao
+import com.zeenom.loan_tracker.common.AmountDto
+import com.zeenom.loan_tracker.friends.*
 import com.zeenom.loan_tracker.security.AuthService
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
@@ -10,11 +9,13 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
+import org.skyscreamer.jsonassert.JSONAssert
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.reactive.server.WebTestClient
+import java.util.*
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class FriendsControllerTest(@LocalServerPort private val port: Int) {
@@ -28,16 +29,48 @@ class FriendsControllerTest(@LocalServerPort private val port: Int) {
 
     @Test
     fun `friends endpoint returns friends`(): Unit = runBlocking {
-        webTestClient.get()
+        val userid = "userid"
+        val friendsDto = FriendsDto(
+            friends = listOf(
+                FriendDto(
+                    name = "John Doe",
+                    email = "sample@gmail.com",
+                    phoneNumber = "+923001234567",
+                    loanAmount = AmountDto(1000.0.toBigDecimal(), Currency.getInstance("USD"), true),
+                    photoUrl = "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl2"
+                )
+            )
+        )
+        Mockito.doReturn(
+            friendsDto
+        ).`when`(friendsDao).findAllByUserId(userid)
+        val result = webTestClient.get()
             .uri("/api/v1/friends")
-            .header("Authorization", "Bearer ${authService.generateJwt("verified-id-token")}")
+            .header("Authorization", "Bearer ${authService.generateJwt(userid)}")
             .exchange()
             .expectStatus().isOk
-            .expectBody()
-            .jsonPath("$.data.friends").isNotEmpty
-            .jsonPath("$.next").value { value: String? ->
-                assertThat(value).isNull()
-            }
+            .expectBody(String::class.java)
+            .returnResult().responseBody
+
+        JSONAssert.assertEquals(
+            result,
+            """
+                {
+                  "data" : {
+                    "friends" : [ {
+                      "photoUrl" : "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl2",
+                      "name" : "John Doe",
+                      "loanAmount" : {
+                        "amount" : 1000.0,
+                        "isOwed" : true
+                      }
+                    } ]
+                  },
+                  "next" : null
+                }
+            """.trimIndent(),
+            true
+        )
     }
 
     @Test

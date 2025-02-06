@@ -1,3 +1,3 @@
 package com.zeenom.loan_tracker.common
 
-data class PaginationDto(val next: String?)
+data class PaginationDto<T>(val input: T, val next: String?)

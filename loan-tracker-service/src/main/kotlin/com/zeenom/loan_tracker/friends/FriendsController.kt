@@ -29,7 +29,7 @@ class FriendsController(
         @AuthenticationPrincipal userId: String
     ): Paginated<FriendsResponse> {
         logger.info("Getting friends for user $userId")
-        return queryFriendsService.execute(PaginationDto(next = next)).let { result ->
+        return queryFriendsService.execute(PaginationDto(input = userId, next = next)).let { result ->
             friendsAdapter.fromDtoToPaginatedResponse(result)
         }
     }
