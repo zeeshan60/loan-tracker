@@ -8,6 +8,7 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    environment: dev  # Define the environment here
     permissions:
       id-token: write
       contents: read
@@ -15,6 +16,17 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@v3
+
+      # Login to DockerHub
+      - name: Login to DockerHub
+        run: echo "${{ secrets.DOCKERHUB_ACCESS_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      # Build and Push Docker Image
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t zeeshan60/loan-tracker-service:latest .
+          docker push zeeshan60/loan-tracker-service:latest
+
 
       - name: Check deploy directory
         run: |
