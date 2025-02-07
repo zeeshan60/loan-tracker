@@ -12,13 +12,12 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - name: Echo Current Directory
-        run: |
-          echo "Current directory: $(pwd)"
 
       - name: Checkout code
         uses: actions/checkout@v3
-
+      - name: Echo Current Directory
+        run: |
+          echo "Current directory: $(pwd)"
       - name: Check service directory
         run: |
           if [ ! -d "./oan-service-tracker" ]; then
