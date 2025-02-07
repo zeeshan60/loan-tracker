@@ -24,7 +24,9 @@ jobs:
           fi
       - name: Package application
         run: |
-          zip -r deploy.zip loan-tracker-service/deploy -x "*.git*"
+          cd loan-service-tracker/deploy
+          zip -r ../../deploy.zip .
+
 
       - name: Configure AWS Credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
