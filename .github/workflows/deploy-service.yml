@@ -20,7 +20,7 @@ jobs:
           echo "Current directory: $(pwd)"
       - name: Check service directory
         run: |
-          if [ ! -d "./oan-service-tracker" ]; then
+          if [ ! -d "$(pwd)/oan-service-tracker" ]; then
             echo "Deploy directory does not exist."
             exit 1
           fi
