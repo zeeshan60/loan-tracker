@@ -24,6 +24,7 @@ jobs:
       # Build and Push Docker Image
       - name: Build and Push Docker Image
         run: |
+          cd loan-tracker-service
           docker build -t zeeshan60/loan-tracker-service:latest .
           docker push zeeshan60/loan-tracker-service:latest
 
