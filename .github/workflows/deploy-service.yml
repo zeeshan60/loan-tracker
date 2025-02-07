@@ -18,23 +18,23 @@ jobs:
       - name: Echo Current Directory
         run: |
           echo "Current directory: $(pwd)"
-      - name: Check service directory
-        run: |
-          if [ ! -d "$(pwd)/loan-service-tracker" ]; then
-            echo "Deploy directory does not exist."
-            exit 1
-          fi
+#      - name: Check service directory
+#        run: |
+#          if [ ! -d "$(pwd)/loan-tracker-service" ]; then
+#            echo "Deploy directory does not exist."
+#            exit 1
+#          fi
 
       - name: Check deploy directory
         run: |
-          if [ ! -d "./loan-service-tracker/deploy" ]; then
+          if [ ! -d "loan-tracker-service/deploy" ]; then
             echo "Deploy directory does not exist."
             exit 1
           fi
 
       - name: Package application
         run: |
-          zip -r deploy.zip ./loan-service-tracker/deploy -x "*.git*"
+          zip -r deploy.zip loan-tracker-service/deploy -x "*.git*"
 
       - name: Configure AWS Credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
