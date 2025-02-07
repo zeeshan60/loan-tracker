@@ -19,16 +19,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Check service directory
+        run: |
+          if [ ! -d "./oan-service-tracker" ]; then
+            echo "Deploy directory does not exist."
+            exit 1
+          fi
+
       - name: Check deploy directory
         run: |
-          if [ ! -d "loan-service-tracker/deploy" ]; then
+          if [ ! -d "./loan-service-tracker/deploy" ]; then
             echo "Deploy directory does not exist."
             exit 1
           fi
 
       - name: Package application
         run: |
-          zip -r deploy.zip loan-service-tracker/deploy -x "*.git*"
+          zip -r deploy.zip ./loan-service-tracker/deploy -x "*.git*"
 
       - name: Configure AWS Credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
