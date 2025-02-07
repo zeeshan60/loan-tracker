@@ -21,6 +21,6 @@ export const FriendsStore = signalStore(
       patchState(store, { loading: true });
       const friends = await firstValueFrom(friendsService.loadAllFriends());
       patchState(store, { loading: false, friends })
-    }
+    },
   }))
 );

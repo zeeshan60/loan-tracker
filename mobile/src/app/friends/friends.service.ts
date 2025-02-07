@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { map, Observable, of, timer } from 'rxjs';
+import { map, Observable, of, tap, timer } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable({
@@ -11,6 +11,13 @@ export class FriendsService {
   constructor() { }
 
   loadAllFriends(): Observable<any> {
+    return timer(2000)
+      .pipe(
+        map((value) => [])
+      );
+  }
+
+  createFriend(friend: { name: string }): Observable<any> {
     return timer(2000)
       .pipe(
         map((value) => [])

@@ -29,14 +29,15 @@ export class AppComponent {
 
   private loader: HTMLIonLoadingElement | null = null;
 
-  readonly activateLoaderWhen = signalMethod<boolean>((isLoading) => {
+  readonly activateLoaderWhen = signalMethod<boolean>(async (isLoading) => {
     if (!this.loader) {
-      return;
+      this.loader = await this.loadingCtrl.create();
     }
     if (isLoading) {
       this.loader.present();
     } else {
       this.loader.dismiss();
+      this.loader = null;
     }
   });
 
@@ -54,12 +55,6 @@ export class AppComponent {
       logOutOutline
     });
 
-    this.loadDependencies().then(() => {
-      this.activateLoaderWhen(this.friendsStore.loading);
-    });
-  }
-
-  async loadDependencies() {
-    this.loader = await this.loadingCtrl.create();
+    this.activateLoaderWhen(this.friendsStore.loading);
   }
 }
