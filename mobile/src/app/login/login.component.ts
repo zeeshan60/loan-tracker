@@ -10,6 +10,7 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
+import { ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-login',
@@ -22,6 +23,7 @@ import {
 export class LoginComponent {
   public auth = inject(Auth);
   public router = inject(Router);
+  private toastController = inject(ToastController);
 
   constructor() { }
 
@@ -31,8 +33,12 @@ export class LoginComponent {
         (response: any) => {
           this.router.navigate(['/']);
         },
-        (err: any) => {
-          console.log('network issue.');
+        async (err: any) => {
+          const toast = await this.toastController.create({
+            message: 'Unable to login at the moment',
+            duration: 1500
+          });
+          toast.present();
         }
       );
   }

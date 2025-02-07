@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { IonApp, IonButton, IonLoading, IonRouterOutlet, LoadingController } from '@ionic/angular/standalone';
+import { IonApp, IonRouterOutlet, LoadingController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   ellipse,
@@ -9,7 +9,8 @@ import {
   peopleOutline,
   settingsOutline,
   addCircleOutline,
-  logOutOutline
+  logOutOutline,
+  addOutline,
 } from 'ionicons/icons';
 import { signalMethod } from '@ngrx/signals';
 import { FriendsStore } from './store/friends.store';
@@ -52,7 +53,8 @@ export class AppComponent {
       peopleOutline,
       settingsOutline,
       addCircleOutline,
-      logOutOutline
+      logOutOutline,
+      addOutline,
     });
 
     this.activateLoaderWhen(this.friendsStore.loading);

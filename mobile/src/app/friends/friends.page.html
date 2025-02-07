@@ -1,7 +1,11 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title slot="start">Friends</ion-title>
-    <ion-button (click)="addFriend()">Add</ion-button>
+    <ion-buttons slot="end">
+      <ion-button (click)="addFriend()">
+        <ion-icon name="add-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 

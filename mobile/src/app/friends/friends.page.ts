@@ -34,7 +34,6 @@ export class FriendsPage {
     })
     modal.present();
     const { data, role } = await modal.onWillDismiss();
-    console.log(data, role);
     if (role === 'confirm') {
       this.friendsStore.loadFriends();
     }
