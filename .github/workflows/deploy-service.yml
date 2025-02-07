@@ -24,7 +24,7 @@ jobs:
           fi
       - name: Package application
         run: |
-          cd loan-service-tracker/deploy
+          cd loan-tracker-service/deploy
           zip -r ../../deploy.zip .
 
 
