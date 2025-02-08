@@ -5,6 +5,7 @@ on:
     branches:
       - main
     paths:
+      - '.github/workflows/deploy-service.yml'
       - 'loan-tracker-service/**'
 
 jobs:
