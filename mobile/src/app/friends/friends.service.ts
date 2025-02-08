@@ -11,14 +11,14 @@ export class FriendsService {
   constructor() { }
 
   loadAllFriends(): Observable<any> {
-    return timer(1000)
+    return timer(0)
       .pipe(
         map((value) => [])
       );
   }
 
   createFriend(friend: { name: string }): Observable<any> {
-    return timer(1000)
+    return timer(100)
       .pipe(
         map((value) => [])
       );

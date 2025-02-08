@@ -1,6 +1,13 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
-import { ModalController } from '@ionic/angular/standalone';
+import {
+  IonButton,
+  IonButtons, IonContent,
+  IonHeader,
+  IonInput, IonItem, IonSpinner,
+  IonTitle,
+  IonToolbar,
+  ModalController,
+} from '@ionic/angular/standalone';
 import { FormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
 import { FriendsService } from '../friends/friends.service';
@@ -13,9 +20,17 @@ import { firstValueFrom } from 'rxjs';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    IonicModule,
     FormsModule,
     NgIf,
+    IonInput,
+    IonToolbar,
+    IonHeader,
+    IonButton,
+    IonButtons,
+    IonTitle,
+    IonContent,
+    IonSpinner,
+    IonItem
   ],
 })
 export class AddFriendComponent  implements OnInit {
