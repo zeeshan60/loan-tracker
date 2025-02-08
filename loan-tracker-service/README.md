@@ -115,6 +115,11 @@ hooks:
       timeout: 300
       runas: ec2-user
 ```
-
+# Installing gradle on windows
+- in power shell
+- Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+- iwr -useb get.scoop.sh | iex
+- scoop install gradle
+- go in project and do gradle wrapper
 
 

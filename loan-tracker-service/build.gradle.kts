@@ -1,9 +1,12 @@
+import org.gradle.api.plugins.ApplicationPlugin
+
 plugins {
 	kotlin("jvm") version "1.9.25"
 	kotlin("plugin.spring") version "1.9.25"
 	id("org.springframework.boot") version "3.4.2"
 	id("io.spring.dependency-management") version "1.1.7"
 	kotlin("plugin.serialization") version "1.9.22" // Use the latest version
+	application
 	groovy
 }
 
@@ -73,4 +76,8 @@ kotlin {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+application {
+	mainClass.set("com.zeenom.loan_tracker.LoanTrackerApplication") // Change this to your main class
 }

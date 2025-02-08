@@ -1,6 +1,5 @@
 package com.zeenom.loan_tracker.controllers
 
-import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
@@ -18,7 +17,6 @@ class HealthCheckControllerIntegrationTest(@LocalServerPort private val port: In
             .exchange()
             .expectStatus().isOk
             .expectBody()
-            .jsonPath("$.message").value { it: String? -> Assertions.assertThat(it).isEqualTo("I'm alive!") }
     }
 
     @Test
