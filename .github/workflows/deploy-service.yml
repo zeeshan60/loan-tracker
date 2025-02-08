@@ -61,7 +61,7 @@ jobs:
       - name: Run tests
         run: |
           cd loan-tracker-service
-          ./gradlew test
+          ./gradlew test --scan --no-daemon
 
       - name: Login to DockerHub
         run: echo "${{ secrets.DOCKERHUB_ACCESS_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
