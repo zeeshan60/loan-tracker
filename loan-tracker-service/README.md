@@ -123,4 +123,29 @@ hooks:
 - go in project and do gradle wrapper
 - git add -f gradle/wrapper/gradle-wrapper.jar
 
+# Checking instance iam role
+```shell
+TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+curl -H "X-aws-ec2-metadata-token: $TOKEN" -v http://169.254.169.254/latest/meta-data/iam/security-credentials/
 
+
+TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+curl -H "X-aws-ec2-metadata-token: $TOKEN" -v http://169.254.169.254/latest/meta-data/iam/security-credentials/Code_deploy
+
+
+TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+curl -H "X-aws-ec2-metadata-token: $TOKEN" -v http://169.254.169.254/latest/meta-data/iam
+
+sudo tail -n 50 /var/log/aws/codedeploy-agent/codedeploy-agent.log
+
+sudo systemctl restart codedeploy-agent
+sudo systemctl status codedeploy-agent
+
+sudo systemctl stop codedeploy-agent
+sudo systemctl start codedeploy-agent
+
+sudo service codedeploy-agent stop
+sudo rm -f /opt/codedeploy-agent/state/.pid/codedeploy-agent.pid.lock
+sudo service codedeploy-agent start
+sudo service codedeploy-agent status
+```
