@@ -35,22 +35,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-          cache: 'gradle'
-
-      - name: Restore Gradle cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: gradle-${{ runner.os }}-
-
       # Setup secrets, run tests, build and push docker image
       - name: Create firebase-secret.json
         run: echo '${{ secrets.FIREBASE_SECRET }}' > $GITHUB_WORKSPACE/loan-tracker-service/firebase-secret.json
@@ -58,10 +42,10 @@ jobs:
       - name: Grant execute permission for Gradlew
         run: chmod +x ./loan-tracker-service/gradlew
 
-      - name: Run tests
-        run: |
-          cd loan-tracker-service
-          ./gradlew test --scan --no-daemon
+#      - name: Run tests
+#        run: |
+#          cd loan-tracker-service
+#          ./gradlew test
 
       - name: Login to DockerHub
         run: echo "${{ secrets.DOCKERHUB_ACCESS_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin

@@ -1,7 +1,7 @@
 FROM --platform=linux/amd64 gradle:7-jdk17-alpine AS builder
 WORKDIR /home/gradle/src
 COPY . .
-RUN gradle bootJar --scan --no-daemon
+RUN gradle build bootJar
 
 FROM eclipse-temurin:17-jre
 
