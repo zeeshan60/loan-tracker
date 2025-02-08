@@ -33,15 +33,14 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@v3
+      - name: Create firebase-secret.json
+        run: echo '${{ secrets.FIREBASE_SECRET }}' > loan-tracker-service/firebase-secret.json
       - name: Grant execute permission for gradlew
         run: chmod +x ./loan-tracker-service/gradlew
       - name: Run tests
         run: |
           cd loan-tracker-service
           ./gradlew test
-      - name: Create firebase-secret.json
-        run: echo '${{ secrets.FIREBASE_SECRET }}' > loan-tracker-service/firebase-secret.json
-
       # Login to DockerHub
       - name: Login to DockerHub
         run: echo "${{ secrets.DOCKERHUB_ACCESS_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin

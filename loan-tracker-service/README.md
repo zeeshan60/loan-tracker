@@ -121,5 +121,6 @@ hooks:
 - iwr -useb get.scoop.sh | iex
 - scoop install gradle
 - go in project and do gradle wrapper
+- git add -f gradle/wrapper/gradle-wrapper.jar
 
 
