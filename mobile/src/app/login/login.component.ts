@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { GoogleAuthProvider } from "firebase/auth";
 import { Auth, signInWithPopup } from '@angular/fire/auth';
 import { Router } from '@angular/router';
@@ -10,6 +10,7 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
+import { ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-login',
@@ -17,16 +18,14 @@ import {
   styleUrls: ['./login.component.scss'],
   standalone: true,
   imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonIcon, IonIcon],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LoginComponent  implements OnInit {
+export class LoginComponent {
   public auth = inject(Auth);
   public router = inject(Router);
+  private toastController = inject(ToastController);
 
   constructor() { }
-
-  ngOnInit() {
-    console.log('login...')
-  }
 
   loginWithGoogle() {
     signInWithPopup(this.auth, new GoogleAuthProvider())
@@ -34,8 +33,12 @@ export class LoginComponent  implements OnInit {
         (response: any) => {
           this.router.navigate(['/']);
         },
-        (err: any) => {
-          console.log('network issue.');
+        async (err: any) => {
+          const toast = await this.toastController.create({
+            message: 'Unable to login at the moment',
+            duration: 1500
+          });
+          toast.present();
         }
       );
   }

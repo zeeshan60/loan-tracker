@@ -1,7 +1,5 @@
-import { Component, EnvironmentInjector, inject } from '@angular/core';
-import { IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel } from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import { triangle, ellipse, square, logoGoogle } from 'ionicons/icons';
+import { ChangeDetectionStrategy, Component, EnvironmentInjector, inject } from '@angular/core';
+import { IonTabs, IonTabBar, IonTabButton, IonIcon } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-tabs',
@@ -9,10 +7,9 @@ import { triangle, ellipse, square, logoGoogle } from 'ionicons/icons';
   styleUrls: ['tabs.page.scss'],
   standalone: true,
   imports: [IonTabs, IonTabBar, IonTabButton, IonIcon],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TabsPage {
-  public environmentInjector = inject(EnvironmentInjector);
-
   constructor() {
   }
 }

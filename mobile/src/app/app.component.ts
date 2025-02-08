@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { IonApp, IonRouterOutlet, LoadingController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   ellipse,
@@ -9,8 +9,11 @@ import {
   peopleOutline,
   settingsOutline,
   addCircleOutline,
-  logOutOutline
+  logOutOutline,
+  addOutline,
 } from 'ionicons/icons';
+import { signalMethod } from '@ngrx/signals';
+import { FriendsStore } from './store/friends.store';
 
 @Component({
   selector: 'app-root',
@@ -20,8 +23,27 @@ import {
     IonApp,
     IonRouterOutlet,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent {
+  readonly loadingCtrl = inject(LoadingController);
+
+  private loader: HTMLIonLoadingElement | null = null;
+
+  readonly activateLoaderWhen = signalMethod<boolean>(async (isLoading) => {
+    if (!this.loader) {
+      this.loader = await this.loadingCtrl.create();
+    }
+    if (isLoading) {
+      this.loader.present();
+    } else {
+      this.loader.dismiss();
+      this.loader = null;
+    }
+  });
+
+  readonly friendsStore = inject(FriendsStore);
+
   constructor() {
     addIcons({
       triangle,
@@ -31,7 +53,10 @@ export class AppComponent {
       peopleOutline,
       settingsOutline,
       addCircleOutline,
-      logOutOutline
+      logOutOutline,
+      addOutline,
     });
+
+    this.activateLoaderWhen(this.friendsStore.loading);
   }
 }

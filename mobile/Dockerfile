@@ -32,6 +32,8 @@ FROM nginx:alpine
 # Copy the built Ionic app from the build stage to the Nginx HTML directory.
 COPY --from=build-stage /app/www /usr/share/nginx/html
 
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 # Expose the port your app is running on (usually 80 for web apps).
 EXPOSE 80
 
