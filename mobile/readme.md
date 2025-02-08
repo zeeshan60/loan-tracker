@@ -1,3 +1,4 @@
+[//]: # (Checking deployment)
 # Loan Tracker - Ionic Application
 
 This project is an Ionic application for tracking loans.
