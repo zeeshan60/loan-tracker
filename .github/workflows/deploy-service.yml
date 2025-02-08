@@ -42,10 +42,10 @@ jobs:
       - name: Grant execute permission for Gradlew
         run: chmod +x ./loan-tracker-service/gradlew
 
-#      - name: Run tests
-#        run: |
-#          cd loan-tracker-service
-#          ./gradlew test
+      - name: Run tests
+        run: |
+          cd loan-tracker-service
+          ./gradlew test
 
       - name: Login to DockerHub
         run: echo "${{ secrets.DOCKERHUB_ACCESS_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
