@@ -10,3 +10,11 @@
 ### running the Ui mobile application using image
 - docker pull nomantufail/loan-tracker-ui-repo:latest
 - docker run -d -p 80:80 --name loan-tracker-ui nomantufail/loan-tracker-ui-repo:latest
+
+### maybe need to add following dependencies
+```shell
+# Install Angular CLI globally
+RUN npm install -g @angular/cli@latest
+RUN npm install @angular/cdk@latest
+RUN npm install @angular/material@latest
+```

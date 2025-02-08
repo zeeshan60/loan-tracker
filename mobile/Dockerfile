@@ -14,6 +14,11 @@ COPY package*.json ./
 # Install project dependencies.  Use --omit=dev for production builds.
 RUN npm install --omit=dev  # Or npm ci if you have a package-lock.json
 
+# Install Angular CLI globally
+RUN npm install -g @angular/cli@latest
+RUN npm install @angular/cdk@latest
+RUN npm install @angular/material@latest
+
 # Copy the rest of the application source code
 COPY . .
 
