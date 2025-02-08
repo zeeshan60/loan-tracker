@@ -52,4 +52,5 @@ jobs:
           aws deploy create-deployment \
             --application-name loan-tracker-service \
             --deployment-group-name loan-tracker-deployment-group \
-            --s3-location bucket=zflash-codedeploy-bucket,key=deployui.zip,bundleType=zip
+            --s3-location bucket=zflash-codedeploy-bucket,key=deployui.zip,bundleType=zip \
+            --ignore-application-stop-failures
