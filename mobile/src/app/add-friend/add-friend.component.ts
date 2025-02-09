@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, inject, OnInit, signal, ViewChild } from '@angular/core';
 import {
   IonButton,
   IonButtons, IonContent,
@@ -8,10 +8,10 @@ import {
   IonToolbar,
   ModalController,
 } from '@ionic/angular/standalone';
-import { FormsModule } from '@angular/forms';
-import { NgIf } from '@angular/common';
+import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FriendsService } from '../friends/friends.service';
 import { firstValueFrom } from 'rxjs';
+import { ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-add-friend',
@@ -29,13 +29,22 @@ import { firstValueFrom } from 'rxjs';
     IonTitle,
     IonContent,
     IonSpinner,
-    IonItem
+    IonItem,
+    ReactiveFormsModule,
   ],
 })
 export class AddFriendComponent  implements OnInit {
   name = '';
   readonly loading = signal(false);
   readonly friendsService = inject(FriendsService);
+  private formBuilder = inject(FormBuilder);
+  private toastCtrl = inject(ToastController);
+  public addFriendForm = this.formBuilder.group({
+    name: ['', Validators.required],
+    email: ['', Validators.email],
+    phone: ['', Validators.required],
+  })
+
   constructor(private modalCtrl: ModalController) { }
 
   ngOnInit() {}
@@ -43,10 +52,20 @@ export class AddFriendComponent  implements OnInit {
   cancel() {
     this.modalCtrl.dismiss(null, 'cancel');
   }
-  async confirm() {
-    this.loading.set(true);
-    const friend = await firstValueFrom(this.friendsService.createFriend({ name: 'somewhat' }));
-    this.loading.set(false);
-    this.modalCtrl.dismiss(friend, 'confirm')
+
+  async onSubmit($event: any) {
+    if (this.addFriendForm.valid) {
+      this.loading.set(true);
+      const friend = await firstValueFrom(this.friendsService.createFriend({ name: 'somewhat' }));
+      this.loading.set(false);
+      this.modalCtrl.dismiss(friend, 'confirm')
+    } else {
+      this.addFriendForm.markAllAsTouched();
+      const toast = await this.toastCtrl.create({
+        message: 'Please fill in the correct values',
+        duration: 1500
+      });
+      toast.present();
+    }
   }
 }

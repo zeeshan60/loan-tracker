@@ -8,19 +8,37 @@
       @if (loading()) {
         <ion-spinner></ion-spinner>
       } @else {
-        <ion-button (click)="confirm()" [strong]="true">Confirm</ion-button>
+        <ion-button type="submit" form="add-friend-form" [strong]="true">Confirm</ion-button>
       }
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 <ion-content class="ion-padding">
-  <ion-item>
-    <ion-input type="text" labelPlacement="stacked" label="Name" [(ngModel)]="name" placeholder="Friend name"></ion-input>
-  </ion-item>
-  <ion-item>
-    <ion-input type="email" labelPlacement="stacked" label="Email" [(ngModel)]="name" placeholder="jhon@go.com"></ion-input>
-  </ion-item>
-  <ion-item>
-    <ion-input type="phone" labelPlacement="stacked" label="Phone number" [(ngModel)]="name" placeholder="+923154379769"></ion-input>
-  </ion-item>
+    <form [formGroup]="addFriendForm" (ngSubmit)="onSubmit($event)" id="add-friend-form">
+            <ion-input
+                    type="text"
+                    labelPlacement="stacked"
+                    label="Name"
+                    formControlName="name"
+                    placeholder="Friend name"
+                    errorText="Name is required"
+            ></ion-input>
+            <ion-input
+                    type="email"
+                    labelPlacement="stacked"
+                    label="Email"
+                    errorText="Invalid email"
+                    formControlName="email"
+                    placeholder="noman@gmail.com"
+                    email
+            ></ion-input>
+            <ion-input
+                    type="tel"
+                    labelPlacement="stacked"
+                    label="Phone number"
+                    formControlName="phone"
+                    placeholder="+923154379769"
+                    errorText="Phone is required"
+            ></ion-input>
+    </form>
 </ion-content>
