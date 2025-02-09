@@ -11,7 +11,7 @@ export class FriendsService {
   constructor() { }
 
   loadAllFriends(): Observable<any> {
-    return timer(0)
+    return timer(1000)
       .pipe(
         map((value) => [])
       );

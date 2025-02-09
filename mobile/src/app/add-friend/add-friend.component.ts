@@ -21,7 +21,6 @@ import { firstValueFrom } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     FormsModule,
-    NgIf,
     IonInput,
     IonToolbar,
     IonHeader,

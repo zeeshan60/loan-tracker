@@ -6,10 +6,9 @@ import {
   IonContent,
   IonButton,
   IonButtons,
-  IonIcon, IonNavLink, IonModal, IonItem, IonInput, ModalController,
+  IonIcon, ModalController,
 } from '@ionic/angular/standalone';
 import { FriendsStore } from '../store/friends.store';
-import { RouterLink } from '@angular/router';
 import { AddFriendComponent } from '../add-friend/add-friend.component';
 import { FormsModule } from '@angular/forms';
 
@@ -18,7 +17,7 @@ import { FormsModule } from '@angular/forms';
   templateUrl: 'friends.page.html',
   styleUrls: ['friends.page.scss'],
   standalone: true,
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonButtons, IonIcon, RouterLink, IonNavLink, IonModal, IonItem, IonInput, FormsModule, AddFriendComponent],
+  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonButtons, IonIcon, FormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FriendsPage {
