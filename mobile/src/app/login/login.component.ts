@@ -31,6 +31,7 @@ export class LoginComponent {
     signInWithPopup(this.auth, new GoogleAuthProvider())
       .then(
         (response: any) => {
+          console.log(response);
           this.router.navigate(['/']);
         },
         async (err: any) => {

@@ -12,6 +12,9 @@ import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angu
 import { FriendsService } from '../friends/friends.service';
 import { firstValueFrom } from 'rxjs';
 import { ToastController } from '@ionic/angular';
+import { DEFAULT_TOAST_DURATION } from '../constants';
+import { CreateFriend } from './model';
+import { HelperService } from '../helper.service';
 
 @Component({
   selector: 'app-add-friend',
@@ -34,20 +37,23 @@ import { ToastController } from '@ionic/angular';
   ],
 })
 export class AddFriendComponent  implements OnInit {
-  name = '';
-  readonly loading = signal(false);
   readonly friendsService = inject(FriendsService);
   private formBuilder = inject(FormBuilder);
-  private toastCtrl = inject(ToastController);
+  private helperService = inject(HelperService);
+
+  name = '';
+  readonly loading = signal(false);
   public addFriendForm = this.formBuilder.group({
-    name: ['', Validators.required],
+    name: this.formBuilder.nonNullable.control('', [Validators.required]),
     email: ['', Validators.email],
-    phone: ['', Validators.required],
+    phone: this.formBuilder.nonNullable.control('', [Validators.required]),
   })
 
   constructor(private modalCtrl: ModalController) { }
 
-  ngOnInit() {}
+  ngOnInit() {
+    console.log('initialized..');
+  }
 
   cancel() {
     this.modalCtrl.dismiss(null, 'cancel');
@@ -55,17 +61,20 @@ export class AddFriendComponent  implements OnInit {
 
   async onSubmit($event: any) {
     if (this.addFriendForm.valid) {
-      this.loading.set(true);
-      const friend = await firstValueFrom(this.friendsService.createFriend({ name: 'somewhat' }));
-      this.loading.set(false);
-      this.modalCtrl.dismiss(friend, 'confirm')
+      try {
+        this.loading.set(true);
+        const friend = await firstValueFrom(
+          this.friendsService.createFriend(this.addFriendForm.getRawValue())
+        );
+        await this.modalCtrl.dismiss(friend, 'confirm')
+      } catch (e) {
+        await this.helperService.showToast('Unable to add friend at the moment');
+      } finally {
+        this.loading.set(false);
+      }
     } else {
       this.addFriendForm.markAllAsTouched();
-      const toast = await this.toastCtrl.create({
-        message: 'Please fill in the correct values',
-        duration: 1500
-      });
-      toast.present();
+      await this.helperService.showToast('Please fill in the correct values');
     }
   }
 }

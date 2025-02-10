@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, ViewChild } from '@angular/core';
 import {
   IonHeader,
   IonToolbar,
@@ -8,9 +8,10 @@ import {
   IonButtons,
   IonIcon, ModalController,
 } from '@ionic/angular/standalone';
-import { FriendsStore } from '../store/friends.store';
+import { FriendsStore } from './friends.store';
 import { AddFriendComponent } from '../add-friend/add-friend.component';
 import { FormsModule } from '@angular/forms';
+import { UserService } from '../user.service';
 
 @Component({
   selector: 'app-friends',
@@ -20,11 +21,16 @@ import { FormsModule } from '@angular/forms';
   imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonButtons, IonIcon, FormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FriendsPage {
+export class FriendsPage implements OnInit {
   readonly friendsStore = inject(FriendsStore);
+  readonly userService = inject(UserService);
   readonly modalCtrl = inject(ModalController);
   constructor() {
-    this.friendsStore.loadFriends();
+    this.friendsStore.loadFriends()
+  }
+
+  async ngOnInit() {
+    console.log(await this.userService.getUser()?.getIdToken());
   }
 
   async addFriend() {

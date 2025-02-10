@@ -8,12 +8,16 @@ import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { getAuth, provideAuth } from '@angular/fire/auth';
 import { environment } from './environments/environment';
 import 'ionicons';
-import {  provideHttpClient } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptors, withInterceptorsFromDi } from '@angular/common/http';
+import { AuthInterceptor } from './app/auth.interceptor';
 
 bootstrapApplication(AppComponent, {
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    provideHttpClient(),
+    {provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
+    provideHttpClient(
+      withInterceptorsFromDi(),
+    ),
     provideIonicAngular(),
     provideRouter(routes, withPreloading(PreloadAllModules)),
     provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),

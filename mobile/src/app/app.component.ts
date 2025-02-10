@@ -13,7 +13,7 @@ import {
   addOutline,
 } from 'ionicons/icons';
 import { signalMethod } from '@ngrx/signals';
-import { FriendsStore } from './store/friends.store';
+import { FriendsStore } from './friends/friends.store';
 
 @Component({
   selector: 'app-root',
@@ -31,13 +31,14 @@ export class AppComponent {
   private loader: HTMLIonLoadingElement | null = null;
 
   readonly activateLoaderWhen = signalMethod<boolean>(async (isLoading) => {
-    if (!this.loader) {
+    console.log(isLoading);
+    if (!this.loader && isLoading) {
       this.loader = await this.loadingCtrl.create();
     }
     if (isLoading) {
-      this.loader.present();
+      this.loader?.present();
     } else {
-      this.loader.dismiss();
+      this.loader?.dismiss();
       this.loader = null;
     }
   });
