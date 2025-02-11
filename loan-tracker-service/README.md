@@ -4,7 +4,7 @@
 
 quick ec2 setup:
 
-```shell
+```bash
 sudo su
 yum install git -y
 yum install docker -y
@@ -23,7 +23,7 @@ another way to send image because building is expensive
 
 on your local machine
 
-```shell
+```bash
 docker build . -t loantracker
 docker save -o image.tar loantracker:latest
 scp -i "zee.pem" image.tar ec2-user@ec2-52-74-229-194.ap-southeast-1.compute.amazonaws.com:/home/ec2-user
@@ -62,14 +62,16 @@ sudo docker pull zeeshan60/loan-tracker-service:latest && sudo docker stop loant
 
 ## installing codedeploy agent
 
-    sudo yum update -y
-    sudo yum install ruby wget -y
-    cd /home/ec2-user
-    wget https://aws-codedeploy-us-east-1.s3.us-east-1.amazonaws.com/latest/install
-    chmod +x install
-    sudo ./install auto
-    sudo systemctl start codedeploy-agent
-    sudo systemctl enable codedeploy-agent
+```bash
+sudo yum update -y
+sudo yum install ruby wget -y
+cd /home/ec2-user
+wget https://aws-codedeploy-us-east-1.s3.us-east-1.amazonaws.com/latest/install
+chmod +x install
+sudo ./install auto
+sudo systemctl start codedeploy-agent
+sudo systemctl enable codedeploy-agent
+```
 
 ### Verify installation
 
@@ -115,7 +117,9 @@ hooks:
       timeout: 300
       runas: ec2-user
 ```
+
 # Installing gradle on windows
+
 - in power shell
 - Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 - iwr -useb get.scoop.sh | iex
@@ -123,4 +127,30 @@ hooks:
 - go in project and do gradle wrapper
 - git add -f gradle/wrapper/gradle-wrapper.jar
 
+# Checking instance iam role and debugging code deploy
 
+```bash
+TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+curl -H "X-aws-ec2-metadata-token: $TOKEN" -v http://169.254.169.254/latest/meta-data/iam/security-credentials/
+
+
+TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+curl -H "X-aws-ec2-metadata-token: $TOKEN" -v http://169.254.169.254/latest/meta-data/iam/security-credentials/Code_deploy
+
+
+TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+curl -H "X-aws-ec2-metadata-token: $TOKEN" -v http://169.254.169.254/latest/meta-data/iam
+
+sudo tail -n 50 /var/log/aws/codedeploy-agent/codedeploy-agent.log
+
+sudo systemctl restart codedeploy-agent
+sudo systemctl status codedeploy-agent
+
+sudo systemctl stop codedeploy-agent
+sudo systemctl start codedeploy-agent
+
+sudo service codedeploy-agent stop
+sudo rm -f /opt/codedeploy-agent/state/.pid/codedeploy-agent.pid.lock
+sudo service codedeploy-agent start
+sudo service codedeploy-agent status
+```
