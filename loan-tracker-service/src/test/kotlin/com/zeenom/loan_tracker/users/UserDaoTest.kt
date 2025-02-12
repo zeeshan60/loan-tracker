@@ -6,7 +6,6 @@ import com.zeenom.loan_tracker.common.JacksonConfig
 import com.zeenom.loan_tracker.common.SecondInstant
 import com.zeenom.loan_tracker.common.r2dbc.toJson
 import com.zeenom.loan_tracker.friends.*
-import com.zeenom.loan_tracker.test_configs.TestSecondInstantConfig
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
@@ -20,15 +19,24 @@ import java.util.*
 
 @DataR2dbcTest
 @ActiveProfiles("test")
-@Import(TestSecondInstantConfig::class, UserDao::class, FriendsDao::class, JacksonConfig::class)
+@Import(JacksonConfig::class)
 class UserDaoTest(
     @Autowired private val objectMapper: ObjectMapper,
     @Autowired private val friendRepository: FriendRepository,
-    @Autowired private val friendsDao: FriendsDao,
     @Autowired private val userRepository: UserRepository,
-    @Autowired private val secondInstant: SecondInstant,
-    @Autowired val userDao: UserDao,
 ) : TestPostgresConfig() {
+
+    private val secondInstant = SecondInstant()
+    private val userDao = UserDao(
+        userRepository = userRepository,
+        secondInstant = secondInstant
+    )
+    private val friendsDao = FriendsDao(
+        friendRepository = friendRepository,
+        secondInstant = secondInstant,
+        objectMapper = objectMapper,
+        userRepository = userRepository
+    )
 
     @Test
     fun `save user and read user successfully`(): Unit = runBlocking {
