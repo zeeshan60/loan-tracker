@@ -36,7 +36,7 @@ import { HelperService } from '../helper.service';
     ReactiveFormsModule,
   ],
 })
-export class AddFriendComponent  implements OnInit {
+export class AddFriendComponent {
   readonly friendsService = inject(FriendsService);
   private formBuilder = inject(FormBuilder);
   private helperService = inject(HelperService);
@@ -50,10 +50,6 @@ export class AddFriendComponent  implements OnInit {
   })
 
   constructor(private modalCtrl: ModalController) { }
-
-  ngOnInit() {
-    console.log('initialized..');
-  }
 
   cancel() {
     this.modalCtrl.dismiss(null, 'cancel');

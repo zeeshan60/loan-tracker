@@ -1,6 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { ToastController } from '@ionic/angular';
 import { DEFAULT_TOAST_DURATION } from './constants';
+import { Storage } from '@ionic/storage-angular';
+import { getAuth } from '@angular/fire/auth';
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +17,10 @@ export class HelperService {
       duration,
       swipeGesture: 'vertical'
     });
-    toast.present();
+    return toast.present();
+  }
+
+  async getFirebaseAccessToken() {
+    return getAuth().currentUser?.getIdToken();
   }
 }

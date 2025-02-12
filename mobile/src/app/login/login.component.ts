@@ -11,6 +11,8 @@ import {
   IonToolbar,
 } from '@ionic/angular/standalone';
 import { ToastController } from '@ionic/angular';
+import { UserCredential } from '@firebase/auth';
+import { AuthStore } from './auth.store';
 
 @Component({
   selector: 'app-login',
@@ -23,24 +25,12 @@ import { ToastController } from '@ionic/angular';
 export class LoginComponent {
   public auth = inject(Auth);
   public router = inject(Router);
+  private authStore = inject(AuthStore);
   private toastController = inject(ToastController);
 
   constructor() { }
 
   loginWithGoogle() {
-    signInWithPopup(this.auth, new GoogleAuthProvider())
-      .then(
-        (response: any) => {
-          console.log(response);
-          this.router.navigate(['/']);
-        },
-        async (err: any) => {
-          const toast = await this.toastController.create({
-            message: 'Unable to login at the moment',
-            duration: 1500
-          });
-          toast.present();
-        }
-      );
+    this.authStore.loginWithGoogle();
   }
 }

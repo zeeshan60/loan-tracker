@@ -8,8 +8,7 @@ import {
   IonIcon,
    IonButtons,
 } from '@ionic/angular/standalone';
-import { Auth, signOut } from '@angular/fire/auth';
-import { Router } from '@angular/router';
+import { AuthStore } from '../login/auth.store';
 
 @Component({
   selector: 'app-account',
@@ -20,13 +19,6 @@ import { Router } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccountPage {
-  public auth = inject(Auth);
-  private router = inject(Router);
+  readonly authStore = inject(AuthStore);
   constructor() {}
-
-  signOut(): void {
-    signOut(this.auth).then(() => {
-      this.router.navigate(['login']);
-    })
-  }
 }

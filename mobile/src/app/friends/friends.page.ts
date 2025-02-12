@@ -11,7 +11,7 @@ import {
 import { FriendsStore } from './friends.store';
 import { AddFriendComponent } from '../add-friend/add-friend.component';
 import { FormsModule } from '@angular/forms';
-import { UserService } from '../user.service';
+import { AuthStore } from '../login/auth.store';
 
 @Component({
   selector: 'app-friends',
@@ -23,15 +23,13 @@ import { UserService } from '../user.service';
 })
 export class FriendsPage implements OnInit {
   readonly friendsStore = inject(FriendsStore);
-  readonly userService = inject(UserService);
   readonly modalCtrl = inject(ModalController);
+  readonly authStore = inject(AuthStore);
   constructor() {
     this.friendsStore.loadFriends()
   }
 
-  async ngOnInit() {
-    console.log(await this.userService.getUser()?.getIdToken());
-  }
+  async ngOnInit() {}
 
   async addFriend() {
     const modal = await this.modalCtrl.create({

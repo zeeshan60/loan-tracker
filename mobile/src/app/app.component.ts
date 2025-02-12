@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { IonApp, IonRouterOutlet, LoadingController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -14,6 +14,9 @@ import {
 } from 'ionicons/icons';
 import { signalMethod } from '@ngrx/signals';
 import { FriendsStore } from './friends/friends.store';
+import { IonicStorageModule } from '@ionic/storage-angular';
+import { AuthStore } from './login/auth.store';
+import { StorageService } from './services/storage.service';
 
 @Component({
   selector: 'app-root',
@@ -22,18 +25,21 @@ import { FriendsStore } from './friends/friends.store';
   imports: [
     IonApp,
     IonRouterOutlet,
+    IonicStorageModule
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   readonly loadingCtrl = inject(LoadingController);
-
+  readonly authStore = inject(AuthStore);
+  readonly storageService = inject(StorageService);
   private loader: HTMLIonLoadingElement | null = null;
 
   readonly activateLoaderWhen = signalMethod<boolean>(async (isLoading) => {
-    console.log(isLoading);
     if (!this.loader && isLoading) {
-      this.loader = await this.loadingCtrl.create();
+      this.loader = await this.loadingCtrl.create({
+        duration: 2000,
+      });
     }
     if (isLoading) {
       this.loader?.present();
@@ -59,5 +65,14 @@ export class AppComponent {
     });
 
     this.activateLoaderWhen(this.friendsStore.loading);
+  }
+
+  async ngOnInit() {
+    await this.initApp();
+  }
+  async initApp() {
+    this.storageService.storageReady$.subscribe(async () => {
+      await this.authStore.setApiKey();
+    });
   }
 }

@@ -1,25 +1,21 @@
-import { HttpEvent, HttpHandler, HttpInterceptor, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
+import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { UserService } from './user.service';
-import { from, Observable, of, switchMap } from 'rxjs';
+import { Observable, of, switchMap } from 'rxjs';
+import { AuthStore } from './login/auth.store';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthInterceptor implements HttpInterceptor {
-  readonly userService = new UserService();
+  readonly authStore = inject(AuthStore);
   intercept(req: HttpRequest<any>, handler: HttpHandler): Observable<HttpEvent<any>> {
-    console.log('Request URL: ' + req.url);
-    if (this.userService.getUser()?.getIdToken()) {
-      return from(this.userService.getUser()?.getIdToken()!)
+    return req.url.includes('/api/v1') ?
+      of(this.authStore.apiKey())
         .pipe(
-          switchMap(authToken => {
-            return handler.handle(req.clone({
-              headers: req.headers.append('X-Authentication-Token', authToken),
-            }));
-          })
-        );
-    }
-    return handler.handle(req);
+          switchMap(authToken => handler.handle(req.clone({
+            headers: req.headers.append('Authorization', `Bearer ${authToken}`),
+          })))
+        ) :
+      handler.handle(req);
   }
 }
