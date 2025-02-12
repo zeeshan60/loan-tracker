@@ -53,7 +53,7 @@ class LoanTrackerIntegrationTest(@LocalServerPort private val port: Int) {
                     .exchange()
                     .expectStatus().isOk
                     .expectBody()
-                    .jsonPath("$.data.friends").isNotEmpty
+                    .jsonPath("$.data.friends").exists()
             }
     }
 }

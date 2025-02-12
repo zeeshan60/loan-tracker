@@ -6,6 +6,8 @@ import com.zeenom.loan_tracker.common.SecondInstant
 import com.zeenom.loan_tracker.common.r2dbc.toJson
 import com.zeenom.loan_tracker.friends.*
 import com.zeenom.loan_tracker.test_configs.TestSecondInstantConfig
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.runBlocking
@@ -44,7 +46,7 @@ class UserDaoTest {
     @Test
     fun `save user and read user successfully`(): Unit = runBlocking {
         val uid = "CMWL0tapZGSDOI3TbzQEM8vblTl2"
-        userRepository.deleteAllByUid(uid).awaitSingleOrNull()
+        userRepository.deleteAllByUid(uid)
         val userDto = UserDto(
             uid = uid,
             email = "example@gmail.com",
@@ -58,7 +60,7 @@ class UserDaoTest {
         val user = userDao.findUserById(uid)
         assertThat(user).isEqualTo(userDto)
 
-        val entity = userRepository.findByUid(uid).awaitSingle()
+        val entity = userRepository.findByUid(uid)!!
         assertThat(entity.createdAt).isBeforeOrEqualTo(secondInstant.now())
         assertThat(entity.updatedAt).isBeforeOrEqualTo(secondInstant.now())
         assertThat(entity.lastLoginAt).isNull()
@@ -67,7 +69,7 @@ class UserDaoTest {
     @Test
     fun `login user and read user successfully`(): Unit = runBlocking {
         val uid = "CMWL0tapZGSDOI3TbzQEM8vblTl2"
-        userRepository.deleteAllByUid(uid).awaitSingleOrNull()
+        userRepository.deleteAllByUid(uid)
         val userDto = UserDto(
             uid = uid,
             email = "example@gmail.com",
@@ -81,7 +83,7 @@ class UserDaoTest {
         val user = userDao.findUserById(uid)
         assertThat(user).isEqualTo(userDto)
 
-        val entity = userRepository.findByUid(uid).awaitSingle()
+        val entity = userRepository.findByUid(uid)!!
         assertThat(entity.createdAt).isBeforeOrEqualTo(secondInstant.now())
         assertThat(entity.updatedAt).isBeforeOrEqualTo(secondInstant.now())
         assertThat(entity.lastLoginAt).isBeforeOrEqualTo(secondInstant.now())
@@ -92,7 +94,7 @@ class UserDaoTest {
 
         @Test
         fun `make all owners of this user his friends`(): Unit = runBlocking {
-            userRepository.deleteAll().awaitSingleOrNull()
+            userRepository.deleteAll()
             val owner1 = getOwner1()
             userDao.createUser(owner1)
             val owner2 = getOwner2()
@@ -212,7 +214,7 @@ class UserDaoTest {
 
         private suspend fun addSomeLoanAmountToThisFriend(phoneNumber: String) {
             val entities =
-                friendRepository.findAll().filter { it.friendPhoneNumber == phoneNumber }.collectList().awaitSingle()
+                friendRepository.findAll().toList().filter { it.friendPhoneNumber == phoneNumber }.toList()
             entities.forEach { friendEntity ->
                 friendRepository.save(
                     friendEntity.copy(
@@ -226,7 +228,7 @@ class UserDaoTest {
                             )
                         ).toJson(objectMapper = objectMapper)
                     )
-                ).awaitSingle()
+                )
             }
         }
 

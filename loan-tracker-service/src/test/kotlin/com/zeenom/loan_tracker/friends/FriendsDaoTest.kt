@@ -215,7 +215,7 @@ class FriendsDaoTest {
         }
 
     private suspend fun cleanup() {
-        userRepository.deleteAll().awaitSingleOrNull()
-        friendRepository.deleteAll().awaitSingleOrNull()
+        userRepository.deleteAll()
+        friendRepository.deleteAll()
     }
 }

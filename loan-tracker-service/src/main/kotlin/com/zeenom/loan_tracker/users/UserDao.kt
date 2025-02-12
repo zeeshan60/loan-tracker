@@ -1,15 +1,13 @@
 package com.zeenom.loan_tracker.users
 
 import com.zeenom.loan_tracker.common.SecondInstant
-import kotlinx.coroutines.reactive.awaitSingle
-import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.stereotype.Service
 
 @Service
 class UserDao(private val userRepository: UserRepository, private val secondInstant: SecondInstant) {
 
     suspend fun loginUser(userDto: UserDto): String {
-        val existingUser = userRepository.findByUid(userDto.uid).awaitSingleOrNull()
+        val existingUser = userRepository.findByUid(userDto.uid)
         if (existingUser != null) {
             userRepository.save(
                 existingUser.copy(
@@ -20,7 +18,7 @@ class UserDao(private val userRepository: UserRepository, private val secondInst
                     updatedAt = secondInstant.now(),
                     lastLoginAt = secondInstant.now()
                 )
-            ).awaitSingle()
+            )
             return "User updated ${userDto.uid}"
         }
         userRepository.save(
@@ -35,7 +33,7 @@ class UserDao(private val userRepository: UserRepository, private val secondInst
                 updatedAt = secondInstant.now(),
                 lastLoginAt = secondInstant.now()
             )
-        ).awaitSingle()
+        )
         return "User logged in ${userDto.uid}"
     }
 
@@ -52,12 +50,12 @@ class UserDao(private val userRepository: UserRepository, private val secondInst
                 updatedAt = secondInstant.now(),
                 lastLoginAt = null
             )
-        ).awaitSingle()
+        )
         return "User created ${userDto.uid}"
     }
 
     suspend fun findUserById(uid: String): UserDto? {
-        return userRepository.findByUid(uid).awaitSingleOrNull()?.let {
+        return userRepository.findByUid(uid)?.let {
             UserDto(
                 uid = it.uid,
                 email = it.email,

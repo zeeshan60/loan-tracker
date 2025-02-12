@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.server.reactive.ServerHttpResponse
@@ -16,6 +17,7 @@ import org.springframework.security.config.web.server.invoke
 import org.springframework.security.web.server.SecurityWebFilterChain
 import org.springframework.security.web.server.ServerAuthenticationEntryPoint
 import org.springframework.security.web.server.authentication.AuthenticationWebFilter
+import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers.pathMatchers
 import reactor.core.publisher.Mono
 import java.nio.charset.StandardCharsets
 
@@ -30,11 +32,12 @@ class SecurityConfig {
     fun webHttpSecurity(
         http: ServerHttpSecurity,
         authManager: AuthManager,
-        authConverter: AuthConverter
+        authConverter: AuthConverter,
     ): SecurityWebFilterChain {
         return http {
             authorizeExchange {
                 authorizePublicApis()
+                authorize(pathMatchers(HttpMethod.OPTIONS, "/**"), permitAll)
                 authorize(anyExchange, authenticated)
             }
             exceptionHandling {
