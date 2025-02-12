@@ -154,3 +154,10 @@ sudo rm -f /opt/codedeploy-agent/state/.pid/codedeploy-agent.pid.lock
 sudo service codedeploy-agent start
 sudo service codedeploy-agent status
 ```
+
+# Domain transfer research
+We updated ns records in domain
+Here is how u look up records live. removing 8.8.8.8 will look up records coming from your router
+```bash
+nslookup -type=A loantracker.zflashstudios.com 8.8.8.8
+```
