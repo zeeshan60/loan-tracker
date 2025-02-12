@@ -2,6 +2,7 @@ package com.zeenom.loan_tracker.users
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.zeenom.loan_tracker.common.AmountDto
+import com.zeenom.loan_tracker.common.JacksonConfig
 import com.zeenom.loan_tracker.common.SecondInstant
 import com.zeenom.loan_tracker.common.r2dbc.toJson
 import com.zeenom.loan_tracker.friends.*
@@ -12,33 +13,22 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import java.util.*
 
-@SpringBootTest
-@ActiveProfiles("local")
-@Import(TestSecondInstantConfig::class)
-class UserDaoTest {
-
-    @Autowired
-    private lateinit var objectMapper: ObjectMapper
-
-    @Autowired
-    private lateinit var friendRepository: FriendRepository
-
-    @Autowired
-    private lateinit var friendsDao: FriendsDao
-
-    @Autowired
-    private lateinit var userRepository: UserRepository
-
-    @Autowired
-    private lateinit var secondInstant: SecondInstant
-
-    @Autowired
-    lateinit var userDao: UserDao
+@DataR2dbcTest
+@ActiveProfiles("test")
+@Import(TestSecondInstantConfig::class, UserDao::class, FriendsDao::class, JacksonConfig::class)
+class UserDaoTest(
+    @Autowired private val objectMapper: ObjectMapper,
+    @Autowired private val friendRepository: FriendRepository,
+    @Autowired private val friendsDao: FriendsDao,
+    @Autowired private val userRepository: UserRepository,
+    @Autowired private val secondInstant: SecondInstant,
+    @Autowired val userDao: UserDao,
+) : TestPostgresConfig() {
 
     @Test
     fun `save user and read user successfully`(): Unit = runBlocking {

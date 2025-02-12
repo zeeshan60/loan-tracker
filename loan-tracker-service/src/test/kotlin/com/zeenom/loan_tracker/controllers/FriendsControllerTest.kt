@@ -13,19 +13,21 @@ import org.skyscreamer.jsonassert.JSONAssert
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.reactive.server.WebTestClient
 import java.util.*
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class FriendsControllerTest(@LocalServerPort private val port: Int) {
+@ActiveProfiles("test")
+class FriendsControllerTest(
+    @LocalServerPort private val port: Int,
+    @Autowired private val authService: AuthService,
+    @Autowired @MockitoBean private val friendsDao: FriendsDao,
+) {
 
-    @Autowired
-    private lateinit var authService: AuthService
     private val webTestClient = WebTestClient.bindToServer().baseUrl("http://localhost:$port").build()
 
-    @MockitoBean
-    private lateinit var friendsDao: FriendsDao
 
     @Test
     fun `friends endpoint returns friends`(): Unit = runBlocking {

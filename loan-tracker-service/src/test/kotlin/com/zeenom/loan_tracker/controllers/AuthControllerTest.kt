@@ -14,28 +14,25 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.whenever
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean
 import org.springframework.test.web.reactive.server.WebTestClient
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class AuthControllerTest(@LocalServerPort private val port: Int) {
+@ActiveProfiles("test")
+class AuthControllerTest(
+    @LocalServerPort private val port: Int,
+    @Autowired @MockitoSpyBean private val firebaseService: FirebaseService,
+    @Autowired @MockitoBean private val eventDao: EventDao,
+    @Autowired @MockitoBean private val userDao: UserDao,
+    @Autowired @MockitoBean private val friendsDao: FriendsDao,
+) {
 
     private val webTestClient = WebTestClient.bindToServer().baseUrl("http://localhost:$port").build()
-
-    @MockitoSpyBean
-    private lateinit var firebaseService: FirebaseService
-
-    @MockitoBean
-    private lateinit var eventDao: EventDao
-
-    @MockitoBean
-    private lateinit var userDao: UserDao
-
-    @MockitoBean
-    private lateinit var friendsDao: FriendsDao
 
     @Test
     fun `given verified id token generates jwt token with expiry successfully`(): Unit = runBlocking {

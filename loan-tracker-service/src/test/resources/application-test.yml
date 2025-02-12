@@ -1,0 +1,9 @@
+spring:
+  r2dbc:
+    url: r2dbc:postgresql://localhost:8888/postgres
+  flyway:
+    enabled: false
+self:
+  api-url: "http://localhost:8080"
+auth:
+  secret-key: "this is a secret that should be replaced with environment variable"

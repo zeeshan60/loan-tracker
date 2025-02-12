@@ -2,8 +2,9 @@ package com.zeenom.loan_tracker.friends
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.zeenom.loan_tracker.common.AmountDto
+import com.zeenom.loan_tracker.common.JacksonConfig
+import com.zeenom.loan_tracker.common.SecondInstant
 import com.zeenom.loan_tracker.common.r2dbc.toJson
-import com.zeenom.loan_tracker.test_configs.TestSecondInstantConfig
 import com.zeenom.loan_tracker.users.UserDao
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEntity
@@ -14,34 +15,34 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import java.time.Instant
 import java.util.*
 
-@SpringBootTest
-@Import(TestSecondInstantConfig::class)
-@ActiveProfiles("local")
-class FriendsDaoTest {
+@DataR2dbcTest
+@Import(JacksonConfig::class)
+@ActiveProfiles("test")
+class FriendsDaoTest(
+    @Autowired private val friendRepository: FriendRepository,
+    @Autowired private val userRepository: UserRepository,
+    @Autowired private val objectMapper: ObjectMapper,
+) : TestPostgresConfig() {
 
-    @Autowired
-    private lateinit var friendsControllerAdapter: FriendsControllerAdapter
+    private val secondInstant = SecondInstant()
+    private val friendsDao = FriendsDao(
+        friendRepository = friendRepository,
+        userRepository = userRepository,
+        secondInstant = secondInstant,
+        objectMapper = objectMapper,
+    )
 
-    @Autowired
-    private lateinit var objectMapper: ObjectMapper
-
-    @Autowired
-    private lateinit var friendRepository: FriendRepository
-
-    @Autowired
-    private lateinit var userRepository: UserRepository
-
-    @Autowired
-    private lateinit var userDao: UserDao
-
-    @Autowired
-    private lateinit var friendsDao: FriendsDao
+    private val userDao = UserDao(
+        userRepository = userRepository,
+        secondInstant = secondInstant
+    )
 
     @Test
     fun `save friend adds a friend info in user friends even if friend itself dont exists`(): Unit = runBlocking {
@@ -221,6 +222,20 @@ class FriendsDaoTest {
                 )
             )
         }
+
+    fun cleanup() = runBlocking {
+        userRepository.deleteAll()
+        friendRepository.deleteAll()
+    }
+}
+
+@SpringBootTest
+@ActiveProfiles("local")
+class FriendsDaoLocalIntegrationTest(
+    @Autowired private val objectMapper: ObjectMapper,
+    @Autowired private val friendRepository: FriendRepository,
+    @Autowired private val userRepository: UserRepository,
+) {
 
     @Test
     @Disabled

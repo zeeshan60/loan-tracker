@@ -63,6 +63,10 @@ dependencies {
     testImplementation("org.spockframework:spock-spring:2.3-groovy-3.0")
     testImplementation("org.codehaus.groovy:groovy-all:3.0.9")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.1")
+    val containerVersion = "1.20.4"
+    testImplementation("org.testcontainers:testcontainers:$containerVersion")
+    testImplementation("org.testcontainers:junit-jupiter:$containerVersion")
+    testImplementation("org.testcontainers:postgresql:$containerVersion")
 }
 
 kotlin {
