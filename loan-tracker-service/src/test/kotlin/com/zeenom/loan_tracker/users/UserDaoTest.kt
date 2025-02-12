@@ -6,6 +6,8 @@ import com.zeenom.loan_tracker.common.SecondInstant
 import com.zeenom.loan_tracker.common.r2dbc.toJson
 import com.zeenom.loan_tracker.friends.*
 import com.zeenom.loan_tracker.test_configs.TestSecondInstantConfig
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.runBlocking
@@ -212,7 +214,7 @@ class UserDaoTest {
 
         private suspend fun addSomeLoanAmountToThisFriend(phoneNumber: String) {
             val entities =
-                friendRepository.findAll().filter { it.friendPhoneNumber == phoneNumber }.collectList().awaitSingle()
+                friendRepository.findAll().toList().filter { it.friendPhoneNumber == phoneNumber }.toList()
             entities.forEach { friendEntity ->
                 friendRepository.save(
                     friendEntity.copy(
@@ -226,7 +228,7 @@ class UserDaoTest {
                             )
                         ).toJson(objectMapper = objectMapper)
                     )
-                ).awaitSingle()
+                )
             }
         }
 

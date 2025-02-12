@@ -4,10 +4,8 @@ import io.r2dbc.postgresql.codec.Json
 import org.springframework.data.annotation.Id
 import org.springframework.data.r2dbc.repository.Query
 import org.springframework.data.relational.core.mapping.Table
-import org.springframework.data.repository.reactive.ReactiveCrudRepository
+import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import org.springframework.stereotype.Repository
-import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
 import java.time.Instant
 import java.util.*
 
@@ -21,11 +19,11 @@ data class UserFriendEntity(
     val friendDisplayName: String,
     val friendTotalAmountsDto: Json?,
     val createdAt: Instant,
-    val updatedAt: Instant
+    val updatedAt: Instant,
 )
 
 @Repository
-interface FriendRepository : ReactiveCrudRepository<UserFriendEntity, UUID> {
+interface FriendRepository : CoroutineCrudRepository<UserFriendEntity, UUID> {
     @Query(
         """
         SELECT u.photo_url, uf.friend_display_name, uf.friend_phone_number, uf.friend_email, uf.friend_total_amounts_dto, uf.updated_at 
@@ -35,9 +33,7 @@ interface FriendRepository : ReactiveCrudRepository<UserFriendEntity, UUID> {
         WHERE owner.uid = :uid
     """
     )
-    fun findAllFriendsByUid(uid: String): Flux<FriendSelectEntity>
-
-    fun findUserFriendEntitiesByUserId(userId: UUID): Flux<UserFriendEntity>
+    suspend fun findAllFriendsByUid(uid: String): List<FriendSelectEntity>
 
     @Query(
         """
@@ -46,7 +42,7 @@ interface FriendRepository : ReactiveCrudRepository<UserFriendEntity, UUID> {
         WHERE (uf.friend_email = :email AND :email IS NOT NULL) OR (uf.friend_phone_number = :phone AND :phone IS NOT NULL)
     """
     )
-    fun findAllByEmailOrPhone(email: String?, phone: String?): Flux<UserFriendEntity>
+    suspend fun findAllByEmailOrPhone(email: String?, phone: String?): List<UserFriendEntity>
 
     @Query(
         """
@@ -56,8 +52,8 @@ interface FriendRepository : ReactiveCrudRepository<UserFriendEntity, UUID> {
         WHERE (uf.friend_email = :email AND :email IS NOT NULL) OR (uf.friend_phone_number = :phone AND :phone IS NOT NULL)
     """
     )
-    fun findOwnersByMyEmailOrPhone(email: String?, phone: String?): Flux<UserEntityWithFriendAmountEntity>
-    fun findByUserIdAndFriendId(id: UUID, friendId: UUID): Mono<UserFriendEntity>
+    suspend fun findOwnersByMyEmailOrPhone(email: String?, phone: String?): List<UserEntityWithFriendAmountEntity>
+    suspend fun findByUserIdAndFriendId(id: UUID, friendId: UUID): UserFriendEntity?
 }
 
 data class UserEntityWithFriendAmountEntity(
@@ -65,7 +61,7 @@ data class UserEntityWithFriendAmountEntity(
     val ownerPhoneNumber: String?,
     val ownerEmail: String?,
     val ownerDisplayName: String,
-    val friendTotalAmountsDto: Json?
+    val friendTotalAmountsDto: Json?,
 )
 
 data class FriendSelectEntity(
@@ -74,5 +70,5 @@ data class FriendSelectEntity(
     val friendEmail: String?,
     val friendPhoneNumber: String?,
     val friendTotalAmountsDto: Json?,
-    val updatedAt: Instant
+    val updatedAt: Instant,
 )
