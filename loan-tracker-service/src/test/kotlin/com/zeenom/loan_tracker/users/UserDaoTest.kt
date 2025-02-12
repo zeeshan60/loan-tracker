@@ -6,10 +6,7 @@ import com.zeenom.loan_tracker.common.SecondInstant
 import com.zeenom.loan_tracker.common.r2dbc.toJson
 import com.zeenom.loan_tracker.friends.*
 import com.zeenom.loan_tracker.test_configs.TestSecondInstantConfig
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.reactor.awaitSingle
-import kotlinx.coroutines.reactor.awaitSingleOrNull
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
@@ -153,7 +150,7 @@ class UserDaoTest {
 
         private suspend fun addUserAsFriendToOwner(
             owner1: UserDto,
-            userDto: UserDto
+            userDto: UserDto,
         ) {
             friendsDao.saveFriend(
                 owner1.uid,
@@ -163,7 +160,7 @@ class UserDaoTest {
 
         private suspend fun assertOwner2HasAFriend(
             owner2: UserDto,
-            userDto: UserDto
+            userDto: UserDto,
         ) {
             val owner2FriendsDto = friendsDao.findAllByUserId(owner2.uid)
             assertThat(owner2FriendsDto.friends).hasSize(1)
@@ -193,7 +190,7 @@ class UserDaoTest {
 
         private suspend fun assertOwner1HasAFriend(
             owner1: UserDto,
-            userDto: UserDto
+            userDto: UserDto,
         ) {
             val owner1FriendsDto = friendsDao.findAllByUserId(owner1.uid)
             assertThat(owner1FriendsDto.friends).hasSize(1)
@@ -214,8 +211,8 @@ class UserDaoTest {
 
         private suspend fun addSomeLoanAmountToThisFriend(phoneNumber: String) {
             val entities =
-                friendRepository.findAll().toList().filter { it.friendPhoneNumber == phoneNumber }.toList()
-            entities.forEach { friendEntity ->
+                friendRepository.findAll().filter { it.friendPhoneNumber == phoneNumber }
+            entities.collect { friendEntity ->
                 friendRepository.save(
                     friendEntity.copy(
                         friendTotalAmountsDto = FriendTotalAmountsDto(

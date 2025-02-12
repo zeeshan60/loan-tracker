@@ -7,9 +7,6 @@ import com.zeenom.loan_tracker.common.TransactionDto
 import com.zeenom.loan_tracker.common.r2dbc.toClass
 import com.zeenom.loan_tracker.test_configs.TestSecondInstantConfig
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.reactor.awaitSingle
-import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
