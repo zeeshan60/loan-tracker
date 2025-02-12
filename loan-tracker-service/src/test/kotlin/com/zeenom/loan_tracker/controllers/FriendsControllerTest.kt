@@ -116,5 +116,19 @@ class FriendsControllerTest(@LocalServerPort private val port: Int) {
         response.expectHeader().valueEquals("Access-Control-Allow-Methods", "GET")
         response.expectHeader().exists("Access-Control-Max-Age")
     }
+
+    @Test
+    fun `test CORS preflight request is allowed`() {
+        val response = webTestClient.options()
+            .uri("/api/v1/friends") // Change this to a real endpoint
+            .header("Origin", "http://example.com") // Simulate a request from a frontend
+            .header("Access-Control-Request-Method", "POST") // Simulate preflight for POST
+            .exchange()
+
+        response.expectStatus().isOk // Ensure preflight is not blocked
+        response.expectHeader().valueEquals("Access-Control-Allow-Origin", "*")
+        response.expectHeader().valueEquals("Access-Control-Allow-Methods", "POST")
+    }
+
 }
 
