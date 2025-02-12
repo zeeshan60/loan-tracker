@@ -58,9 +58,9 @@ class FriendsDao(
             throw IllegalArgumentException("At least one of userId, email or phoneNumber must be provided")
         }
 
-        val user = userRepository.findByUid(uid).awaitSingleOrNull() ?: throw IllegalArgumentException("User not found")
-        val friendId = friendDto.email?.let { userRepository.findByEmail(it).awaitSingleOrNull()?.id }
-            ?: friendDto.phoneNumber?.let { userRepository.findByPhoneNumber(it).awaitSingleOrNull()?.id }
+        val user = userRepository.findByUid(uid) ?: throw IllegalArgumentException("User not found")
+        val friendId = friendDto.email?.let { userRepository.findByEmail(it)?.id }
+            ?: friendDto.phoneNumber?.let { userRepository.findByPhoneNumber(it)?.id }
         addFriendToUser(user = user, friendId = friendId, friendDto = friendDto)
         friendId?.let { addUserToFriend(friendId = it, user = user) }
     }
@@ -107,7 +107,7 @@ class FriendsDao(
 
     @Transactional
     suspend fun makeMyOwnersMyFriends(uid: String) {
-        val userEntity = userRepository.findByUid(uid).awaitSingleOrNull()
+        val userEntity = userRepository.findByUid(uid)
             ?: throw IllegalArgumentException("User not found")
 
         updateMyIdInMyOwnersRecord(userEntity)

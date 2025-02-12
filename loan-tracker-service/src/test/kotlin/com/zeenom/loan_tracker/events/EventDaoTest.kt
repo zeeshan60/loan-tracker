@@ -6,6 +6,8 @@ import com.zeenom.loan_tracker.common.SecondInstant
 import com.zeenom.loan_tracker.common.TransactionDto
 import com.zeenom.loan_tracker.common.r2dbc.toClass
 import com.zeenom.loan_tracker.test_configs.TestSecondInstantConfig
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.runBlocking
@@ -36,7 +38,7 @@ class EventDaoTest {
 
     @Test
     fun `successfully saves event and reads it back`(): Unit = runBlocking {
-        eventRepository.deleteAll().awaitSingleOrNull()
+        eventRepository.deleteAll()
         val eventDto = EventDto(
             event = EventType.CREATE_TRANSACTION,
             payload = TransactionDto(
@@ -52,7 +54,7 @@ class EventDaoTest {
         eventDao.saveEvent(eventDto)
 
 
-        val entity = eventRepository.findAll().collectList().awaitSingle().first()
+        val entity = eventRepository.findAll().first()
         assertThat(entity.event).isEqualTo(eventDto.event)
         assertThat(entity.userId).isEqualTo(eventDto.userId)
         assertThat(entity.payload?.toClass(objectMapper, EventPayloadDto::class.java)).isEqualTo(eventDto.payload)

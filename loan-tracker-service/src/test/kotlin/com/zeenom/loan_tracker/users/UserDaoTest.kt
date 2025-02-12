@@ -46,7 +46,7 @@ class UserDaoTest {
     @Test
     fun `save user and read user successfully`(): Unit = runBlocking {
         val uid = "CMWL0tapZGSDOI3TbzQEM8vblTl2"
-        userRepository.deleteAllByUid(uid).awaitSingleOrNull()
+        userRepository.deleteAllByUid(uid)
         val userDto = UserDto(
             uid = uid,
             email = "example@gmail.com",
@@ -60,7 +60,7 @@ class UserDaoTest {
         val user = userDao.findUserById(uid)
         assertThat(user).isEqualTo(userDto)
 
-        val entity = userRepository.findByUid(uid).awaitSingle()
+        val entity = userRepository.findByUid(uid)!!
         assertThat(entity.createdAt).isBeforeOrEqualTo(secondInstant.now())
         assertThat(entity.updatedAt).isBeforeOrEqualTo(secondInstant.now())
         assertThat(entity.lastLoginAt).isNull()
@@ -69,7 +69,7 @@ class UserDaoTest {
     @Test
     fun `login user and read user successfully`(): Unit = runBlocking {
         val uid = "CMWL0tapZGSDOI3TbzQEM8vblTl2"
-        userRepository.deleteAllByUid(uid).awaitSingleOrNull()
+        userRepository.deleteAllByUid(uid)
         val userDto = UserDto(
             uid = uid,
             email = "example@gmail.com",
@@ -83,7 +83,7 @@ class UserDaoTest {
         val user = userDao.findUserById(uid)
         assertThat(user).isEqualTo(userDto)
 
-        val entity = userRepository.findByUid(uid).awaitSingle()
+        val entity = userRepository.findByUid(uid)!!
         assertThat(entity.createdAt).isBeforeOrEqualTo(secondInstant.now())
         assertThat(entity.updatedAt).isBeforeOrEqualTo(secondInstant.now())
         assertThat(entity.lastLoginAt).isBeforeOrEqualTo(secondInstant.now())
@@ -94,7 +94,7 @@ class UserDaoTest {
 
         @Test
         fun `make all owners of this user his friends`(): Unit = runBlocking {
-            userRepository.deleteAll().awaitSingleOrNull()
+            userRepository.deleteAll()
             val owner1 = getOwner1()
             userDao.createUser(owner1)
             val owner2 = getOwner2()
