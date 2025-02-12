@@ -2,6 +2,8 @@ import { inject, Injectable } from '@angular/core';
 import { map, Observable, of, tap, timer } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
+import { AddFriend } from './friends.store';
+import { Friend } from './model';
 
 @Injectable({
   providedIn: 'root'
@@ -11,19 +13,11 @@ export class FriendsService {
 
   constructor() { }
 
-  loadAllFriends(): Observable<any> {
-    return this.http.get(environment.apiBaseUrl + '/friends');
-    // return timer(1000)
-    //   .pipe(
-    //     map((value) => [])
-    //   );
+  loadAllFriends(): Observable<{ data: { friends: Friend[]}}> {
+    return this.http.get<{ data: { friends: Friend[]}}>(environment.apiBaseUrl + '/friends');
   }
 
-  createFriend(friend: { name: string, email: string|null, phone: string }): Observable<any> {
-    throw new Error('not implemented.');
-    return timer(100)
-      .pipe(
-        map((value) => [])
-      );
+  addFriend(friend: AddFriend): Observable<any> {
+    return this.http.post(environment.apiBaseUrl + '/friends/add', friend)
   }
 }

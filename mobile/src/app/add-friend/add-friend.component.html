@@ -14,7 +14,7 @@
   </ion-toolbar>
 </ion-header>
 <ion-content class="ion-padding">
-    <form [formGroup]="addFriendForm" (ngSubmit)="onSubmit($event)" id="add-friend-form">
+    <form [formGroup]="addFriendForm" (ngSubmit)="onSubmit()" id="add-friend-form">
             <ion-input
                     type="text"
                     labelPlacement="stacked"
@@ -36,7 +36,7 @@
                     type="tel"
                     labelPlacement="stacked"
                     label="Phone number"
-                    formControlName="phone"
+                    formControlName="phoneNumber"
                     placeholder="+923154379769"
                     errorText="Phone is required"
             ></ion-input>

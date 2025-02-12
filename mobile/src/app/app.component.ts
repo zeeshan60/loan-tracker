@@ -11,6 +11,7 @@ import {
   addCircleOutline,
   logOutOutline,
   addOutline,
+  person
 } from 'ionicons/icons';
 import { signalMethod } from '@ngrx/signals';
 import { FriendsStore } from './friends/friends.store';
@@ -62,6 +63,7 @@ export class AppComponent implements OnInit {
       addCircleOutline,
       logOutOutline,
       addOutline,
+      person
     });
 
     this.activateLoaderWhen(this.friendsStore.loading);

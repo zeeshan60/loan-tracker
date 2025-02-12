@@ -1,13 +1,20 @@
-import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
-import { inject } from '@angular/core';
+import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
+import { computed, inject, Signal } from '@angular/core';
 import { FriendsService } from './friends.service';
 import { firstValueFrom } from 'rxjs';
 import { HelperService } from '../helper.service';
-import { HttpErrorResponse } from '@angular/common/http';
+import { MethodsDictionary } from '@ngrx/signals/src/signal-store-models';
+import { Friend } from './model'
 
 type FriendsState = {
-  friends: any[],
+  friends: Friend[],
   loading: boolean,
+}
+
+export type AddFriend = {
+  name: string,
+  email: string|null,
+  phoneNumber: string
 }
 
 const initialState: FriendsState = {
@@ -15,23 +22,51 @@ const initialState: FriendsState = {
   loading: false,
 }
 
+interface Methods extends MethodsDictionary {
+  loadFriends(): Promise<void>;
+  addFriend(friend: AddFriend): Promise<void>;
+}
+
 export const FriendsStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
+  withComputed(({ friends }) => {
+    const unSettledFriends = computed(() => {
+      return friends().filter(friend => friend.loanAmount?.amount)
+    });
+    const finalAmount = computed(() => {
+      return unSettledFriends().reduce((acc: number, friend: Friend) => {
+        return friend.loanAmount?.isOwed ?
+          acc + friend.loanAmount.amount :
+          acc - friend.loanAmount!.amount;
+      }, 0);
+    });
+    return {
+      unSettledFriends,
+      finalAmount,
+    }
+  }),
   withMethods((
     store,
     friendsService = inject(FriendsService),
     helperService = inject(HelperService),
-  ) => ({
+  ): Methods => ({
     async loadFriends(): Promise<void> {
       patchState(store, { loading: true });
       try {
-        const friends = await firstValueFrom(friendsService.loadAllFriends());
-        patchState(store, { friends })
+        const {data} = await firstValueFrom(friendsService.loadAllFriends());
+        patchState(store, { friends: data.friends })
       } catch (e) {
-        await helperService.showToast('Unable to load friends from the moment');
+        await helperService.showToast('Unable to load friends at the moment');
       } finally {
         patchState(store, { loading: false })
+      }
+    },
+    async addFriend(friend: AddFriend): Promise<void> {
+      try {
+        await firstValueFrom(friendsService.addFriend(friend));
+      } catch (e) {
+        await helperService.showToast('Unable to create friend at the moment');
       }
     },
   }))

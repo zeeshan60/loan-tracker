@@ -15,6 +15,7 @@ import { ToastController } from '@ionic/angular';
 import { DEFAULT_TOAST_DURATION } from '../constants';
 import { CreateFriend } from './model';
 import { HelperService } from '../helper.service';
+import { FriendsStore } from '../friends/friends.store';
 
 @Component({
   selector: 'app-add-friend',
@@ -37,7 +38,7 @@ import { HelperService } from '../helper.service';
   ],
 })
 export class AddFriendComponent {
-  readonly friendsService = inject(FriendsService);
+  readonly friendsStore = inject(FriendsStore);
   private formBuilder = inject(FormBuilder);
   private helperService = inject(HelperService);
 
@@ -46,7 +47,7 @@ export class AddFriendComponent {
   public addFriendForm = this.formBuilder.group({
     name: this.formBuilder.nonNullable.control('', [Validators.required]),
     email: ['', Validators.email],
-    phone: this.formBuilder.nonNullable.control('', [Validators.required]),
+    phoneNumber: this.formBuilder.nonNullable.control('', [Validators.required]),
   })
 
   constructor(private modalCtrl: ModalController) { }
@@ -55,13 +56,11 @@ export class AddFriendComponent {
     this.modalCtrl.dismiss(null, 'cancel');
   }
 
-  async onSubmit($event: any) {
+  async onSubmit() {
     if (this.addFriendForm.valid) {
       try {
         this.loading.set(true);
-        const friend = await firstValueFrom(
-          this.friendsService.createFriend(this.addFriendForm.getRawValue())
-        );
+        const friend = await this.friendsStore.addFriend(this.addFriendForm.getRawValue());
         await this.modalCtrl.dismiss(friend, 'confirm')
       } catch (e) {
         await this.helperService.showToast('Unable to add friend at the moment');

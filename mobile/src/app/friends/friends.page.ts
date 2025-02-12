@@ -6,19 +6,20 @@ import {
   IonContent,
   IonButton,
   IonButtons,
-  IonIcon, ModalController,
+  IonIcon, ModalController, IonList, IonItem, IonAvatar, IonLabel,
 } from '@ionic/angular/standalone';
 import { FriendsStore } from './friends.store';
 import { AddFriendComponent } from '../add-friend/add-friend.component';
 import { FormsModule } from '@angular/forms';
 import { AuthStore } from '../login/auth.store';
+import { CurrencyPipe, NgStyle } from '@angular/common';
 
 @Component({
   selector: 'app-friends',
   templateUrl: 'friends.page.html',
   styleUrls: ['friends.page.scss'],
   standalone: true,
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonButtons, IonIcon, FormsModule],
+  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonButtons, IonIcon, FormsModule, IonList, IonItem, IonAvatar, IonLabel, NgStyle, CurrencyPipe],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FriendsPage implements OnInit {
@@ -26,10 +27,12 @@ export class FriendsPage implements OnInit {
   readonly modalCtrl = inject(ModalController);
   readonly authStore = inject(AuthStore);
   constructor() {
-    this.friendsStore.loadFriends()
   }
 
-  async ngOnInit() {}
+  async ngOnInit() {
+    await this.friendsStore.loadFriends()
+    console.log(this.friendsStore.unSettledFriends());
+  }
 
   async addFriend() {
     const modal = await this.modalCtrl.create({
@@ -37,6 +40,7 @@ export class FriendsPage implements OnInit {
     })
     modal.present();
     const { data, role } = await modal.onWillDismiss();
+    console.log(data);
     if (role === 'confirm') {
       this.friendsStore.loadFriends();
     }
