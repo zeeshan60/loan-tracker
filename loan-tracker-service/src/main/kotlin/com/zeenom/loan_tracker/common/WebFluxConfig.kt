@@ -23,4 +23,3 @@ class WebFluxConfig {
         return CorsWebFilter(source)
     }
 }
-

@@ -1,6 +1,7 @@
 package com.zeenom.loan_tracker.controllers
 
 import com.zeenom.loan_tracker.common.AmountDto
+import com.zeenom.loan_tracker.common.exceptions.NotFoundException
 import com.zeenom.loan_tracker.events.EventDao
 import com.zeenom.loan_tracker.events.EventPayloadDto
 import com.zeenom.loan_tracker.friends.*
@@ -134,5 +135,28 @@ class FriendsControllerTest(
         response.expectHeader().valueEquals("Access-Control-Allow-Methods", "POST")
     }
 
+    @Test
+    fun `given service throws notfoudexception resolves to 404 with exception message`() = runBlocking {
+        Mockito.doThrow(NotFoundException("Friend not found")).`when`(friendsDao).findAllByUserId(any())
+        val result = webTestClient.get()
+            .uri("/api/v1/friends")
+            .header("Authorization", "Bearer ${authService.generateJwt("sample uid")}")
+            .exchange()
+            .expectStatus().isNotFound
+            .expectBody(String::class.java)
+            .returnResult().responseBody
+
+        JSONAssert.assertEquals(
+            result,
+            """
+                {
+                  "error" : {
+                    "message" : "Friend not found"
+                  }
+                }
+            """.trimIndent(),
+            true
+        )
+    }
 }
 
