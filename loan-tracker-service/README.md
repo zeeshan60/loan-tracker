@@ -44,6 +44,11 @@ docker build . -t zeeshan60/loan-tracker-service && docker push zeeshan60/loan-t
 sudo docker pull zeeshan60/loan-tracker-service:latest && sudo docker stop loantracker && sudo docker container prune
   -f && sudo docker run -d -p 8080:8080 -e SPRING_PROFILES_ACTIVE=dev --name loantracker zeeshan60/loan-tracker-service:
   latest && sudo docker image prune -f
+
+#installing docker compose
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+sudo yum install -y libxcrypt-compat
 ```
 
 ### (Below commands run container on host network)
