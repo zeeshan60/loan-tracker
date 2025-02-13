@@ -1,8 +1,8 @@
 spring:
   r2dbc:
-    url: r2dbc:postgresql://localhost:5432/postgres
-    username: postgres
-    password: postgres
+    url: r2dbc:${DATABASE_URL}
+    username: ${DATABASE_USER}
+    password: ${DATABASE_PASSWORD}
     pool:
       enabled: true
       initial-size: 5
@@ -13,9 +13,9 @@ spring:
     baseline-on-migrate: true
     placeholder-replacement: true
     validate-on-migrate: true
-    url: jdbc:postgresql://localhost:5432/postgres
-    user: postgres
-    password: postgres
+    url: jdbc:${DATABASE_URL}
+    user: ${DATABASE_USER}
+    password: ${DATABASE_PASSWORD}
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:local}
   application:

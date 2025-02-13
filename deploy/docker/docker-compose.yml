@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres
+    container_name: postgres_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: posgres
+    ports:
+      - "5432:5432"
+      - "5432"
+    networks:
+      - loan-tracker-net
+
+  service:
+    image: zeeshan60/loan-tracker-service:latest
+    container_name: loan_tracker_service
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgresql://postgres:5432/postgres
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: postgres
+      SPRING_PROFILES_ACTIVE: dev
+    ports:
+      - "8080:8080"
+      - "8080"
+    networks:
+      - loan-tracker-net
+
+  ui:
+    image: zeeshan60/loan-tracker-ui-repo:latest
+    container_name: loan_tracker_ui
+    restart: unless-stopped
+    depends_on:
+      - service
+    ports:
+      - "80:80"
+      - "80"
+    networks:
+      - loan-tracker-net
+
+networks:
+  loan-tracker-net:
+    driver: bridge
