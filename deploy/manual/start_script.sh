@@ -103,8 +103,14 @@ def deploy():
         # Navigate to the directory where your docker-compose.yml file is located
         os.chdir(DOCKER_COMPOSE_DIR)
 
-        # Run the 'sudo docker-compose up' command
+        # Step 1: Pull latest images (only updates changed images)
+        subprocess.run(['sudo', 'docker-compose', 'pull'], check=True)
+
+        # Step 2: Restart only services with updated images
         subprocess.run(['sudo', 'docker-compose', 'up', '-d'], check=True)
+
+        # Step 3: Remove old, unused containers
+        subprocess.run(['sudo', 'docker image prune', '-f'], check=True)
 
         return jsonify({'message': 'Deployment successful'}), 200
     except subprocess.CalledProcessError as e:
