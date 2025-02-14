@@ -10,6 +10,8 @@ import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest
 import org.springframework.context.annotation.Import
@@ -126,6 +128,30 @@ class FriendsDaoTest(
                 )
             )
         }
+
+    @ParameterizedTest
+    @CsvSource(
+        "test@gmail.com,",
+        ", +6512345678",
+        "test@gmail.com, +6512345678",
+    )
+    fun `saving oneself as friend via email throws bad request`(email: String?, phone: String?): Unit = runBlocking {
+        cleanup()
+        userDao.createUser(
+            UserDto(
+                uid = "123",
+                email = "test@gmail.com",
+                phoneNumber = "+6512345678",
+                displayName = "Zeeshan Tufail",
+                photoUrl = "https://example.com/photo.jpg",
+                emailVerified = true
+            )
+        )
+        assertThatThrownBy {
+            runBlocking { friendsDao.saveFriend("123", CreateFriendDto(name = "Zeeshan Tufail", email = email, phoneNumber = phone)) }
+        }.isInstanceOf(IllegalArgumentException::class.java)
+            .hasMessage("User cannot be friend of oneself")
+    }
 
     @Test
     fun `throws error if none of the userId, email, or phoneNumber provided for friend`(): Unit = runBlocking {

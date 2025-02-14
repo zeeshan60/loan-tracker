@@ -57,6 +57,9 @@ class FriendsDao(
         }
 
         val user = userRepository.findByUid(uid) ?: throw IllegalArgumentException("User not found")
+        if (user.email == friendDto.email || user.phoneNumber == friendDto.phoneNumber) {
+            throw IllegalArgumentException("User cannot be friend of oneself")
+        }
         val friendId = friendDto.email?.let { userRepository.findByEmail(it)?.id }
             ?: friendDto.phoneNumber?.let { userRepository.findByPhoneNumber(it)?.id }
         addFriendToUser(user = user, friendId = friendId, friendDto = friendDto)
