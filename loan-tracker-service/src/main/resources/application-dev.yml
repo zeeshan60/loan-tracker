@@ -1,4 +1,4 @@
 self:
-  api-url: "http://52.74.229.194:8080"
+  api-url: "https://loanapi.codewithzeeshan.com"
 auth:
     secret-key: "this is a secret that should be replaced with environment variable"

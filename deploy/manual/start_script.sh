@@ -69,7 +69,7 @@ services:
     depends_on:
       - service
     ports:
-      - "80:80"
+      - "8081:80"
     networks:
       - loan-tracker-net
 
