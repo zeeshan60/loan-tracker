@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 import { StorageService } from '../services/storage.service';
 import { MethodsDictionary } from '@ngrx/signals/src/signal-store-models';
+import { PUBLIC_API } from '../constants';
 
 type AuthState = {
   apiKey: string,
@@ -25,7 +26,7 @@ const login = async (
   storageService: StorageService,
 ) => {
   try {
-    const url = 'http://52.74.229.194:8080/login'; // `${environment.apiBaseUrl.split('/api')[0]}/login`
+    const url = `${PUBLIC_API}/login`
     const { token: apiKey } = await firstValueFrom(
       http.post<{ token: string  }>(url, {
         idToken: `Bearer ${idToken}`
