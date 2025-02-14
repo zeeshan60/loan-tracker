@@ -110,7 +110,7 @@ def deploy():
         subprocess.run(['sudo', 'docker-compose', 'up', '-d'], check=True)
 
         # Step 3: Remove old, unused containers
-        subprocess.run(['sudo', 'docker image prune', '-f'], check=True)
+        subprocess.run(['sudo', 'docker', 'image', 'prune', '-f', '||', 'true'], check=True)
 
         return jsonify({'message': 'Deployment successful'}), 200
     except subprocess.CalledProcessError as e:
