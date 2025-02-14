@@ -27,7 +27,9 @@ on your local machine
 docker build . -t loantracker
 docker save -o image.tar loantracker:latest
 scp -i "zee.pem" image.tar ec2-user@ec2-52-74-229-194.ap-southeast-1.compute.amazonaws.com:/home/ec2-user
+scp -i "zee.pem" ../deploy/manual/start_script.sh ec2-user@18.141.11.231:/home/ec2-user
 ssh -i "zee.pem" ec2-user@ec2-52-74-229-194.ap-southeast-1.compute.amazonaws.com
+ssh -i "zee.pem" ec2-user@46.137.192.133
 sudo docker load -i image.tar
 sudo docker stop loantracker
 sudo docker container prune -f
@@ -44,6 +46,15 @@ docker build . -t zeeshan60/loan-tracker-service && docker push zeeshan60/loan-t
 sudo docker pull zeeshan60/loan-tracker-service:latest && sudo docker stop loantracker && sudo docker container prune
   -f && sudo docker run -d -p 8080:8080 -e SPRING_PROFILES_ACTIVE=dev --name loantracker zeeshan60/loan-tracker-service:
   latest && sudo docker image prune -f
+
+#installing docker compose
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+sudo yum install -y libxcrypt-compat
+
+sudo docker rm -f $(sudo docker ps -a -q)
+sudo docker image rm -f $(sudo docker images -q)
+sudo netstat -tuln | grep 5000
 ```
 
 ### (Below commands run container on host network)
@@ -153,4 +164,11 @@ sudo service codedeploy-agent stop
 sudo rm -f /opt/codedeploy-agent/state/.pid/codedeploy-agent.pid.lock
 sudo service codedeploy-agent start
 sudo service codedeploy-agent status
+```
+
+# Domain transfer research
+We updated ns records in domain
+Here is how u look up records live. removing 8.8.8.8 will look up records coming from your router
+```bash
+nslookup -type=A loantracker.zflashstudios.com 8.8.8.8
 ```

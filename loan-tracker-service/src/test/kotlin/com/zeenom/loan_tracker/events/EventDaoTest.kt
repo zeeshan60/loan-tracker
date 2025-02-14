@@ -2,39 +2,37 @@ package com.zeenom.loan_tracker.events
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.zeenom.loan_tracker.common.AmountDto
+import com.zeenom.loan_tracker.common.JacksonConfig
 import com.zeenom.loan_tracker.common.SecondInstant
 import com.zeenom.loan_tracker.common.TransactionDto
 import com.zeenom.loan_tracker.common.r2dbc.toClass
-import com.zeenom.loan_tracker.test_configs.TestSecondInstantConfig
+import com.zeenom.loan_tracker.friends.TestPostgresConfig
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.reactor.awaitSingle
-import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import java.util.*
 
-@SpringBootTest
-@ActiveProfiles("local")
-@Import(TestSecondInstantConfig::class)
-class EventDaoTest {
+@DataR2dbcTest
+@ActiveProfiles("test")
+@Import(JacksonConfig::class)
+class EventDaoTest(
+    @Autowired private val eventRepository: EventRepository,
+    @Autowired private val objectMapper: ObjectMapper,
+) : TestPostgresConfig() {
 
-    @Autowired
-    private lateinit var secondInstant: SecondInstant
-
-    @Autowired
-    private lateinit var eventRepository: EventRepository
-
-    @Autowired
-    lateinit var eventDao: EventDao
-
-    @Autowired
-    lateinit var objectMapper: ObjectMapper
+    private val secondInstant = SecondInstant()
+    private val eventDao = EventDao(
+        eventRepository = eventRepository,
+        eventEntityAdapter = EventEntityAdapter(
+            objectMapper = objectMapper,
+            secondInstant = secondInstant
+        ),
+    )
 
     @Test
     fun `successfully saves event and reads it back`(): Unit = runBlocking {

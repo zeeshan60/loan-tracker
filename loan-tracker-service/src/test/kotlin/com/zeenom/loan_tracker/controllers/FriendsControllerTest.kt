@@ -1,6 +1,9 @@
 package com.zeenom.loan_tracker.controllers
 
 import com.zeenom.loan_tracker.common.AmountDto
+import com.zeenom.loan_tracker.common.exceptions.NotFoundException
+import com.zeenom.loan_tracker.events.EventDao
+import com.zeenom.loan_tracker.events.EventPayloadDto
 import com.zeenom.loan_tracker.friends.*
 import com.zeenom.loan_tracker.security.AuthService
 import kotlinx.coroutines.runBlocking
@@ -13,19 +16,20 @@ import org.skyscreamer.jsonassert.JSONAssert
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.reactive.server.WebTestClient
 import java.util.*
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class FriendsControllerTest(@LocalServerPort private val port: Int) {
-
-    @Autowired
-    private lateinit var authService: AuthService
+@ActiveProfiles("test")
+class FriendsControllerTest(
+    @LocalServerPort private val port: Int,
+    @Autowired private val authService: AuthService,
+    @Autowired @MockitoBean private val friendsDao: FriendsDao,
+    @Autowired@MockitoBean private val eventDao: EventDao
+) {
     private val webTestClient = WebTestClient.bindToServer().baseUrl("http://localhost:$port").build()
-
-    @MockitoBean
-    private lateinit var friendsDao: FriendsDao
 
     @Test
     fun `friends endpoint returns friends`(): Unit = runBlocking {
@@ -76,6 +80,7 @@ class FriendsControllerTest(@LocalServerPort private val port: Int) {
     @Test
     fun `addFriend creates friend successfully`(): Unit = runBlocking {
         Mockito.doReturn(Unit).`when`(friendsDao).saveFriend(any(), any())
+        Mockito.doReturn(Unit).`when`(eventDao).saveEvent<EventPayloadDto>(any())
         webTestClient.post()
             .uri("/api/v1/friends/add")
             .header("Authorization", "Bearer ${authService.generateJwt("sample uid")}")
@@ -130,5 +135,28 @@ class FriendsControllerTest(@LocalServerPort private val port: Int) {
         response.expectHeader().valueEquals("Access-Control-Allow-Methods", "POST")
     }
 
+    @Test
+    fun `given service throws notfoudexception resolves to 404 with exception message`() = runBlocking {
+        Mockito.doThrow(NotFoundException("Friend not found")).`when`(friendsDao).findAllByUserId(any())
+        val result = webTestClient.get()
+            .uri("/api/v1/friends")
+            .header("Authorization", "Bearer ${authService.generateJwt("sample uid")}")
+            .exchange()
+            .expectStatus().isNotFound
+            .expectBody(String::class.java)
+            .returnResult().responseBody
+
+        JSONAssert.assertEquals(
+            result,
+            """
+                {
+                  "error" : {
+                    "message" : "Friend not found"
+                  }
+                }
+            """.trimIndent(),
+            true
+        )
+    }
 }
 

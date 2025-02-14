@@ -3,6 +3,7 @@ package com.zeenom.loan_tracker.firebase
 import com.google.api.core.ApiFuture
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseToken
+import com.zeenom.loan_tracker.common.exceptions.UnauthorizedException
 import com.zeenom.loan_tracker.users.UserDto
 import kotlinx.coroutines.reactive.awaitSingle
 import org.slf4j.LoggerFactory
@@ -15,10 +16,10 @@ import java.util.concurrent.Executors
 @Service
 class FirebaseService(
     private val firebaseAuth: FirebaseAuth,
-    private val firebaseAdapter: FirebaseAdapter
+    private val firebaseAdapter: FirebaseAdapter,
 ) {
 
-    val logger = LoggerFactory.getLogger(FirebaseService::class.java)
+    private val logger = LoggerFactory.getLogger(FirebaseService::class.java)
     suspend fun userByVerifyingIdToken(idToken: String): UserDto {
         logger.info("Verifying id token")
         return getUserByVerifyingToken(idToken).also {
@@ -48,7 +49,11 @@ fun <T> ApiFuture<T>.toCompletableFuture(): CompletableFuture<T> {
             try {
                 completableFuture.complete(this.get())
             } catch (e: Exception) {
-                completableFuture.completeExceptionally(e)
+                completableFuture.completeExceptionally(
+                    UnauthorizedException(
+                        e.cause?.message ?: "Error verifying id token", e.cause
+                    )
+                )
             }
         },
         Executors.newSingleThreadExecutor()

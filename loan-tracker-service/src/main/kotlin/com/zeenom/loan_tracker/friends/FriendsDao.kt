@@ -9,9 +9,7 @@ import com.zeenom.loan_tracker.users.UserEntity
 import com.zeenom.loan_tracker.users.UserRepository
 import io.r2dbc.postgresql.codec.Json
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
@@ -25,7 +23,7 @@ class FriendsDao(
 ) {
 
     suspend fun findAllByUserId(userId: String): FriendsDto = coroutineScope {
-        val friendsEntities = friendRepository.findAllFriendsByUid(userId).toList()
+        val friendsEntities = friendRepository.findAllFriendsByUid(userId)
 
         friendsEntities.map {
             FriendDto(
@@ -59,6 +57,9 @@ class FriendsDao(
         }
 
         val user = userRepository.findByUid(uid) ?: throw IllegalArgumentException("User not found")
+        if (user.email == friendDto.email || user.phoneNumber == friendDto.phoneNumber) {
+            throw IllegalArgumentException("User cannot be friend of oneself")
+        }
         val friendId = friendDto.email?.let { userRepository.findByEmail(it)?.id }
             ?: friendDto.phoneNumber?.let { userRepository.findByPhoneNumber(it)?.id }
         addFriendToUser(user = user, friendId = friendId, friendDto = friendDto)
@@ -151,7 +152,7 @@ class FriendsDao(
 
     private suspend fun updateMyIdInMyOwnersRecord(userEntity: UserEntity) {
         val userFriendEntities =
-            friendRepository.findAllByEmailOrPhone(userEntity.email, userEntity.phoneNumber).toList()
+            friendRepository.findAllByEmailOrPhone(userEntity.email, userEntity.phoneNumber)
 
         val updatedFriends = userFriendEntities.mapNotNull {
             if (it.friendId == null && it.id != null) {

@@ -1,39 +1,43 @@
 package com.zeenom.loan_tracker.friends
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.zeenom.loan_tracker.test_configs.TestSecondInstantConfig
+import com.zeenom.loan_tracker.common.JacksonConfig
+import com.zeenom.loan_tracker.common.SecondInstant
 import com.zeenom.loan_tracker.users.UserDao
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserRepository
-import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 
-@SpringBootTest
-@Import(TestSecondInstantConfig::class)
-@ActiveProfiles("local")
-class FriendsDaoTest {
+@DataR2dbcTest
+@Import(JacksonConfig::class)
+@ActiveProfiles("test")
+class FriendsDaoTest(
+    @Autowired private val friendRepository: FriendRepository,
+    @Autowired private val userRepository: UserRepository,
+    @Autowired private val objectMapper: ObjectMapper,
+) : TestPostgresConfig() {
 
-    @Autowired
-    private lateinit var objectMapper: ObjectMapper
+    private val secondInstant = SecondInstant()
+    private val friendsDao = FriendsDao(
+        friendRepository = friendRepository,
+        userRepository = userRepository,
+        secondInstant = secondInstant,
+        objectMapper = objectMapper,
+    )
 
-    @Autowired
-    private lateinit var friendRepository: FriendRepository
-
-    @Autowired
-    private lateinit var userRepository: UserRepository
-
-    @Autowired
-    private lateinit var userDao: UserDao
-
-    @Autowired
-    private lateinit var friendsDao: FriendsDao
+    private val userDao = UserDao(
+        userRepository = userRepository,
+        secondInstant = secondInstant
+    )
 
     @Test
     fun `save friend adds a friend info in user friends even if friend itself dont exists`(): Unit = runBlocking {
@@ -125,6 +129,30 @@ class FriendsDaoTest {
             )
         }
 
+    @ParameterizedTest
+    @CsvSource(
+        "test@gmail.com,",
+        ", +6512345678",
+        "test@gmail.com, +6512345678",
+    )
+    fun `saving oneself as friend via email or phone throws bad request`(email: String?, phone: String?): Unit = runBlocking {
+        cleanup()
+        userDao.createUser(
+            UserDto(
+                uid = "123",
+                email = "test@gmail.com",
+                phoneNumber = "+6512345678",
+                displayName = "Zeeshan Tufail",
+                photoUrl = "https://example.com/photo.jpg",
+                emailVerified = true
+            )
+        )
+        assertThatThrownBy {
+            runBlocking { friendsDao.saveFriend("123", CreateFriendDto(name = "Zeeshan Tufail", email = email, phoneNumber = phone)) }
+        }.isInstanceOf(IllegalArgumentException::class.java)
+            .hasMessage("User cannot be friend of oneself")
+    }
+
     @Test
     fun `throws error if none of the userId, email, or phoneNumber provided for friend`(): Unit = runBlocking {
 
@@ -214,7 +242,7 @@ class FriendsDaoTest {
             )
         }
 
-    private suspend fun cleanup() {
+    fun cleanup() = runBlocking {
         userRepository.deleteAll()
         friendRepository.deleteAll()
     }

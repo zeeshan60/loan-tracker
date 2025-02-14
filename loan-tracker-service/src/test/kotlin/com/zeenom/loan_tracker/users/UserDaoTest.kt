@@ -2,46 +2,41 @@ package com.zeenom.loan_tracker.users
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.zeenom.loan_tracker.common.AmountDto
+import com.zeenom.loan_tracker.common.JacksonConfig
 import com.zeenom.loan_tracker.common.SecondInstant
 import com.zeenom.loan_tracker.common.r2dbc.toJson
 import com.zeenom.loan_tracker.friends.*
-import com.zeenom.loan_tracker.test_configs.TestSecondInstantConfig
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.reactor.awaitSingle
-import kotlinx.coroutines.reactor.awaitSingleOrNull
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import java.util.*
 
-@SpringBootTest
-@ActiveProfiles("local")
-@Import(TestSecondInstantConfig::class)
-class UserDaoTest {
+@DataR2dbcTest
+@ActiveProfiles("test")
+@Import(JacksonConfig::class)
+class UserDaoTest(
+    @Autowired private val objectMapper: ObjectMapper,
+    @Autowired private val friendRepository: FriendRepository,
+    @Autowired private val userRepository: UserRepository,
+) : TestPostgresConfig() {
 
-    @Autowired
-    private lateinit var objectMapper: ObjectMapper
-
-    @Autowired
-    private lateinit var friendRepository: FriendRepository
-
-    @Autowired
-    private lateinit var friendsDao: FriendsDao
-
-    @Autowired
-    private lateinit var userRepository: UserRepository
-
-    @Autowired
-    private lateinit var secondInstant: SecondInstant
-
-    @Autowired
-    lateinit var userDao: UserDao
+    private val secondInstant = SecondInstant()
+    private val userDao = UserDao(
+        userRepository = userRepository,
+        secondInstant = secondInstant
+    )
+    private val friendsDao = FriendsDao(
+        friendRepository = friendRepository,
+        secondInstant = secondInstant,
+        objectMapper = objectMapper,
+        userRepository = userRepository
+    )
 
     @Test
     fun `save user and read user successfully`(): Unit = runBlocking {
@@ -153,7 +148,7 @@ class UserDaoTest {
 
         private suspend fun addUserAsFriendToOwner(
             owner1: UserDto,
-            userDto: UserDto
+            userDto: UserDto,
         ) {
             friendsDao.saveFriend(
                 owner1.uid,
@@ -163,7 +158,7 @@ class UserDaoTest {
 
         private suspend fun assertOwner2HasAFriend(
             owner2: UserDto,
-            userDto: UserDto
+            userDto: UserDto,
         ) {
             val owner2FriendsDto = friendsDao.findAllByUserId(owner2.uid)
             assertThat(owner2FriendsDto.friends).hasSize(1)
@@ -193,7 +188,7 @@ class UserDaoTest {
 
         private suspend fun assertOwner1HasAFriend(
             owner1: UserDto,
-            userDto: UserDto
+            userDto: UserDto,
         ) {
             val owner1FriendsDto = friendsDao.findAllByUserId(owner1.uid)
             assertThat(owner1FriendsDto.friends).hasSize(1)
@@ -214,8 +209,8 @@ class UserDaoTest {
 
         private suspend fun addSomeLoanAmountToThisFriend(phoneNumber: String) {
             val entities =
-                friendRepository.findAll().toList().filter { it.friendPhoneNumber == phoneNumber }.toList()
-            entities.forEach { friendEntity ->
+                friendRepository.findAll().filter { it.friendPhoneNumber == phoneNumber }
+            entities.collect { friendEntity ->
                 friendRepository.save(
                     friendEntity.copy(
                         friendTotalAmountsDto = FriendTotalAmountsDto(
