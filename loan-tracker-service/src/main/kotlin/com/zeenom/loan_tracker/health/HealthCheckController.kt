@@ -9,6 +9,6 @@ class HealthCheckController {
 
     @GetMapping("/health")
     suspend fun healthCheck(): MessageResponse {
-        return MessageResponse(message = "I'm alive 0.3!")
+        return MessageResponse(message = "I'm alive 0.4!")
     }
 }
