@@ -1,4 +1,4 @@
-name: Deploy UI to AWS
+name: Deploying Frontend
 
 on:
   push:
