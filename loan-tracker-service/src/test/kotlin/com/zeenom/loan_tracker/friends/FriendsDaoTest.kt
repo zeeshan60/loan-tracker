@@ -135,7 +135,7 @@ class FriendsDaoTest(
         ", +6512345678",
         "test@gmail.com, +6512345678",
     )
-    fun `saving oneself as friend via email throws bad request`(email: String?, phone: String?): Unit = runBlocking {
+    fun `saving oneself as friend via email or phone throws bad request`(email: String?, phone: String?): Unit = runBlocking {
         cleanup()
         userDao.createUser(
             UserDto(
