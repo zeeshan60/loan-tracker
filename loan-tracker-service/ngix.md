@@ -16,9 +16,28 @@ server {
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers HIGH:!aNULL:!MD5;
 
-    # Route all traffic to frontend (port 5000)
+    # Route all traffic to frontend (port 8081)
     location / {
         proxy_pass http://127.0.0.1:8081/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}
+
+# Deploy webhook
+server {
+    listen 443 ssl;
+    server_name loandeploy.codewithzeeshan.com;
+
+    ssl_certificate /etc/letsencrypt/live/loandeploy.codewithzeeshan.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/loandeploy.codewithzeeshan.com/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+
+    # Route all traffic to deploy (port 5000)
+    location / {
+        proxy_pass http://127.0.0.1:5000/;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -50,18 +69,18 @@ sudo yum install -y certbot python3-certbot-nginx
 
 sudo certbot certonly --standalone -d loanapi.codewithzeeshan.com
 sudo certbot certonly --standalone -d loanapp.codewithzeeshan.com
+sudo certbot certonly --standalone -d loandeploy.codewithzeeshan.com
 
 sudo yum install -y nginx
 sudo systemctl enable nginx
 #add nginx config in this file
+sudo rm /etc/nginx/conf.d/reverse-proxy.conf
 sudo nano /etc/nginx/conf.d/reverse-proxy.conf
 
 #make sure port 80 is free
 sudo systemctl start nginx
 
-#make sure these domains point to same server as nginx
-sudo certbot --nginx -d loanapp.codewithzeeshan.com -d loanapi.codewithzeeshan.com
-
+sudo systemctl stop nginx
 sudo systemctl start nginx
 sudo nginx -t
 sudo systemctl restart nginx
