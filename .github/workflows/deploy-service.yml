@@ -43,6 +43,6 @@ jobs:
       # 🔥 Deploy using Flask REST API instead of CodeDeploy
       - name: Deploy via Flask API
         run: |
-          curl -X POST "http://52.74.229.194/:5000/deploy" \
+          curl -X POST "http://52.74.229.194:5000/deploy" \
             -H "Authorization: Bearer ${{ secrets.FLASK_DEPLOY_TOKEN }}" \
             -H "Content-Type: application/json"
