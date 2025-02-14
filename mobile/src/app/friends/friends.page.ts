@@ -12,14 +12,14 @@ import { FriendsStore } from './friends.store';
 import { AddFriendComponent } from '../add-friend/add-friend.component';
 import { FormsModule } from '@angular/forms';
 import { AuthStore } from '../login/auth.store';
-import { CurrencyPipe, NgStyle } from '@angular/common';
+import { CurrencyPipe } from '@angular/common';
 
 @Component({
   selector: 'app-friends',
   templateUrl: 'friends.page.html',
   styleUrls: ['friends.page.scss'],
   standalone: true,
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonButtons, IonIcon, FormsModule, IonList, IonItem, IonAvatar, IonLabel, NgStyle, CurrencyPipe],
+  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonButtons, IonIcon, FormsModule, IonList, IonItem, IonAvatar, IonLabel, CurrencyPipe],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FriendsPage implements OnInit {

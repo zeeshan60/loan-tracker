@@ -3,7 +3,7 @@ import {
   IonButton,
   IonButtons, IonContent,
   IonHeader,
-  IonInput, IonItem, IonSpinner,
+  IonInput, IonSpinner,
   IonTitle,
   IonToolbar,
   ModalController,
@@ -33,7 +33,6 @@ import { FriendsStore } from '../friends/friends.store';
     IonTitle,
     IonContent,
     IonSpinner,
-    IonItem,
     ReactiveFormsModule,
   ],
 })
