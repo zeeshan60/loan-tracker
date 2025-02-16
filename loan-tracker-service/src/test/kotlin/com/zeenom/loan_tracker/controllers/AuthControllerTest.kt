@@ -1,13 +1,13 @@
 package com.zeenom.loan_tracker.controllers
 
-import com.zeenom.loan_tracker.events.EventDao
+import com.zeenom.loan_tracker.events.CommandDao
 import com.zeenom.loan_tracker.events.CommandDto
 import com.zeenom.loan_tracker.events.EventType
 import com.zeenom.loan_tracker.firebase.FirebaseService
 import com.zeenom.loan_tracker.friends.FriendsDao
 import com.zeenom.loan_tracker.security.LoginRequest
-import com.zeenom.loan_tracker.users.UserEventDao
 import com.zeenom.loan_tracker.users.UserDto
+import com.zeenom.loan_tracker.users.UserEventHandler
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -27,8 +27,8 @@ import org.springframework.test.web.reactive.server.WebTestClient
 class AuthControllerTest(
     @LocalServerPort private val port: Int,
     @Autowired @MockitoSpyBean private val firebaseService: FirebaseService,
-    @Autowired @MockitoBean private val eventDao: EventDao,
-    @Autowired @MockitoBean private val userDao: UserEventDao,
+    @Autowired @MockitoBean private val commandDao: CommandDao,
+    @Autowired @MockitoBean private val userEventHandler: UserEventHandler,
     @Autowired @MockitoBean private val friendsDao: FriendsDao,
 ) {
 
@@ -52,10 +52,10 @@ class AuthControllerTest(
             userDto
         ).whenever(firebaseService).userByVerifyingIdToken(idToken)
 
-        Mockito.doReturn(Unit).whenever(userDao).createIfNotExist(userDto)
+        Mockito.doReturn(Unit).whenever(userEventHandler).createIfNotExist(userDto)
         Mockito.doReturn(Unit).whenever(friendsDao).makeMyOwnersMyFriends("123")
 
-        Mockito.doReturn(Unit).whenever(eventDao).saveEvent(
+        Mockito.doReturn(Unit).whenever(commandDao).saveEvent(
             CommandDto(
                 event = EventType.LOGIN,
                 payload = userDto,
@@ -76,7 +76,7 @@ class AuthControllerTest(
             .jsonPath("$.token").value { it: String? -> assertThat(it).isNotEmpty() }
 
         argumentCaptor<CommandDto<UserDto>>().apply {
-            Mockito.verify(eventDao, Mockito.times(1)).saveEvent(capture())
+            Mockito.verify(commandDao, Mockito.times(1)).saveEvent(capture())
             assertThat(firstValue).isEqualTo(
                 CommandDto(
                     event = EventType.LOGIN,
@@ -86,9 +86,10 @@ class AuthControllerTest(
             )
         }
 
-        val userDaoCaptor = argumentCaptor<UserDto>()
-        Mockito.verify(userDao, Mockito.times(1)).createIfNotExist(userDaoCaptor.capture())
-        assertThat(userDaoCaptor.firstValue).isEqualTo(userDto)
+        val userDtoCaptor = argumentCaptor<UserDto>()
+        Mockito.verify(userEventHandler, Mockito.times(1))
+            .createIfNotExist(userDtoCaptor.capture())
+        assertThat(userDtoCaptor.firstValue).isEqualTo(userDto)
 
         Mockito.verify(friendsDao, Mockito.times(1)).makeMyOwnersMyFriends("123")
     }

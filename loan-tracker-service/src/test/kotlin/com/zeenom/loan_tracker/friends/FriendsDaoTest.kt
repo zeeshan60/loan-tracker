@@ -1,9 +1,8 @@
 package com.zeenom.loan_tracker.friends
 
-import com.zeenom.loan_tracker.common.AmountDto
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEvent
-import com.zeenom.loan_tracker.users.UserEventDao
+import com.zeenom.loan_tracker.users.UserEventHandler
 import com.zeenom.loan_tracker.users.UserEventRepository
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -19,7 +18,6 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest
-import java.util.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DataR2dbcTest
@@ -28,8 +26,8 @@ class FriendsDaoTest(
     @Autowired private val userEventRepository: UserEventRepository,
 ) : TestPostgresConfig() {
 
-    private val userEventDao = mock<UserEventDao>()
-    private val friendsDao = FriendsDao(eventRepository = eventRepository, userEventDao = userEventDao)
+    private val userEventHandler = mock<UserEventHandler>()
+    private val friendsDao = FriendsDao(eventRepository = eventRepository, userEventHandler = userEventHandler)
 
 
     @BeforeEach
@@ -68,7 +66,7 @@ class FriendsDaoTest(
                 photoUrl = "https://test.com",
                 emailVerified = true
             )
-        ).`when`(userEventDao).findUserById("123")
+        ).`when`(userEventHandler).findUserById("123")
 
         doReturn(
             listOf(
@@ -89,7 +87,7 @@ class FriendsDaoTest(
                     emailVerified = true
                 )
             ).asFlow()
-        ).`when`(userEventDao).findUsersByUids(listOf("124", "125"))
+        ).`when`(userEventHandler).findUsersByUids(listOf("124", "125"))
 
         friendsDao.saveFriend(
             uid = "124",
@@ -156,9 +154,9 @@ class FriendsDaoTest(
 
     @Test
     fun `find all friends when no friend has signed up return friends successfully`(): Unit = runBlocking {
-        doReturn(emptyFlow<UserEvent>()).`when`(userEventDao)
+        doReturn(emptyFlow<UserEvent>()).`when`(userEventHandler)
             .findUsersByPhoneNumbers(listOf("+923001234568", "+923001234569"))
-        doReturn(emptyFlow<UserEvent>()).`when`(userEventDao)
+        doReturn(emptyFlow<UserEvent>()).`when`(userEventHandler)
             .findUsersByEmails(listOf("user2@gmail.com", "user3@gmail.com"))
         friendsDao.saveFriend(
             uid = "123",
@@ -294,11 +292,11 @@ class FriendsDaoTest(
     ): Unit = runBlocking {
         userEventRepository.deleteAll()
         eventRepository.deleteAll()
-        val userDao = UserEventDao(userEventRepository)
-        val friendsDao = FriendsDao(eventRepository = eventRepository, userEventDao = userDao)
+        val userEventHandler = UserEventHandler(userEventRepository)
+        val friendsDao = FriendsDao(eventRepository = eventRepository, userEventHandler = userEventHandler)
         val (user1, user2) = friendData
         user1.photo?.let {
-            userDao.createUser(
+            userEventHandler.createUser(
                 UserDto(
                     uid = "124",
                     email = user1.email,
@@ -310,7 +308,7 @@ class FriendsDaoTest(
             )
         }
         user2.photo?.let {
-            userDao.createUser(
+            userEventHandler.createUser(
                 UserDto(
                     uid = "125",
                     email = user2.email,

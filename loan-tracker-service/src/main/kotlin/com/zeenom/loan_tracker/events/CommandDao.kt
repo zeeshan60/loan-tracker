@@ -3,7 +3,7 @@ package com.zeenom.loan_tracker.events
 import org.springframework.stereotype.Service
 
 @Service
-class EventDao(
+class CommandDao(
     private val eventRepository: EventRepository,
     private val eventEntityAdapter: EventEntityAdapter,
 ) {

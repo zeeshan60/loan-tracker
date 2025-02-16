@@ -20,13 +20,13 @@ import java.util.*
 @DataR2dbcTest
 @ActiveProfiles("test")
 @Import(JacksonConfig::class)
-class EventDaoTest(
+class CommandDaoTest(
     @Autowired private val eventRepository: EventRepository,
     @Autowired private val objectMapper: ObjectMapper,
 ) : TestPostgresConfig() {
 
     private val secondInstant = SecondInstant()
-    private val eventDao = EventDao(
+    private val commandDao = CommandDao(
         eventRepository = eventRepository,
         eventEntityAdapter = EventEntityAdapter(
             objectMapper = objectMapper,
@@ -49,7 +49,7 @@ class EventDaoTest(
             ),
             userId = "123",
         )
-        eventDao.saveEvent(commandDto)
+        commandDao.saveEvent(commandDto)
 
 
         val entity = eventRepository.findAll().first()

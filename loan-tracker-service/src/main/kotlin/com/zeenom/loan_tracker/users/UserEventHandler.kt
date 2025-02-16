@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service
 import java.time.Instant
 
 @Service
-class UserEventDao(private val userRepository: UserEventRepository) {
+class UserEventHandler(private val userRepository: UserEventRepository) {
     suspend fun createIfNotExist(userDto: UserDto) {
         findUserById(userDto.uid) ?: createUser(userDto)
     }

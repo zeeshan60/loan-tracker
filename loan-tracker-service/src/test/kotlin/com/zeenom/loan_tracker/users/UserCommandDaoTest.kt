@@ -13,11 +13,11 @@ import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest
 
 @DataR2dbcTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UserEventDaoTest(
+class UserCommandDaoTest(
     @Autowired private val userEventRepository: UserEventRepository,
 ) : TestPostgresConfig() {
 
-    private val userEventDao = UserEventDao(
+    private val userEventHandler = UserEventHandler(
         userRepository = userEventRepository
     )
 
@@ -56,7 +56,7 @@ class UserEventDaoTest(
 
     private suspend fun createUser(userDto: UserDto): UserDto {
 
-        userEventDao.createUser(userDto = userDto)
+        userEventHandler.createUser(userDto = userDto)
         return userDto
     }
 
@@ -73,7 +73,7 @@ class UserEventDaoTest(
     fun `find user by id returns user successfully`(): Unit = runBlocking {
         val userDto = createUser(userDto = userDto)
 
-        val user = userEventDao.findUserById(userDto.uid)
+        val user = userEventHandler.findUserById(userDto.uid)
 
         assertThat(user).isNotNull
         assertThat(user!!.uid).isEqualTo(userDto.uid)
@@ -90,7 +90,7 @@ class UserEventDaoTest(
         val userDto2 = userDto.copy(uid = "124", email = "user2@gmail.com", phoneNumber = "+923001234568")
         createUser(userDto = userDto2)
 
-        val users = userEventDao.findUsersByUids(listOf("123", "124")).toList()
+        val users = userEventHandler.findUsersByUids(listOf("123", "124")).toList()
 
         assertThat(users).hasSize(2)
         val user = users[0]

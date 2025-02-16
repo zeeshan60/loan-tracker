@@ -2,7 +2,7 @@ package com.zeenom.loan_tracker.controllers
 
 import com.zeenom.loan_tracker.common.AmountDto
 import com.zeenom.loan_tracker.common.exceptions.NotFoundException
-import com.zeenom.loan_tracker.events.EventDao
+import com.zeenom.loan_tracker.events.CommandDao
 import com.zeenom.loan_tracker.events.CommandPayloadDto
 import com.zeenom.loan_tracker.friends.*
 import com.zeenom.loan_tracker.security.AuthService
@@ -27,7 +27,7 @@ class FriendsControllerTest(
     @LocalServerPort private val port: Int,
     @Autowired private val authService: AuthService,
     @Autowired @MockitoBean private val friendsDao: FriendsDao,
-    @Autowired@MockitoBean private val eventDao: EventDao
+    @Autowired@MockitoBean private val commandDao: CommandDao
 ) {
     private val webTestClient = WebTestClient.bindToServer().baseUrl("http://localhost:$port").build()
 
@@ -80,7 +80,7 @@ class FriendsControllerTest(
     @Test
     fun `addFriend creates friend successfully`(): Unit = runBlocking {
         Mockito.doReturn(Unit).`when`(friendsDao).saveFriend(any(), any())
-        Mockito.doReturn(Unit).`when`(eventDao).saveEvent<CommandPayloadDto>(any())
+        Mockito.doReturn(Unit).`when`(commandDao).saveEvent<CommandPayloadDto>(any())
         webTestClient.post()
             .uri("/api/v1/friends/add")
             .header("Authorization", "Bearer ${authService.generateJwt("sample uid")}")
