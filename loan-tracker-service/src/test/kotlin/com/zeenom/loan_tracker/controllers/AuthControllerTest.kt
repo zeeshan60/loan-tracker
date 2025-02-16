@@ -6,7 +6,7 @@ import com.zeenom.loan_tracker.events.EventType
 import com.zeenom.loan_tracker.firebase.FirebaseService
 import com.zeenom.loan_tracker.friends.FriendsDao
 import com.zeenom.loan_tracker.security.LoginRequest
-import com.zeenom.loan_tracker.users.UserDao
+import com.zeenom.loan_tracker.users.UserEventDao
 import com.zeenom.loan_tracker.users.UserDto
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
@@ -28,7 +28,7 @@ class AuthControllerTest(
     @LocalServerPort private val port: Int,
     @Autowired @MockitoSpyBean private val firebaseService: FirebaseService,
     @Autowired @MockitoBean private val eventDao: EventDao,
-    @Autowired @MockitoBean private val userDao: UserDao,
+    @Autowired @MockitoBean private val userDao: UserEventDao,
     @Autowired @MockitoBean private val friendsDao: FriendsDao,
 ) {
 

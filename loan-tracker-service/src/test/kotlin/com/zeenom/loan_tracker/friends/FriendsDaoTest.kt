@@ -3,7 +3,8 @@ package com.zeenom.loan_tracker.friends
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.zeenom.loan_tracker.common.JacksonConfig
 import com.zeenom.loan_tracker.common.SecondInstant
-import com.zeenom.loan_tracker.users.UserDao
+import com.zeenom.loan_tracker.users.NewUserRepository
+import com.zeenom.loan_tracker.users.UserEventDao
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserRepository
 import kotlinx.coroutines.runBlocking
@@ -22,7 +23,7 @@ import org.springframework.test.context.ActiveProfiles
 @ActiveProfiles("test")
 class FriendsDaoTest(
     @Autowired private val friendRepository: FriendRepository,
-    @Autowired private val userRepository: UserRepository,
+    @Autowired private val userRepository: NewUserRepository,
     @Autowired private val objectMapper: ObjectMapper,
 ) : TestPostgresConfig() {
 
@@ -34,9 +35,8 @@ class FriendsDaoTest(
         objectMapper = objectMapper,
     )
 
-    private val userDao = UserDao(
-        userRepository = userRepository,
-        secondInstant = secondInstant
+    private val userDao = UserEventDao(
+        userRepository = userRepository
     )
 
     @Test

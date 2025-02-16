@@ -26,5 +26,4 @@ interface UserRepository : CoroutineCrudRepository<UserEntity, String> {
     suspend fun findByUid(uid: String): UserEntity?
     suspend fun findByEmail(email: String): UserEntity?
     suspend fun findByPhoneNumber(phoneNumber: String): UserEntity?
-    suspend fun deleteAllByUid(uid: String): Void
 }

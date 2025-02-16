@@ -28,8 +28,8 @@ interface FriendRepository : CoroutineCrudRepository<UserFriendEntity, UUID> {
         """
         SELECT u.photo_url, uf.friend_display_name, uf.friend_phone_number, uf.friend_email, uf.friend_total_amounts_dto, uf.updated_at 
         FROM user_friends uf
-        LEFT JOIN users u ON uf.friend_id = u.id
-        INNER JOIN users owner ON uf.user_id = owner.id
+        LEFT JOIN user_events u ON uf.friend_id = u.id
+        INNER JOIN user_events owner ON uf.user_id = owner.id
         WHERE owner.uid = :uid
     """
     )
@@ -47,7 +47,7 @@ interface FriendRepository : CoroutineCrudRepository<UserFriendEntity, UUID> {
     @Query(
         """
         SELECT u.id as owner_id, u.phone_number as owner_phone_number, u.email as owner_email, u.display_name as owner_display_name, uf.friend_total_amounts_dto
-        FROM users u
+        FROM user_events u
         INNER JOIN user_friends uf ON u.id = uf.user_id
         WHERE (uf.friend_email = :email AND :email IS NOT NULL) OR (uf.friend_phone_number = :phone AND :phone IS NOT NULL)
     """

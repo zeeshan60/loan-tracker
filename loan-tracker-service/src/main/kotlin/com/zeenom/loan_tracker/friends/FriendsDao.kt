@@ -5,8 +5,8 @@ import com.zeenom.loan_tracker.common.AmountDto
 import com.zeenom.loan_tracker.common.SecondInstant
 import com.zeenom.loan_tracker.common.r2dbc.toClass
 import com.zeenom.loan_tracker.common.r2dbc.toJson
-import com.zeenom.loan_tracker.users.UserEntity
-import com.zeenom.loan_tracker.users.UserRepository
+import com.zeenom.loan_tracker.users.NewUserRepository
+import com.zeenom.loan_tracker.users.UserEvent
 import io.r2dbc.postgresql.codec.Json
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.toList
@@ -14,15 +14,25 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
+interface IFriendsDao {
+    suspend fun findAllByUserId(userId: String): FriendsDto
+
+    @Transactional
+    suspend fun saveFriend(uid: String, friendDto: CreateFriendDto)
+
+    @Transactional
+    suspend fun makeMyOwnersMyFriends(uid: String)
+}
+
 @Service
 class FriendsDao(
     private val friendRepository: FriendRepository,
     private val objectMapper: ObjectMapper,
-    private val userRepository: UserRepository,
+    private val userRepository: NewUserRepository,
     private val secondInstant: SecondInstant,
-) {
+) : IFriendsDao {
 
-    suspend fun findAllByUserId(userId: String): FriendsDto = coroutineScope {
+    override suspend fun findAllByUserId(userId: String): FriendsDto = coroutineScope {
         val friendsEntities = friendRepository.findAllFriendsByUid(userId)
 
         friendsEntities.map {
@@ -50,7 +60,7 @@ class FriendsDao(
     }
 
     @Transactional
-    suspend fun saveFriend(uid: String, friendDto: CreateFriendDto) {
+    override suspend fun saveFriend(uid: String, friendDto: CreateFriendDto) {
 
         if (friendDto.email == null && friendDto.phoneNumber == null) {
             throw IllegalArgumentException("At least one of userId, email or phoneNumber must be provided")
@@ -67,7 +77,7 @@ class FriendsDao(
     }
 
     private suspend fun addFriendToUser(
-        user: UserEntity,
+        user: UserEvent,
         friendId: UUID?,
         friendDto: CreateFriendDto,
     ) {
@@ -85,7 +95,7 @@ class FriendsDao(
         )
     }
 
-    private suspend fun addUserToFriend(friendId: UUID, user: UserEntity) {
+    private suspend fun addUserToFriend(friendId: UUID, user: UserEvent) {
         val existing = friendRepository.findByUserIdAndFriendId(
             friendId,
             user.id ?: throw IllegalArgumentException("User Not found")
@@ -107,7 +117,7 @@ class FriendsDao(
     }
 
     @Transactional
-    suspend fun makeMyOwnersMyFriends(uid: String) {
+    override suspend fun makeMyOwnersMyFriends(uid: String) {
         val userEntity = userRepository.findByUid(uid)
             ?: throw IllegalArgumentException("User not found")
 
@@ -116,7 +126,7 @@ class FriendsDao(
     }
 
     private suspend fun addMyOwnersAsMyFriends(
-        userEntity: UserEntity,
+        userEntity: UserEvent,
     ) {
         val owners = friendRepository.findOwnersByMyEmailOrPhone(userEntity.email, userEntity.phoneNumber)
         val newUserFriends = owners.map { owner ->
@@ -150,7 +160,7 @@ class FriendsDao(
             })
         }.toJson(objectMapper = objectMapper)
 
-    private suspend fun updateMyIdInMyOwnersRecord(userEntity: UserEntity) {
+    private suspend fun updateMyIdInMyOwnersRecord(userEntity: UserEvent) {
         val userFriendEntities =
             friendRepository.findAllByEmailOrPhone(userEntity.email, userEntity.phoneNumber)
 

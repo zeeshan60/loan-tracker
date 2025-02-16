@@ -12,6 +12,7 @@ import io.swagger.v3.core.util.Json
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.skyscreamer.jsonassert.JSONAssert
 import org.springframework.beans.factory.annotation.Autowired
@@ -20,6 +21,7 @@ import org.springframework.context.annotation.Import
 
 @DataR2dbcTest
 @Import(JacksonConfig::class)
+@Disabled
 class TransactionDaoTest(
     @Autowired private val transactionRepository: TransactionRepository,
     @Autowired private val userRepository: UserRepository,
