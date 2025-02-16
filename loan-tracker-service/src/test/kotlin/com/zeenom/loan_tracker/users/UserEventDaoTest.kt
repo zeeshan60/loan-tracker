@@ -14,7 +14,7 @@ import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest
 @DataR2dbcTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UserEventDaoTest(
-    @Autowired private val userEventRepository: NewUserRepository,
+    @Autowired private val userEventRepository: UserEventRepository,
 ) : TestPostgresConfig() {
 
     private val userEventDao = UserEventDao(

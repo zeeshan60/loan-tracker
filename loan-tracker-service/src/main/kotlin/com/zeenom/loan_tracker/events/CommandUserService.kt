@@ -17,7 +17,7 @@ class CommandCreateUser(
 ) : Command<UserDto> {
     override suspend fun execute(eventDto: EventDto<UserDto>) {
         CoroutineScope(Dispatchers.IO).launch { eventDao.saveEvent(eventDto) }
-        userDao.loginUser(userDto = eventDto.payload)
+        userDao.createIfNotExist(userDto = eventDto.payload)
         friendsDao.makeMyOwnersMyFriends(eventDto.userId)
     }
 }

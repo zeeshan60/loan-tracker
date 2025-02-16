@@ -5,7 +5,7 @@ import com.zeenom.loan_tracker.common.AmountDto
 import com.zeenom.loan_tracker.common.SecondInstant
 import com.zeenom.loan_tracker.common.r2dbc.toClass
 import com.zeenom.loan_tracker.common.r2dbc.toJson
-import com.zeenom.loan_tracker.users.NewUserRepository
+import com.zeenom.loan_tracker.users.UserEventRepository
 import com.zeenom.loan_tracker.users.UserEvent
 import io.r2dbc.postgresql.codec.Json
 import kotlinx.coroutines.coroutineScope
@@ -28,7 +28,7 @@ interface IFriendsDao {
 class FriendsDao(
     private val friendRepository: FriendRepository,
     private val objectMapper: ObjectMapper,
-    private val userRepository: NewUserRepository,
+    private val userRepository: UserEventRepository,
     private val secondInstant: SecondInstant,
 ) : IFriendsDao {
 
