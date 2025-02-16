@@ -1,8 +1,10 @@
 package com.zeenom.loan_tracker.friends
 
+import com.zeenom.loan_tracker.common.AmountDto
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEvent
 import com.zeenom.loan_tracker.users.UserEventDao
+import com.zeenom.loan_tracker.users.UserEventRepository
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.toList
@@ -10,13 +12,21 @@ import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest
+import java.util.*
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DataR2dbcTest
-class NewFriendEventsDaoTest(@Autowired private val eventRepository: NewFriendEventRepository) : TestPostgresConfig() {
+class NewFriendEventsDaoTest(
+    @Autowired private val eventRepository: NewFriendEventRepository,
+    @Autowired private val userEventRepository: UserEventRepository,
+) : TestPostgresConfig() {
 
     private val userEventDao = mock<UserEventDao>()
     private val newFriendEventsDao = NewFriendEventsDao(eventRepository = eventRepository, userEventDao = userEventDao)
@@ -148,7 +158,8 @@ class NewFriendEventsDaoTest(@Autowired private val eventRepository: NewFriendEv
     fun `find all friends when no friend has signed up return friends successfully`(): Unit = runBlocking {
         doReturn(emptyFlow<UserEvent>()).`when`(userEventDao)
             .findUsersByPhoneNumbers(listOf("+923001234568", "+923001234569"))
-        doReturn(emptyFlow<UserEvent>()).`when`(userEventDao).findUsersByEmails(emptyList())
+        doReturn(emptyFlow<UserEvent>()).`when`(userEventDao)
+            .findUsersByEmails(listOf("user2@gmail.com", "user3@gmail.com"))
         newFriendEventsDao.saveFriend(
             uid = "123",
             friendDto = CreateFriendDto(
@@ -167,5 +178,202 @@ class NewFriendEventsDaoTest(@Autowired private val eventRepository: NewFriendEv
         )
         val friendsDto = newFriendEventsDao.findAllByUserId("123")
         assertThat(friendsDto.friends).hasSize(2)
+
+        assertThat(friendsDto.friends[0]).isEqualTo(
+            FriendDto(
+                email = "user2@gmail.com",
+                phoneNumber = "+923001234568",
+                name = "User 2",
+                photoUrl = null,
+                loanAmount = AmountDto(
+                    amount = 100.toBigDecimal(),
+                    currency = Currency.getInstance("USD"),
+                    isOwed = false
+                )
+            )
+        )
+
+        assertThat(friendsDto.friends[1]).isEqualTo(
+            FriendDto(
+                email = "user3@gmail.com",
+                phoneNumber = "+923001234569",
+                name = "User 3",
+                photoUrl = null,
+                loanAmount = AmountDto(
+                    amount = 100.toBigDecimal(),
+                    currency = Currency.getInstance("USD"),
+                    isOwed = false
+                )
+            )
+        )
+    }
+
+    data class FriendTestData(
+        val email: String?,
+        val phone: String?,
+        val friendEmail: String?,
+        val friendPhone: String?,
+        val photo: String?,
+        val friendPhoto: String?,
+    )
+
+    companion object {
+        @JvmStatic
+        fun friendTestData() = listOf(
+            Pair(
+                FriendTestData(
+                    email = "user1@gmail.com",
+                    phone = "+923001234568",
+                    friendEmail = "user1@gmail.com",
+                    friendPhone = "+923001234568",
+                    photo = "https://test1.com",
+                    friendPhoto = "https://test1.com"
+                ),
+                FriendTestData(
+                    email = "user2@gmail.com",
+                    phone = "+923001234569",
+                    friendEmail = "user2@gmail.com",
+                    friendPhone = "+923001234569",
+                    photo = "https://test2.com",
+                    friendPhoto = "https://test2.com"
+                )
+            ),
+            Pair(
+                FriendTestData(
+                    email = "user1@gmail.com",
+                    phone = null,
+                    friendEmail = "user1@gmail.com",
+                    friendPhone = "+923001234568",
+                    photo = "https://test1.com",
+                    friendPhoto = "https://test1.com"
+                ),
+                FriendTestData(
+                    email = null,
+                    phone = "+923001234569",
+                    friendEmail = "user2@gmail.com",
+                    friendPhone = "+923001234569",
+                    photo = "https://test2.com",
+                    friendPhoto = "https://test2.com"
+                )
+            ),
+            Pair(
+                FriendTestData(
+                    email = "user1@gmail.com",
+                    phone = null,
+                    friendEmail = null,
+                    friendPhone = "+923001234568",
+                    photo = "https://test1.com",
+                    friendPhoto = null
+                ),
+                FriendTestData(
+                    email = null,
+                    phone = "+923001234569",
+                    friendEmail = null,
+                    friendPhone = "+923001234569",
+                    photo = "https://test2.com",
+                    friendPhoto = "https://test2.com"
+                )
+            ),
+            Pair(
+                FriendTestData(
+                    email = null,
+                    phone = null,
+                    friendEmail = null,
+                    friendPhone = "+923001234568",
+                    photo = null,
+                    friendPhoto = null
+                ),
+                FriendTestData(
+                    email = null,
+                    phone = null,
+                    friendEmail = "user2@gmail.com",
+                    friendPhone = null,
+                    photo = null,
+                    friendPhoto = null
+                )
+            )
+        )
+    }
+
+    @ParameterizedTest
+    @MethodSource("friendTestData")
+    fun `find all friends when everyone is signed up has photos`(
+        friendData: Pair<FriendTestData, FriendTestData>,
+    ): Unit = runBlocking {
+        userEventRepository.deleteAll()
+        eventRepository.deleteAll()
+        val userDao = UserEventDao(userEventRepository)
+        val newFriendEventsDao = NewFriendEventsDao(eventRepository = eventRepository, userEventDao = userDao)
+        val (user1, user2) = friendData
+        user1.photo?.let {
+            userDao.createUser(
+                UserDto(
+                    uid = "124",
+                    email = user1.email,
+                    phoneNumber = user1.phone,
+                    displayName = "User 2",
+                    photoUrl = user1.photo,
+                    emailVerified = true
+                )
+            )
+        }
+        user2.photo?.let {
+            userDao.createUser(
+                UserDto(
+                    uid = "125",
+                    email = user2.email,
+                    phoneNumber = user2.phone,
+                    displayName = "User 3",
+                    photoUrl = user2.photo,
+                    emailVerified = true
+                )
+            )
+        }
+        newFriendEventsDao.saveFriend(
+            uid = "123",
+            friendDto = CreateFriendDto(
+                name = "User 2",
+                email = user1.friendEmail,
+                phoneNumber = user1.friendPhone
+            )
+        )
+        newFriendEventsDao.saveFriend(
+            uid = "123",
+            friendDto = CreateFriendDto(
+                name = "User 3",
+                email = user2.friendEmail,
+                phoneNumber = user2.friendPhone
+            )
+        )
+        val friendsDto = newFriendEventsDao.findAllByUserId("123")
+        assertThat(friendsDto.friends).hasSize(2)
+
+        assertThat(friendsDto.friends[0]).isEqualTo(
+            FriendDto(
+                email = user1.friendEmail,
+                phoneNumber = user1.friendPhone,
+                name = "User 2",
+                photoUrl = user1.friendPhoto,
+                loanAmount = AmountDto(
+                    amount = 100.toBigDecimal(),
+                    currency = Currency.getInstance("USD"),
+                    isOwed = false
+                )
+            )
+        )
+
+        assertThat(friendsDto.friends[1]).isEqualTo(
+            FriendDto(
+                email = user2.friendEmail,
+                phoneNumber = user2.friendPhone,
+                name = "User 3",
+                photoUrl = user2.friendPhoto,
+                loanAmount = AmountDto(
+                    amount = 100.toBigDecimal(),
+                    currency = Currency.getInstance("USD"),
+                    isOwed = false
+                )
+            )
+        )
     }
 }

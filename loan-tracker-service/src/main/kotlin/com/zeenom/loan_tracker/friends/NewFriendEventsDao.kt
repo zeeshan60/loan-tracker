@@ -44,11 +44,12 @@ class NewFriendEventsDao(
     override suspend fun findAllByUserId(userId: String): FriendsDto {
         val events = eventRepository.findAllByUserUid(userId).toList()
         val phones = events.mapNotNull { it.friendPhoneNumber }
-        val emails = events.filter { it.friendPhoneNumber !in phones }.mapNotNull { it.friendEmail }
         val usersByPhones = userEventDao.findUsersByPhoneNumbers(phones).toList().associateBy { it.phoneNumber }
+        val emails = events.filter { it.friendPhoneNumber !in usersByPhones.keys }.mapNotNull { it.friendEmail }
         val usersByEmails = userEventDao.findUsersByEmails(emails).toList().associateBy { it.email }
         val friends = events.map {
-            val user = usersByPhones[it.friendPhoneNumber] ?: usersByEmails[it.friendEmail]
+            val user =
+                it.friendPhoneNumber?.let { usersByPhones[it] } ?: it.friendEmail?.let { usersByEmails[it] }
             FriendDto(
                 email = it.friendEmail,
                 phoneNumber = it.friendPhoneNumber,

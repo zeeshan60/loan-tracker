@@ -5,13 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.zeenom.loan_tracker.common.MessageResponse
 import com.zeenom.loan_tracker.common.Paginated
 import com.zeenom.loan_tracker.firebase.FirebaseService
-import com.zeenom.loan_tracker.friends.CreateFriendRequest
-import com.zeenom.loan_tracker.friends.FriendsResponse
-import com.zeenom.loan_tracker.friends.TestPostgresConfig
+import com.zeenom.loan_tracker.friends.*
 import com.zeenom.loan_tracker.prettyAndPrint
 import com.zeenom.loan_tracker.security.JWTTokenResponse
 import com.zeenom.loan_tracker.security.LoginRequest
 import com.zeenom.loan_tracker.users.UserDto
+import com.zeenom.loan_tracker.users.UserEventRepository
+import com.zeenom.loan_tracker.users.UserRepository
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
@@ -33,6 +33,15 @@ class FriendControllerIntegrationTest(
     @LocalServerPort private val port: Int,
     @Autowired @MockitoSpyBean private val firebaseService: FirebaseService,
 ) : TestPostgresConfig() {
+    @Autowired
+    private lateinit var friendRepository: FriendRepository
+
+    @Autowired
+    private lateinit var newFriendEventRepository: NewFriendEventRepository
+
+    @Autowired
+    private lateinit var userEventRepository: UserEventRepository
+
     @Autowired
     private lateinit var objectMapper: ObjectMapper
     private val webTestClient = WebTestClient.bindToServer().baseUrl("http://localhost:$port").build()
@@ -59,7 +68,9 @@ class FriendControllerIntegrationTest(
     )
 
     @BeforeAll
-    fun beforeAll() {
+    fun beforeAll(): Unit = runBlocking {
+        userEventRepository.deleteAll()
+        friendRepository.deleteAll()
         zeeToken = loginUser(
             userDto = zeeDto
         ).token
