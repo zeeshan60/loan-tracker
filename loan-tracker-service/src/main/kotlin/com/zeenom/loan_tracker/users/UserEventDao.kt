@@ -1,23 +1,14 @@
 package com.zeenom.loan_tracker.users
 
 import org.springframework.dao.DuplicateKeyException
-import org.springframework.data.repository.kotlin.CoroutineCrudRepository
-import org.springframework.stereotype.Repository
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.util.*
 
-@Repository
-interface UserEventRepository : CoroutineCrudRepository<UserEvent, UUID> {
-    suspend fun findByUid(uid: String): UserEvent?
-    suspend fun findByEmail(email: String): UserEvent?
-    suspend fun findByPhoneNumber(phoneNumber: String): UserEvent?
-}
-
 @Service
 class UserEventDao(private val userRepository: UserEventRepository) {
     suspend fun createIfNotExist(userDto: UserDto) {
-        findUserById(userDto.uid)?.let { createUser(userDto) }
+        findUserById(userDto.uid) ?: createUser(userDto)
     }
 
     suspend fun createUser(userDto: UserDto) {
