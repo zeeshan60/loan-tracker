@@ -1,176 +1,106 @@
 package com.zeenom.loan_tracker.friends
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.zeenom.loan_tracker.common.AmountDto
-import com.zeenom.loan_tracker.common.SecondInstant
-import com.zeenom.loan_tracker.common.r2dbc.toClass
-import com.zeenom.loan_tracker.common.r2dbc.toJson
-import com.zeenom.loan_tracker.users.UserEventRepository
-import com.zeenom.loan_tracker.users.UserEvent
-import io.r2dbc.postgresql.codec.Json
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.toList
+import com.zeenom.loan_tracker.users.UserEventDao
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.*
+import org.springframework.data.annotation.Id
+import org.springframework.data.relational.core.mapping.Table
+import org.springframework.data.repository.kotlin.CoroutineCrudRepository
+import org.springframework.stereotype.Repository
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
+import java.time.Instant
 import java.util.*
 
-interface IFriendsDao {
-    suspend fun findAllByUserId(userId: String): FriendsDto
+@Table("friend_events")
+data class FriendEvent(
+    @Id val id: UUID? = null,
+    val userUid: String,
+    val friendEmail: String?,
+    val friendPhoneNumber: String?,
+    val friendDisplayName: String,
+    val createdAt: Instant,
+    val streamId: UUID,
+    val version: Int,
+    val eventType: FriendEventType,
+)
 
-    @Transactional
-    suspend fun saveFriend(uid: String, friendDto: CreateFriendDto)
-
-    @Transactional
-    suspend fun makeMyOwnersMyFriends(uid: String)
+enum class FriendEventType {
+    FRIEND_CREATED
 }
 
+@Repository
+interface FriendEventRepository : CoroutineCrudRepository<FriendEvent, UUID> {
+    suspend fun findAllByUserUid(userUid: String): Flow<FriendEvent>
+    suspend fun findByFriendEmail(email: String): Flow<FriendEvent>
+    suspend fun findByFriendPhoneNumber(phoneNumber: String): Flow<FriendEvent>
+}
 
 @Service
 class FriendsDao(
-    private val friendRepository: FriendRepository,
-    private val objectMapper: ObjectMapper,
-    private val userRepository: UserEventRepository,
-    private val secondInstant: SecondInstant,
-) : IFriendsDao {
-
-    override suspend fun findAllByUserId(userId: String): FriendsDto = coroutineScope {
-        val friendsEntities = friendRepository.findAllFriendsByUid(userId)
-
-        friendsEntities.map {
+    private val eventRepository: FriendEventRepository,
+    private val userEventDao: UserEventDao,
+) {
+    suspend fun findAllByUserId(userId: String): FriendsDto {
+        val events = eventRepository.findAllByUserUid(userId).toList()
+        val phones = events.mapNotNull { it.friendPhoneNumber }
+        val usersByPhones = userEventDao.findUsersByPhoneNumbers(phones).toList().associateBy { it.phoneNumber }
+        val emails = events.filter { it.friendPhoneNumber !in usersByPhones.keys }.mapNotNull { it.friendEmail }
+        val usersByEmails = userEventDao.findUsersByEmails(emails).toList().associateBy { it.email }
+        val friends = events.map {
+            val user =
+                it.friendPhoneNumber?.let { usersByPhones[it] } ?: it.friendEmail?.let { usersByEmails[it] }
             FriendDto(
-                photoUrl = it.photoUrl,
-                name = it.friendDisplayName,
                 email = it.friendEmail,
                 phoneNumber = it.friendPhoneNumber,
-                loanAmount = it.friendTotalAmountsDto?.let {
-                    val totalAmounts = it.toClass(
-                        objectMapper = objectMapper,
-                        FriendTotalAmountsDto::class.java
-                    )
-                    totalAmounts.amountsPerCurrency.firstOrNull()?.let { amountDto ->
-                        AmountDto(
-                            amount = amountDto.amount,
-                            currency = amountDto.currency,
-                            isOwed = amountDto.isOwed
-
-                        )
-                    }
-                }
+                name = it.friendDisplayName,
+                photoUrl = user?.photoUrl,
+                loanAmount = null
             )
-        }.let { FriendsDto(friends = it) }
+        }
+        return FriendsDto(friends)
     }
 
-    @Transactional
-    override suspend fun saveFriend(uid: String, friendDto: CreateFriendDto) {
+    suspend fun saveFriend(uid: String, friendDto: CreateFriendDto) {
 
-        if (friendDto.email == null && friendDto.phoneNumber == null) {
-            throw IllegalArgumentException("At least one of userId, email or phoneNumber must be provided")
-        }
-
-        val user = userRepository.findByUid(uid) ?: throw IllegalArgumentException("User not found")
-        if (user.email == friendDto.email || user.phoneNumber == friendDto.phoneNumber) {
-            throw IllegalArgumentException("User cannot be friend of oneself")
-        }
-        val friendId = friendDto.email?.let { userRepository.findByEmail(it)?.id }
-            ?: friendDto.phoneNumber?.let { userRepository.findByPhoneNumber(it)?.id }
-        addFriendToUser(user = user, friendId = friendId, friendDto = friendDto)
-        friendId?.let { addUserToFriend(friendId = it, user = user) }
-    }
-
-    private suspend fun addFriendToUser(
-        user: UserEvent,
-        friendId: UUID?,
-        friendDto: CreateFriendDto,
-    ) {
-        friendRepository.save(
-            UserFriendEntity(
-                userId = user.id ?: throw IllegalArgumentException("User not found"),
-                friendId = friendId,
-                friendTotalAmountsDto = null,
-                createdAt = secondInstant.now(),
-                updatedAt = secondInstant.now(),
-                friendDisplayName = friendDto.name,
+        eventRepository.save(
+            FriendEvent(
+                userUid = uid,
                 friendEmail = friendDto.email,
-                friendPhoneNumber = friendDto.phoneNumber
+                friendPhoneNumber = friendDto.phoneNumber,
+                friendDisplayName = friendDto.name,
+                createdAt = Instant.now(),
+                streamId = UUID.randomUUID(),
+                version = 1,
+                eventType = FriendEventType.FRIEND_CREATED
             )
         )
     }
 
-    private suspend fun addUserToFriend(friendId: UUID, user: UserEvent) {
-        val existing = friendRepository.findByUserIdAndFriendId(
-            friendId,
-            user.id ?: throw IllegalArgumentException("User Not found")
-        )
-        if (existing == null) {
-            friendRepository.save(
-                UserFriendEntity(
-                    userId = friendId,
-                    friendId = user.id,
-                    friendTotalAmountsDto = null,
-                    createdAt = secondInstant.now(),
-                    updatedAt = secondInstant.now(),
-                    friendDisplayName = user.displayName,
-                    friendEmail = user.email,
-                    friendPhoneNumber = user.phoneNumber
+    @OptIn(ExperimentalCoroutinesApi::class)
+    suspend fun makeMyOwnersMyFriends(uid: String) {
+        val user = userEventDao.findUserById(uid) ?: throw IllegalArgumentException("User not found")
+        val emailFriends = user.email?.let { eventRepository.findByFriendEmail(user.email) } ?: emptyFlow()
+        val phoneFriends =
+            user.phoneNumber?.let { eventRepository.findByFriendPhoneNumber(user.phoneNumber) } ?: emptyFlow()
+
+        val myFriendIds = emailFriends.flatMapMerge { phoneFriends }.map { it.userUid }.toList().distinct()
+        val friends =
+            userEventDao.findUsersByUids(myFriendIds)
+
+        friends.collect { friendDto ->
+            eventRepository.save(
+                FriendEvent(
+                    userUid = uid,
+                    friendEmail = friendDto.email,
+                    friendPhoneNumber = friendDto.phoneNumber,
+                    friendDisplayName = friendDto.displayName,
+                    createdAt = Instant.now(),
+                    streamId = UUID.randomUUID(),
+                    version = 1,
+                    eventType = FriendEventType.FRIEND_CREATED
                 )
             )
         }
-    }
-
-    @Transactional
-    override suspend fun makeMyOwnersMyFriends(uid: String) {
-        val userEntity = userRepository.findByUid(uid)
-            ?: throw IllegalArgumentException("User not found")
-
-        updateMyIdInMyOwnersRecord(userEntity)
-        addMyOwnersAsMyFriends(userEntity)
-    }
-
-    private suspend fun addMyOwnersAsMyFriends(
-        userEntity: UserEvent,
-    ) {
-        val owners = friendRepository.findOwnersByMyEmailOrPhone(userEntity.email, userEntity.phoneNumber)
-        val newUserFriends = owners.map { owner ->
-            UserFriendEntity(
-                userId = userEntity.id ?: throw IllegalArgumentException("User not found"),
-                friendId = owner.ownerId,
-                friendEmail = owner.ownerEmail,
-                friendPhoneNumber = owner.ownerPhoneNumber,
-                friendDisplayName = owner.ownerDisplayName,
-                friendTotalAmountsDto = owner.friendTotalAmountsDto?.let { revertAmount(it) },
-                createdAt = secondInstant.now(),
-                updatedAt = secondInstant.now()
-            )
-        }
-        if (newUserFriends.isEmpty()) return
-        friendRepository.saveAll(newUserFriends).toList()
-    }
-
-    private fun revertAmount(friendAmountsDtoJson: Json) =
-        friendAmountsDtoJson.let {
-            val amountDto = it.toClass(
-                objectMapper = objectMapper,
-                FriendTotalAmountsDto::class.java
-            )
-            FriendTotalAmountsDto(amountsPerCurrency = amountDto.amountsPerCurrency.map {
-                AmountDto(
-                    amount = it.amount,
-                    currency = it.currency,
-                    isOwed = !it.isOwed
-                )
-            })
-        }.toJson(objectMapper = objectMapper)
-
-    private suspend fun updateMyIdInMyOwnersRecord(userEntity: UserEvent) {
-        val userFriendEntities =
-            friendRepository.findAllByEmailOrPhone(userEntity.email, userEntity.phoneNumber)
-
-        val updatedFriends = userFriendEntities.mapNotNull {
-            if (it.friendId == null && it.id != null) {
-                it.copy(friendId = userEntity.id)
-            } else null
-        }
-        if (updatedFriends.isEmpty()) return
-        friendRepository.saveAll(updatedFriends).toList()
     }
 }

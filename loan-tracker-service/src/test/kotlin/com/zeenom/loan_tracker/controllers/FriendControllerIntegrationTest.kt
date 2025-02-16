@@ -11,7 +11,6 @@ import com.zeenom.loan_tracker.security.JWTTokenResponse
 import com.zeenom.loan_tracker.security.LoginRequest
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventRepository
-import com.zeenom.loan_tracker.users.UserRepository
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
@@ -33,11 +32,9 @@ class FriendControllerIntegrationTest(
     @LocalServerPort private val port: Int,
     @Autowired @MockitoSpyBean private val firebaseService: FirebaseService,
 ) : TestPostgresConfig() {
-    @Autowired
-    private lateinit var friendRepository: FriendRepository
 
     @Autowired
-    private lateinit var newFriendEventRepository: NewFriendEventRepository
+    private lateinit var friendEventRepository: FriendEventRepository
 
     @Autowired
     private lateinit var userEventRepository: UserEventRepository
@@ -70,7 +67,7 @@ class FriendControllerIntegrationTest(
     @BeforeAll
     fun beforeAll(): Unit = runBlocking {
         userEventRepository.deleteAll()
-        friendRepository.deleteAll()
+        friendEventRepository.deleteAll()
         zeeToken = loginUser(
             userDto = zeeDto
         ).token
