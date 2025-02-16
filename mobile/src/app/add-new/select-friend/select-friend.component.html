@@ -2,19 +2,21 @@
   <ion-toolbar>
     <ion-title>Select Friend</ion-title>
   </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar [(ngModel)]="filter"></ion-searchbar>
+  </ion-toolbar>
 </ion-header>
-<ion-content class="ion-padding">
-  <h1>Select Friend</h1>
+<ion-content>
   <ion-list>
     <ion-item (click)="createNewFriend()">
       <ion-avatar slot="start">
           <ion-icon size="large" name="add-outline"></ion-icon>
       </ion-avatar>
       <ion-label>
-        <h2>Create new friend</h2>
+        <h2>Add <span style="color: green">{{filter()}}</span></h2>
       </ion-label>
     </ion-item>
-    @for( friend of friendsStore.friends(); track friend.name) {
+    @for( friend of friends(); track friend.name) {
       <ion-item (click)="chooseFriend(friend)">
         <ion-avatar slot="start">
           @if (friend.photoUrl) {

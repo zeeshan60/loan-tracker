@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, model, OnInit, signal } from '@angular/core';
 import { IonicModule, NavController } from '@ionic/angular';
 import { DefineExpenseComponent } from '../define-expense/define-expense.component';
 import {
@@ -8,7 +8,7 @@ import {
   IonItem,
   IonLabel,
   IonList,
-  IonNav, IonTitle, IonToolbar,
+  IonNav, IonSearchbar, IonTitle, IonToolbar,
   ModalController,
 } from '@ionic/angular/standalone';
 import { AddFriendComponent } from '../../add-friend/add-friend.component';
@@ -31,7 +31,7 @@ import { Friend } from '../../friends/model';
     IonLabel,
     IonList,
 
-    IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonButtons, IonIcon, FormsModule, IonList, IonItem, IonAvatar, IonLabel, CurrencyPipe
+    IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonButtons, IonIcon, FormsModule, IonList, IonItem, IonAvatar, IonLabel, CurrencyPipe, IonSearchbar,
   ],
 })
 export class SelectFriendComponent  implements OnInit {
@@ -39,6 +39,10 @@ export class SelectFriendComponent  implements OnInit {
   readonly defineExpenseComponent = DefineExpenseComponent;
   modalCtrl = inject(ModalController);
   friendsStore = inject(FriendsStore);
+  filter = model<string>('');
+  readonly friends = computed(() => this.friendsStore.friends().filter(friend =>
+    friend.name.toLowerCase().includes(this.filter().toLowerCase())
+  ))
   constructor() { }
 
   ngOnInit() {}
@@ -54,6 +58,7 @@ export class SelectFriendComponent  implements OnInit {
   async createNewFriend() {
     const modal = await this.modalCtrl.create({
       component: AddFriendComponent,
+      componentProps: { name: this.filter()}
     })
     modal.present();
     const { role } = await modal.onWillDismiss();

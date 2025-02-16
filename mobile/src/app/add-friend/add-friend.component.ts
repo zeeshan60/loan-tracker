@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, ElementRef, inject, OnInit, signal, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  inject,
+  Input,
+  OnInit,
+  signal,
+  ViewChild,
+} from '@angular/core';
 import {
   IonButton,
   IonButtons, IonContent,
@@ -36,12 +45,12 @@ import { FriendsStore } from '../friends/friends.store';
     ReactiveFormsModule,
   ],
 })
-export class AddFriendComponent {
+export class AddFriendComponent implements OnInit {
+  @Input() name: string = '';
   readonly friendsStore = inject(FriendsStore);
   private formBuilder = inject(FormBuilder);
   private helperService = inject(HelperService);
 
-  name = '';
   readonly loading = signal(false);
   public addFriendForm = this.formBuilder.group({
     name: this.formBuilder.nonNullable.control('', [Validators.required]),
@@ -49,7 +58,15 @@ export class AddFriendComponent {
     phoneNumber: this.formBuilder.nonNullable.control('', [Validators.required]),
   })
 
-  constructor(private modalCtrl: ModalController) { }
+  constructor(private modalCtrl: ModalController) {
+  }
+
+  ngOnInit() {
+    // set the passed name
+    this.addFriendForm.patchValue({
+      name: this.name,
+    })
+  }
 
   cancel() {
     this.modalCtrl.dismiss(null, 'cancel');
