@@ -15,6 +15,7 @@ import { AddFriendComponent } from '../../add-friend/add-friend.component';
 import { FriendsStore } from '../../friends/friends.store';
 import { CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Friend } from '../../friends/model';
 
 @Component({
   selector: 'app-select-friend',
@@ -42,11 +43,15 @@ export class SelectFriendComponent  implements OnInit {
 
   ngOnInit() {}
 
-  navigateToPageTwo() {
-    this.nav.push(DefineExpenseComponent, { foo: 'bar'});
+  navigateToPageTwo(friend: Friend) {
+    this.nav.push(DefineExpenseComponent, { friend });
   }
 
-  async addFriend() {
+  async chooseFriend(friend: Friend) {
+    this.navigateToPageTwo(friend);
+  }
+
+  async createNewFriend() {
     const modal = await this.modalCtrl.create({
       component: AddFriendComponent,
     })
