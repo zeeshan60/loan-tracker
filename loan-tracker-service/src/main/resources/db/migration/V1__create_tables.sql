@@ -53,9 +53,10 @@ CREATE TABLE friend_events
     friend_display_name VARCHAR(255) NOT NULL,
     friend_photo_url    TEXT,
     created_at          TIMESTAMP    NOT NULL,
+    stream_id           UUID         NOT NULL,
     version             INT          NOT NULL,
     event_type          VARCHAR(255) NOT NULL
 );
 
-CREATE UNIQUE INDEX idx_friend_events_version_userId ON friend_events (user_uid, version);
+CREATE UNIQUE INDEX idx_friend_events_version_userId ON friend_events (stream_id, version);
 CREATE INDEX idx_friend_events_created_at ON friend_events (created_at);

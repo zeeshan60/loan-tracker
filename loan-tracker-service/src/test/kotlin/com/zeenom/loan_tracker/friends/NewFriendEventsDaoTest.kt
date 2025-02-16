@@ -2,6 +2,7 @@ package com.zeenom.loan_tracker.friends
 
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventDao
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
@@ -15,9 +16,9 @@ import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest
 @DataR2dbcTest
 class NewFriendEventsDaoTest(@Autowired private val eventRepository: NewFriendEventRepository) : TestPostgresConfig() {
 
-    private val newFriendEventsDao = NewFriendEventsDao(eventRepository)
-
     private val userEventDao = mock<UserEventDao>()
+    private val newFriendEventsDao = NewFriendEventsDao(eventRepository = eventRepository, userEventDao = userEventDao)
+
 
     @BeforeEach
     fun setUp(): Unit = runBlocking {
@@ -50,22 +51,98 @@ class NewFriendEventsDaoTest(@Autowired private val eventRepository: NewFriendEv
             UserDto(
                 uid = "123",
                 email = "user1@gmail.com",
-                phoneNumber = "+923001234567",
+                phoneNumber = "+923001234568",
                 displayName = "User 1",
                 photoUrl = "https://test.com",
                 emailVerified = true
             )
         ).`when`(userEventDao).findUserById("123")
 
+        doReturn(
+            listOf(
+                UserDto(
+                    uid = "124",
+                    email = "user2@gmail.com",
+                    phoneNumber = "+923001234569",
+                    displayName = "User 2",
+                    photoUrl = "https://test.com",
+                    emailVerified = true
+                ),
+                UserDto(
+                    uid = "125",
+                    email = "user3@gmail.com",
+                    phoneNumber = "+923001234570",
+                    displayName = "User 3",
+                    photoUrl = "https://test.com",
+                    emailVerified = true
+                )
+            ).asFlow()
+        ).`when`(userEventDao).findUsersByUids(listOf("124", "125"))
+
         newFriendEventsDao.saveFriend(
             uid = "124",
             friendDto = CreateFriendDto(
-                name = "User 2",
-                email = "user2@gmail.com",
+                name = "User 1",
+                email = "user1@gmail.com",
+                phoneNumber = "+923001234568"
+            )
+        )
+        newFriendEventsDao.saveFriend(
+            uid = "125",
+            friendDto = CreateFriendDto(
+                name = "User 1",
+                email = "user1@gmail.com",
                 phoneNumber = "+923001234568"
             )
         )
 
-        newFriendEventsDao.makeMyOwnersMyFriends("124")
+        newFriendEventsDao.makeMyOwnersMyFriends("123")
+
+        val events = eventRepository.findAll().toList()
+
+        assertThat(events).hasSize(4)
+        val friend1 = events[0]
+        assertThat(friend1.userUid).isEqualTo("124")
+        assertThat(friend1.friendDisplayName).isEqualTo("User 1")
+        assertThat(friend1.friendEmail).isEqualTo("user1@gmail.com")
+        assertThat(friend1.friendPhoneNumber).isEqualTo("+923001234568")
+        assertThat(friend1.friendPhotoUrl).isNull()
+        assertThat(friend1.createdAt).isNotNull
+        assertThat(friend1.streamId).isNotNull
+        assertThat(friend1.version).isEqualTo(1)
+        assertThat(friend1.eventType).isEqualTo(FriendEventType.CREATE_FRIEND)
+
+        val friend2 = events[1]
+        assertThat(friend2.userUid).isEqualTo("125")
+        assertThat(friend2.friendDisplayName).isEqualTo("User 1")
+        assertThat(friend2.friendEmail).isEqualTo("user1@gmail.com")
+        assertThat(friend2.friendPhoneNumber).isEqualTo("+923001234568")
+        assertThat(friend2.friendPhotoUrl).isNull()
+        assertThat(friend2.createdAt).isNotNull
+        assertThat(friend2.streamId).isNotNull
+        assertThat(friend2.version).isEqualTo(1)
+        assertThat(friend2.eventType).isEqualTo(FriendEventType.CREATE_FRIEND)
+
+        val friend3 = events[2]
+        assertThat(friend3.userUid).isEqualTo("123")
+        assertThat(friend3.friendDisplayName).isEqualTo("User 2")
+        assertThat(friend3.friendEmail).isEqualTo("user2@gmail.com")
+        assertThat(friend3.friendPhoneNumber).isEqualTo("+923001234569")
+        assertThat(friend3.friendPhotoUrl).isEqualTo("https://test.com")
+        assertThat(friend3.createdAt).isNotNull
+        assertThat(friend3.streamId).isNotNull
+        assertThat(friend3.version).isEqualTo(1)
+        assertThat(friend3.eventType).isEqualTo(FriendEventType.CREATE_FRIEND)
+
+        val friend4 = events[3]
+        assertThat(friend4.userUid).isEqualTo("123")
+        assertThat(friend4.friendDisplayName).isEqualTo("User 3")
+        assertThat(friend4.friendEmail).isEqualTo("user3@gmail.com")
+        assertThat(friend4.friendPhoneNumber).isEqualTo("+923001234570")
+        assertThat(friend4.friendPhotoUrl).isEqualTo("https://test.com")
+        assertThat(friend4.createdAt).isNotNull
+        assertThat(friend4.streamId).isNotNull
+        assertThat(friend4.version).isEqualTo(1)
+        assertThat(friend4.eventType).isEqualTo(FriendEventType.CREATE_FRIEND)
     }
 }

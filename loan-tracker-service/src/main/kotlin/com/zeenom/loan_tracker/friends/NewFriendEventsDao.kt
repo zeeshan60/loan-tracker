@@ -1,10 +1,8 @@
 package com.zeenom.loan_tracker.friends
 
+import com.zeenom.loan_tracker.users.UserEventDao
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flatMapMerge
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.flow.*
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
@@ -22,6 +20,7 @@ data class NewFriendEvent(
     val friendDisplayName: String,
     val friendPhotoUrl: String?,
     val createdAt: Instant,
+    val streamId: UUID,
     val version: Int,
     val eventType: FriendEventType,
 )
@@ -37,7 +36,10 @@ interface NewFriendEventRepository : CoroutineCrudRepository<NewFriendEvent, UUI
 }
 
 @Service
-class NewFriendEventsDao(private val eventRepository: NewFriendEventRepository) : IFriendsDao {
+class NewFriendEventsDao(
+    private val eventRepository: NewFriendEventRepository,
+    private val userEventDao: UserEventDao,
+) : IFriendsDao {
     override suspend fun findAllByUserId(userId: String): FriendsDto {
         TODO("Not yet implemented")
     }
@@ -52,6 +54,7 @@ class NewFriendEventsDao(private val eventRepository: NewFriendEventRepository) 
                 friendDisplayName = friendDto.name,
                 friendPhotoUrl = null,
                 createdAt = Instant.now(),
+                streamId = UUID.randomUUID(),
                 version = 1,
                 eventType = FriendEventType.CREATE_FRIEND
             )
@@ -60,10 +63,29 @@ class NewFriendEventsDao(private val eventRepository: NewFriendEventRepository) 
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun makeMyOwnersMyFriends(uid: String) {
-        val emailFriends = eventRepository.findByFriendEmail(uid)
-        val phoneFriends = eventRepository.findByFriendPhoneNumber(uid)
+        val user = userEventDao.findUserById(uid) ?: throw IllegalArgumentException("User not found")
+        val emailFriends = user.email?.let { eventRepository.findByFriendEmail(user.email) } ?: emptyFlow()
+        val phoneFriends =
+            user.phoneNumber?.let { eventRepository.findByFriendPhoneNumber(user.phoneNumber) } ?: emptyFlow()
 
+        val myFriendIds = emailFriends.flatMapMerge { phoneFriends }.map { it.userUid }.toList().distinct()
+        val friends =
+            userEventDao.findUsersByUids(myFriendIds)
 
-
+        friends.collect { friendDto ->
+            eventRepository.save(
+                NewFriendEvent(
+                    userUid = uid,
+                    friendEmail = friendDto.email,
+                    friendPhoneNumber = friendDto.phoneNumber,
+                    friendDisplayName = friendDto.displayName,
+                    friendPhotoUrl = friendDto.photoUrl,
+                    createdAt = Instant.now(),
+                    streamId = UUID.randomUUID(),
+                    version = 1,
+                    eventType = FriendEventType.CREATE_FRIEND
+                )
+            )
+        }
     }
 }
