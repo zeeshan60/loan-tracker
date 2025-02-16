@@ -3,7 +3,6 @@ package com.zeenom.loan_tracker.users
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.stereotype.Service
 import java.time.Instant
-import java.util.*
 
 @Service
 class UserEventDao(private val userRepository: UserEventRepository) {
@@ -15,7 +14,6 @@ class UserEventDao(private val userRepository: UserEventRepository) {
         try {
             userRepository.save(
                 UserEvent(
-                    userId = UUID.randomUUID(),
                     uid = userDto.uid,
                     displayName = userDto.displayName,
                     phoneNumber = userDto.phoneNumber,

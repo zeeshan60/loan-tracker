@@ -8,7 +8,6 @@ import java.util.*
 @Table("user_events")
 data class UserEvent(
     @Id val id: UUID? = null,
-    val userId: UUID,
     val uid: String,
     val displayName: String,
     val phoneNumber: String?,

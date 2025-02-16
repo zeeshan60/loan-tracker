@@ -24,6 +24,7 @@ interface IFriendsDao {
     suspend fun makeMyOwnersMyFriends(uid: String)
 }
 
+
 @Service
 class FriendsDao(
     private val friendRepository: FriendRepository,
