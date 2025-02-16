@@ -57,6 +57,32 @@ class UserEventDao(private val userRepository: UserEventRepository) {
             )
         }
     }
+
+    suspend fun findUsersByEmails(emails: List<String>): Flow<UserDto> {
+        return userRepository.findAllByEmailIn(emails).map {
+            UserDto(
+                uid = it.uid,
+                displayName = it.displayName,
+                phoneNumber = it.phoneNumber,
+                email = it.email,
+                emailVerified = it.emailVerified ?: false, //todo make the dto optional
+                photoUrl = it.photoUrl
+            )
+        }
+    }
+
+    suspend fun findUsersByPhoneNumbers(phoneNumbers: List<String>): Flow<UserDto> {
+        return userRepository.findAllByPhoneNumberIn(phoneNumbers).map {
+            UserDto(
+                uid = it.uid,
+                displayName = it.displayName,
+                phoneNumber = it.phoneNumber,
+                email = it.email,
+                emailVerified = it.emailVerified ?: false, //todo make the dto optional
+                photoUrl = it.photoUrl
+            )
+        }
+    }
 }
 
 interface NewEvent {

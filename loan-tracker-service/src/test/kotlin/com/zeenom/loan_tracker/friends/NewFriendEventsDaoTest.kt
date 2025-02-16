@@ -1,8 +1,10 @@
 package com.zeenom.loan_tracker.friends
 
 import com.zeenom.loan_tracker.users.UserDto
+import com.zeenom.loan_tracker.users.UserEvent
 import com.zeenom.loan_tracker.users.UserEventDao
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
@@ -140,5 +142,30 @@ class NewFriendEventsDaoTest(@Autowired private val eventRepository: NewFriendEv
         assertThat(friend4.streamId).isNotNull
         assertThat(friend4.version).isEqualTo(1)
         assertThat(friend4.eventType).isEqualTo(FriendEventType.FRIEND_CREATED)
+    }
+
+    @Test
+    fun `find all friends when no friend has signed up return friends successfully`(): Unit = runBlocking {
+        doReturn(emptyFlow<UserEvent>()).`when`(userEventDao)
+            .findUsersByPhoneNumbers(listOf("+923001234568", "+923001234569"))
+        doReturn(emptyFlow<UserEvent>()).`when`(userEventDao).findUsersByEmails(emptyList())
+        newFriendEventsDao.saveFriend(
+            uid = "123",
+            friendDto = CreateFriendDto(
+                name = "User 2",
+                email = "user2@gmail.com",
+                phoneNumber = "+923001234568"
+            )
+        )
+        newFriendEventsDao.saveFriend(
+            uid = "123",
+            friendDto = CreateFriendDto(
+                name = "User 3",
+                email = "user3@gmail.com",
+                phoneNumber = "+923001234569"
+            )
+        )
+        val friendsDto = newFriendEventsDao.findAllByUserId("123")
+        assertThat(friendsDto.friends).hasSize(2)
     }
 }

@@ -1,5 +1,6 @@
 package com.zeenom.loan_tracker.friends
 
+import com.zeenom.loan_tracker.common.AmountDto
 import com.zeenom.loan_tracker.users.UserEventDao
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
@@ -30,6 +31,7 @@ enum class FriendEventType {
 
 @Repository
 interface NewFriendEventRepository : CoroutineCrudRepository<NewFriendEvent, UUID> {
+    suspend fun findAllByUserUid(userUid: String): Flow<NewFriendEvent>
     suspend fun findByFriendEmail(email: String): Flow<NewFriendEvent>
     suspend fun findByFriendPhoneNumber(phoneNumber: String): Flow<NewFriendEvent>
 }
@@ -40,7 +42,26 @@ class NewFriendEventsDao(
     private val userEventDao: UserEventDao,
 ) : IFriendsDao {
     override suspend fun findAllByUserId(userId: String): FriendsDto {
-        TODO("Not yet implemented")
+        val events = eventRepository.findAllByUserUid(userId).toList()
+        val phones = events.mapNotNull { it.friendPhoneNumber }
+        val emails = events.filter { it.friendPhoneNumber !in phones }.mapNotNull { it.friendEmail }
+        val usersByPhones = userEventDao.findUsersByPhoneNumbers(phones).toList().associateBy { it.phoneNumber }
+        val usersByEmails = userEventDao.findUsersByEmails(emails).toList().associateBy { it.email }
+        val friends = events.map {
+            val user = usersByPhones[it.friendPhoneNumber] ?: usersByEmails[it.friendEmail]
+            FriendDto(
+                email = it.friendEmail,
+                phoneNumber = it.friendPhoneNumber,
+                name = it.friendDisplayName,
+                photoUrl = user?.photoUrl,
+                loanAmount = AmountDto(
+                    amount = 100.toBigDecimal(),
+                    currency = Currency.getInstance("USD"),
+                    isOwed = false
+                )
+            )
+        }
+        return FriendsDto(friends)
     }
 
     override suspend fun saveFriend(uid: String, friendDto: CreateFriendDto) {

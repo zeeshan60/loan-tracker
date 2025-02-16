@@ -11,4 +11,6 @@ interface UserEventRepository : CoroutineCrudRepository<UserEvent, UUID> {
     suspend fun findAllByUidIn(uids: List<String>): Flow<UserEvent>
     suspend fun findByEmail(email: String): UserEvent?
     suspend fun findByPhoneNumber(phoneNumber: String): UserEvent?
+    suspend fun findAllByEmailIn(emails: List<String>): Flow<UserEvent>
+    suspend fun findAllByPhoneNumberIn(phoneNumbers: List<String>): Flow<UserEvent>
 }
