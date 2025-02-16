@@ -17,18 +17,18 @@ class EventEntityAdapter(
     private val secondInstant: SecondInstant
 ) {
 
-    fun fromDto(eventDto: EventDto<*>, id: UUID? = null, createdAt: Instant? = null) =
+    fun fromDto(commandDto: CommandDto<*>, id: UUID? = null, createdAt: Instant? = null) =
         EventEntity(
             id = id,
-            event = eventDto.event,
-            userId = eventDto.userId,
+            event = commandDto.event,
+            userId = commandDto.userId,
             createdAt = createdAt ?: secondInstant.now(),
-            payload = eventDto.payload?.toJson(objectMapper)
+            payload = commandDto.payload?.toJson(objectMapper)
         )
 
-    fun toDto(entity: EventEntity) = EventDto(
+    fun toDto(entity: EventEntity) = CommandDto(
         event = entity.event,
-        payload = entity.payload?.toClass(objectMapper, EventPayloadDto::class.java),
+        payload = entity.payload?.toClass(objectMapper, CommandPayloadDto::class.java),
         userId = entity.userId,
     )
 }

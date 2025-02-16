@@ -2,7 +2,10 @@ package com.zeenom.loan_tracker.friends
 
 import com.zeenom.loan_tracker.users.UserEventDao
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapMerge
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.util.*
@@ -59,19 +62,19 @@ class FriendsDao(
         val friends =
             userEventDao.findUsersByUids(myFriendIds)
 
-        friends.collect { friendDto ->
-            eventRepository.save(
-                FriendEvent(
-                    userUid = uid,
-                    friendEmail = friendDto.email,
-                    friendPhoneNumber = friendDto.phoneNumber,
-                    friendDisplayName = friendDto.displayName,
-                    createdAt = Instant.now(),
-                    streamId = UUID.randomUUID(),
-                    version = 1,
-                    eventType = FriendEventType.FRIEND_CREATED
-                )
+        friends.map { friendDto ->
+            FriendEvent(
+                userUid = uid,
+                friendEmail = friendDto.email,
+                friendPhoneNumber = friendDto.phoneNumber,
+                friendDisplayName = friendDto.displayName,
+                createdAt = Instant.now(),
+                streamId = UUID.randomUUID(),
+                version = 1,
+                eventType = FriendEventType.FRIEND_CREATED
             )
+        }.also {
+            eventRepository.saveAll(it).toList()
         }
     }
 }

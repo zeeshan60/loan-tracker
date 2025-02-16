@@ -1,6 +1,6 @@
 package com.zeenom.loan_tracker.users
 
-import com.zeenom.loan_tracker.events.EventPayloadDto
+import com.zeenom.loan_tracker.events.CommandPayloadDto
 
 data class UserDto(
     val uid: String,
@@ -9,4 +9,4 @@ data class UserDto(
     val displayName: String,
     val photoUrl: String?,
     val emailVerified: Boolean
-) : EventPayloadDto
+) : CommandPayloadDto

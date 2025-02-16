@@ -3,7 +3,7 @@ package com.zeenom.loan_tracker.friends
 import com.zeenom.loan_tracker.common.MessageResponse
 import com.zeenom.loan_tracker.common.Paginated
 import com.zeenom.loan_tracker.common.PaginationDto
-import com.zeenom.loan_tracker.events.EventDto
+import com.zeenom.loan_tracker.events.CommandDto
 import com.zeenom.loan_tracker.events.EventType
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -42,7 +42,7 @@ class FriendsController(
     ): MessageResponse {
         logger.info("Adding friend for user $userId")
         commandCreateFriends.execute(
-            EventDto(
+            CommandDto(
                 event = EventType.ADD_FRIEND,
                 payload = friendsAdapter.fromRequestToDto(friendRequest),
                 userId = userId

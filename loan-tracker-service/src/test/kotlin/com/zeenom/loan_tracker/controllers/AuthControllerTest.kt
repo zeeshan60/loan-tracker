@@ -1,7 +1,7 @@
 package com.zeenom.loan_tracker.controllers
 
 import com.zeenom.loan_tracker.events.EventDao
-import com.zeenom.loan_tracker.events.EventDto
+import com.zeenom.loan_tracker.events.CommandDto
 import com.zeenom.loan_tracker.events.EventType
 import com.zeenom.loan_tracker.firebase.FirebaseService
 import com.zeenom.loan_tracker.friends.FriendsDao
@@ -56,7 +56,7 @@ class AuthControllerTest(
         Mockito.doReturn(Unit).whenever(friendsDao).makeMyOwnersMyFriends("123")
 
         Mockito.doReturn(Unit).whenever(eventDao).saveEvent(
-            EventDto(
+            CommandDto(
                 event = EventType.LOGIN,
                 payload = userDto,
                 userId = "123",
@@ -75,10 +75,10 @@ class AuthControllerTest(
             .expectBody()
             .jsonPath("$.token").value { it: String? -> assertThat(it).isNotEmpty() }
 
-        argumentCaptor<EventDto<UserDto>>().apply {
+        argumentCaptor<CommandDto<UserDto>>().apply {
             Mockito.verify(eventDao, Mockito.times(1)).saveEvent(capture())
             assertThat(firstValue).isEqualTo(
-                EventDto(
+                CommandDto(
                     event = EventType.LOGIN,
                     payload = userDto,
                     userId = "123",

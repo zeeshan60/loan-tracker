@@ -1,6 +1,6 @@
 package com.zeenom.loan_tracker.friends
 
-import com.zeenom.loan_tracker.events.EventPayloadDto
+import com.zeenom.loan_tracker.events.CommandPayloadDto
 import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(description = "Request to create a new friend. Either email or phone number must be provided.")
@@ -19,4 +19,4 @@ data class CreateFriendDto(
     val email: String?,
     val phoneNumber: String?,
     val name: String,
-) : EventPayloadDto
+) : CommandPayloadDto

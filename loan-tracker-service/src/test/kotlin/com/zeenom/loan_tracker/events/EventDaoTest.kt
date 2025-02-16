@@ -37,7 +37,7 @@ class EventDaoTest(
     @Test
     fun `successfully saves event and reads it back`(): Unit = runBlocking {
         eventRepository.deleteAll()
-        val eventDto = EventDto(
+        val commandDto = CommandDto(
             event = EventType.CREATE_TRANSACTION,
             payload = TransactionDto(
                 amount = AmountDto(
@@ -49,13 +49,13 @@ class EventDaoTest(
             ),
             userId = "123",
         )
-        eventDao.saveEvent(eventDto)
+        eventDao.saveEvent(commandDto)
 
 
         val entity = eventRepository.findAll().first()
-        assertThat(entity.event).isEqualTo(eventDto.event)
-        assertThat(entity.userId).isEqualTo(eventDto.userId)
-        assertThat(entity.payload?.toClass(objectMapper, EventPayloadDto::class.java)).isEqualTo(eventDto.payload)
+        assertThat(entity.event).isEqualTo(commandDto.event)
+        assertThat(entity.userId).isEqualTo(commandDto.userId)
+        assertThat(entity.payload?.toClass(objectMapper, CommandPayloadDto::class.java)).isEqualTo(commandDto.payload)
         assertThat(entity.createdAt).isBeforeOrEqualTo(secondInstant.now())
     }
 }

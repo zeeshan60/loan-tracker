@@ -7,8 +7,8 @@ class EventDao(
     private val eventRepository: EventRepository,
     private val eventEntityAdapter: EventEntityAdapter,
 ) {
-    suspend fun <T : EventPayloadDto?> saveEvent(eventDto: EventDto<T>) {
-        eventRepository.save(eventEntityAdapter.fromDto(eventDto))
+    suspend fun <T : CommandPayloadDto?> saveEvent(commandDto: CommandDto<T>) {
+        eventRepository.save(eventEntityAdapter.fromDto(commandDto))
     }
 }
 

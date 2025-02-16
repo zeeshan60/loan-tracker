@@ -1,7 +1,7 @@
 package com.zeenom.loan_tracker.security
 
 import com.zeenom.loan_tracker.events.CommandCreateUser
-import com.zeenom.loan_tracker.events.EventDto
+import com.zeenom.loan_tracker.events.CommandDto
 import com.zeenom.loan_tracker.events.EventType
 import com.zeenom.loan_tracker.firebase.FirebaseService
 import io.jsonwebtoken.Jwts
@@ -26,7 +26,7 @@ class AuthService(
         val user = firebaseService.userByVerifyingIdToken(idToken)
 
         commandCreateUser.execute(
-            EventDto(
+            CommandDto(
                 event = EventType.LOGIN,
                 payload = user,
                 userId = user.uid
