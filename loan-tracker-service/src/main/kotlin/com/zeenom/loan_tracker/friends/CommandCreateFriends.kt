@@ -10,11 +10,11 @@ import org.springframework.stereotype.Service
 
 @Service
 class CommandCreateFriends(
-    private val friendsDao: FriendsDao,
+    private val friendsEventHandler: FriendsEventHandler,
     private val commandDao: CommandDao,
 ) : Command<CreateFriendDto> {
     override suspend fun execute(commandDto: CommandDto<CreateFriendDto>) {
         CoroutineScope(Dispatchers.IO).launch { commandDao.saveEvent(commandDto) }
-        friendsDao.saveFriend(commandDto.userId, commandDto.payload)
+        friendsEventHandler.saveFriend(commandDto.userId, commandDto.payload)
     }
 }

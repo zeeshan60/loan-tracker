@@ -26,7 +26,7 @@ import java.util.*
 class FriendsControllerTest(
     @LocalServerPort private val port: Int,
     @Autowired private val authService: AuthService,
-    @Autowired @MockitoBean private val friendsDao: FriendsDao,
+    @Autowired @MockitoBean private val friendsEventHandler: FriendsEventHandler,
     @Autowired@MockitoBean private val commandDao: CommandDao
 ) {
     private val webTestClient = WebTestClient.bindToServer().baseUrl("http://localhost:$port").build()
@@ -47,7 +47,7 @@ class FriendsControllerTest(
         )
         Mockito.doReturn(
             friendsDto
-        ).`when`(friendsDao).findAllByUserId(userid)
+        ).`when`(friendsEventHandler).findAllByUserId(userid)
         val result = webTestClient.get()
             .uri("/api/v1/friends")
             .header("Authorization", "Bearer ${authService.generateJwt(userid)}")
@@ -79,7 +79,7 @@ class FriendsControllerTest(
 
     @Test
     fun `addFriend creates friend successfully`(): Unit = runBlocking {
-        Mockito.doReturn(Unit).`when`(friendsDao).saveFriend(any(), any())
+        Mockito.doReturn(Unit).`when`(friendsEventHandler).saveFriend(any(), any())
         Mockito.doReturn(Unit).`when`(commandDao).saveEvent<CommandPayloadDto>(any())
         webTestClient.post()
             .uri("/api/v1/friends/add")
@@ -97,7 +97,7 @@ class FriendsControllerTest(
             .jsonPath("$.message").isEqualTo("Friend added successfully")
 
         val captor = argumentCaptor<String, CreateFriendDto>()
-        Mockito.verify(friendsDao).saveFriend(captor.first.capture(), captor.second.capture())
+        Mockito.verify(friendsEventHandler).saveFriend(captor.first.capture(), captor.second.capture())
         assertThat(captor.first.firstValue).isEqualTo("sample uid")
         assertThat(captor.second.firstValue).isEqualTo(
             CreateFriendDto(
@@ -137,7 +137,7 @@ class FriendsControllerTest(
 
     @Test
     fun `given service throws notfoudexception resolves to 404 with exception message`() = runBlocking {
-        Mockito.doThrow(NotFoundException("Friend not found")).`when`(friendsDao).findAllByUserId(any())
+        Mockito.doThrow(NotFoundException("Friend not found")).`when`(friendsEventHandler).findAllByUserId(any())
         val result = webTestClient.get()
             .uri("/api/v1/friends")
             .header("Authorization", "Bearer ${authService.generateJwt("sample uid")}")

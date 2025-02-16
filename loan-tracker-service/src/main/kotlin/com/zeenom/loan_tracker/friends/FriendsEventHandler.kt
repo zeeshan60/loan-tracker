@@ -11,7 +11,7 @@ import java.time.Instant
 import java.util.*
 
 @Service
-class FriendsDao(
+class FriendsEventHandler(
     private val eventRepository: FriendEventRepository,
     private val userEventHandler: UserEventHandler,
 ) {

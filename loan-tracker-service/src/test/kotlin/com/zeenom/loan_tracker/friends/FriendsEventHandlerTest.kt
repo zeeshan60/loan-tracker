@@ -21,13 +21,13 @@ import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DataR2dbcTest
-class FriendsDaoTest(
+class FriendsEventHandlerTest(
     @Autowired private val eventRepository: FriendEventRepository,
     @Autowired private val userEventRepository: UserEventRepository,
 ) : TestPostgresConfig() {
 
     private val userEventHandler = mock<UserEventHandler>()
-    private val friendsDao = FriendsDao(eventRepository = eventRepository, userEventHandler = userEventHandler)
+    private val friendsEventHandler = FriendsEventHandler(eventRepository = eventRepository, userEventHandler = userEventHandler)
 
 
     @BeforeEach
@@ -37,7 +37,7 @@ class FriendsDaoTest(
 
     @Test
     fun `saves friend event successfully`(): Unit = runBlocking {
-        friendsDao.saveFriend(
+        friendsEventHandler.saveFriend(
             uid = "123",
             friendDto = CreateFriendDto(
                 name = "John Doe",
@@ -89,7 +89,7 @@ class FriendsDaoTest(
             ).asFlow()
         ).`when`(userEventHandler).findUsersByUids(listOf("124", "125"))
 
-        friendsDao.saveFriend(
+        friendsEventHandler.saveFriend(
             uid = "124",
             friendDto = CreateFriendDto(
                 name = "User 1",
@@ -97,7 +97,7 @@ class FriendsDaoTest(
                 phoneNumber = "+923001234568"
             )
         )
-        friendsDao.saveFriend(
+        friendsEventHandler.saveFriend(
             uid = "125",
             friendDto = CreateFriendDto(
                 name = "User 1",
@@ -106,7 +106,7 @@ class FriendsDaoTest(
             )
         )
 
-        friendsDao.makeMyOwnersMyFriends("123")
+        friendsEventHandler.makeMyOwnersMyFriends("123")
 
         val events = eventRepository.findAll().toList()
 
@@ -158,7 +158,7 @@ class FriendsDaoTest(
             .findUsersByPhoneNumbers(listOf("+923001234568", "+923001234569"))
         doReturn(emptyFlow<UserEvent>()).`when`(userEventHandler)
             .findUsersByEmails(listOf("user2@gmail.com", "user3@gmail.com"))
-        friendsDao.saveFriend(
+        friendsEventHandler.saveFriend(
             uid = "123",
             friendDto = CreateFriendDto(
                 name = "User 2",
@@ -166,7 +166,7 @@ class FriendsDaoTest(
                 phoneNumber = "+923001234568"
             )
         )
-        friendsDao.saveFriend(
+        friendsEventHandler.saveFriend(
             uid = "123",
             friendDto = CreateFriendDto(
                 name = "User 3",
@@ -174,7 +174,7 @@ class FriendsDaoTest(
                 phoneNumber = "+923001234569"
             )
         )
-        val friendsDto = friendsDao.findAllByUserId("123")
+        val friendsDto = friendsEventHandler.findAllByUserId("123")
         assertThat(friendsDto.friends).hasSize(2)
 
         assertThat(friendsDto.friends[0]).isEqualTo(
@@ -293,7 +293,7 @@ class FriendsDaoTest(
         userEventRepository.deleteAll()
         eventRepository.deleteAll()
         val userEventHandler = UserEventHandler(userEventRepository)
-        val friendsDao = FriendsDao(eventRepository = eventRepository, userEventHandler = userEventHandler)
+        val friendsEventHandler = FriendsEventHandler(eventRepository = eventRepository, userEventHandler = userEventHandler)
         val (user1, user2) = friendData
         user1.photo?.let {
             userEventHandler.createUser(
@@ -319,7 +319,7 @@ class FriendsDaoTest(
                 )
             )
         }
-        friendsDao.saveFriend(
+        friendsEventHandler.saveFriend(
             uid = "123",
             friendDto = CreateFriendDto(
                 name = "User 2",
@@ -327,7 +327,7 @@ class FriendsDaoTest(
                 phoneNumber = user1.friendPhone
             )
         )
-        friendsDao.saveFriend(
+        friendsEventHandler.saveFriend(
             uid = "123",
             friendDto = CreateFriendDto(
                 name = "User 3",
@@ -335,7 +335,7 @@ class FriendsDaoTest(
                 phoneNumber = user2.friendPhone
             )
         )
-        val friendsDto = friendsDao.findAllByUserId("123")
+        val friendsDto = friendsEventHandler.findAllByUserId("123")
         assertThat(friendsDto.friends).hasSize(2)
 
         assertThat(friendsDto.friends[0]).isEqualTo(

@@ -17,7 +17,7 @@ import java.util.*
 @SpringBootTest
 @ActiveProfiles("local")
 @Disabled
-class FriendsDaoLocalIntegrationTest(
+class FriendsEventHandlerLocalIntegrationTest(
     @Autowired private val objectMapper: ObjectMapper,
     @Autowired private val friendRepository: FriendRepository,
     @Autowired private val userRepository: UserRepository,

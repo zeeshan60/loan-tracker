@@ -4,7 +4,7 @@ import com.zeenom.loan_tracker.events.CommandDao
 import com.zeenom.loan_tracker.events.CommandDto
 import com.zeenom.loan_tracker.events.EventType
 import com.zeenom.loan_tracker.firebase.FirebaseService
-import com.zeenom.loan_tracker.friends.FriendsDao
+import com.zeenom.loan_tracker.friends.FriendsEventHandler
 import com.zeenom.loan_tracker.security.LoginRequest
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventHandler
@@ -29,7 +29,7 @@ class AuthControllerTest(
     @Autowired @MockitoSpyBean private val firebaseService: FirebaseService,
     @Autowired @MockitoBean private val commandDao: CommandDao,
     @Autowired @MockitoBean private val userEventHandler: UserEventHandler,
-    @Autowired @MockitoBean private val friendsDao: FriendsDao,
+    @Autowired @MockitoBean private val friendsEventHandler: FriendsEventHandler,
 ) {
 
     private val webTestClient = WebTestClient.bindToServer().baseUrl("http://localhost:$port").build()
@@ -53,7 +53,7 @@ class AuthControllerTest(
         ).whenever(firebaseService).userByVerifyingIdToken(idToken)
 
         Mockito.doReturn(Unit).whenever(userEventHandler).createIfNotExist(userDto)
-        Mockito.doReturn(Unit).whenever(friendsDao).makeMyOwnersMyFriends("123")
+        Mockito.doReturn(Unit).whenever(friendsEventHandler).makeMyOwnersMyFriends("123")
 
         Mockito.doReturn(Unit).whenever(commandDao).saveEvent(
             CommandDto(
@@ -91,7 +91,7 @@ class AuthControllerTest(
             .createIfNotExist(userDtoCaptor.capture())
         assertThat(userDtoCaptor.firstValue).isEqualTo(userDto)
 
-        Mockito.verify(friendsDao, Mockito.times(1)).makeMyOwnersMyFriends("123")
+        Mockito.verify(friendsEventHandler, Mockito.times(1)).makeMyOwnersMyFriends("123")
     }
 }
 
