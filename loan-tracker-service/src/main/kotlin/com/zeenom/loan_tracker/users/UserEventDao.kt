@@ -1,5 +1,7 @@
 package com.zeenom.loan_tracker.users
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -32,6 +34,19 @@ class UserEventDao(private val userRepository: UserEventRepository) {
 
     suspend fun findUserById(uid: String): UserDto? {
         return userRepository.findByUid(uid)?.let {
+            UserDto(
+                uid = it.uid,
+                displayName = it.displayName,
+                phoneNumber = it.phoneNumber,
+                email = it.email,
+                emailVerified = it.emailVerified ?: false, //todo make the dto optional
+                photoUrl = it.photoUrl
+            )
+        }
+    }
+
+    suspend fun findUsersByUids(uids: List<String>): Flow<UserDto> {
+        return userRepository.findAllByUidIn(uids).map {
             UserDto(
                 uid = it.uid,
                 displayName = it.displayName,

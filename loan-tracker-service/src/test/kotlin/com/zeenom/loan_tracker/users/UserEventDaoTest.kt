@@ -28,7 +28,7 @@ class UserEventDaoTest(
 
     @Test
     fun `adds new user event successfully`(): Unit = runBlocking {
-        val userDto = createUser()
+        val userDto = createUser(userDto = userDto)
 
         val userEvent = userEventRepository.findAll().toList()
 
@@ -54,24 +54,24 @@ class UserEventDaoTest(
             return userDto
         }
 
-    private suspend fun createUser(): UserDto {
+    private suspend fun createUser(userDto: UserDto): UserDto {
 
-        userEventDao.createUser(userDto)
+        userEventDao.createUser(userDto = userDto)
         return userDto
     }
 
     @Test
     fun `adds new user should fail if user already exists`(): Unit = runBlocking {
-        createUser()
+        createUser(userDto = userDto)
 
-        assertThatThrownBy { runBlocking { createUser() } }
+        assertThatThrownBy { runBlocking { createUser(userDto = userDto) } }
             .isInstanceOf(IllegalArgumentException::class.java)
             .hasMessage("User already exist")
     }
 
     @Test
     fun `find user by id returns user successfully`(): Unit = runBlocking {
-        val userDto = createUser()
+        val userDto = createUser(userDto = userDto)
 
         val user = userEventDao.findUserById(userDto.uid)
 
@@ -82,5 +82,31 @@ class UserEventDaoTest(
         assertThat(user.displayName).isEqualTo(userDto.displayName)
         assertThat(user.photoUrl).isEqualTo(userDto.photoUrl)
         assertThat(user.emailVerified).isEqualTo(userDto.emailVerified)
+    }
+
+    @Test
+    fun `find multiple users using uids successfully`(): Unit = runBlocking {
+        createUser(userDto = userDto)
+        val userDto2 = userDto.copy(uid = "124", email = "user2@gmail.com", phoneNumber = "+923001234568")
+        createUser(userDto = userDto2)
+
+        val users = userEventDao.findUsersByUids(listOf("123", "124")).toList()
+
+        assertThat(users).hasSize(2)
+        val user = users[0]
+        assertThat(user.uid).isEqualTo(userDto.uid)
+        assertThat(user.email).isEqualTo(userDto.email)
+        assertThat(user.phoneNumber).isEqualTo(userDto.phoneNumber)
+        assertThat(user.displayName).isEqualTo(userDto.displayName)
+        assertThat(user.photoUrl).isEqualTo(userDto.photoUrl)
+        assertThat(user.emailVerified).isEqualTo(userDto.emailVerified)
+
+        val user2 = users[1]
+        assertThat(user2.uid).isEqualTo(userDto2.uid)
+        assertThat(user2.email).isEqualTo(userDto2.email)
+        assertThat(user2.phoneNumber).isEqualTo(userDto2.phoneNumber)
+        assertThat(user2.displayName).isEqualTo(userDto2.displayName)
+        assertThat(user2.photoUrl).isEqualTo(userDto2.photoUrl)
+        assertThat(user2.emailVerified).isEqualTo(userDto2.emailVerified)
     }
 }

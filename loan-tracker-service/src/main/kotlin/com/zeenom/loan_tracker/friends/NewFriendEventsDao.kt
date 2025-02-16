@@ -1,5 +1,10 @@
 package com.zeenom.loan_tracker.friends
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapMerge
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.toList
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
@@ -26,7 +31,10 @@ enum class FriendEventType {
 }
 
 @Repository
-interface NewFriendEventRepository : CoroutineCrudRepository<NewFriendEvent, UUID>
+interface NewFriendEventRepository : CoroutineCrudRepository<NewFriendEvent, UUID> {
+    suspend fun findByFriendEmail(email: String): Flow<NewFriendEvent>
+    suspend fun findByFriendPhoneNumber(phoneNumber: String): Flow<NewFriendEvent>
+}
 
 @Service
 class NewFriendEventsDao(private val eventRepository: NewFriendEventRepository) : IFriendsDao {
@@ -50,7 +58,12 @@ class NewFriendEventsDao(private val eventRepository: NewFriendEventRepository) 
         )
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun makeMyOwnersMyFriends(uid: String) {
-        TODO("Not yet implemented")
+        val emailFriends = eventRepository.findByFriendEmail(uid)
+        val phoneFriends = eventRepository.findByFriendPhoneNumber(uid)
+
+
+
     }
 }
