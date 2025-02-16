@@ -106,43 +106,39 @@ class NewFriendEventsDaoTest(@Autowired private val eventRepository: NewFriendEv
         assertThat(friend1.friendDisplayName).isEqualTo("User 1")
         assertThat(friend1.friendEmail).isEqualTo("user1@gmail.com")
         assertThat(friend1.friendPhoneNumber).isEqualTo("+923001234568")
-        assertThat(friend1.friendPhotoUrl).isNull()
         assertThat(friend1.createdAt).isNotNull
         assertThat(friend1.streamId).isNotNull
         assertThat(friend1.version).isEqualTo(1)
-        assertThat(friend1.eventType).isEqualTo(FriendEventType.CREATE_FRIEND)
+        assertThat(friend1.eventType).isEqualTo(FriendEventType.FRIEND_CREATED)
 
         val friend2 = events[1]
         assertThat(friend2.userUid).isEqualTo("125")
         assertThat(friend2.friendDisplayName).isEqualTo("User 1")
         assertThat(friend2.friendEmail).isEqualTo("user1@gmail.com")
         assertThat(friend2.friendPhoneNumber).isEqualTo("+923001234568")
-        assertThat(friend2.friendPhotoUrl).isNull()
         assertThat(friend2.createdAt).isNotNull
         assertThat(friend2.streamId).isNotNull
         assertThat(friend2.version).isEqualTo(1)
-        assertThat(friend2.eventType).isEqualTo(FriendEventType.CREATE_FRIEND)
+        assertThat(friend2.eventType).isEqualTo(FriendEventType.FRIEND_CREATED)
 
         val friend3 = events[2]
         assertThat(friend3.userUid).isEqualTo("123")
         assertThat(friend3.friendDisplayName).isEqualTo("User 2")
         assertThat(friend3.friendEmail).isEqualTo("user2@gmail.com")
         assertThat(friend3.friendPhoneNumber).isEqualTo("+923001234569")
-        assertThat(friend3.friendPhotoUrl).isEqualTo("https://test.com")
         assertThat(friend3.createdAt).isNotNull
         assertThat(friend3.streamId).isNotNull
         assertThat(friend3.version).isEqualTo(1)
-        assertThat(friend3.eventType).isEqualTo(FriendEventType.CREATE_FRIEND)
+        assertThat(friend3.eventType).isEqualTo(FriendEventType.FRIEND_CREATED)
 
         val friend4 = events[3]
         assertThat(friend4.userUid).isEqualTo("123")
         assertThat(friend4.friendDisplayName).isEqualTo("User 3")
         assertThat(friend4.friendEmail).isEqualTo("user3@gmail.com")
         assertThat(friend4.friendPhoneNumber).isEqualTo("+923001234570")
-        assertThat(friend4.friendPhotoUrl).isEqualTo("https://test.com")
         assertThat(friend4.createdAt).isNotNull
         assertThat(friend4.streamId).isNotNull
         assertThat(friend4.version).isEqualTo(1)
-        assertThat(friend4.eventType).isEqualTo(FriendEventType.CREATE_FRIEND)
+        assertThat(friend4.eventType).isEqualTo(FriendEventType.FRIEND_CREATED)
     }
 }

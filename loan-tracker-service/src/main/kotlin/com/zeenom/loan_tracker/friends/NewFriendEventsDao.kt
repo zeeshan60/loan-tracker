@@ -18,7 +18,6 @@ data class NewFriendEvent(
     val friendEmail: String?,
     val friendPhoneNumber: String?,
     val friendDisplayName: String,
-    val friendPhotoUrl: String?,
     val createdAt: Instant,
     val streamId: UUID,
     val version: Int,
@@ -26,7 +25,7 @@ data class NewFriendEvent(
 )
 
 enum class FriendEventType {
-    CREATE_FRIEND
+    FRIEND_CREATED
 }
 
 @Repository
@@ -52,11 +51,10 @@ class NewFriendEventsDao(
                 friendEmail = friendDto.email,
                 friendPhoneNumber = friendDto.phoneNumber,
                 friendDisplayName = friendDto.name,
-                friendPhotoUrl = null,
                 createdAt = Instant.now(),
                 streamId = UUID.randomUUID(),
                 version = 1,
-                eventType = FriendEventType.CREATE_FRIEND
+                eventType = FriendEventType.FRIEND_CREATED
             )
         )
     }
@@ -79,11 +77,10 @@ class NewFriendEventsDao(
                     friendEmail = friendDto.email,
                     friendPhoneNumber = friendDto.phoneNumber,
                     friendDisplayName = friendDto.displayName,
-                    friendPhotoUrl = friendDto.photoUrl,
                     createdAt = Instant.now(),
                     streamId = UUID.randomUUID(),
                     version = 1,
-                    eventType = FriendEventType.CREATE_FRIEND
+                    eventType = FriendEventType.FRIEND_CREATED
                 )
             )
         }

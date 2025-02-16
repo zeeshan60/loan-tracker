@@ -1,3 +1,5 @@
+-- noinspection SqlResolveForFile @ routine/"gen_random_uuid"
+
 CREATE TABLE events
 (
     id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -51,7 +53,6 @@ CREATE TABLE friend_events
     friend_email        VARCHAR(255),
     friend_phone_number VARCHAR(255),
     friend_display_name VARCHAR(255) NOT NULL,
-    friend_photo_url    TEXT,
     created_at          TIMESTAMP    NOT NULL,
     stream_id           UUID         NOT NULL,
     version             INT          NOT NULL,
