@@ -11,7 +11,6 @@ import {
 import { FriendsStore } from './friends.store';
 import { AddFriendComponent } from '../add-friend/add-friend.component';
 import { FormsModule } from '@angular/forms';
-import { AuthStore } from '../login/auth.store';
 import { CurrencyPipe } from '@angular/common';
 
 @Component({
@@ -25,13 +24,9 @@ import { CurrencyPipe } from '@angular/common';
 export class FriendsPage implements OnInit {
   readonly friendsStore = inject(FriendsStore);
   readonly modalCtrl = inject(ModalController);
-  readonly authStore = inject(AuthStore);
-  constructor() {
-  }
+  constructor() {}
 
   async ngOnInit() {
-    await this.friendsStore.loadFriends()
-    console.log(this.friendsStore.unSettledFriends());
   }
 
   async addFriend() {
@@ -39,8 +34,7 @@ export class FriendsPage implements OnInit {
       component: AddFriendComponent,
     })
     modal.present();
-    const { data, role } = await modal.onWillDismiss();
-    console.log(data);
+    const { role } = await modal.onWillDismiss();
     if (role === 'confirm') {
       this.friendsStore.loadFriends();
     }

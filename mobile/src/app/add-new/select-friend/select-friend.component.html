@@ -1,0 +1,42 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Select Friend</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="navigateToPageTwo()" [strong]="true">Next</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <h1>Select Friend</h1>
+  <ion-list>
+    <ion-item (click)="addFriend()">
+      <ion-avatar slot="start">
+          <ion-icon size="large" name="add-outline"></ion-icon>
+      </ion-avatar>
+      <ion-label>
+        <h2>Create new friend</h2>
+      </ion-label>
+    </ion-item>
+    @for( friend of friendsStore.friends(); track friend.name) {
+      <ion-item>
+        <ion-avatar slot="start">
+          @if (friend.photoUrl) {
+            <img [src]="friend.photoUrl" alt="Friend's photo" />
+          } @else {
+            <ion-icon size="large" name="person" [color]="friend.loanAmount?.isOwed ? 'success': 'danger'"></ion-icon>
+          }
+        </ion-avatar>
+        <ion-label>
+          <h2>{{ friend.name }}</h2>
+        </ion-label>
+        @if (friend.loanAmount) {
+          <p>
+            <ion-label [color]="friend.loanAmount.isOwed ? 'success': 'danger'">
+              {{ friend.loanAmount.amount | currency }}
+            </ion-label>
+          </p>
+        }
+      </ion-item>
+    }
+  </ion-list>
+</ion-content>

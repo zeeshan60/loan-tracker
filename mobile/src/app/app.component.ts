@@ -75,6 +75,9 @@ export class AppComponent implements OnInit {
   async initApp() {
     this.storageService.storageReady$.subscribe(async () => {
       await this.authStore.setApiKey();
+
+      // load all friends
+      await this.friendsStore.loadFriends()
     });
   }
 }
