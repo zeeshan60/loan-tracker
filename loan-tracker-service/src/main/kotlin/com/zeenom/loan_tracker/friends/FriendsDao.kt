@@ -1,6 +1,5 @@
 package com.zeenom.loan_tracker.friends
 
-import com.zeenom.loan_tracker.common.AmountDto
 import com.zeenom.loan_tracker.users.UserEventDao
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
