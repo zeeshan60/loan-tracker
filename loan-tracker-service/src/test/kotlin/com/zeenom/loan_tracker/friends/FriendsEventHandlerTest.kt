@@ -205,8 +205,8 @@ class FriendsEventHandlerTest(
         val phone: String?,
         val friendEmail: String?,
         val friendPhone: String?,
-        val photo: String?,
-        val friendPhoto: String?,
+        val photo: String? = null,
+        val friendPhoto: String? = null,
     )
 
     data class AddFriend(
@@ -215,6 +215,47 @@ class FriendsEventHandlerTest(
     )
 
     companion object {
+
+        @JvmStatic
+        fun addSelfAsFriendData() = listOf(
+            FriendTestData(
+                email = "user1@gmail.com",
+                phone = "+923001234568",
+                friendEmail = "user1@gmail.com",
+                friendPhone = "+923001234568"
+            ),
+            FriendTestData(
+                email = "user1@gmail.com",
+                phone = "+923001234569",
+                friendEmail = "user1@gmail.com",
+                friendPhone = "+923001234568"
+            ),
+            FriendTestData(
+                email = "user1@gmail.com",
+                phone = "+923001234568",
+                friendEmail = "user2@gmail.com",
+                friendPhone = "+923001234568"
+            ),
+            FriendTestData(
+                email = null,
+                phone = "+923001234568",
+                friendEmail = "user2@gmail.com",
+                friendPhone = "+923001234568"
+            ),
+            FriendTestData(
+                email = null,
+                phone = "+923001234568",
+                friendEmail = null,
+                friendPhone = "+923001234568"
+            ),
+            FriendTestData(
+                email = "user1@gmail.com",
+                phone = null,
+                friendEmail = "user1@gmail.com",
+                friendPhone = null
+            )
+        )
+
         @JvmStatic
         fun friendTestData() = listOf(
             Pair(
@@ -457,6 +498,52 @@ class FriendsEventHandlerTest(
                         name = "John Doe",
                         email = null,
                         phoneNumber = null
+                    )
+                )
+            }
+        }.isInstanceOf(IllegalArgumentException::class.java)
+    }
+
+    @ParameterizedTest
+    @MethodSource("addSelfAsFriendData")
+    fun `add friend with self email or phone throws illegal argument`(friendData: FriendTestData): Unit = runBlocking {
+
+        doReturn(
+            UserDto(
+                uid = "123",
+                email = friendData.email,
+                phoneNumber = friendData.phone,
+                displayName = "User 1",
+                photoUrl = "https://test.com",
+                emailVerified = true
+            )
+        ).`when`(userEventHandler).findUserById("123")
+        assertThatThrownBy {
+            runBlocking {
+                friendsEventHandler.saveFriend(
+                    uid = "123",
+                    friendDto = CreateFriendDto(
+                        name = "John Doe",
+                        email = friendData.friendEmail,
+                        phoneNumber = friendData.friendPhone
+                    )
+                )
+            }
+        }.isInstanceOf(IllegalArgumentException::class.java)
+
+    }
+
+    @Test
+    fun `add friend when user dont exist throws illegal argument`(): Unit = runBlocking {
+        doReturn(null).`when`(userEventHandler).findUserById("123")
+        assertThatThrownBy {
+            runBlocking {
+                friendsEventHandler.saveFriend(
+                    uid = "123",
+                    friendDto = CreateFriendDto(
+                        name = "John Doe",
+                        email = "user1@gmail.com",
+                        phoneNumber = "+923001234568"
                     )
                 )
             }
