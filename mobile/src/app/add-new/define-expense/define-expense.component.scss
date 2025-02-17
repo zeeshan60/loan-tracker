@@ -9,7 +9,7 @@
   }
 }
 
-ion-select{
+ion-select.split-option-select {
   &::part(text) {
     color: red;
   }
@@ -24,8 +24,9 @@ ion-item {
     --inner-border-width: 0;
   }
 
-  ion-input.currency {
-    width: 100px;
+  ion-select.currency {
+    min-width: 25%;
+    margin-right: 15px;
   }
 
   &.currency-expense ion-input.ion-invalid {

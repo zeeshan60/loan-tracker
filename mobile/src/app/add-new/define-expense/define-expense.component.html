@@ -28,16 +28,18 @@
       ></ion-input>
     </ion-item>
     <ion-item class="currency-expense">
-      <ion-input
-        class="currency"
-        slot="start"
-        type="text"
-        labelPlacement="stacked"
-        label="Currency"
-        errorText="Currency is required"
+      <ion-select
         formControlName="currency"
-        placeholder="PKR"
-      ></ion-input>
+        class="currency"
+        placeholder="Select currency"
+        label="Currency"
+        label-placement="stacked"
+        interface="action-sheet"
+      >
+        @for (currency of supportedCurrencies; track currency) {
+          <ion-select-option value="{{currency}}">{{currency}}</ion-select-option>
+        }
+      </ion-select>
       <ion-input
         type="number"
         labelPlacement="stacked"
@@ -47,11 +49,11 @@
       ></ion-input>
     </ion-item>
     <ion-item>
-      <ion-select formControlName="whoOwesWho" [class.is-owed]="isOwed()" color="green" placeholder="place holder .." label="Who owes who" label-placement="stacked" interface="action-sheet">
-        <ion-select-option class="green" value="amrood">Paid by you and split equally</ion-select-option>
-        <ion-select-option  class="green" value="oranges">{{navProps['friend']['name']}} owes you the full amount</ion-select-option>
-        <ion-select-option  class="red" value="apples">Paid by {{navProps['friend']['name']}} and split equally</ion-select-option>
-        <ion-select-option  class="red" value="banana">You owe {{navProps['friend']['name']}} the full amount</ion-select-option>
+      <ion-select formControlName="whoOwesWho" class="split-option-select" [class.is-owed]="isOwed()" color="green" placeholder="place holder .." label="Who owes who" label-placement="stacked" interface="action-sheet">
+        <ion-select-option class="green" [value]="SplitOption.YouPaidSplitEqually">Paid by you and split equally</ion-select-option>
+        <ion-select-option  class="green" [value]="SplitOption.TheyOweYouAll">{{navProps['friend']['name']}} owes you the full amount</ion-select-option>
+        <ion-select-option  class="red" [value]="SplitOption.TheyPaidSplitEqually">Paid by {{navProps['friend']['name']}} and split equally</ion-select-option>
+        <ion-select-option  class="red" [value]="SplitOption.YouOweThemAll">You owe {{navProps['friend']['name']}} the full amount</ion-select-option>
       </ion-select>
     </ion-item>
   </ion-list>

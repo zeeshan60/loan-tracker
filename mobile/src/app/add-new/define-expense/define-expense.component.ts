@@ -9,8 +9,18 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HelperService } from '../../helper.service';
+import { delay, firstValueFrom, timer } from 'rxjs';
+import { Router } from '@angular/router';
+import { FriendsStore } from '../../friends/friends.store';
+
+export enum SplitOptions {
+  YouPaidSplitEqually,
+  TheyPaidSplitEqually,
+  TheyOweYouAll,
+  YouOweThemAll
+}
 
 @Component({
   selector: 'app-define-expense',
@@ -40,15 +50,20 @@ export class DefineExpenseComponent  implements OnInit {
   readonly loading = signal(false);
   readonly helperService = inject(HelperService);
   readonly formBuilder = inject(FormBuilder);
+  readonly friendsStore = inject(FriendsStore);
+  readonly SplitOption = SplitOptions;
+  readonly supportedCurrencies = ['PKR', 'USD', 'SGD'];
+  readonly router = inject(Router);
   navProps = inject(NavParams).data;
   defineExpenseForm = this.formBuilder.group({
-    description: this.formBuilder.control('', [Validators.required]),
-    currency: ['PKR', Validators.required],
-    expense: [null, [Validators.required]],
-    whoOwesWho: this.formBuilder.nonNullable.control('amrood', [Validators.required]),
+    description: this.formBuilder.nonNullable.control('', [Validators.required, Validators.maxLength(1000)]),
+    currency: this.formBuilder.nonNullable.control('PKR', [Validators.required]),
+    expense: this.formBuilder.nonNullable.control(null, [Validators.required, Validators.min(1)]),
+    whoOwesWho: this.formBuilder.nonNullable.control(SplitOptions.YouPaidSplitEqually, [Validators.required]),
   });
   isOwed = () => {
-    return ['amrood', 'oranges'].includes(this.defineExpenseForm.value.whoOwesWho!);
+    return [SplitOptions.YouPaidSplitEqually, SplitOptions.TheyOweYouAll]
+      .includes(this.defineExpenseForm.value.whoOwesWho!);
   };
   constructor() { }
 
@@ -60,6 +75,9 @@ export class DefineExpenseComponent  implements OnInit {
     if (this.defineExpenseForm.valid) {
       try {
         this.loading.set(true);
+        await this.saveExpense(this.defineExpenseForm.getRawValue());
+        await this.friendsStore.loadFriends();
+        this.router.navigate(['/'])
       } catch (e) {
         await this.helperService.showToast('Unable to add friend at the moment');
       } finally {
@@ -69,5 +87,15 @@ export class DefineExpenseComponent  implements OnInit {
       this.defineExpenseForm.markAllAsTouched();
       await this.helperService.showToast('Please fill in the correct values');
     }
+  }
+
+  async saveExpense(formValue: {
+    description: string,
+    currency: string,
+    expense: number|null,
+    whoOwesWho: SplitOptions
+  }) {
+    console.log(formValue);
+    return firstValueFrom(timer(1000));
   }
 }
