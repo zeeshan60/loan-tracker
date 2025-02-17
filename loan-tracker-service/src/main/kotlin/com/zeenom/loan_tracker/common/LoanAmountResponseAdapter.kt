@@ -1,5 +1,6 @@
 package com.zeenom.loan_tracker.common
 
+import com.zeenom.loan_tracker.transactions.AmountDto
 import org.springframework.stereotype.Service
 
 

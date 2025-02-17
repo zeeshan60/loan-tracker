@@ -1,6 +1,6 @@
 package com.zeenom.loan_tracker.friends
 
-import com.zeenom.loan_tracker.common.AmountDto
+import com.zeenom.loan_tracker.transactions.AmountDto
 import com.zeenom.loan_tracker.events.CommandPayloadDto
 
 data class FriendsDto(val friends: List<FriendDto>, val next: String? = null) : CommandPayloadDto

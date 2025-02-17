@@ -1,4 +1,4 @@
-package com.zeenom.loan_tracker.common
+package com.zeenom.loan_tracker.transactions
 
 import com.zeenom.loan_tracker.events.CommandPayloadDto
 import java.math.BigDecimal

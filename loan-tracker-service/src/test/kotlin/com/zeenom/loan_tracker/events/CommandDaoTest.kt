@@ -1,10 +1,10 @@
 package com.zeenom.loan_tracker.events
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.zeenom.loan_tracker.common.AmountDto
+import com.zeenom.loan_tracker.transactions.AmountDto
 import com.zeenom.loan_tracker.common.JacksonConfig
 import com.zeenom.loan_tracker.common.SecondInstant
-import com.zeenom.loan_tracker.common.TransactionDto
+import com.zeenom.loan_tracker.transactions.TransactionDto
 import com.zeenom.loan_tracker.common.r2dbc.toClass
 import com.zeenom.loan_tracker.friends.TestPostgresConfig
 import kotlinx.coroutines.flow.first

@@ -2,7 +2,7 @@ package com.zeenom.loan_tracker.events
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.zeenom.loan_tracker.common.TransactionDto
+import com.zeenom.loan_tracker.transactions.TransactionDto
 
 data class CommandDto<T : CommandPayloadDto?>(
     val commandType: CommandType,

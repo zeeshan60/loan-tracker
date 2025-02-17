@@ -1,6 +1,6 @@
 package com.zeenom.loan_tracker.controllers
 
-import com.zeenom.loan_tracker.common.AmountDto
+import com.zeenom.loan_tracker.transactions.AmountDto
 import com.zeenom.loan_tracker.common.exceptions.NotFoundException
 import com.zeenom.loan_tracker.events.CommandDao
 import com.zeenom.loan_tracker.events.CommandPayloadDto

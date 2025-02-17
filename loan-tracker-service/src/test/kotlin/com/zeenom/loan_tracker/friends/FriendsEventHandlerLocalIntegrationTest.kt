@@ -1,7 +1,7 @@
 package com.zeenom.loan_tracker.friends
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.zeenom.loan_tracker.common.AmountDto
+import com.zeenom.loan_tracker.transactions.AmountDto
 import com.zeenom.loan_tracker.common.r2dbc.toJson
 import com.zeenom.loan_tracker.users.UserEntity
 import com.zeenom.loan_tracker.users.UserRepository
