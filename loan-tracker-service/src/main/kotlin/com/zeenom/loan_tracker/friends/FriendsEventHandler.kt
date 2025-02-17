@@ -37,6 +37,18 @@ class FriendsEventHandler(
 
     suspend fun saveFriend(uid: String, friendDto: CreateFriendDto) {
 
+        if (friendDto.email == null && friendDto.phoneNumber == null) {
+            throw IllegalArgumentException("Email or phone number is required")
+        }
+
+        if (friendDto.email != null)
+            eventRepository.findByUserUidAndFriendEmail(uid, friendDto.email)
+                ?.let { throw IllegalArgumentException("Friend with email ${friendDto.email} already exist") }
+
+        if (friendDto.phoneNumber != null)
+            eventRepository.findByUserUidAndFriendPhoneNumber(uid, friendDto.phoneNumber)
+                ?.let { throw IllegalArgumentException("Friend with phone number ${friendDto.phoneNumber} already exist") }
+
         eventRepository.save(
             FriendEvent(
                 userUid = uid,

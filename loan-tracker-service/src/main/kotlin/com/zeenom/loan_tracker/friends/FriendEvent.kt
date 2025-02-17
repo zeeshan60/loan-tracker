@@ -29,5 +29,7 @@ enum class FriendEventType {
 interface FriendEventRepository : CoroutineCrudRepository<FriendEvent, UUID> {
     suspend fun findAllByUserUid(userUid: String): Flow<FriendEvent>
     suspend fun findByFriendEmail(email: String): Flow<FriendEvent>
+    suspend fun findByUserUidAndFriendEmail(userUid: String, email: String): FriendEvent?
+    suspend fun findByUserUidAndFriendPhoneNumber(userUid: String, phoneNumber: String): FriendEvent?
     suspend fun findByFriendPhoneNumber(phoneNumber: String): Flow<FriendEvent>
 }

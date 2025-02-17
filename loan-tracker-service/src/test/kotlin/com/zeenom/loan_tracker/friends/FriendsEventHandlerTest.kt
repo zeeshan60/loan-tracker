@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -27,7 +28,8 @@ class FriendsEventHandlerTest(
 ) : TestPostgresConfig() {
 
     private val userEventHandler = mock<UserEventHandler>()
-    private val friendsEventHandler = FriendsEventHandler(eventRepository = eventRepository, userEventHandler = userEventHandler)
+    private val friendsEventHandler =
+        FriendsEventHandler(eventRepository = eventRepository, userEventHandler = userEventHandler)
 
 
     @BeforeEach
@@ -207,6 +209,11 @@ class FriendsEventHandlerTest(
         val friendPhoto: String?,
     )
 
+    data class AddFriend(
+        val email: String?,
+        val phone: String?,
+    )
+
     companion object {
         @JvmStatic
         fun friendTestData() = listOf(
@@ -283,6 +290,55 @@ class FriendsEventHandlerTest(
                 )
             )
         )
+
+        @JvmStatic
+        fun addFriendTestData() = listOf(
+            Pair(
+                AddFriend(
+                    email = "user1@gmail.com",
+                    phone = "+923001234568",
+                ), AddFriend(
+                    email = "user1@gmail.com",
+                    phone = "+923001234568",
+                )
+            ),
+            Pair(
+                AddFriend(
+                    email = "user1@gmail.com",
+                    phone = "+923001234568",
+                ), AddFriend(
+                    email = "user1@gmail.com",
+                    phone = "+923001234569",
+                )
+            ),
+            Pair(
+                AddFriend(
+                    email = "user1@gmail.com",
+                    phone = "+923001234568",
+                ), AddFriend(
+                    email = "user2@gmail.com",
+                    phone = "+923001234568",
+                )
+            ),
+            Pair(
+                AddFriend(
+                    email = "user1@gmail.com",
+                    phone = null,
+                ), AddFriend(
+                    email = "user1@gmail.com",
+                    phone = "+923001234568",
+                )
+            ),
+            Pair(
+                AddFriend(
+                    email = "user1@gmail.com",
+                    phone = "+923001234568",
+                ), AddFriend(
+                    email = null,
+                    phone = "+923001234568",
+                )
+            )
+        )
     }
 
     @ParameterizedTest
@@ -293,7 +349,8 @@ class FriendsEventHandlerTest(
         userEventRepository.deleteAll()
         eventRepository.deleteAll()
         val userEventHandler = UserEventHandler(userEventRepository)
-        val friendsEventHandler = FriendsEventHandler(eventRepository = eventRepository, userEventHandler = userEventHandler)
+        val friendsEventHandler =
+            FriendsEventHandler(eventRepository = eventRepository, userEventHandler = userEventHandler)
         val (user1, user2) = friendData
         user1.photo?.let {
             userEventHandler.createUser(
@@ -357,5 +414,52 @@ class FriendsEventHandlerTest(
                 loanAmount = null
             )
         )
+    }
+
+
+    @ParameterizedTest
+    @MethodSource("addFriendTestData")
+    fun `friends emails and phones should not overlap`(
+        addFriendData: Pair<AddFriend, AddFriend>,
+    ): Unit = runBlocking {
+        val (friend1, friend2) = addFriendData
+        friendsEventHandler.saveFriend(
+            uid = "123",
+            friendDto = CreateFriendDto(
+                name = "John Doe",
+                email = friend1.email,
+                phoneNumber = friend1.phone
+            )
+        )
+
+        assertThatThrownBy {
+            runBlocking {
+                friendsEventHandler.saveFriend(
+                    uid = "123",
+                    friendDto = CreateFriendDto(
+                        name = "John Doe 2",
+                        email = friend1.email,
+                        phoneNumber = friend2.phone
+                    )
+                )
+            }
+        }.isInstanceOf(IllegalArgumentException::class.java)
+
+    }
+
+    @Test
+    fun `add friend with no email and phone throws illegal argument`() {
+        assertThatThrownBy {
+            runBlocking {
+                friendsEventHandler.saveFriend(
+                    uid = "123",
+                    friendDto = CreateFriendDto(
+                        name = "John Doe",
+                        email = null,
+                        phoneNumber = null
+                    )
+                )
+            }
+        }.isInstanceOf(IllegalArgumentException::class.java)
     }
 }
