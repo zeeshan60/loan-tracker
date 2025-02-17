@@ -2,7 +2,7 @@ package com.zeenom.loan_tracker.security
 
 import com.zeenom.loan_tracker.events.CommandCreateUser
 import com.zeenom.loan_tracker.events.CommandDto
-import com.zeenom.loan_tracker.events.EventType
+import com.zeenom.loan_tracker.events.CommandType
 import com.zeenom.loan_tracker.firebase.FirebaseService
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
@@ -27,7 +27,7 @@ class AuthService(
 
         commandCreateUser.execute(
             CommandDto(
-                event = EventType.LOGIN,
+                commandType = CommandType.LOGIN,
                 payload = user,
                 userId = user.uid
             )

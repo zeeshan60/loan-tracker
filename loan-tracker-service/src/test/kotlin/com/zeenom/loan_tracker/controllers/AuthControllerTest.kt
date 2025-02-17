@@ -2,7 +2,7 @@ package com.zeenom.loan_tracker.controllers
 
 import com.zeenom.loan_tracker.events.CommandDao
 import com.zeenom.loan_tracker.events.CommandDto
-import com.zeenom.loan_tracker.events.EventType
+import com.zeenom.loan_tracker.events.CommandType
 import com.zeenom.loan_tracker.firebase.FirebaseService
 import com.zeenom.loan_tracker.friends.FriendsEventHandler
 import com.zeenom.loan_tracker.security.LoginRequest
@@ -57,7 +57,7 @@ class AuthControllerTest(
 
         Mockito.doReturn(Unit).whenever(commandDao).saveEvent(
             CommandDto(
-                event = EventType.LOGIN,
+                commandType = CommandType.LOGIN,
                 payload = userDto,
                 userId = "123",
             )
@@ -79,7 +79,7 @@ class AuthControllerTest(
             Mockito.verify(commandDao, Mockito.times(1)).saveEvent(capture())
             assertThat(firstValue).isEqualTo(
                 CommandDto(
-                    event = EventType.LOGIN,
+                    commandType = CommandType.LOGIN,
                     payload = userDto,
                     userId = "123",
                 )

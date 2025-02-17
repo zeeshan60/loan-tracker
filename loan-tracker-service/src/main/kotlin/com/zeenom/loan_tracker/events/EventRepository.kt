@@ -4,4 +4,4 @@ import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface EventRepository : CoroutineCrudRepository<EventEntity, String>
+interface EventRepository : CoroutineCrudRepository<CommandEntity, String>

@@ -4,7 +4,7 @@ import com.zeenom.loan_tracker.common.MessageResponse
 import com.zeenom.loan_tracker.common.Paginated
 import com.zeenom.loan_tracker.common.PaginationDto
 import com.zeenom.loan_tracker.events.CommandDto
-import com.zeenom.loan_tracker.events.EventType
+import com.zeenom.loan_tracker.events.CommandType
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import org.slf4j.LoggerFactory
@@ -43,7 +43,7 @@ class FriendsController(
         logger.info("Adding friend for user $userId")
         commandCreateFriends.execute(
             CommandDto(
-                event = EventType.ADD_FRIEND,
+                commandType = CommandType.ADD_FRIEND,
                 payload = friendsAdapter.fromRequestToDto(friendRequest),
                 userId = userId
             )

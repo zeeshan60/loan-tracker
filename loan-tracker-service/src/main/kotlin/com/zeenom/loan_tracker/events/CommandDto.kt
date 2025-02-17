@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.zeenom.loan_tracker.common.TransactionDto
 
 data class CommandDto<T : CommandPayloadDto?>(
-    val event: EventType,
+    val commandType: CommandType,
     val payload: T,
     val userId: String
 )
@@ -16,6 +16,6 @@ data class CommandDto<T : CommandPayloadDto?>(
 )
 interface CommandPayloadDto
 
-enum class EventType {
+enum class CommandType {
     LOGIN, CREATE_TRANSACTION, ADD_FRIEND
 }

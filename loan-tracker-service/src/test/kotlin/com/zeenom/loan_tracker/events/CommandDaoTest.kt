@@ -28,17 +28,14 @@ class CommandDaoTest(
     private val secondInstant = SecondInstant()
     private val commandDao = CommandDao(
         eventRepository = eventRepository,
-        eventEntityAdapter = EventEntityAdapter(
-            objectMapper = objectMapper,
-            secondInstant = secondInstant
-        ),
+        objectMapper = objectMapper,
     )
 
     @Test
     fun `successfully saves event and reads it back`(): Unit = runBlocking {
         eventRepository.deleteAll()
         val commandDto = CommandDto(
-            event = EventType.CREATE_TRANSACTION,
+            commandType = CommandType.CREATE_TRANSACTION,
             payload = TransactionDto(
                 amount = AmountDto(
                     currency = Currency.getInstance("USD"),
@@ -53,7 +50,7 @@ class CommandDaoTest(
 
 
         val entity = eventRepository.findAll().first()
-        assertThat(entity.event).isEqualTo(commandDto.event)
+        assertThat(entity.commandType).isEqualTo(commandDto.commandType)
         assertThat(entity.userId).isEqualTo(commandDto.userId)
         assertThat(entity.payload?.toClass(objectMapper, CommandPayloadDto::class.java)).isEqualTo(commandDto.payload)
         assertThat(entity.createdAt).isBeforeOrEqualTo(secondInstant.now())
