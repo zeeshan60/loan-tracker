@@ -41,7 +41,7 @@ class FriendsEventHandler(
             throw IllegalArgumentException("Email or phone number is required")
         }
 
-        val user = userEventHandler.findUserById(uid) ?: throw IllegalArgumentException("User not found")
+        val user = userEventHandler.findUserById(uid) ?: throw IllegalArgumentException("User $uid not found")
         if (user.email == friendDto.email || user.phoneNumber == friendDto.phoneNumber) {
             throw IllegalArgumentException("Your friend can't have same email or phone as yours")
         }

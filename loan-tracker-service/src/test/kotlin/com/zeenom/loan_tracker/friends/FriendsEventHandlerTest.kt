@@ -69,6 +69,26 @@ class FriendsEventHandlerTest(
                 emailVerified = true
             )
         ).`when`(userEventHandler).findUserById("123")
+        doReturn(
+            UserDto(
+                uid = "124",
+                email = "user124@gmail.com",
+                phoneNumber = "+923001234124",
+                displayName = "User 1",
+                photoUrl = "https://test.com",
+                emailVerified = true
+            )
+        ).`when`(userEventHandler).findUserById("124")
+        doReturn(
+            UserDto(
+                uid = "125",
+                email = "user125@gmail.com",
+                phoneNumber = "+923001234125",
+                displayName = "User 1",
+                photoUrl = "https://test.com",
+                emailVerified = true
+            )
+        ).`when`(userEventHandler).findUserById("125")
 
         doReturn(
             listOf(
@@ -160,6 +180,16 @@ class FriendsEventHandlerTest(
             .findUsersByPhoneNumbers(listOf("+923001234568", "+923001234569"))
         doReturn(emptyFlow<UserEvent>()).`when`(userEventHandler)
             .findUsersByEmails(listOf("user2@gmail.com", "user3@gmail.com"))
+        doReturn(
+            UserDto(
+                uid = "123",
+                email = "user1@gmail.com",
+                phoneNumber = "+923001234123",
+                displayName = "User 1",
+                photoUrl = "https://test.com",
+                emailVerified = true
+            )
+        ).`when`(userEventHandler).findUserById("123")
         friendsEventHandler.saveFriend(
             uid = "123",
             friendDto = CreateFriendDto(
@@ -393,6 +423,16 @@ class FriendsEventHandlerTest(
         val friendsEventHandler =
             FriendsEventHandler(eventRepository = eventRepository, userEventHandler = userEventHandler)
         val (user1, user2) = friendData
+        userEventHandler.createUser(
+            UserDto(
+                uid = "123",
+                email = "user123@gmail.com",
+                phoneNumber = "+923001234123",
+                displayName = "User 1",
+                photoUrl = user1.photo,
+                emailVerified = true
+            )
+        )
         user1.photo?.let {
             userEventHandler.createUser(
                 UserDto(
@@ -463,6 +503,16 @@ class FriendsEventHandlerTest(
     fun `friends emails and phones should not overlap`(
         addFriendData: Pair<AddFriend, AddFriend>,
     ): Unit = runBlocking {
+        doReturn(
+            UserDto(
+                uid = "123",
+                email = "user@gmail.com",
+                phoneNumber = "+923001234567",
+                displayName = "User 1",
+                photoUrl = "https://test.com",
+                emailVerified = true
+            )
+        ).`when`(userEventHandler).findUserById("123")
         val (friend1, friend2) = addFriendData
         friendsEventHandler.saveFriend(
             uid = "123",
