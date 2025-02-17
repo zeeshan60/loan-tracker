@@ -13,7 +13,7 @@ import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest
 
 @DataR2dbcTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UserCommandDaoTest(
+class UserEventHandlerTest(
     @Autowired private val userEventRepository: UserEventRepository,
 ) : TestPostgresConfig() {
 
@@ -61,12 +61,34 @@ class UserCommandDaoTest(
     }
 
     @Test
-    fun `adds new user should fail if user already exists`(): Unit = runBlocking {
+    fun `adds new user with same uid should fail as user already exists`(): Unit = runBlocking {
+        createUser(userDto = userDto)
+
+        assertThatThrownBy {
+            runBlocking {
+                createUser(
+                    userDto = UserDto(
+                        uid = "123",
+                        email = "user1@gmail.com",
+                        phoneNumber = "+923001234568",
+                        displayName = "Test User",
+                        photoUrl = "https://test.com",
+                        emailVerified = true
+                    )
+                )
+            }
+        }
+            .isInstanceOf(IllegalStateException::class.java)
+            .hasMessage("User with this unique identifier already exist")
+    }
+
+    @Test
+    fun `adds new user with same email and phone should fail as user already exists`(): Unit = runBlocking {
         createUser(userDto = userDto)
 
         assertThatThrownBy { runBlocking { createUser(userDto = userDto) } }
             .isInstanceOf(IllegalArgumentException::class.java)
-            .hasMessage("User already exist")
+            .hasMessage("User with email ${userDto.email} or phone number ${userDto.phoneNumber} already exist")
     }
 
     @Test

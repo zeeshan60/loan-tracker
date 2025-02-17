@@ -2,6 +2,7 @@ package com.zeenom.loan_tracker.users
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.toList
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -14,6 +15,15 @@ class UserEventHandler(private val userRepository: UserEventRepository) {
 
     suspend fun createUser(userDto: UserDto) {
         try {
+
+            val existing =
+                userDto.email?.let { findUsersByEmails(listOf(userDto.email)).toList() } ?: userDto.phoneNumber?.let {
+                    findUsersByPhoneNumbers(listOf(userDto.phoneNumber)).toList()
+                } ?: emptyList()
+            if (existing.isNotEmpty()) {
+                throw IllegalArgumentException("User with email ${userDto.email} or phone number ${userDto.phoneNumber} already exist")
+            }
+
             userRepository.save(
                 UserEvent(
                     uid = userDto.uid,
@@ -28,7 +38,7 @@ class UserEventHandler(private val userRepository: UserEventRepository) {
                 )
             )
         } catch (e: DuplicateKeyException) {
-            throw IllegalArgumentException("User already exist")
+            throw IllegalStateException("User with this unique identifier already exist")
         }
     }
 
