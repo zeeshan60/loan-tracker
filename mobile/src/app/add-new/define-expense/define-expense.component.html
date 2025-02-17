@@ -3,19 +3,57 @@
     <ion-buttons slot="start">
       <ion-back-button></ion-back-button>
     </ion-buttons>
-    <ion-title>Page Two</ion-title>
+    <ion-title>With you and {{this.navProps['friend']['name']}}</ion-title>
     <ion-buttons slot="end">
       @if (loading()) {
         <ion-spinner></ion-spinner>
       } @else {
-        <ion-button type="submit" form="add-friend-form" [strong]="true">Confirm</ion-button>
+        <ion-button type="submit" form="add-friend-form" [strong]="true">Save</ion-button>
       }
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 <ion-content class="ion-padding">
-  <h1>Page Two</h1>
-  <div>
-    Page two content
-  </div>
+  <h1>Define expense details</h1>
+  <form [formGroup]="defineExpenseForm" (ngSubmit)="onSubmit()" id="add-friend-form">
+  <ion-list>
+    <ion-item>
+      <ion-input
+        type="text"
+        labelPlacement="stacked"
+        label="Description"
+        formControlName="description"
+        placeholder="Description"
+        errorText="Description is required"
+      ></ion-input>
+    </ion-item>
+    <ion-item class="currency-expense">
+      <ion-input
+        class="currency"
+        slot="start"
+        type="text"
+        labelPlacement="stacked"
+        label="Currency"
+        errorText="Currency is required"
+        formControlName="currency"
+        placeholder="PKR"
+      ></ion-input>
+      <ion-input
+        type="number"
+        labelPlacement="stacked"
+        label="Expense"
+        formControlName="expense"
+        errorText="Expense is required"
+      ></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-select formControlName="whoOwesWho" [class.is-owed]="isOwed()" color="green" placeholder="place holder .." label="Who owes who" label-placement="stacked" interface="action-sheet">
+        <ion-select-option class="green" value="amrood">Paid by you and split equally</ion-select-option>
+        <ion-select-option  class="green" value="oranges">{{navProps['friend']['name']}} owes you the full amount</ion-select-option>
+        <ion-select-option  class="red" value="apples">Paid by {{navProps['friend']['name']}} and split equally</ion-select-option>
+        <ion-select-option  class="red" value="banana">You owe {{navProps['friend']['name']}} the full amount</ion-select-option>
+      </ion-select>
+    </ion-item>
+  </ion-list>
+  </form>
 </ion-content>

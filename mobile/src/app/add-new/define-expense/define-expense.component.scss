@@ -1,0 +1,34 @@
+::ng-deep {
+  .action-sheet-button {
+    &.red {
+      color: red;
+    }
+    &.green {
+      color: green;
+    }
+  }
+}
+
+ion-select{
+  &::part(text) {
+    color: red;
+  }
+  &.is-owed::part(text) {
+    color: green;
+  }
+}
+
+ion-item {
+  &::part(native) {
+    padding-left: 0;
+    --inner-border-width: 0;
+  }
+
+  ion-input.currency {
+    width: 100px;
+  }
+
+  &.currency-expense ion-input.ion-invalid {
+    margin-top: 10px
+  }
+}

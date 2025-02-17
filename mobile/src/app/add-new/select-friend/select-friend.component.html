@@ -17,7 +17,7 @@
       </ion-label>
     </ion-item>
     @for( friend of friends(); track friend.name) {
-      <ion-item (click)="chooseFriend(friend)">
+      <ion-item (click)="chooseFriend(friend)" button>
         <ion-avatar slot="start">
           @if (friend.photoUrl) {
             <img [src]="friend.photoUrl" alt="Friend's photo" />
@@ -35,6 +35,12 @@
             </ion-label>
           </p>
         }
+      </ion-item>
+    } @empty {
+      <ion-item disabled="true">
+        <ion-label>
+          <h2>No friends in you friend list.</h2>
+        </ion-label>
       </ion-item>
     }
   </ion-list>

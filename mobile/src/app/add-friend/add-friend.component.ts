@@ -1,12 +1,10 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  ElementRef,
   inject,
   Input,
   OnInit,
   signal,
-  ViewChild,
 } from '@angular/core';
 import {
   IonButton,
@@ -18,11 +16,6 @@ import {
   ModalController,
 } from '@ionic/angular/standalone';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { FriendsService } from '../friends/friends.service';
-import { firstValueFrom } from 'rxjs';
-import { ToastController } from '@ionic/angular';
-import { DEFAULT_TOAST_DURATION } from '../constants';
-import { CreateFriend } from './model';
 import { HelperService } from '../helper.service';
 import { FriendsStore } from '../friends/friends.store';
 
