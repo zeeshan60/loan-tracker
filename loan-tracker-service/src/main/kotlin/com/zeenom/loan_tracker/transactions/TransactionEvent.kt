@@ -1,6 +1,5 @@
 package com.zeenom.loan_tracker.transactions
 
-import kotlinx.coroutines.flow.Flow
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
@@ -14,13 +13,14 @@ data class TransactionEvent(
     @Id val id: UUID? = null,
     val userUid: String,
     val amount: BigDecimal,
-    val currency: Currency,
+    val currency: String,
     val transactionType: TransactionType,
-    val recipientId: String,
+    val recipientId: UUID,
     val createdAt: Instant,
+    val createdBy: String,
     val streamId: UUID,
     val version: Int,
-    val eventType: TransactionEventType
+    val eventType: TransactionEventType,
 )
 
 enum class TransactionType {
@@ -32,8 +32,4 @@ enum class TransactionEventType {
 }
 
 @Repository
-interface TransactionEventRepository : CoroutineCrudRepository<TransactionEvent, UUID> {
-    suspend fun findAllByUserUid(userUid: String): Flow<TransactionEvent>
-    suspend fun findByRecipientId(recipientId: String): Flow<TransactionEvent>
-    suspend fun findByUserUidAndRecipientId(userUid: String, recipientId: String): TransactionEvent?
-}
+interface TransactionEventRepository : CoroutineCrudRepository<TransactionEvent, UUID>

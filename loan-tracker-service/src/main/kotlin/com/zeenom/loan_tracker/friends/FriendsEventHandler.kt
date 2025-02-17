@@ -15,6 +15,8 @@ class FriendsEventHandler(
     private val eventRepository: FriendEventRepository,
     private val userEventHandler: UserEventHandler,
 ) {
+    private final val friendEventRepository: FriendEventRepository = TODO("initialize me")
+
     suspend fun findAllByUserId(userId: String): FriendsDto {
         val events = eventRepository.findAllByUserUid(userId).toList()
         val phones = events.mapNotNull { it.friendPhoneNumber }
@@ -93,5 +95,9 @@ class FriendsEventHandler(
         }.also {
             eventRepository.saveAll(it).toList()
         }
+    }
+
+    suspend fun friendExistsByUserIdAndFriendId(userUid: String, recipientId: UUID): Boolean {
+        return eventRepository.findByUserUidAndStreamId(userUid, recipientId) != null
     }
 }

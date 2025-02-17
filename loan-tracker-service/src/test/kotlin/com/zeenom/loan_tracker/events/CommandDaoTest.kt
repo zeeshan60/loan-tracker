@@ -42,7 +42,7 @@ class CommandDaoTest(
                     amount = 100.0.toBigDecimal(),
                     isOwed = true
                 ),
-                recipientId = "123",
+                recipientId = UUID.randomUUID(),
             ),
             userId = "123",
         )

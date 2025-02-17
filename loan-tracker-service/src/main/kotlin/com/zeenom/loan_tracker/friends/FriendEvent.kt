@@ -32,4 +32,5 @@ interface FriendEventRepository : CoroutineCrudRepository<FriendEvent, UUID> {
     suspend fun findByUserUidAndFriendEmail(userUid: String, email: String): FriendEvent?
     suspend fun findByUserUidAndFriendPhoneNumber(userUid: String, phoneNumber: String): FriendEvent?
     suspend fun findByFriendPhoneNumber(phoneNumber: String): Flow<FriendEvent>
+    suspend fun findByUserUidAndStreamId(userUid: String, recipientId: UUID): FriendEvent?
 }
