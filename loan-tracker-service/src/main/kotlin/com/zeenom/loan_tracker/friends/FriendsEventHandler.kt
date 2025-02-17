@@ -15,7 +15,6 @@ class FriendsEventHandler(
     private val eventRepository: FriendEventRepository,
     private val userEventHandler: UserEventHandler,
 ) {
-    private final val friendEventRepository: FriendEventRepository = TODO("initialize me")
 
     suspend fun findAllByUserId(userId: String): FriendsDto {
         val events = eventRepository.findAllByUserUid(userId).toList()
