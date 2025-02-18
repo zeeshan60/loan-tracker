@@ -1,15 +1,15 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
-import { IonicModule, NavParams } from '@ionic/angular';
+import { NavParams } from '@ionic/angular';
 import {
   IonBackButton, IonButton,
   IonButtons,
   IonContent,
-  IonHeader, IonIcon,
+  IonHeader,
   IonInput, IonItem, IonList, IonSelect, IonSelectOption, IonSpinner,
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HelperService } from '../../helper.service';
 import { delay, firstValueFrom, timer } from 'rxjs';
 import { Router } from '@angular/router';
@@ -41,7 +41,6 @@ export enum SplitOptions {
     IonButton,
     IonSelect,
     IonSelectOption,
-    IonIcon,
     IonList,
     IonItem,
   ],
@@ -68,7 +67,6 @@ export class DefineExpenseComponent  implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    console.log(this.navProps);
   }
 
   async onSubmit() {
@@ -95,7 +93,6 @@ export class DefineExpenseComponent  implements OnInit {
     expense: number|null,
     whoOwesWho: SplitOptions
   }) {
-    console.log(formValue);
     return firstValueFrom(timer(1000));
   }
 }

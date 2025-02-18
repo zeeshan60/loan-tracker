@@ -22,6 +22,11 @@ export const routes: Routes = [
           import('../account/account.page').then((m) => m.AccountPage),
       },
       {
+        path: 'activity-log',
+        loadComponent: () =>
+          import('../activity-log/activity-log.page').then((m) => m.ActivityLogPage),
+      },
+      {
         path: '',
         redirectTo: '/tabs/friends',
         pathMatch: 'full',

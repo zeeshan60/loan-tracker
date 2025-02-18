@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonNav, ModalController } from '@ionic/angular/standalone';
+import { IonNav } from '@ionic/angular/standalone';
 import { SelectFriendComponent } from './select-friend/select-friend.component';
 
 @Component({
@@ -7,7 +7,7 @@ import { SelectFriendComponent } from './select-friend/select-friend.component';
   templateUrl: 'add-new.page.html',
   styleUrls: ['add-new.page.scss'],
   standalone: true,
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonNav],
+  imports: [IonNav],
 })
 export class AddNewPage {
   component = SelectFriendComponent;

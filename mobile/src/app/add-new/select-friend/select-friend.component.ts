@@ -1,8 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, model, OnInit, signal } from '@angular/core';
-import { IonicModule, NavController } from '@ionic/angular';
 import { DefineExpenseComponent } from '../define-expense/define-expense.component';
 import {
-  IonAvatar, IonButton, IonButtons, IonContent,
+  IonAvatar, IonContent,
   IonHeader,
   IonIcon,
   IonItem,
@@ -30,8 +29,7 @@ import { Friend } from '../../friends/model';
     IonItem,
     IonLabel,
     IonList,
-
-    IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonButtons, IonIcon, FormsModule, IonList, IonItem, IonAvatar, IonLabel, CurrencyPipe, IonSearchbar,
+    IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, FormsModule, IonList, IonItem, IonAvatar, IonLabel, CurrencyPipe, IonSearchbar,
   ],
 })
 export class SelectFriendComponent  implements OnInit {

@@ -1,7 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { ToastController } from '@ionic/angular';
 import { DEFAULT_TOAST_DURATION } from './constants';
-import { Storage } from '@ionic/storage-angular';
 import { getAuth } from '@angular/fire/auth';
 
 @Injectable({
@@ -22,5 +21,9 @@ export class HelperService {
 
   async getFirebaseAccessToken() {
     return getAuth().currentUser?.getIdToken();
+  }
+
+  async getUser() {
+    return getAuth().currentUser;
   }
 }
