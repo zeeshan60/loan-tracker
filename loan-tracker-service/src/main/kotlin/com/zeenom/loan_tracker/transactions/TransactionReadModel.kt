@@ -48,16 +48,7 @@ class TransactionReadModel(
 class TransactionEventState {
     fun apply(existing: TransactionEvent, next: TransactionEvent): TransactionEvent {
         return when (next.eventType) {
-            TransactionEventType.TRANSACTION_CREATED -> {
-                existing.copy(
-                    amount = next.amount,
-                    currency = next.currency,
-                    transactionType = next.transactionType,
-                    recipientId = next.recipientId,
-                    createdAt = next.createdAt,
-                    version = next.version
-                )
-            }
+            TransactionEventType.TRANSACTION_CREATED -> throw IllegalArgumentException("Transaction event type not supported")
         }
     }
 }
