@@ -103,15 +103,9 @@ class FriendsEventHandler(
         }
     }
 
-    suspend fun findFriendByUserIdAndFriendId(userUid: String, friendId: UUID): FriendDto? {
+    suspend fun findFriendByUserIdAndFriendId(userUid: String, friendId: UUID): FriendId? {
         return eventRepository.findByUserUidAndStreamId(userUid, friendId)?.let {
-            FriendDto(
-                email = it.friendEmail,
-                phoneNumber = it.friendPhoneNumber,
-                name = it.friendDisplayName,
-                photoUrl = null,
-                loanAmount = null
-            )
+            FriendId(it.friendEmail, it.friendPhoneNumber)
         }
     }
 
@@ -124,3 +118,5 @@ class FriendsEventHandler(
             ?: phoneNumber?.let { eventRepository.findByUserUidAndFriendPhoneNumber(userUid, phoneNumber) })?.streamId
     }
 }
+
+data class FriendId(val email: String?, val phoneNumber: String?)

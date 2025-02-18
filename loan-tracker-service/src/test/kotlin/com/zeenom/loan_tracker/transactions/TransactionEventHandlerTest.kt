@@ -1,6 +1,6 @@
 package com.zeenom.loan_tracker.transactions
 
-import com.zeenom.loan_tracker.friends.FriendDto
+import com.zeenom.loan_tracker.friends.FriendId
 import com.zeenom.loan_tracker.friends.FriendsEventHandler
 import com.zeenom.loan_tracker.friends.TestPostgresConfig
 import com.zeenom.loan_tracker.users.UserDto
@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest
 import java.util.*
@@ -49,12 +50,9 @@ class TransactionEventHandlerTest(@Autowired private val transactionEventReposit
 
         val friendEventStreamId = UUID.randomUUID()
         doReturn(
-            FriendDto(
+            FriendId(
                 email = "friend@gmail.com",
                 phoneNumber = "+923001234568",
-                photoUrl = "https://test.com",
-                name = "Friend",
-                loanAmount = null
             )
         ).`when`(friendEventHandler).findFriendByUserIdAndFriendId("123", friendEventStreamId)
         val transactionDto = TransactionDto(
@@ -100,15 +98,12 @@ class TransactionEventHandlerTest(@Autowired private val transactionEventReposit
         ).`when`(userEventHandler).findUserById("123")
 
         val friendEventStreamId = UUID.randomUUID()
-        doReturn(
-            FriendDto(
+        whenever(friendEventHandler.findFriendByUserIdAndFriendId("123", friendEventStreamId)).thenReturn(
+            FriendId(
                 email = "friend@gmail.com",
                 phoneNumber = "+923001234568",
-                photoUrl = "https://test.com",
-                name = "Friend",
-                loanAmount = null
             )
-        ).`when`(friendEventHandler).findFriendByUserIdAndFriendId("123", friendEventStreamId)
+        )
         val myStreamId = UUID.randomUUID()
         doReturn(myStreamId).`when`(friendEventHandler).findFriendStreamIdByEmailOrPhoneNumber(
             "124",
