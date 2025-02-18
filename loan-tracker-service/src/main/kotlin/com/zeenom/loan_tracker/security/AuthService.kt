@@ -1,6 +1,6 @@
 package com.zeenom.loan_tracker.security
 
-import com.zeenom.loan_tracker.events.CommandCreateUser
+import com.zeenom.loan_tracker.events.LoginUserCommand
 import com.zeenom.loan_tracker.events.CommandDto
 import com.zeenom.loan_tracker.events.CommandType
 import com.zeenom.loan_tracker.firebase.FirebaseService
@@ -15,7 +15,7 @@ import javax.crypto.spec.SecretKeySpec
 class AuthService(
     private val firebaseService: FirebaseService,
     private val authProperties: AuthProperties,
-    private val commandCreateUser: CommandCreateUser
+    private val loginUserCommand: LoginUserCommand
 ) {
     val logger = LoggerFactory.getLogger(AuthService::class.java)
     suspend fun generateJwtUsingIdToken(idToken: String): String {
@@ -25,7 +25,7 @@ class AuthService(
     suspend fun uidByVerifyingIdToken(idToken: String): String {
         val user = firebaseService.userByVerifyingIdToken(idToken)
 
-        commandCreateUser.execute(
+        loginUserCommand.execute(
             CommandDto(
                 commandType = CommandType.LOGIN,
                 payload = user,

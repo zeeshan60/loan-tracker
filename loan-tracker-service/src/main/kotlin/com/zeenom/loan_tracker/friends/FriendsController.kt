@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*
 class FriendsController(
     val queryFriendsService: QueryFriendsService,
     val friendsAdapter: FriendsControllerAdapter,
-    private val commandCreateFriends: CommandCreateFriends
+    private val createFriendCommand: CreateFriendCommand
 ) {
 
     val logger = LoggerFactory.getLogger(FriendsController::class.java)
@@ -41,7 +41,7 @@ class FriendsController(
         @AuthenticationPrincipal userId: String
     ): MessageResponse {
         logger.info("Adding friend for user $userId")
-        commandCreateFriends.execute(
+        createFriendCommand.execute(
             CommandDto(
                 commandType = CommandType.ADD_FRIEND,
                 payload = friendsAdapter.fromRequestToDto(friendRequest),

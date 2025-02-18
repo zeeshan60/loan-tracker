@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 import org.springframework.stereotype.Service
 
 @Service
-class CommandCreateFriends(
+class CreateFriendCommand(
     private val friendsEventHandler: FriendsEventHandler,
     private val commandDao: CommandDao,
 ) : Command<CreateFriendDto> {

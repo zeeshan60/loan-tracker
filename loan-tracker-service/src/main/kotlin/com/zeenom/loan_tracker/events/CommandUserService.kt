@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 import org.springframework.stereotype.Service
 
 @Service
-class CommandCreateUser(
+class LoginUserCommand(
     private val userEventHandler: UserEventHandler,
     private val commandDao: CommandDao,
     private val friendsEventHandler: FriendsEventHandler,
