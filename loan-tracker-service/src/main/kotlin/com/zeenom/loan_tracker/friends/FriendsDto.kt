@@ -9,5 +9,5 @@ data class FriendDto(
     val phoneNumber: String?,
     val photoUrl: String?,
     val name: String,
-    val loanAmount: AmountDto?,
+    val loanAmount: AmountDto?
 )

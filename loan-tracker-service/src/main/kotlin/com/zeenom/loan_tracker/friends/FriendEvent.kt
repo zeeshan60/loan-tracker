@@ -1,5 +1,6 @@
 package com.zeenom.loan_tracker.friends
 
+import com.zeenom.loan_tracker.common.events.IEvent
 import kotlinx.coroutines.flow.Flow
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
@@ -16,10 +17,10 @@ data class FriendEvent(
     val friendPhoneNumber: String?,
     val friendDisplayName: String,
     val createdAt: Instant,
-    val streamId: UUID,
-    val version: Int,
+    override val streamId: UUID,
+    override val version: Int,
     val eventType: FriendEventType,
-)
+): IEvent
 
 enum class FriendEventType {
     FRIEND_CREATED

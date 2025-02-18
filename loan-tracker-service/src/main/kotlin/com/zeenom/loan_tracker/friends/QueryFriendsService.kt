@@ -10,4 +10,3 @@ class QueryFriendsService(private val friendsEventHandler: FriendsEventHandler) 
         return friendsEventHandler.findAllByUserId(input.input)
     }
 }
-

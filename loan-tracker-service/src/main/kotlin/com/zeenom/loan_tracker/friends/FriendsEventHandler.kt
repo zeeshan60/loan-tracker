@@ -1,23 +1,30 @@
 package com.zeenom.loan_tracker.friends
 
+import com.zeenom.loan_tracker.transactions.TransactionReadModel
 import com.zeenom.loan_tracker.users.UserEventHandler
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.util.*
+
 
 @Service
 class FriendsEventHandler(
     private val eventRepository: FriendEventRepository,
     private val userEventHandler: UserEventHandler,
+    private val transactionReadModel: TransactionReadModel,
 ) {
 
-    suspend fun findAllByUserId(userId: String): FriendsDto {
+    suspend fun findAllByUserId(userId: String): FriendsDto = withContext(Dispatchers.IO) {
         val events = eventRepository.findAllByUserUid(userId).toList()
+        val amountsPerFriend = async { transactionReadModel.balancesOfFriends(userId, events.map { it.streamId }) }
         val phones = events.mapNotNull { it.friendPhoneNumber }
         val usersByPhones = userEventHandler.findUsersByPhoneNumbers(phones).toList().associateBy { it.phoneNumber }
         val emails = events.filter { it.friendPhoneNumber !in usersByPhones.keys }.mapNotNull { it.friendEmail }
@@ -30,10 +37,10 @@ class FriendsEventHandler(
                 phoneNumber = it.friendPhoneNumber,
                 name = it.friendDisplayName,
                 photoUrl = user?.photoUrl,
-                loanAmount = null
+                loanAmount = amountsPerFriend.await()[it.streamId]
             )
         }
-        return FriendsDto(friends)
+        FriendsDto(friends)
     }
 
     suspend fun saveFriend(uid: String, friendDto: CreateFriendDto) {
@@ -93,6 +100,18 @@ class FriendsEventHandler(
             )
         }.also {
             eventRepository.saveAll(it).toList()
+        }
+    }
+
+    suspend fun findFriendByUserIdAndFriendId(userUid: String, friendId: UUID): FriendDto? {
+        return eventRepository.findByUserUidAndStreamId(userUid, friendId)?.let {
+            FriendDto(
+                email = it.friendEmail,
+                phoneNumber = it.friendPhoneNumber,
+                name = it.friendDisplayName,
+                photoUrl = null,
+                loanAmount = null
+            )
         }
     }
 

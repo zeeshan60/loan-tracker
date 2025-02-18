@@ -1,5 +1,7 @@
 package com.zeenom.loan_tracker.friends
 
+import com.zeenom.loan_tracker.transactions.AmountDto
+import com.zeenom.loan_tracker.transactions.TransactionReadModel
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEvent
 import com.zeenom.loan_tracker.users.UserEventHandler
@@ -15,10 +17,13 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest
+import java.util.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DataR2dbcTest
@@ -28,13 +33,19 @@ class FriendsEventHandlerTest(
 ) : TestPostgresConfig() {
 
     private val userEventHandler = mock<UserEventHandler>()
+    private val transactionReadModel = mock<TransactionReadModel>()
     private val friendsEventHandler =
-        FriendsEventHandler(eventRepository = eventRepository, userEventHandler = userEventHandler)
+        FriendsEventHandler(
+            eventRepository = eventRepository,
+            userEventHandler = userEventHandler,
+            transactionReadModel = transactionReadModel
+        )
 
 
     @BeforeEach
     fun setUp(): Unit = runBlocking {
         eventRepository.deleteAll()
+        doReturn(emptyMap<UUID, AmountDto>()).whenever(transactionReadModel).balancesOfFriends(any(), any())
     }
 
     @Test
@@ -421,7 +432,11 @@ class FriendsEventHandlerTest(
         eventRepository.deleteAll()
         val userEventHandler = UserEventHandler(userEventRepository)
         val friendsEventHandler =
-            FriendsEventHandler(eventRepository = eventRepository, userEventHandler = userEventHandler)
+            FriendsEventHandler(
+                eventRepository = eventRepository,
+                userEventHandler = userEventHandler,
+                transactionReadModel = transactionReadModel
+            )
         val (user1, user2) = friendData
         userEventHandler.createUser(
             UserDto(

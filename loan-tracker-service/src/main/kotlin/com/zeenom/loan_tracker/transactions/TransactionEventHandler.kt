@@ -17,6 +17,7 @@ class TransactionEventHandler(
             ?: throw IllegalArgumentException("User with id $userUid does not exist")
         if (!friendEventHandler.friendExistsByUserIdAndFriendId(userUid, transactionDto.recipientId))
             throw IllegalArgumentException("User with id $userUid does not have friend with id ${transactionDto.recipientId}")
+
         transactionEventRepository.save(
             TransactionEvent(
                 userUid = userUid,
