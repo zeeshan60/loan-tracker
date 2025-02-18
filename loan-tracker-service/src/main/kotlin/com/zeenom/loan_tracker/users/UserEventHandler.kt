@@ -1,6 +1,7 @@
 package com.zeenom.loan_tracker.users
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import org.springframework.dao.DuplicateKeyException
@@ -56,6 +57,7 @@ class UserEventHandler(private val userRepository: UserEventRepository) {
     }
 
     suspend fun findUsersByUids(uids: List<String>): Flow<UserDto> {
+        if (uids.isEmpty()) return emptyFlow()
         return userRepository.findAllByUidIn(uids).map {
             UserDto(
                 uid = it.uid,
@@ -69,6 +71,7 @@ class UserEventHandler(private val userRepository: UserEventRepository) {
     }
 
     suspend fun findUsersByEmails(emails: List<String>): Flow<UserDto> {
+        if (emails.isEmpty()) return emptyFlow()
         return userRepository.findAllByEmailIn(emails).map {
             UserDto(
                 uid = it.uid,
@@ -82,6 +85,7 @@ class UserEventHandler(private val userRepository: UserEventRepository) {
     }
 
     suspend fun findUsersByPhoneNumbers(phoneNumbers: List<String>): Flow<UserDto> {
+        if (phoneNumbers.isEmpty()) return emptyFlow()
         return userRepository.findAllByPhoneNumberIn(phoneNumbers).map {
             UserDto(
                 uid = it.uid,

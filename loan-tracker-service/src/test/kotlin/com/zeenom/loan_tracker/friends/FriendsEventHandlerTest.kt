@@ -23,6 +23,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest
+import java.time.Instant
 import java.util.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -613,5 +614,78 @@ class FriendsEventHandlerTest(
                 )
             }
         }.isInstanceOf(IllegalArgumentException::class.java)
+    }
+
+    @Test
+    fun `get friends also adds amountdto when friends have transactions`(): Unit = runBlocking {
+
+        val friendStreamId = UUID.randomUUID()
+
+        whenever(userEventHandler.findUserById("123")).thenReturn(
+            UserDto(
+                uid = "123",
+                email = "user@gmail.com",
+                phoneNumber = "+923001234567",
+                displayName = "User 1",
+                photoUrl = "https://test.com",
+                emailVerified = true
+            )
+        )
+
+
+        whenever(transactionReadModel.balancesOfFriends("123", listOf(friendStreamId))).thenReturn(
+            mapOf(
+                friendStreamId to AmountDto(
+                    currency = Currency.getInstance("USD"),
+                    amount = 100.0.toBigDecimal(),
+                    isOwed = true
+                )
+            )
+        )
+
+        whenever(userEventHandler.findUsersByPhoneNumbers(listOf("+923001234568"))).thenReturn(
+            listOf(
+                UserDto(
+                    uid = "124",
+                    email = "friend1@gmail.com",
+                    phoneNumber = "+923001234568",
+                    displayName = "Friend 1",
+                    photoUrl = "https://test.com",
+                    emailVerified = true
+                )
+            ).asFlow()
+        )
+        whenever(userEventHandler.findUsersByEmails(emptyList())).thenReturn(
+            emptyFlow()
+        )
+
+        eventRepository.save(
+            FriendEvent(
+                userUid = "123",
+                friendDisplayName = "Friend 1",
+                friendEmail = "friend1@gmail.com",
+                friendPhoneNumber = "+923001234568",
+                createdAt = Instant.now(),
+                streamId = friendStreamId,
+                version = 1,
+                eventType = FriendEventType.FRIEND_CREATED,
+            )
+        )
+        val friends = friendsEventHandler.findAllByUserId("123")
+
+        assertThat(friends.friends).hasSize(1)
+        assertThat(friends.friends[0]).isEqualTo(
+            FriendDto(
+                email = "friend1@gmail.com",
+                phoneNumber = "+923001234568",
+                name = "Friend 1",
+                photoUrl = "https://test.com",
+                loanAmount = AmountDto(
+                    amount = 100.0.toBigDecimal(),
+                    currency = Currency.getInstance("USD"),
+                    isOwed = true
+                )
+            )
+        )
     }
 }

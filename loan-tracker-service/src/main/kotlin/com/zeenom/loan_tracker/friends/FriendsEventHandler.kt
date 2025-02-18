@@ -25,10 +25,12 @@ class FriendsEventHandler(
     suspend fun findAllByUserId(userId: String): FriendsDto = withContext(Dispatchers.IO) {
         val events = eventRepository.findAllByUserUid(userId).toList()
         val amountsPerFriend = async { transactionReadModel.balancesOfFriends(userId, events.map { it.streamId }) }
-        val phones = events.mapNotNull { it.friendPhoneNumber }
-        val usersByPhones = userEventHandler.findUsersByPhoneNumbers(phones).toList().associateBy { it.phoneNumber }
-        val emails = events.filter { it.friendPhoneNumber !in usersByPhones.keys }.mapNotNull { it.friendEmail }
-        val usersByEmails = userEventHandler.findUsersByEmails(emails).toList().associateBy { it.email }
+        val usersByPhones =
+            userEventHandler.findUsersByPhoneNumbers(events.mapNotNull { it.friendPhoneNumber }).toList()
+                .associateBy { it.phoneNumber }
+        val usersByEmails =
+            userEventHandler.findUsersByEmails(events.filter { it.friendPhoneNumber !in usersByPhones.keys }
+                .mapNotNull { it.friendEmail }).toList().associateBy { it.email }
         val friends = events.map {
             val user =
                 it.friendPhoneNumber?.let { usersByPhones[it] } ?: it.friendEmail?.let { usersByEmails[it] }
