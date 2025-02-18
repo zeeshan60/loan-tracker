@@ -118,4 +118,9 @@ class FriendsEventHandler(
     suspend fun friendExistsByUserIdAndFriendId(userUid: String, recipientId: UUID): Boolean {
         return eventRepository.findByUserUidAndStreamId(userUid, recipientId) != null
     }
+
+    suspend fun findFriendStreamIdByEmailOrPhoneNumber(userUid: String, email: String?, phoneNumber: String?): UUID? {
+        return (email?.let { eventRepository.findByUserUidAndFriendEmail(userUid, email) }
+            ?: phoneNumber?.let { eventRepository.findByUserUidAndFriendPhoneNumber(userUid, phoneNumber) })?.streamId
+    }
 }

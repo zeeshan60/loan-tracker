@@ -49,7 +49,7 @@ class UserEventHandler(private val userRepository: UserEventRepository) {
                 displayName = it.displayName,
                 phoneNumber = it.phoneNumber,
                 email = it.email,
-                emailVerified = it.emailVerified ?: false, //todo make the dto optional
+                emailVerified = it.emailVerified ?: false,
                 photoUrl = it.photoUrl
             )
         }
@@ -62,7 +62,7 @@ class UserEventHandler(private val userRepository: UserEventRepository) {
                 displayName = it.displayName,
                 phoneNumber = it.phoneNumber,
                 email = it.email,
-                emailVerified = it.emailVerified ?: false, //todo make the dto optional
+                emailVerified = it.emailVerified ?: false,
                 photoUrl = it.photoUrl
             )
         }
@@ -75,7 +75,7 @@ class UserEventHandler(private val userRepository: UserEventRepository) {
                 displayName = it.displayName,
                 phoneNumber = it.phoneNumber,
                 email = it.email,
-                emailVerified = it.emailVerified ?: false, //todo make the dto optional
+                emailVerified = it.emailVerified ?: false,
                 photoUrl = it.photoUrl
             )
         }
@@ -88,10 +88,40 @@ class UserEventHandler(private val userRepository: UserEventRepository) {
                 displayName = it.displayName,
                 phoneNumber = it.phoneNumber,
                 email = it.email,
-                emailVerified = it.emailVerified ?: false, //todo make the dto optional
+                emailVerified = it.emailVerified ?: false,
                 photoUrl = it.photoUrl
             )
         }
+    }
+
+    suspend fun findUserByEmail(email: String): UserDto? {
+        return userRepository.findByEmail(email)?.let {
+            UserDto(
+                uid = it.uid,
+                displayName = it.displayName,
+                phoneNumber = it.phoneNumber,
+                email = it.email,
+                emailVerified = it.emailVerified ?: false,
+                photoUrl = it.photoUrl
+            )
+        }
+    }
+
+    suspend fun findUserByPhoneNumber(phoneNumber: String): UserDto? {
+        return userRepository.findByPhoneNumber(phoneNumber)?.let {
+            UserDto(
+                uid = it.uid,
+                displayName = it.displayName,
+                phoneNumber = it.phoneNumber,
+                email = it.email,
+                emailVerified = it.emailVerified ?: false,
+                photoUrl = it.photoUrl
+            )
+        }
+    }
+
+    suspend fun findUserByEmailOrPhoneNumber(email: String?, phoneNumber: String?): UserDto? {
+        return email?.let { findUserByEmail(email) } ?: phoneNumber?.let { findUserByPhoneNumber(phoneNumber) }
     }
 }
 

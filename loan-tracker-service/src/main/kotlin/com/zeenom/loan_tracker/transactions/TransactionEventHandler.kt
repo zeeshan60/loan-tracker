@@ -12,11 +12,17 @@ class TransactionEventHandler(
     private val userEventHandler: UserEventHandler,
     private val friendEventHandler: FriendsEventHandler,
 ) {
-    suspend fun saveEvent(userUid: String, transactionDto: TransactionDto) {
-        userEventHandler.findUserById(userUid)
+    suspend fun addTransaction(userUid: String, transactionDto: TransactionDto) {
+        val me = userEventHandler.findUserById(userUid)
             ?: throw IllegalArgumentException("User with id $userUid does not exist")
-        if (!friendEventHandler.friendExistsByUserIdAndFriendId(userUid, transactionDto.recipientId))
-            throw IllegalArgumentException("User with id $userUid does not have friend with id ${transactionDto.recipientId}")
+        val friend = friendEventHandler.findFriendByUserIdAndFriendId(userUid, transactionDto.recipientId)
+            ?: throw IllegalArgumentException("User with id $userUid does not have friend with id ${transactionDto.recipientId}")
+
+        val friendUser = userEventHandler.findUserByEmailOrPhoneNumber(friend.email, friend.phoneNumber)
+        val friendStreamId = friendUser?.let {
+            friendEventHandler.findFriendStreamIdByEmailOrPhoneNumber(friendUser.uid, me.email, me.phoneNumber)
+                ?: throw IllegalArgumentException("Friend with email ${friend.email} or phone number ${friend.phoneNumber} does not exist")
+        }
 
         transactionEventRepository.save(
             TransactionEvent(
@@ -32,5 +38,22 @@ class TransactionEventHandler(
                 createdBy = userUid
             )
         )
+
+        if (friendStreamId != null) {
+            transactionEventRepository.save(
+                TransactionEvent(
+                    userUid = friendUser.uid,
+                    amount = transactionDto.amount.amount,
+                    currency = transactionDto.amount.currency.toString(),
+                    transactionType = if (transactionDto.amount.isOwed) TransactionType.DEBIT else TransactionType.CREDIT,
+                    recipientId = friendStreamId,
+                    createdAt = Instant.now(),
+                    streamId = UUID.randomUUID(),
+                    version = 1,
+                    eventType = TransactionEventType.TRANSACTION_CREATED,
+                    createdBy = userUid
+                )
+            )
+        }
     }
 }
