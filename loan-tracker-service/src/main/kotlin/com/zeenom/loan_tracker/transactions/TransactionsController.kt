@@ -84,7 +84,7 @@ class TransactionsController(
                     SplitType.TheyOweYouAll -> transactionRequest.amount
                     SplitType.YouOweThemAll -> transactionRequest.amount
                 },
-                currency = transactionRequest.currency,
+                currency = Currency.getInstance(transactionRequest.currency),
                 isOwed = when (transactionRequest.type) {
                     SplitType.YouPaidSplitEqually -> true
                     SplitType.TheyPaidSplitEqually -> false
@@ -98,7 +98,7 @@ class TransactionsController(
 
 data class TransactionRequest(
     val amount: BigDecimal,
-    val currency: Currency,
+    val currency: String,
     val type: SplitType,
     @Schema(description = "For updates recipient id must be same as the original recipient id")
     val recipientId: UUID,
