@@ -1,6 +1,7 @@
 package com.zeenom.loan_tracker.transactions
 
 import com.zeenom.loan_tracker.common.events.ReadModel
+import com.zeenom.loan_tracker.friends.FriendEventRepository
 import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
@@ -10,6 +11,7 @@ import java.util.*
 @Service
 class TransactionReadModel(
     private val transactionEventRepository: TransactionEventRepository,
+    private val friendEventRepository: FriendEventRepository,
 ) : ReadModel<TransactionEvent> {
 
     private val transactionEventState: TransactionEventState = TransactionEventState()
@@ -23,9 +25,26 @@ class TransactionReadModel(
             .reduceOrNull { current, next -> transactionEventState.apply(current, next) }
     }
 
-    suspend fun transactionsByFriendId(userId: String, friendId: UUID): List<TransactionEvent> {
+    suspend fun transactionsByFriendId(userId: String, friendId: UUID): List<TransactionDto> {
+        val friend = friendEventRepository.findByUserUidAndStreamId(userId, friendId) ?: throw IllegalArgumentException(
+            "Friend not found"
+        )
         return transactionEventRepository
-            .findAllByUserUidAndRecipientId(userId, friendId).toList().let { this.resolveAll(it) }
+            .findAllByUserUidAndRecipientId(userId, friendId).toList().let { this.resolveAll(it) }.map {
+                TransactionDto(
+                    amount = AmountDto(
+                        amount = it.amount,
+                        currency = Currency.getInstance(it.currency),
+                        isOwed = it.transactionType == TransactionType.CREDIT
+                    ),
+                    recipientId = it.recipientId,
+                    transactionStreamId = it.streamId,
+                    description = it.description,
+                    originalAmount = it.totalAmount,
+                    splitType = it.splitType,
+                    recipientName = friend.friendDisplayName
+                )
+            }
     }
 
     suspend fun balancesOfFriends(userId: String, friendIds: List<UUID>): Map<UUID, AmountDto> {

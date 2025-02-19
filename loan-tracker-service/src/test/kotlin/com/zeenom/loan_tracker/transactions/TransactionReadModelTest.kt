@@ -1,11 +1,15 @@
 package com.zeenom.loan_tracker.transactions
 
+import com.zeenom.loan_tracker.friends.FriendEvent
+import com.zeenom.loan_tracker.friends.FriendEventType
+import com.zeenom.loan_tracker.friends.FriendId
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import java.time.Instant
 import java.util.*
 
 class TransactionReadModelTest {
@@ -13,18 +17,36 @@ class TransactionReadModelTest {
     @Test
     fun `given a friend and some transactions return balance successfully`(): Unit = runBlocking {
         val friendStreamId = UUID.randomUUID()
-        val transactionReadModel = TransactionReadModel(mock {
-            on {
-                runBlocking {
-                    findAllByUserUidAndRecipientIdIn(
-                        "123",
-                        listOf(friendStreamId)
-                    )
-                }
-            } doReturn sampleTransactions(
-                friendStreamId
-            ).asFlow()
-        })
+        val transactionReadModel = TransactionReadModel(
+            mock {
+                on {
+                    runBlocking {
+                        findAllByUserUidAndRecipientIdIn(
+                            "123",
+                            listOf(friendStreamId)
+                        )
+                    }
+                } doReturn sampleTransactions(
+                    friendStreamId
+                ).asFlow()
+            },
+            friendEventRepository = mock {
+                on {
+                    runBlocking {
+                        findByUserUidAndStreamId("123", friendStreamId)
+                    }
+                } doReturn FriendEvent(
+                    friendDisplayName = "John Doe",
+                    userUid = "124",
+                    friendEmail = "John@gmail.com",
+                    friendPhoneNumber = "+923001234567",
+                    createdAt = Instant.now(),
+                    streamId = friendStreamId,
+                    version = 1,
+                    eventType = FriendEventType.FRIEND_CREATED,
+                )
+            }
+        )
 
         val balances = transactionReadModel.balancesOfFriends("123", listOf(friendStreamId))
         assertThat(balances).hasSize(1)
@@ -48,7 +70,37 @@ class TransactionReadModelTest {
             } doReturn sampleTransactions(
                 friendStreamId1
             ).plus(sampleTransactions(friendStreamId2)).asFlow()
-        })
+        },
+            friendEventRepository = mock {
+                on {
+                    runBlocking {
+                        findByUserUidAndStreamId("123", friendStreamId1)
+                    }
+                } doReturn FriendEvent(
+                    friendDisplayName = "John Doe",
+                    userUid = "123",
+                    friendEmail = "John@gmail.com",
+                    friendPhoneNumber = "+923001234567",
+                    createdAt = Instant.now(),
+                    streamId = friendStreamId1,
+                    version = 1,
+                    eventType = FriendEventType.FRIEND_CREATED,
+                )
+                on {
+                    runBlocking {
+                        findByUserUidAndStreamId("123", friendStreamId2)
+                    }
+                } doReturn FriendEvent(
+                    friendDisplayName = "John Doe 2",
+                    userUid = "123",
+                    friendEmail = "John2@gmail.com",
+                    friendPhoneNumber = "+923001234568",
+                    createdAt = Instant.now(),
+                    streamId = friendStreamId2,
+                    version = 1,
+                    eventType = FriendEventType.FRIEND_CREATED,
+                )
+            })
 
         val balances = transactionReadModel.balancesOfFriends("123", listOf(friendStreamId1, friendStreamId2))
         assertThat(balances).hasSize(2)
@@ -64,48 +116,66 @@ class TransactionReadModelTest {
     @Test
     fun `read single transaction stream successfully`(): Unit = runBlocking {
         val transactionStreamId = UUID.randomUUID()
-        val transactionReadModel = TransactionReadModel(mock {
-            val friendStreamId = UUID.randomUUID()
-            on {
-                runBlocking {
-                    findAllByUserUidAndStreamId(
-                        "123",
-                        transactionStreamId
+        val friendStreamId = UUID.randomUUID()
+        val transactionReadModel = TransactionReadModel(
+            mock {
+                on {
+                    runBlocking {
+                        findAllByUserUidAndStreamId(
+                            "123",
+                            transactionStreamId
+                        )
+                    }
+                } doReturn listOf(
+                    TransactionEvent(
+                        userUid = "123",
+                        amount = 200.0.toBigDecimal(),
+                        currency = "USD",
+                        transactionType = TransactionType.CREDIT,
+                        recipientId = friendStreamId,
+                        createdAt = Date().toInstant(),
+                        createdBy = "123",
+                        streamId = transactionStreamId,
+                        version = 1,
+                        eventType = TransactionEventType.TRANSACTION_CREATED,
+                        description = "some description",
+                        splitType = SplitType.TheyOweYouAll,
+                        totalAmount = 200.0.toBigDecimal()
+                    ),
+                    TransactionEvent(
+                        userUid = "123",
+                        amount = 100.0.toBigDecimal(),
+                        currency = "USD",
+                        transactionType = TransactionType.DEBIT,
+                        recipientId = friendStreamId,
+                        createdAt = Date().toInstant(),
+                        createdBy = "123",
+                        streamId = transactionStreamId,
+                        version = 2,
+                        eventType = TransactionEventType.TRANSACTION_UPDATED,
+                        description = "some description",
+                        splitType = SplitType.YouOweThemAll,
+                        totalAmount = 200.0.toBigDecimal()
                     )
-                }
-            } doReturn listOf(
-                TransactionEvent(
-                    userUid = "123",
-                    amount = 200.0.toBigDecimal(),
-                    currency = "USD",
-                    transactionType = TransactionType.CREDIT,
-                    recipientId = friendStreamId,
-                    createdAt = Date().toInstant(),
-                    createdBy = "123",
-                    streamId = transactionStreamId,
+                ).asFlow()
+            },
+            friendEventRepository = mock {
+                on {
+                    runBlocking {
+                        findByUserUidAndStreamId("123", friendStreamId)
+                    }
+                } doReturn FriendEvent(
+                    friendDisplayName = "John Doe",
+                    userUid = "124",
+                    friendEmail = "John@gmail.com",
+                    friendPhoneNumber = "+923001234567",
+                    createdAt = Instant.now(),
+                    streamId = friendStreamId,
                     version = 1,
-                    eventType = TransactionEventType.TRANSACTION_CREATED,
-                    description = "some description",
-                    splitType = SplitType.TheyOweYouAll,
-                    totalAmount = 200.0.toBigDecimal()
-                ),
-                TransactionEvent(
-                    userUid = "123",
-                    amount = 100.0.toBigDecimal(),
-                    currency = "USD",
-                    transactionType = TransactionType.DEBIT,
-                    recipientId = friendStreamId,
-                    createdAt = Date().toInstant(),
-                    createdBy = "123",
-                    streamId = transactionStreamId,
-                    version = 2,
-                    eventType = TransactionEventType.TRANSACTION_UPDATED,
-                    description = "some description",
-                    splitType = SplitType.YouOweThemAll,
-                    totalAmount = 200.0.toBigDecimal()
+                    eventType = FriendEventType.FRIEND_CREATED,
                 )
-            ).asFlow()
-        })
+            }
+        )
 
         val transaction = transactionReadModel.read("123", transactionStreamId)
         assertThat(transaction).isNotNull

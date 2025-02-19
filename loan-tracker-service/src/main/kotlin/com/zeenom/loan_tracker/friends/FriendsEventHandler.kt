@@ -108,7 +108,7 @@ class FriendsEventHandler(
 
     suspend fun findFriendByUserIdAndFriendId(userUid: String, friendId: UUID): FriendId? {
         return eventRepository.findByUserUidAndStreamId(userUid, friendId)?.let {
-            FriendId(it.friendEmail, it.friendPhoneNumber)
+            FriendId(it.friendEmail, it.friendPhoneNumber, it.friendDisplayName)
         }
     }
 
@@ -122,4 +122,4 @@ class FriendsEventHandler(
     }
 }
 
-data class FriendId(val email: String?, val phoneNumber: String?)
+data class FriendId(val email: String?, val phoneNumber: String?, val name: String)

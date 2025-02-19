@@ -1,6 +1,8 @@
 package com.zeenom.loan_tracker.transactions;
 
 import com.zeenom.loan_tracker.common.Paginated
+import com.zeenom.loan_tracker.common.amountForYou
+import com.zeenom.loan_tracker.common.isOwed
 import com.zeenom.loan_tracker.events.CommandDto
 import com.zeenom.loan_tracker.events.CommandType
 import io.swagger.v3.oas.annotations.Operation
@@ -69,7 +71,9 @@ class TransactionsController(
                                 amount = transaction.amount.amount,
                                 currency = transaction.amount.currency.toString(),
                                 isOwed = transaction.amount.isOwed
-                            )
+                            ),
+                            totalAmount = transaction.originalAmount,
+                            friendName = transaction.recipientName!!,
                         )
                     }
                 ),
@@ -81,26 +85,18 @@ class TransactionsController(
     private fun requestToDto(transactionRequest: TransactionRequest) =
         TransactionDto(
             amount = AmountDto(
-                amount = when (transactionRequest.type) {
-                    SplitType.YouPaidSplitEqually -> transactionRequest.amount / 2.toBigDecimal()
-                    SplitType.TheyPaidSplitEqually -> transactionRequest.amount / 2.toBigDecimal()
-                    SplitType.TheyOweYouAll -> transactionRequest.amount
-                    SplitType.YouOweThemAll -> transactionRequest.amount
-                },
+                amount = transactionRequest.type.amountForYou(transactionRequest.amount),
                 currency = Currency.getInstance(transactionRequest.currency),
-                isOwed = when (transactionRequest.type) {
-                    SplitType.YouPaidSplitEqually -> true
-                    SplitType.TheyPaidSplitEqually -> false
-                    SplitType.TheyOweYouAll -> true
-                    SplitType.YouOweThemAll -> false
-                }
+                isOwed = transactionRequest.type.isOwed()
             ),
             recipientId = transactionRequest.recipientId,
             description = transactionRequest.description,
             splitType = transactionRequest.type,
-            originalAmount = transactionRequest.amount
+            originalAmount = transactionRequest.amount,
+            recipientName = null
         )
 }
+
 
 data class TransactionRequest(
     val amount: BigDecimal,
@@ -124,6 +120,8 @@ data class TransactionsResponse(
 
 data class TransactionResponse(
     val transactionId: UUID,
+    val totalAmount: BigDecimal,
+    val friendName: String,
     val amountResponse: AmountResponse,
 )
 

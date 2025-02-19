@@ -46,7 +46,8 @@ class CommandDaoTest(
                 recipientId = UUID.randomUUID(),
                 description = "test",
                 originalAmount = 100.0.toBigDecimal(),
-                splitType = SplitType.TheyOweYouAll
+                splitType = SplitType.TheyOweYouAll,
+                recipientName = "John Doe",
             ),
             userId = "123",
         )

@@ -1,5 +1,6 @@
 package com.zeenom.loan_tracker.transactions
 
+import com.zeenom.loan_tracker.friends.FriendEventRepository
 import com.zeenom.loan_tracker.friends.FriendId
 import com.zeenom.loan_tracker.friends.FriendsEventHandler
 import com.zeenom.loan_tracker.friends.TestPostgresConfig
@@ -23,7 +24,9 @@ class TransactionEventHandlerTest(@Autowired private val transactionEventReposit
     TestPostgresConfig() {
     private val userEventHandler = mock<UserEventHandler>()
     private val friendEventHandler = mock<FriendsEventHandler>()
-    private val transactionReadModel = TransactionReadModel(transactionEventRepository)
+    private val friendEventRepository = mock<FriendEventRepository>()
+    private val transactionReadModel =
+        TransactionReadModel(transactionEventRepository, friendEventRepository = friendEventRepository)
 
     private val transactionEventHandler = TransactionEventHandler(
         transactionEventRepository = transactionEventRepository,
@@ -55,6 +58,7 @@ class TransactionEventHandlerTest(@Autowired private val transactionEventReposit
             FriendId(
                 email = "friend@gmail.com",
                 phoneNumber = "+923001234568",
+                name = "Friend"
             )
         ).`when`(friendEventHandler).findFriendByUserIdAndFriendId("123", friendEventStreamId)
         val transactionDto = TransactionDto(
@@ -66,7 +70,8 @@ class TransactionEventHandlerTest(@Autowired private val transactionEventReposit
             recipientId = friendEventStreamId,
             description = "Test Transaction",
             splitType = SplitType.TheyOweYouAll,
-            originalAmount = 100.0.toBigDecimal()
+            originalAmount = 100.0.toBigDecimal(),
+            recipientName = "Friend"
         )
 
         transactionEventHandler.addTransaction(
@@ -107,6 +112,7 @@ class TransactionEventHandlerTest(@Autowired private val transactionEventReposit
             FriendId(
                 email = "friend@gmail.com",
                 phoneNumber = "+923001234568",
+                name = "Friend"
             )
         )
         val myStreamId = UUID.randomUUID()
@@ -134,7 +140,8 @@ class TransactionEventHandlerTest(@Autowired private val transactionEventReposit
             recipientId = friendEventStreamId,
             description = "Test Transaction",
             splitType = SplitType.TheyOweYouAll,
-            originalAmount = 100.0.toBigDecimal()
+            originalAmount = 100.0.toBigDecimal(),
+            recipientName = "Friend"
         )
 
         transactionEventHandler.addTransaction(
@@ -184,7 +191,8 @@ class TransactionEventHandlerTest(@Autowired private val transactionEventReposit
             recipientId = friendEventStreamId,
             description = "Test Transaction",
             splitType = SplitType.TheyOweYouAll,
-            originalAmount = 100.0.toBigDecimal()
+            originalAmount = 100.0.toBigDecimal(),
+            recipientName = "Friend"
         )
 
         assertThatThrownBy {
@@ -222,7 +230,8 @@ class TransactionEventHandlerTest(@Autowired private val transactionEventReposit
             recipientId = friendEventStreamId,
             description = "Test Transaction",
             splitType = SplitType.TheyOweYouAll,
-            originalAmount = 100.0.toBigDecimal()
+            originalAmount = 100.0.toBigDecimal(),
+            recipientName = "Friend"
         )
 
         assertThatThrownBy { runBlocking { transactionEventHandler.addTransaction("123", transactionDto) } }
@@ -248,6 +257,7 @@ class TransactionEventHandlerTest(@Autowired private val transactionEventReposit
             FriendId(
                 email = "friend@gmail.com",
                 phoneNumber = "+923001234568",
+                name = "Friend"
             )
         )
         val myStreamId = UUID.randomUUID()
@@ -275,7 +285,8 @@ class TransactionEventHandlerTest(@Autowired private val transactionEventReposit
             recipientId = friendEventStreamId,
             description = "Test Transaction",
             splitType = SplitType.TheyOweYouAll,
-            originalAmount = 100.0.toBigDecimal()
+            originalAmount = 100.0.toBigDecimal(),
+            recipientName = "Friend"
         )
 
         transactionEventHandler.addTransaction(

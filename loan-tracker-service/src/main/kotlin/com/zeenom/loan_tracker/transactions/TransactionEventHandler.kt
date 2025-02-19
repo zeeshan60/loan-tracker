@@ -1,5 +1,6 @@
 package com.zeenom.loan_tracker.transactions
 
+import com.zeenom.loan_tracker.common.reverse
 import com.zeenom.loan_tracker.friends.FriendsEventHandler
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventHandler
@@ -51,7 +52,7 @@ class TransactionEventHandler(
                     eventType = TransactionEventType.TRANSACTION_CREATED,
                     createdBy = userUid,
                     description = transactionDto.description,
-                    splitType = transactionDto.splitType,
+                    splitType = transactionDto.splitType.reverse(),
                     totalAmount = transactionDto.originalAmount,
                 )
             )

@@ -1,5 +1,7 @@
 package com.zeenom.loan_tracker.common
 
+import com.zeenom.loan_tracker.transactions.SplitType
+import java.math.BigDecimal
 import java.net.URI
 import java.time.Instant
 import java.time.LocalDate
@@ -122,4 +124,31 @@ fun addQueryParams(url: String, params: Map<String, String>): String {
         finalQuery,
         uri.fragment
     ).toString().replace(" ", "%20")
+}
+
+fun SplitType.reverse(): SplitType {
+    return when (this) {
+        SplitType.TheyOweYouAll -> SplitType.YouOweThemAll
+        SplitType.YouOweThemAll -> SplitType.TheyOweYouAll
+        SplitType.YouPaidSplitEqually -> SplitType.TheyPaidSplitEqually
+        SplitType.TheyPaidSplitEqually -> SplitType.YouPaidSplitEqually
+    }
+}
+
+fun SplitType.isOwed(): Boolean {
+    return when (this) {
+        SplitType.TheyOweYouAll -> true
+        SplitType.YouOweThemAll -> false
+        SplitType.YouPaidSplitEqually -> true
+        SplitType.TheyPaidSplitEqually -> false
+    }
+}
+
+fun SplitType.amountForYou(amount: BigDecimal): BigDecimal {
+    return when (this) {
+        SplitType.TheyOweYouAll -> amount
+        SplitType.YouOweThemAll -> amount
+        SplitType.YouPaidSplitEqually -> amount / 2.toBigDecimal()
+        SplitType.TheyPaidSplitEqually -> amount / 2.toBigDecimal()
+    }
 }

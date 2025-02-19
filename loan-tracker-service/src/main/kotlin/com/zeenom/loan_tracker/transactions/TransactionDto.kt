@@ -10,6 +10,7 @@ data class TransactionDto(
     val originalAmount: BigDecimal,
     val splitType: SplitType,
     val recipientId: UUID,
+    val recipientName: String?,
     val transactionStreamId: UUID? = null
 ) : CommandPayloadDto
 
