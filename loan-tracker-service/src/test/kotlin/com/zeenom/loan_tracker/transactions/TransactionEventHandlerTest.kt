@@ -64,6 +64,9 @@ class TransactionEventHandlerTest(@Autowired private val transactionEventReposit
                 isOwed = true
             ),
             recipientId = friendEventStreamId,
+            description = "Test Transaction",
+            splitType = SplitType.TheyOweYouAll,
+            originalAmount = 100.0.toBigDecimal()
         )
 
         transactionEventHandler.addTransaction(
@@ -129,6 +132,9 @@ class TransactionEventHandlerTest(@Autowired private val transactionEventReposit
                 isOwed = true
             ),
             recipientId = friendEventStreamId,
+            description = "Test Transaction",
+            splitType = SplitType.TheyOweYouAll,
+            originalAmount = 100.0.toBigDecimal()
         )
 
         transactionEventHandler.addTransaction(
@@ -176,6 +182,9 @@ class TransactionEventHandlerTest(@Autowired private val transactionEventReposit
                 isOwed = true
             ),
             recipientId = friendEventStreamId,
+            description = "Test Transaction",
+            splitType = SplitType.TheyOweYouAll,
+            originalAmount = 100.0.toBigDecimal()
         )
 
         assertThatThrownBy {
@@ -211,6 +220,9 @@ class TransactionEventHandlerTest(@Autowired private val transactionEventReposit
                 isOwed = true
             ),
             recipientId = friendEventStreamId,
+            description = "Test Transaction",
+            splitType = SplitType.TheyOweYouAll,
+            originalAmount = 100.0.toBigDecimal()
         )
 
         assertThatThrownBy { runBlocking { transactionEventHandler.addTransaction("123", transactionDto) } }
@@ -261,6 +273,9 @@ class TransactionEventHandlerTest(@Autowired private val transactionEventReposit
                 isOwed = true
             ),
             recipientId = friendEventStreamId,
+            description = "Test Transaction",
+            splitType = SplitType.TheyOweYouAll,
+            originalAmount = 100.0.toBigDecimal()
         )
 
         transactionEventHandler.addTransaction(

@@ -14,16 +14,19 @@ import java.util.*
 data class TransactionEvent(
     @Id val id: UUID? = null,
     val userUid: String,
+    val description: String,
     val amount: BigDecimal,
     val currency: String,
     val transactionType: TransactionType,
+    val splitType: SplitType,
+    val totalAmount: BigDecimal,
     val recipientId: UUID,
     val createdAt: Instant,
     val createdBy: String,
     override val streamId: UUID,
     override val version: Int,
     val eventType: TransactionEventType,
-): IEvent
+) : IEvent
 
 enum class TransactionType {
     CREDIT, DEBIT

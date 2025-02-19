@@ -95,7 +95,10 @@ class TransactionsController(
                     SplitType.YouOweThemAll -> false
                 }
             ),
-            recipientId = transactionRequest.recipientId
+            recipientId = transactionRequest.recipientId,
+            description = transactionRequest.description,
+            splitType = transactionRequest.type,
+            originalAmount = transactionRequest.amount
         )
 }
 
@@ -105,6 +108,7 @@ data class TransactionRequest(
     val type: SplitType,
     @Schema(description = "For updates recipient id must be same as the original recipient id")
     val recipientId: UUID,
+    val description: String,
 )
 
 enum class SplitType {

@@ -30,7 +30,10 @@ class TransactionEventHandler(
                 streamId = transactionStreamId,
                 version = 1,
                 eventType = TransactionEventType.TRANSACTION_CREATED,
-                createdBy = userUid
+                createdBy = userUid,
+                description = transactionDto.description,
+                splitType = transactionDto.splitType,
+                totalAmount = transactionDto.originalAmount,
             )
         )
 
@@ -46,7 +49,10 @@ class TransactionEventHandler(
                     streamId = transactionStreamId,
                     version = 1,
                     eventType = TransactionEventType.TRANSACTION_CREATED,
-                    createdBy = userUid
+                    createdBy = userUid,
+                    description = transactionDto.description,
+                    splitType = transactionDto.splitType,
+                    totalAmount = transactionDto.originalAmount,
                 )
             )
         }
@@ -74,7 +80,10 @@ class TransactionEventHandler(
                 streamId = transactionDto.transactionStreamId,
                 version = existingTransaction.version + 1,
                 eventType = TransactionEventType.TRANSACTION_UPDATED,
-                createdBy = userUid
+                createdBy = userUid,
+                description = transactionDto.description,
+                splitType = transactionDto.splitType,
+                totalAmount = transactionDto.originalAmount,
             )
         )
 
@@ -90,7 +99,10 @@ class TransactionEventHandler(
                     streamId = transactionDto.transactionStreamId,
                     version = existingCrossTransaction.version + 1,
                     eventType = TransactionEventType.TRANSACTION_UPDATED,
-                    createdBy = userUid
+                    createdBy = userUid,
+                    description = transactionDto.description,
+                    splitType = transactionDto.splitType,
+                    totalAmount = transactionDto.originalAmount,
                 )
             )
         }

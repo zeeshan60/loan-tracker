@@ -18,7 +18,10 @@ class TransactionQuery(
                     isOwed = it.transactionType == TransactionType.CREDIT
                 ),
                 recipientId = it.recipientId,
-                transactionStreamId = it.streamId
+                transactionStreamId = it.streamId,
+                description = it.description,
+                originalAmount = it.totalAmount,
+                splitType = it.splitType
             )
         }.let { Paginated(it, null) }
     }

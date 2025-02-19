@@ -6,6 +6,9 @@ import java.util.*
 
 data class TransactionDto(
     val amount: AmountDto,
+    val description: String,
+    val originalAmount: BigDecimal,
+    val splitType: SplitType,
     val recipientId: UUID,
     val transactionStreamId: UUID? = null
 ) : CommandPayloadDto

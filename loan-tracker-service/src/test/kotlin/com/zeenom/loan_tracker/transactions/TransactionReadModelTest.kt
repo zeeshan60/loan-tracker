@@ -84,7 +84,10 @@ class TransactionReadModelTest {
                     createdBy = "123",
                     streamId = transactionStreamId,
                     version = 1,
-                    eventType = TransactionEventType.TRANSACTION_CREATED
+                    eventType = TransactionEventType.TRANSACTION_CREATED,
+                    description = "some description",
+                    splitType = SplitType.TheyOweYouAll,
+                    totalAmount = 200.0.toBigDecimal()
                 ),
                 TransactionEvent(
                     userUid = "123",
@@ -96,7 +99,10 @@ class TransactionReadModelTest {
                     createdBy = "123",
                     streamId = transactionStreamId,
                     version = 2,
-                    eventType = TransactionEventType.TRANSACTION_UPDATED
+                    eventType = TransactionEventType.TRANSACTION_UPDATED,
+                    description = "some description",
+                    splitType = SplitType.YouOweThemAll,
+                    totalAmount = 200.0.toBigDecimal()
                 )
             ).asFlow()
         })
@@ -121,7 +127,10 @@ class TransactionReadModelTest {
                 createdBy = "123",
                 streamId = UUID.randomUUID(),
                 version = 1,
-                eventType = TransactionEventType.TRANSACTION_CREATED
+                eventType = TransactionEventType.TRANSACTION_CREATED,
+                description = "some description",
+                splitType = SplitType.TheyOweYouAll,
+                totalAmount = 100.0.toBigDecimal()
             ),
             TransactionEvent(
                 userUid = "123",
@@ -133,7 +142,10 @@ class TransactionReadModelTest {
                 createdBy = "123",
                 streamId = transactionStreamId,
                 version = 1,
-                eventType = TransactionEventType.TRANSACTION_CREATED
+                eventType = TransactionEventType.TRANSACTION_CREATED,
+                description = "some description",
+                splitType = SplitType.TheyOweYouAll,
+                totalAmount = 200.0.toBigDecimal()
             ),
             TransactionEvent(
                 userUid = "123",
@@ -145,7 +157,10 @@ class TransactionReadModelTest {
                 createdBy = "123",
                 streamId = transactionStreamId,
                 version = 2,
-                eventType = TransactionEventType.TRANSACTION_UPDATED
+                eventType = TransactionEventType.TRANSACTION_UPDATED,
+                description = "some description",
+                splitType = SplitType.YouOweThemAll,
+                totalAmount = 200.0.toBigDecimal()
             ),
             TransactionEvent(
                 userUid = "123",
@@ -157,7 +172,10 @@ class TransactionReadModelTest {
                 createdBy = "123",
                 streamId = UUID.randomUUID(),
                 version = 1,
-                eventType = TransactionEventType.TRANSACTION_CREATED
+                eventType = TransactionEventType.TRANSACTION_CREATED,
+                description = "some description",
+                splitType = SplitType.YouOweThemAll,
+                totalAmount = 150.0.toBigDecimal()
             )
         )
     }
