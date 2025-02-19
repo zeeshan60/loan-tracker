@@ -63,10 +63,13 @@ class TransactionsController(
             Paginated(
                 TransactionsResponse(
                     transactions = it.data.map { transaction ->
-                        AmountResponse(
-                            amount = transaction.amount.amount,
-                            currency = transaction.amount.currency,
-                            isOwed = transaction.amount.isOwed
+                        TransactionResponse(
+                            transactionId = transaction.transactionStreamId!!,
+                            amountResponse = AmountResponse(
+                                amount = transaction.amount.amount,
+                                currency = transaction.amount.currency.toString(),
+                                isOwed = transaction.amount.isOwed
+                            )
                         )
                     }
                 ),
@@ -112,11 +115,16 @@ enum class SplitType {
 }
 
 data class TransactionsResponse(
-    val transactions: List<AmountResponse>,
+    val transactions: List<TransactionResponse>,
+)
+
+data class TransactionResponse(
+    val transactionId: UUID,
+    val amountResponse: AmountResponse,
 )
 
 data class AmountResponse(
     val amount: BigDecimal,
-    val currency: Currency,
+    val currency: String,
     val isOwed: Boolean,
 )
