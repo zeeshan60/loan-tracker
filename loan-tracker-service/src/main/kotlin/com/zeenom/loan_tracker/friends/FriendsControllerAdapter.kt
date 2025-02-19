@@ -13,13 +13,8 @@ class FriendsControllerAdapter(val loanAmountResponseAdapter: LoanAmountResponse
     fun FriendDto.toResponse() = FriendResponse(
         photoUrl = this.photoUrl,
         name = this.name,
-        loanAmount = this.loanAmount?.let { loanAmountResponseAdapter.fromDto(it) }
-    )
-
-    fun CreateFriendRequest.toDto() = CreateFriendDto(
-        email = this.email,
-        phoneNumber = this.phoneNumber,
-        name = this.name,
+        loanAmount = this.loanAmount?.let { loanAmountResponseAdapter.fromDto(it) },
+        friendId = this.friendId
     )
 
     fun fromRequestToDto(createFriendRequest: CreateFriendRequest): CreateFriendDto {

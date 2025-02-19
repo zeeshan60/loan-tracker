@@ -35,6 +35,7 @@ class FriendsEventHandler(
             val user =
                 it.friendPhoneNumber?.let { usersByPhones[it] } ?: it.friendEmail?.let { usersByEmails[it] }
             FriendDto(
+                friendId = it.streamId,
                 email = it.friendEmail,
                 phoneNumber = it.friendPhoneNumber,
                 name = it.friendDisplayName,

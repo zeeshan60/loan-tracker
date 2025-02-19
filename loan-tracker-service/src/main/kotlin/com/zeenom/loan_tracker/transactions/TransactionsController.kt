@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Schema
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -32,7 +33,7 @@ class TransactionsController(private val createTransactionCommand: CreateTransac
     }
 
     @Operation(summary = "Update a transaction")
-    @PostMapping("/update")
+    @PutMapping("/update")
     suspend fun updateTransaction(
         @RequestBody transactionRequest: TransactionRequest,
         @AuthenticationPrincipal userId: String,

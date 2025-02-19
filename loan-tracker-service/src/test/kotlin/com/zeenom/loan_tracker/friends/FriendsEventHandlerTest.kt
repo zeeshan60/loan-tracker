@@ -10,8 +10,7 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -221,25 +220,19 @@ class FriendsEventHandlerTest(
         val friendsDto = friendsEventHandler.findAllByUserId("123")
         assertThat(friendsDto.friends).hasSize(2)
 
-        assertThat(friendsDto.friends[0]).isEqualTo(
-            FriendDto(
-                email = "user2@gmail.com",
-                phoneNumber = "+923001234568",
-                name = "User 2",
-                photoUrl = null,
-                loanAmount = null
-            )
-        )
+        assertThat(friendsDto.friends[0].email).isEqualTo("user2@gmail.com")
+        assertThat(friendsDto.friends[0].phoneNumber).isEqualTo("+923001234568")
+        assertThat(friendsDto.friends[0].name).isEqualTo("User 2")
+        assertThat(friendsDto.friends[0].photoUrl).isNull()
+        assertThat(friendsDto.friends[0].loanAmount).isNull()
+        assertThat(friendsDto.friends[0].friendId).isNotNull()
 
-        assertThat(friendsDto.friends[1]).isEqualTo(
-            FriendDto(
-                email = "user3@gmail.com",
-                phoneNumber = "+923001234569",
-                name = "User 3",
-                photoUrl = null,
-                loanAmount = null
-            )
-        )
+        assertThat(friendsDto.friends[1].email).isEqualTo("user3@gmail.com")
+        assertThat(friendsDto.friends[1].phoneNumber).isEqualTo("+923001234569")
+        assertThat(friendsDto.friends[1].name).isEqualTo("User 3")
+        assertThat(friendsDto.friends[1].photoUrl).isNull()
+        assertThat(friendsDto.friends[1].loanAmount).isNull()
+        assertThat(friendsDto.friends[1].friendId).isNotNull()
     }
 
     data class FriendTestData(
@@ -492,25 +485,20 @@ class FriendsEventHandlerTest(
         val friendsDto = friendsEventHandler.findAllByUserId("123")
         assertThat(friendsDto.friends).hasSize(2)
 
-        assertThat(friendsDto.friends[0]).isEqualTo(
-            FriendDto(
-                email = user1.friendEmail,
-                phoneNumber = user1.friendPhone,
-                name = "User 2",
-                photoUrl = user1.friendPhoto,
-                loanAmount = null
-            )
-        )
+        assertThat(friendsDto.friends[0].email).isEqualTo(user1.friendEmail)
+        assertThat(friendsDto.friends[0].phoneNumber).isEqualTo(user1.friendPhone)
+        assertThat(friendsDto.friends[0].name).isEqualTo("User 2")
+        assertThat(friendsDto.friends[0].photoUrl).isEqualTo(user1.friendPhoto)
+        assertThat(friendsDto.friends[0].loanAmount).isNull()
+        assertThat(friendsDto.friends[0].friendId).isNotNull()
 
-        assertThat(friendsDto.friends[1]).isEqualTo(
-            FriendDto(
-                email = user2.friendEmail,
-                phoneNumber = user2.friendPhone,
-                name = "User 3",
-                photoUrl = user2.friendPhoto,
-                loanAmount = null
-            )
-        )
+
+        assertThat(friendsDto.friends[1].email).isEqualTo(user2.friendEmail)
+        assertThat(friendsDto.friends[1].phoneNumber).isEqualTo(user2.friendPhone)
+        assertThat(friendsDto.friends[1].name).isEqualTo("User 3")
+        assertThat(friendsDto.friends[1].photoUrl).isEqualTo(user2.friendPhoto)
+        assertThat(friendsDto.friends[1].loanAmount).isNull()
+        assertThat(friendsDto.friends[1].friendId).isNotNull()
     }
 
 
@@ -674,18 +662,13 @@ class FriendsEventHandlerTest(
         val friends = friendsEventHandler.findAllByUserId("123")
 
         assertThat(friends.friends).hasSize(1)
-        assertThat(friends.friends[0]).isEqualTo(
-            FriendDto(
-                email = "friend1@gmail.com",
-                phoneNumber = "+923001234568",
-                name = "Friend 1",
-                photoUrl = "https://test.com",
-                loanAmount = AmountDto(
-                    amount = 100.0.toBigDecimal(),
-                    currency = Currency.getInstance("USD"),
-                    isOwed = true
-                )
-            )
-        )
+        assertThat(friends.friends[0].email).isEqualTo("friend1@gmail.com")
+        assertThat(friends.friends[0].phoneNumber).isEqualTo("+923001234568")
+        assertThat(friends.friends[0].name).isEqualTo("Friend 1")
+        assertThat(friends.friends[0].photoUrl).isEqualTo("https://test.com")
+        assertThat(friends.friends[0].loanAmount!!.amount).isEqualTo(100.0.toBigDecimal())
+        assertThat(friends.friends[0].loanAmount!!.currency).isEqualTo(Currency.getInstance("USD"))
+        assertThat(friends.friends[0].loanAmount!!.isOwed).isTrue()
+        assertThat(friends.friends[0].friendId).isNotNull
     }
 }

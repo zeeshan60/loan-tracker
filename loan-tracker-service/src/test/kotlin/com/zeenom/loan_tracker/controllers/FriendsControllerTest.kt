@@ -1,11 +1,14 @@
 package com.zeenom.loan_tracker.controllers
 
-import com.zeenom.loan_tracker.transactions.AmountDto
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.zeenom.loan_tracker.common.Paginated
 import com.zeenom.loan_tracker.common.exceptions.NotFoundException
 import com.zeenom.loan_tracker.events.CommandDao
 import com.zeenom.loan_tracker.events.CommandPayloadDto
 import com.zeenom.loan_tracker.friends.*
 import com.zeenom.loan_tracker.security.AuthService
+import com.zeenom.loan_tracker.transactions.AmountDto
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -27,7 +30,8 @@ class FriendsControllerTest(
     @LocalServerPort private val port: Int,
     @Autowired private val authService: AuthService,
     @Autowired @MockitoBean private val friendsEventHandler: FriendsEventHandler,
-    @Autowired@MockitoBean private val commandDao: CommandDao
+    @Autowired @MockitoBean private val commandDao: CommandDao,
+    @Autowired private val objectMapper: ObjectMapper,
 ) {
     private val webTestClient = WebTestClient.bindToServer().baseUrl("http://localhost:$port").build()
 
@@ -41,7 +45,8 @@ class FriendsControllerTest(
                     email = "sample@gmail.com",
                     phoneNumber = "+923001234567",
                     loanAmount = AmountDto(1000.0.toBigDecimal(), Currency.getInstance("USD"), true),
-                    photoUrl = "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl2"
+                    photoUrl = "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl2",
+                    friendId = UUID.randomUUID()
                 )
             )
         )
@@ -54,27 +59,18 @@ class FriendsControllerTest(
             .exchange()
             .expectStatus().isOk
             .expectBody(String::class.java)
-            .returnResult().responseBody
+            .returnResult().responseBody!!.let {
+                objectMapper.readValue(
+                    it,
+                    object : TypeReference<Paginated<FriendsResponse>>() {})
+            }
 
-        JSONAssert.assertEquals(
-            result,
-            """
-                {
-                  "data" : {
-                    "friends" : [ {
-                      "photoUrl" : "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl2",
-                      "name" : "John Doe",
-                      "loanAmount" : {
-                        "amount" : 1000.0,
-                        "isOwed" : true
-                      }
-                    } ]
-                  },
-                  "next" : null
-                }
-            """.trimIndent(),
-            true
-        )
+        assertThat(result.data.friends).hasSize(1)
+        assertThat(result.data.friends[0].name).isEqualTo("John Doe")
+        assertThat(result.data.friends[0].loanAmount?.amount).isEqualTo(1000.0.toBigDecimal())
+        assertThat(result.data.friends[0].loanAmount?.isOwed).isTrue()
+        assertThat(result.data.friends[0].photoUrl).isEqualTo("https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl2")
+        assertThat(result.data.friends[0].friendId).isNotNull()
     }
 
     @Test

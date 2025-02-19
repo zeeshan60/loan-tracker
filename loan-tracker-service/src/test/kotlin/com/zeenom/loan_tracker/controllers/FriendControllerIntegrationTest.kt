@@ -5,8 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.zeenom.loan_tracker.common.MessageResponse
 import com.zeenom.loan_tracker.common.Paginated
 import com.zeenom.loan_tracker.firebase.FirebaseService
-import com.zeenom.loan_tracker.friends.*
-import com.zeenom.loan_tracker.prettyAndPrint
+import com.zeenom.loan_tracker.friends.CreateFriendRequest
+import com.zeenom.loan_tracker.friends.FriendEventRepository
+import com.zeenom.loan_tracker.friends.FriendsResponse
+import com.zeenom.loan_tracker.friends.TestPostgresConfig
 import com.zeenom.loan_tracker.security.JWTTokenResponse
 import com.zeenom.loan_tracker.security.LoginRequest
 import com.zeenom.loan_tracker.users.UserDto
@@ -16,7 +18,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
 import org.mockito.Mockito
 import org.mockito.kotlin.whenever
-import org.skyscreamer.jsonassert.JSONAssert
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
@@ -91,22 +92,13 @@ class FriendControllerIntegrationTest(
         val friendResponse = queryFriend(
             token = zeeToken
         )
-        JSONAssert.assertEquals(
-            """
-                {
-                  "data" : {
-                    "friends" : [ {
-                      "photoUrl" : null,
-                      "name" : "John Doe",
-                      "loanAmount" : null
-                    } ]
-                  },
-                  "next" : null
-                }
-            """.trimIndent(),
-            friendResponse.prettyAndPrint(objectMapper),
-            true
-        )
+
+        assertThat(friendResponse.data.friends).hasSize(1)
+        assertThat(friendResponse.data.friends[0].name).isEqualTo("John Doe")
+        assertThat(friendResponse.data.friends[0].photoUrl).isNull()
+        assertThat(friendResponse.data.friends[0].loanAmount).isNull()
+        assertThat(friendResponse.data.friends[0].friendId).isNotNull()
+
     }
 
     @Order(4)
@@ -117,47 +109,26 @@ class FriendControllerIntegrationTest(
 
     @Order(5)
     @Test
-    fun `john logs in and find zee as his friend`() {
+    fun `john find zee as his friend`() {
         val response = queryFriend(token = johnToken)
-        JSONAssert.assertEquals(
-            """
-                {
-                  "data" : {
-                    "friends" : [ {
-                      "photoUrl" : "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl2",
-                      "name" : "Zeeshan Tufail",
-                      "loanAmount" : null
-                    } ]
-                  },
-                  "next" : null
-                }
-            """.trimIndent(),
-            response.prettyAndPrint(objectMapper),
-            true
-        )
+
+        assertThat(response.data.friends).hasSize(1)
+        assertThat(response.data.friends[0].name).isEqualTo("Zeeshan Tufail")
+        assertThat(response.data.friends[0].photoUrl).isNotNull()
+        assertThat(response.data.friends[0].loanAmount).isNull()
+        assertThat(response.data.friends[0].friendId).isNotNull()
     }
 
-    @Order(5)
+    @Order(6)
     @Test
     fun `zee query friends again and john  is linked successfully`() {
         val response = queryFriend(zeeToken)
         //Check that photoUrl is now available for friend
-        JSONAssert.assertEquals(
-            """
-                {
-                  "data" : {
-                    "friends" : [ {
-                      "photoUrl" : "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl3",
-                      "name" : "John Doe",
-                      "loanAmount" : null
-                    } ]
-                  },
-                  "next" : null
-                }
-            """.trimIndent(),
-            response.prettyAndPrint(objectMapper),
-            true
-        )
+        assertThat(response.data.friends).hasSize(1)
+        assertThat(response.data.friends[0].name).isEqualTo("John Doe")
+        assertThat(response.data.friends[0].photoUrl).isNotNull()
+        assertThat(response.data.friends[0].loanAmount).isNull()
+        assertThat(response.data.friends[0].friendId).isNotNull()
     }
 
     private fun queryFriend(token: String): Paginated<FriendsResponse> {
