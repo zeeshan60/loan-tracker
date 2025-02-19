@@ -46,7 +46,7 @@ class CommandDaoTest(
             ),
             userId = "123",
         )
-        commandDao.saveEvent(commandDto)
+        commandDao.addCommand(commandDto)
 
 
         val entity = eventRepository.findAll().first()

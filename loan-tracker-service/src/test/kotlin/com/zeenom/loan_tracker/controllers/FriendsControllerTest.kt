@@ -80,7 +80,7 @@ class FriendsControllerTest(
     @Test
     fun `addFriend creates friend successfully`(): Unit = runBlocking {
         Mockito.doReturn(Unit).`when`(friendsEventHandler).saveFriend(any(), any())
-        Mockito.doReturn(Unit).`when`(commandDao).saveEvent<CommandPayloadDto>(any())
+        Mockito.doReturn(Unit).`when`(commandDao).addCommand<CommandPayloadDto>(any())
         webTestClient.post()
             .uri("/api/v1/friends/add")
             .header("Authorization", "Bearer ${authService.generateJwt("sample uid")}")

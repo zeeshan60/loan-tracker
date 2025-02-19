@@ -55,7 +55,7 @@ class AuthControllerTest(
         Mockito.doReturn(Unit).whenever(userEventHandler).createIfNotExist(userDto)
         Mockito.doReturn(Unit).whenever(friendsEventHandler).makeMyOwnersMyFriends("123")
 
-        Mockito.doReturn(Unit).whenever(commandDao).saveEvent(
+        Mockito.doReturn(Unit).whenever(commandDao).addCommand(
             CommandDto(
                 commandType = CommandType.LOGIN,
                 payload = userDto,
@@ -76,7 +76,7 @@ class AuthControllerTest(
             .jsonPath("$.token").value { it: String? -> assertThat(it).isNotEmpty() }
 
         argumentCaptor<CommandDto<UserDto>>().apply {
-            Mockito.verify(commandDao, Mockito.times(1)).saveEvent(capture())
+            Mockito.verify(commandDao, Mockito.times(1)).addCommand(capture())
             assertThat(firstValue).isEqualTo(
                 CommandDto(
                     commandType = CommandType.LOGIN,

@@ -23,11 +23,13 @@ class TransactionEventHandlerTest(@Autowired private val transactionEventReposit
     TestPostgresConfig() {
     private val userEventHandler = mock<UserEventHandler>()
     private val friendEventHandler = mock<FriendsEventHandler>()
+    private val transactionReadModel = TransactionReadModel(transactionEventRepository)
 
     private val transactionEventHandler = TransactionEventHandler(
         transactionEventRepository = transactionEventRepository,
         userEventHandler = userEventHandler,
-        friendEventHandler = friendEventHandler
+        friendEventHandler = friendEventHandler,
+        transactionReadModel = transactionReadModel
     )
 
     @BeforeEach

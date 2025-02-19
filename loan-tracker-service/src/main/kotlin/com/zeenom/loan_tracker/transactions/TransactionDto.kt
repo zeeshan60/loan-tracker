@@ -6,7 +6,8 @@ import java.util.*
 
 data class TransactionDto(
     val amount: AmountDto,
-    val recipientId: UUID
+    val recipientId: UUID,
+    val transactionStreamId: UUID? = null
 ) : CommandPayloadDto
 
 data class AmountDto(

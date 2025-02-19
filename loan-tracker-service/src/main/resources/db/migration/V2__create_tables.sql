@@ -15,7 +15,7 @@ CREATE TABLE transaction_events
     event_type       VARCHAR(255) NOT NULL
 );
 
-CREATE UNIQUE INDEX idx_transaction_events_version_userId ON transaction_events (stream_id, version);
+CREATE UNIQUE INDEX idx_transaction_events_version_userId ON transaction_events (user_uid, stream_id, version);
 CREATE INDEX idx_transaction_events_created_at ON transaction_events (created_at);
 CREATE INDEX idx_transaction_events_user_uid ON transaction_events (user_uid);
 CREATE INDEX idx_transaction_events_recipient_id ON transaction_events (recipient_id);

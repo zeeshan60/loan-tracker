@@ -16,7 +16,7 @@ class LoginUserCommand(
     private val friendsEventHandler: FriendsEventHandler,
 ) : Command<UserDto> {
     override suspend fun execute(commandDto: CommandDto<UserDto>) {
-        CoroutineScope(Dispatchers.IO).launch { commandDao.saveEvent(commandDto) }
+        CoroutineScope(Dispatchers.IO).launch { commandDao.addCommand(commandDto) }
         userEventHandler.createIfNotExist(userDto = commandDto.payload)
         friendsEventHandler.makeMyOwnersMyFriends(commandDto.userId)
     }

@@ -14,7 +14,7 @@ class CreateFriendCommand(
     private val commandDao: CommandDao,
 ) : Command<CreateFriendDto> {
     override suspend fun execute(commandDto: CommandDto<CreateFriendDto>) {
-        CoroutineScope(Dispatchers.IO).launch { commandDao.saveEvent(commandDto) }
+        CoroutineScope(Dispatchers.IO).launch { commandDao.addCommand(commandDto) }
         friendsEventHandler.saveFriend(commandDto.userId, commandDto.payload)
     }
 }

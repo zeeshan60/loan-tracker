@@ -10,7 +10,7 @@ class CommandDao(
     private val eventRepository: EventRepository,
     private val objectMapper: ObjectMapper,
 ) {
-    suspend fun <T : CommandPayloadDto?> saveEvent(commandDto: CommandDto<T>) {
+    suspend fun <T : CommandPayloadDto?> addCommand(commandDto: CommandDto<T>) {
         eventRepository.save(
             CommandEntity(
                 userId = commandDto.userId,

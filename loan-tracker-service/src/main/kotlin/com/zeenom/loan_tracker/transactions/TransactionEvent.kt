@@ -30,7 +30,8 @@ enum class TransactionType {
 }
 
 enum class TransactionEventType {
-    TRANSACTION_CREATED
+    TRANSACTION_CREATED,
+    TRANSACTION_UPDATED
 }
 
 @Repository

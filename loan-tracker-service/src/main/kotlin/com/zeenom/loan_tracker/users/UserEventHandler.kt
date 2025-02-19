@@ -129,10 +129,3 @@ class UserEventHandler(private val userRepository: UserEventRepository) {
     }
 }
 
-interface NewEvent {
-    val type: NewEventType
-}
-
-enum class NewEventType {
-    CREATE_USER
-}
