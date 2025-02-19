@@ -1,21 +1,22 @@
 package com.zeenom.loan_tracker.transactions;
 
+import com.zeenom.loan_tracker.common.Paginated
 import com.zeenom.loan_tracker.events.CommandDto
 import com.zeenom.loan_tracker.events.CommandType
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Schema
 import org.springframework.security.core.annotation.AuthenticationPrincipal
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.math.BigDecimal
 import java.util.*
 
 @RestController
 @RequestMapping("api/v1/transactions")
-class TransactionsController(private val createTransactionCommand: CreateTransactionCommand) {
+class TransactionsController(
+    private val createTransactionCommand: CreateTransactionCommand,
+    private val updateTransactionCommand: UpdateTransactionCommand,
+    private val transactionQuery: TransactionQuery,
+) {
 
     @Operation(summary = "Add a transaction")
     @PostMapping("/add")
@@ -38,13 +39,40 @@ class TransactionsController(private val createTransactionCommand: CreateTransac
         @RequestBody transactionRequest: TransactionRequest,
         @AuthenticationPrincipal userId: String,
     ) {
-        createTransactionCommand.execute(
+        updateTransactionCommand.execute(
             CommandDto(
                 userId = userId,
                 payload = requestToDto(transactionRequest),
                 commandType = CommandType.UPDATE_TRANSACTION
             )
         )
+    }
+
+    @Operation(summary = "Get transactions list per page for friend id")
+    @GetMapping("/friend")
+    suspend fun getTransactions(
+        @AuthenticationPrincipal userId: String,
+        @RequestBody friendTransactionQueryDto: FriendTransactionQueryDto,
+    ): Paginated<TransactionsResponse> {
+        return transactionQuery.execute(
+            FriendTransactionQueryDto(
+                userId = userId,
+                friendId = friendTransactionQueryDto.friendId
+            )
+        ).let {
+            Paginated(
+                TransactionsResponse(
+                    transactions = it.data.map { transaction ->
+                        AmountResponse(
+                            amount = transaction.amount.amount,
+                            currency = transaction.amount.currency,
+                            isOwed = transaction.amount.isOwed
+                        )
+                    }
+                ),
+                it.next
+            )
+        }
     }
 
     private fun requestToDto(transactionRequest: TransactionRequest) =
@@ -83,4 +111,12 @@ enum class SplitType {
     YouOweThemAll
 }
 
+data class TransactionsResponse(
+    val transactions: List<AmountResponse>,
+)
 
+data class AmountResponse(
+    val amount: BigDecimal,
+    val currency: Currency,
+    val isOwed: Boolean,
+)

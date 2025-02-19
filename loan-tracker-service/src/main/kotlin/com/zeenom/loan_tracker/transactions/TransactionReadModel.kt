@@ -23,6 +23,11 @@ class TransactionReadModel(
             .reduceOrNull { current, next -> transactionEventState.apply(current, next) }
     }
 
+    suspend fun transactionsByFriendId(userId: String, friendId: UUID): List<TransactionEvent> {
+        return transactionEventRepository
+            .findAllByUserUidAndRecipientId(userId, friendId).toList().let { this.resolveAll(it) }
+    }
+
     suspend fun balancesOfFriends(userId: String, friendIds: List<UUID>): Map<UUID, AmountDto> {
         return transactionEventRepository
             .findAllByUserUidAndRecipientIdIn(userId, friendIds).toList()
@@ -51,6 +56,7 @@ class TransactionEventState {
             TransactionEventType.TRANSACTION_UPDATED -> {
                 next
             }
+
             else -> throw IllegalArgumentException("Transaction event type not supported")
         }
     }

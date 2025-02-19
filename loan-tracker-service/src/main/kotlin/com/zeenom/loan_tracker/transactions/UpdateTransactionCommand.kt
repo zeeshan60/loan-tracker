@@ -7,10 +7,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.springframework.stereotype.Service
-import java.util.*
 
 @Service
-class CreateTransactionCommand(
+class UpdateTransactionCommand(
     private val transactionEventHandler: TransactionEventHandler,
     private val commandDao: CommandDao,
 ) : Command<TransactionDto> {
@@ -18,11 +17,6 @@ class CreateTransactionCommand(
         CoroutineScope(Dispatchers.IO).launch {
             commandDao.addCommand(commandDto)
         }
-        transactionEventHandler.addTransaction(commandDto.userId, commandDto.payload)
+        transactionEventHandler.updateTransaction(commandDto.userId, commandDto.payload)
     }
 }
-
-data class FriendTransactionQueryDto(
-    val userId: String,
-    val friendId: UUID,
-)
