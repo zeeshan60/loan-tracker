@@ -49,13 +49,7 @@ class TransactionEventState {
     fun apply(existing: TransactionEvent, next: TransactionEvent): TransactionEvent {
         return when (next.eventType) {
             TransactionEventType.TRANSACTION_UPDATED -> {
-                existing.copy(
-                    amount = next.amount,
-                    currency = next.currency,
-                    transactionType = next.transactionType,
-                    createdAt = next.createdAt,
-                    version = next.version
-                )
+                next
             }
             else -> throw IllegalArgumentException("Transaction event type not supported")
         }

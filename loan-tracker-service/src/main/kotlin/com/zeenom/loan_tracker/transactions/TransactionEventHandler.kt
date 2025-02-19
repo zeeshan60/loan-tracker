@@ -64,11 +64,14 @@ class TransactionEventHandler(
             ?: throw IllegalArgumentException("Transaction with id ${transactionDto.transactionStreamId} does not exist")
 
         transactionEventRepository.save(
-            existingTransaction.copy(
+            TransactionEvent(
+                userUid = userUid,
                 amount = transactionDto.amount.amount,
                 currency = transactionDto.amount.currency.toString(),
                 transactionType = if (transactionDto.amount.isOwed) TransactionType.CREDIT else TransactionType.DEBIT,
+                recipientId = transactionDto.recipientId,
                 createdAt = Instant.now(),
+                streamId = transactionDto.transactionStreamId,
                 version = existingTransaction.version + 1,
                 eventType = TransactionEventType.TRANSACTION_UPDATED,
                 createdBy = userUid
@@ -77,11 +80,14 @@ class TransactionEventHandler(
 
         if (friendStreamId != null) {
             transactionEventRepository.save(
-                existingCrossTransaction.copy(
+                TransactionEvent(
+                    userUid = friendUser.uid,
                     amount = transactionDto.amount.amount,
                     currency = transactionDto.amount.currency.toString(),
                     transactionType = if (transactionDto.amount.isOwed) TransactionType.DEBIT else TransactionType.CREDIT,
+                    recipientId = friendStreamId,
                     createdAt = Instant.now(),
+                    streamId = transactionDto.transactionStreamId,
                     version = existingCrossTransaction.version + 1,
                     eventType = TransactionEventType.TRANSACTION_UPDATED,
                     createdBy = userUid
