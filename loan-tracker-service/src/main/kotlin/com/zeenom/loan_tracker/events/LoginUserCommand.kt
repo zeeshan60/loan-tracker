@@ -26,7 +26,6 @@ class LoginUserCommand(
             transactionEventHandler.addReverseTransactions(
                 commandDto.payload,
                 friendsEventHandler.findAllByUserId(commandDto.userId).friends)
-
         }
     }
 }

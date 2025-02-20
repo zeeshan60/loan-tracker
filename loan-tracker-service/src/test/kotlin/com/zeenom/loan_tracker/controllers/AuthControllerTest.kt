@@ -4,6 +4,7 @@ import com.zeenom.loan_tracker.events.CommandDao
 import com.zeenom.loan_tracker.events.CommandDto
 import com.zeenom.loan_tracker.events.CommandType
 import com.zeenom.loan_tracker.firebase.FirebaseService
+import com.zeenom.loan_tracker.friends.FriendsDto
 import com.zeenom.loan_tracker.friends.FriendsEventHandler
 import com.zeenom.loan_tracker.security.LoginRequest
 import com.zeenom.loan_tracker.users.UserDto
@@ -54,6 +55,7 @@ class AuthControllerTest(
 
         Mockito.doReturn(Unit).whenever(userEventHandler).createUser(userDto)
         Mockito.doReturn(Unit).whenever(friendsEventHandler).makeMyOwnersMyFriends("123")
+        whenever(friendsEventHandler.findAllByUserId("123")).thenReturn(FriendsDto(friends = emptyList()))
 
         Mockito.doReturn(Unit).whenever(commandDao).addCommand(
             CommandDto(
