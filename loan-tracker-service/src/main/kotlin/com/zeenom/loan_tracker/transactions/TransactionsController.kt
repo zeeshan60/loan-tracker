@@ -1,5 +1,6 @@
 package com.zeenom.loan_tracker.transactions;
 
+import com.zeenom.loan_tracker.common.MessageResponse
 import com.zeenom.loan_tracker.common.Paginated
 import com.zeenom.loan_tracker.common.amountForYou
 import com.zeenom.loan_tracker.common.isOwed
@@ -25,7 +26,7 @@ class TransactionsController(
     suspend fun addTransaction(
         @RequestBody transactionRequest: TransactionRequest,
         @AuthenticationPrincipal userId: String,
-    ) {
+    ): MessageResponse {
         createTransactionCommand.execute(
             CommandDto(
                 userId = userId,
@@ -33,6 +34,7 @@ class TransactionsController(
                 commandType = CommandType.CREATE_TRANSACTION
             )
         )
+        return MessageResponse("Transaction added successfully")
     }
 
     @Operation(summary = "Update a transaction")
@@ -40,7 +42,7 @@ class TransactionsController(
     suspend fun updateTransaction(
         @RequestBody transactionRequest: TransactionRequest,
         @AuthenticationPrincipal userId: String,
-    ) {
+    ): MessageResponse {
         updateTransactionCommand.execute(
             CommandDto(
                 userId = userId,
@@ -48,18 +50,19 @@ class TransactionsController(
                 commandType = CommandType.UPDATE_TRANSACTION
             )
         )
+        return MessageResponse("Transaction updated successfully")
     }
 
     @Operation(summary = "Get transactions list per page for friend id")
     @GetMapping("/friend")
     suspend fun getTransactions(
+        @RequestParam friendId: UUID,
         @AuthenticationPrincipal userId: String,
-        @RequestBody friendTransactionQueryDto: FriendTransactionQueryDto,
     ): Paginated<TransactionsResponse> {
         return transactionQuery.execute(
             FriendTransactionQueryDto(
                 userId = userId,
-                friendId = friendTransactionQueryDto.friendId
+                friendId = friendId
             )
         ).let {
             Paginated(

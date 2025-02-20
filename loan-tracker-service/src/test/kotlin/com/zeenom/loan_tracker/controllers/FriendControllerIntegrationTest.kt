@@ -25,25 +25,13 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean
 import org.springframework.test.web.reactive.server.WebTestClient
 
-@TestMethodOrder(MethodOrderer.OrderAnnotation::class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
-class FriendControllerIntegrationTest(
-    @LocalServerPort private val port: Int,
-    @Autowired @MockitoSpyBean private val firebaseService: FirebaseService,
-) : TestPostgresConfig() {
+class FriendControllerIntegrationTest(@LocalServerPort val port: Int) : BaseIntegration(port) {
 
     @Autowired
     private lateinit var friendEventRepository: FriendEventRepository
 
     @Autowired
     private lateinit var userEventRepository: UserEventRepository
-
-    @Autowired
-    private lateinit var objectMapper: ObjectMapper
-    private val webTestClient = WebTestClient.bindToServer().baseUrl("http://localhost:$port").build()
-
 
     private lateinit var zeeToken: String
     private var zeeDto = UserDto(
@@ -130,38 +118,23 @@ class FriendControllerIntegrationTest(
         assertThat(response.data.friends[0].loanAmount).isNull()
         assertThat(response.data.friends[0].friendId).isNotNull()
     }
+}
 
-    private fun queryFriend(token: String): Paginated<FriendsResponse> {
-        return webTestClient.get()
-            .uri("/api/v1/friends")
-            .header("Authorization", "Bearer $token")
-            .exchange()
-            .expectStatus().isOk
-            .expectBody(String::class.java)
-            .returnResult().responseBody!!.let {
-                objectMapper.readValue(
-                    it,
-                    object : TypeReference<Paginated<FriendsResponse>>() {})
-            }
-    }
+@TestMethodOrder(MethodOrderer.OrderAnnotation::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test")
+class BaseIntegration(port: Int) : TestPostgresConfig() {
 
-    private fun addFriend(token: String): MessageResponse {
-        return webTestClient.post()
-            .uri("/api/v1/friends/add")
-            .header("Authorization", "Bearer $token")
-            .bodyValue(
-                CreateFriendRequest(
-                    name = "John Doe",
-                    email = "john@gmail.com",
-                    phoneNumber = "+923001234568",
-                )
-            )
-            .exchange()
-            .expectStatus().isOk
-            .expectBody(MessageResponse::class.java).returnResult().responseBody!!
-    }
+    @Autowired
+    @MockitoSpyBean
+    private lateinit var firebaseService: FirebaseService
 
-    private fun loginUser(userDto: UserDto): JWTTokenResponse {
+    @Autowired
+    lateinit var objectMapper: ObjectMapper
+
+    val webTestClient = WebTestClient.bindToServer().baseUrl("http://localhost:$port").build()
+    fun loginUser(userDto: UserDto): JWTTokenResponse {
         val idToken =
             "eyJhbGciOiJSUzI1NiIsImtpZCI6ImE0MzRmMzFkN2Y3NWRiN2QyZjQ0YjgxZDg1MjMwZWQxN2ZlNTk3MzciLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiWmVlc2hhbiBUdWZhaWwiLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jS3hlSEhxNENsNU9RZjdDSENISHA4Ym1ObEswbmFGbzJHa282UTJPS0xDRjRkNjVHbHc9czk2LWMiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vbG9hbi10cmFja2VyLTliMjVkIiwiYXVkIjoibG9hbi10cmFja2VyLTliMjVkIiwiYXV0aF90aW1lIjoxNzM4NTEyNzA3LCJ1c2VyX2lkIjoiQ01XTDB0YXBaR1NET0kzVGJ6UUVNOHZibFRsMiIsInN1YiI6IkNNV0wwdGFwWkdTRE9JM1RielFFTTh2YmxUbDIiLCJpYXQiOjE3Mzg1MTI3MDcsImV4cCI6MTczODUxNjMwNywiZW1haWwiOiJ6ZWVzaGFudHVmYWlsODZAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZ29vZ2xlLmNvbSI6WyIxMTE4MzA4MjI1MDU4Mjc5Mzk3OTQiXSwiZW1haWwiOlsiemVlc2hhbnR1ZmFpbDg2QGdtYWlsLmNvbSJdfSwic2lnbl9pbl9wcm92aWRlciI6Imdvb2dsZS5jb20ifX0.T5p39Aja_tqrZ3Xlcl7AD0M9Lm9kkUY4ACNqr2a1eBfWfxp22Yu8BUkO3NiiSHAhx7-CgXRc8hs6KQRX3D5h8L_rwm3g5b7hVGkHy-YnvL0beOghhshJpp-WdYLP6xZ7gTB8ENwM8aC5U3kYuvc4VblwzdOC0jxkkvwNDDTmlhUJmVoua2VmEBjcuxEP0sILhHy0NWZjimf_DeeNDS7O6hI9uo5rnOfTPdfUaT5EagRyh0CNcP-FuxLsu6qFeMRqEXXIjYR8HpA3MnfcIen-_h-UTHWNxFv3SLIjkhkpRFP9oh7WGBIKJNfu6TExZlJ0A6aZSwF_lfxoGJdISnRLkQ"
         runBlocking {
@@ -182,5 +155,32 @@ class FriendControllerIntegrationTest(
         assertThat(responseToken).isNotNull
         return responseToken!!
     }
-
+    fun addFriend(token: String, name: String = "John Doe"): MessageResponse {
+        return webTestClient.post()
+            .uri("/api/v1/friends/add")
+            .header("Authorization", "Bearer $token")
+            .bodyValue(
+                CreateFriendRequest(
+                    name = name,
+                    email = "${name.replace(" ", "_")}@gmail.com",
+                    phoneNumber = "+923001234568",
+                )
+            )
+            .exchange()
+            .expectStatus().isOk
+            .expectBody(MessageResponse::class.java).returnResult().responseBody!!
+    }
+    fun queryFriend(token: String): Paginated<FriendsResponse> {
+        return webTestClient.get()
+            .uri("/api/v1/friends")
+            .header("Authorization", "Bearer $token")
+            .exchange()
+            .expectStatus().isOk
+            .expectBody(String::class.java)
+            .returnResult().responseBody!!.let {
+                objectMapper.readValue(
+                    it,
+                    object : TypeReference<Paginated<FriendsResponse>>() {})
+            }
+    }
 }
