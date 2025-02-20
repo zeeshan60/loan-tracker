@@ -77,6 +77,7 @@ class TransactionsController(
                             ),
                             totalAmount = transaction.originalAmount,
                             friendName = transaction.recipientName!!,
+                            description = transaction.description
                         )
                     }
                 ),
@@ -122,6 +123,7 @@ data class TransactionsResponse(
 )
 
 data class TransactionResponse(
+    val description: String,
     val transactionId: UUID,
     val totalAmount: BigDecimal,
     val friendName: String,

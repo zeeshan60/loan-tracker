@@ -121,6 +121,7 @@ class TransactionsControllerIntegrationTest_MinimalScript(@LocalServerPort priva
         assertThat(result.data.transactions[0].amountResponse.isOwed).isTrue()
         assertThat(result.data.transactions[0].totalAmount).isEqualTo(100.0.toBigDecimal())
         assertThat(result.data.transactions[0].transactionId).isNotNull()
+        assertThat(result.data.transactions[0].description).isEqualTo("Sample transaction")
     }
 
     @Order(3)
@@ -158,5 +159,6 @@ class TransactionsControllerIntegrationTest_MinimalScript(@LocalServerPort priva
         assertThat(result.data.transactions[0].amountResponse.isOwed).isFalse()
         assertThat(result.data.transactions[0].totalAmount).isEqualTo(100.0.toBigDecimal())
         assertThat(result.data.transactions[0].transactionId).isNotNull()
+        assertThat(result.data.transactions[0].description).isEqualTo("Sample transaction")
     }
 }
