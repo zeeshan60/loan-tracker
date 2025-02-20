@@ -41,12 +41,21 @@ class TransactionsControllerIntegrationTest_MinimalScript(@LocalServerPort priva
     private lateinit var transactionEventRepository: TransactionEventRepository
 
     private lateinit var zeeToken: String
+    private lateinit var johnToken: String
     private var zeeDto = UserDto(
         uid = "123",
         email = "zee@gmail.com",
         phoneNumber = "+923001234567",
         displayName = "Zeeshan Tufail",
         photoUrl = "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl2",
+        emailVerified = true
+    )
+    private var johnDto = UserDto(
+        uid = "124",
+        email = "john@gmail.com",
+        phoneNumber = "+923001234568",
+        displayName = "John Doe",
+        photoUrl = "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl3",
         emailVerified = true
     )
     private lateinit var johnFriendId: UUID
@@ -107,6 +116,37 @@ class TransactionsControllerIntegrationTest_MinimalScript(@LocalServerPort priva
         assertThat(result.data.transactions[0].amountResponse.amount).isEqualTo(50.0.toBigDecimal())
         assertThat(result.data.transactions[0].amountResponse.currency).isEqualTo("USD")
         assertThat(result.data.transactions[0].amountResponse.isOwed).isTrue()
+        assertThat(result.data.transactions[0].totalAmount).isEqualTo(100.0.toBigDecimal())
+        assertThat(result.data.transactions[0].transactionId).isNotNull()
+    }
+
+    @Order(3)
+    @Test
+    fun `login with friend as user`() {
+        johnToken = loginUser(johnDto).token
+    }
+
+    @Order(4)
+    @Test
+    fun `get all transactions as john`() {
+        val zeeFriendId = queryFriend(johnToken).data.friends.first().friendId
+        val result = webTestClient.get()
+            .uri("/api/v1/transactions/friend?friendId=$zeeFriendId")
+            .header("Authorization", "Bearer $zeeToken")
+            .exchange()
+            .expectStatus().isOk
+            .expectBody(String::class.java)
+            .returnResult().responseBody!!.let {
+                objectMapper.readValue(
+                    it,
+                    object : TypeReference<Paginated<TransactionsResponse>>() {})
+            }
+
+        assertThat(result.data.transactions).hasSize(1)
+        assertThat(result.data.transactions[0].friendName).isEqualTo("zee")
+        assertThat(result.data.transactions[0].amountResponse.amount).isEqualTo(50.0.toBigDecimal())
+        assertThat(result.data.transactions[0].amountResponse.currency).isEqualTo("USD")
+        assertThat(result.data.transactions[0].amountResponse.isOwed).isFalse()
         assertThat(result.data.transactions[0].totalAmount).isEqualTo(100.0.toBigDecimal())
         assertThat(result.data.transactions[0].transactionId).isNotNull()
     }
