@@ -11,6 +11,7 @@ import com.zeenom.loan_tracker.transactions.TransactionsResponse
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventRepository
 import kotlinx.coroutines.runBlocking
+import org.assertj.core.api.Assertions.`as`
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Order
@@ -59,6 +60,8 @@ class TransactionsControllerIntegrationTest_MinimalScript(@LocalServerPort priva
         emailVerified = true
     )
     private lateinit var johnFriendId: UUID
+
+    private lateinit var zeeFriendId: UUID
 
     @BeforeAll
     fun setupBeforeAll(): Unit = runBlocking {
@@ -124,15 +127,21 @@ class TransactionsControllerIntegrationTest_MinimalScript(@LocalServerPort priva
     @Test
     fun `login with friend as user`() {
         johnToken = loginUser(johnDto).token
+        val queryFriend = queryFriend(johnToken)
+        zeeFriendId = queryFriend.data.friends.first().friendId
+        assertThat(zeeFriendId).isNotNull()
+        val loanAmount = queryFriend.data.friends.first().loanAmount
+        assertThat(loanAmount).isNotNull
+        assertThat(loanAmount!!.amount).isEqualTo(100.0.toBigDecimal())
+        assertThat(loanAmount.isOwed).isFalse()
     }
 
     @Order(4)
     @Test
     fun `get all transactions as john`() {
-        val zeeFriendId = queryFriend(johnToken).data.friends.first().friendId
         val result = webTestClient.get()
             .uri("/api/v1/transactions/friend?friendId=$zeeFriendId")
-            .header("Authorization", "Bearer $zeeToken")
+            .header("Authorization", "Bearer $johnToken")
             .exchange()
             .expectStatus().isOk
             .expectBody(String::class.java)

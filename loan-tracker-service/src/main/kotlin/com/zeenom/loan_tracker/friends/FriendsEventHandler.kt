@@ -3,11 +3,8 @@ package com.zeenom.loan_tracker.friends
 import com.zeenom.loan_tracker.transactions.TransactionReadModel
 import com.zeenom.loan_tracker.users.UserEventHandler
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flatMapMerge
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
@@ -79,16 +76,15 @@ class FriendsEventHandler(
         )
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     suspend fun makeMyOwnersMyFriends(uid: String) {
         val user = userEventHandler.findUserById(uid) ?: throw IllegalArgumentException("User not found")
         val emailFriends = user.email?.let { eventRepository.findByFriendEmail(user.email) } ?: emptyFlow()
         val phoneFriends =
             user.phoneNumber?.let { eventRepository.findByFriendPhoneNumber(user.phoneNumber) } ?: emptyFlow()
 
-        val myFriendIds = emailFriends.flatMapMerge { phoneFriends }.map { it.userUid }.toList().distinct()
+        val myFriendIds = emailFriends.toList().plus(phoneFriends.toList()).map { it.userUid }.distinct()
         val friends =
-            userEventHandler.findUsersByUids(myFriendIds)
+            userEventHandler.findUsersByUids(myFriendIds).toList()
 
         friends.map { friendDto ->
             FriendEvent(

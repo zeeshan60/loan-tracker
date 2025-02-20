@@ -52,7 +52,7 @@ class AuthControllerTest(
             userDto
         ).whenever(firebaseService).userByVerifyingIdToken(idToken)
 
-        Mockito.doReturn(Unit).whenever(userEventHandler).createIfNotExist(userDto)
+        Mockito.doReturn(Unit).whenever(userEventHandler).createUser(userDto)
         Mockito.doReturn(Unit).whenever(friendsEventHandler).makeMyOwnersMyFriends("123")
 
         Mockito.doReturn(Unit).whenever(commandDao).addCommand(
@@ -88,7 +88,7 @@ class AuthControllerTest(
 
         val userDtoCaptor = argumentCaptor<UserDto>()
         Mockito.verify(userEventHandler, Mockito.times(1))
-            .createIfNotExist(userDtoCaptor.capture())
+            .createUser(userDtoCaptor.capture())
         assertThat(userDtoCaptor.firstValue).isEqualTo(userDto)
 
         Mockito.verify(friendsEventHandler, Mockito.times(1)).makeMyOwnersMyFriends("123")

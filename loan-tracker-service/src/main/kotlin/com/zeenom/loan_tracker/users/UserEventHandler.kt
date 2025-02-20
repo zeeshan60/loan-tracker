@@ -10,9 +10,6 @@ import java.time.Instant
 
 @Service
 class UserEventHandler(private val userRepository: UserEventRepository) {
-    suspend fun createIfNotExist(userDto: UserDto) {
-        findUserById(userDto.uid) ?: createUser(userDto)
-    }
 
     suspend fun createUser(userDto: UserDto) {
         try {
