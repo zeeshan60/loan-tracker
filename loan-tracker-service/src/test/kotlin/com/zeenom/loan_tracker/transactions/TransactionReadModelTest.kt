@@ -2,7 +2,6 @@ package com.zeenom.loan_tracker.transactions
 
 import com.zeenom.loan_tracker.friends.FriendEvent
 import com.zeenom.loan_tracker.friends.FriendEventType
-import com.zeenom.loan_tracker.friends.FriendId
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
