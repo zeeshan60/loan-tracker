@@ -132,7 +132,7 @@ class TransactionsControllerIntegrationTest_MinimalScript(@LocalServerPort priva
         assertThat(zeeFriendId).isNotNull()
         val loanAmount = queryFriend.data.friends.first().loanAmount
         assertThat(loanAmount).isNotNull
-        assertThat(loanAmount!!.amount).isEqualTo(100.0.toBigDecimal())
+        assertThat(loanAmount!!.amount).isEqualTo(50.0.toBigDecimal())
         assertThat(loanAmount.isOwed).isFalse()
     }
 
@@ -152,7 +152,7 @@ class TransactionsControllerIntegrationTest_MinimalScript(@LocalServerPort priva
             }
 
         assertThat(result.data.transactions).hasSize(1)
-        assertThat(result.data.transactions[0].friendName).isEqualTo("zee")
+        assertThat(result.data.transactions[0].friendName).isEqualTo("Zeeshan Tufail")
         assertThat(result.data.transactions[0].amountResponse.amount).isEqualTo(50.0.toBigDecimal())
         assertThat(result.data.transactions[0].amountResponse.currency).isEqualTo("USD")
         assertThat(result.data.transactions[0].amountResponse.isOwed).isFalse()
