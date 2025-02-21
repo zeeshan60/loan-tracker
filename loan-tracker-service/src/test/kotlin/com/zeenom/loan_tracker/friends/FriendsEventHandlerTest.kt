@@ -36,9 +36,7 @@ class FriendsEventHandlerTest(
     private val transactionReadModel = mock<TransactionReadModel>()
     private val friendsEventHandler =
         FriendsEventHandler(
-            eventRepository = eventRepository,
-            userEventHandler = userEventHandler,
-            transactionReadModel = transactionReadModel
+            eventRepository = eventRepository
         )
 
 
@@ -427,9 +425,7 @@ class FriendsEventHandlerTest(
         val userEventHandler = UserEventHandler(userEventRepository)
         val friendsEventHandler =
             FriendsEventHandler(
-                eventRepository = eventRepository,
-                userEventHandler = userEventHandler,
-                transactionReadModel = transactionReadModel
+                eventRepository = eventRepository
             )
         val (user1, user2) = friendData
         userEventHandler.createUser(

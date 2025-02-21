@@ -1,67 +1,28 @@
 package com.zeenom.loan_tracker.friends
 
-import com.zeenom.loan_tracker.transactions.TransactionReadModel
-import com.zeenom.loan_tracker.users.UserEventHandler
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.emptyFlow
+import com.zeenom.loan_tracker.users.UserDto
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.util.*
 
-
 @Service
 class FriendsEventHandler(
     private val eventRepository: FriendEventRepository,
-    private val userEventHandler: UserEventHandler,
-    private val transactionReadModel: TransactionReadModel,
 ) {
 
-    suspend fun findAllByUserId(userId: String): FriendsDto = withContext(Dispatchers.IO) {
-        val events = eventRepository.findAllByUserUid(userId).toList()
-        val amountsPerFriend = async { transactionReadModel.balancesOfFriends(userId, events.map { it.streamId }) }
-        val usersByPhones =
-            userEventHandler.findUsersByPhoneNumbers(events.mapNotNull { it.friendPhoneNumber }).toList()
-                .associateBy { it.phoneNumber }
-        val usersByEmails =
-            userEventHandler.findUsersByEmails(events.filter { it.friendPhoneNumber !in usersByPhones.keys }
-                .mapNotNull { it.friendEmail }).toList().associateBy { it.email }
-        val friends = events.map {
-            val user =
-                it.friendPhoneNumber?.let { usersByPhones[it] } ?: it.friendEmail?.let { usersByEmails[it] }
-            FriendDto(
-                friendId = it.streamId,
-                email = it.friendEmail,
-                phoneNumber = it.friendPhoneNumber,
-                name = it.friendDisplayName,
-                photoUrl = user?.photoUrl,
-                loanAmount = amountsPerFriend.await()[it.streamId]
-            )
-        }
-        FriendsDto(friends)
+    suspend fun findAllEventsByUserId(userId: String) = eventRepository.findAllByUserUid(userId)
+
+    suspend fun findByUserUidAndFriendEmail(userUid: String, email: String): FriendEvent? {
+        return eventRepository.findByUserUidAndFriendEmail(userUid, email)
+    }
+
+    suspend fun findByUserUidAndFriendPhoneNumber(userUid: String, phoneNumber: String): FriendEvent? {
+        return eventRepository.findByUserUidAndFriendPhoneNumber(userUid, phoneNumber)
     }
 
     suspend fun saveFriend(uid: String, friendDto: CreateFriendDto) {
-
-        if (friendDto.email == null && friendDto.phoneNumber == null) {
-            throw IllegalArgumentException("Email or phone number is required")
-        }
-
-        val user = userEventHandler.findUserById(uid) ?: throw IllegalArgumentException("User $uid not found")
-        if (user.email == friendDto.email || user.phoneNumber == friendDto.phoneNumber) {
-            throw IllegalArgumentException("Your friend can't have same email or phone as yours")
-        }
-
-        if (friendDto.email != null)
-            eventRepository.findByUserUidAndFriendEmail(uid, friendDto.email)
-                ?.let { throw IllegalArgumentException("Friend with email ${friendDto.email} already exist") }
-
-        if (friendDto.phoneNumber != null)
-            eventRepository.findByUserUidAndFriendPhoneNumber(uid, friendDto.phoneNumber)
-                ?.let { throw IllegalArgumentException("Friend with phone number ${friendDto.phoneNumber} already exist") }
-
         eventRepository.save(
             FriendEvent(
                 userUid = uid,
@@ -76,22 +37,13 @@ class FriendsEventHandler(
         )
     }
 
-    suspend fun makeMyOwnersMyFriends(uid: String) {
-        val user = userEventHandler.findUserById(uid) ?: throw IllegalArgumentException("User not found")
-        val emailFriends = user.email?.let { eventRepository.findByFriendEmail(user.email) } ?: emptyFlow()
-        val phoneFriends =
-            user.phoneNumber?.let { eventRepository.findByFriendPhoneNumber(user.phoneNumber) } ?: emptyFlow()
-
-        val myFriendIds = emailFriends.toList().plus(phoneFriends.toList()).map { it.userUid }.distinct()
-        val friends =
-            userEventHandler.findUsersByUids(myFriendIds).toList()
-
-        friends.map { friendDto ->
+    suspend fun saveAllUsersAsFriends(userId: String, userDtos: List<UserDto>) {
+        userDtos.map { userDto ->
             FriendEvent(
-                userUid = uid,
-                friendEmail = friendDto.email,
-                friendPhoneNumber = friendDto.phoneNumber,
-                friendDisplayName = friendDto.displayName,
+                userUid = userId,
+                friendEmail = userDto.email,
+                friendPhoneNumber = userDto.phoneNumber,
+                friendDisplayName = userDto.displayName,
                 createdAt = Instant.now(),
                 streamId = UUID.randomUUID(),
                 version = 1,
@@ -100,6 +52,14 @@ class FriendsEventHandler(
         }.also {
             eventRepository.saveAll(it).toList()
         }
+    }
+
+    suspend fun findByFriendEmail(email: String): Flow<FriendEvent> {
+        return eventRepository.findByFriendEmail(email)
+    }
+
+    suspend fun findByFriendPhoneNumber(phoneNumber: String): Flow<FriendEvent> {
+        return eventRepository.findByFriendPhoneNumber(phoneNumber)
     }
 
     suspend fun findFriendByUserIdAndFriendId(userUid: String, friendId: UUID): FriendId? {
