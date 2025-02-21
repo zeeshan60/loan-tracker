@@ -6,10 +6,10 @@ import com.zeenom.loan_tracker.events.CommandType
 import com.zeenom.loan_tracker.firebase.FirebaseService
 import com.zeenom.loan_tracker.friends.FriendService
 import com.zeenom.loan_tracker.friends.FriendsDto
-import com.zeenom.loan_tracker.friends.FriendsEventHandler
 import com.zeenom.loan_tracker.security.LoginRequest
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventHandler
+import com.zeenom.loan_tracker.users.UserService
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -30,7 +30,7 @@ class AuthControllerTest(
     @LocalServerPort private val port: Int,
     @Autowired @MockitoSpyBean private val firebaseService: FirebaseService,
     @Autowired @MockitoBean private val commandDao: CommandDao,
-    @Autowired @MockitoBean private val userEventHandler: UserEventHandler,
+    @Autowired @MockitoBean private val userService: UserService,
     @Autowired @MockitoBean private val friendService: FriendService,
 ) {
 
@@ -54,7 +54,7 @@ class AuthControllerTest(
             userDto
         ).whenever(firebaseService).userByVerifyingIdToken(idToken)
 
-        Mockito.doReturn(Unit).whenever(userEventHandler).createUser(userDto)
+        Mockito.doReturn(Unit).whenever(userService).createUser(userDto)
         Mockito.doReturn(Unit).whenever(friendService).searchUsersImFriendOfAndAddThemAsMyFriends("123")
         whenever(friendService.findAllByUserId("123")).thenReturn(FriendsDto(friends = emptyList()))
 
@@ -90,7 +90,7 @@ class AuthControllerTest(
         }
 
         val userDtoCaptor = argumentCaptor<UserDto>()
-        Mockito.verify(userEventHandler, Mockito.times(1))
+        Mockito.verify(userService, Mockito.times(1))
             .createUser(userDtoCaptor.capture())
         assertThat(userDtoCaptor.firstValue).isEqualTo(userDto)
 

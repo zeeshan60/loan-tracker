@@ -13,12 +13,16 @@ import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest
 
 @DataR2dbcTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UserEventHandlerTest(
+class UserServiceTest(
     @Autowired private val userEventRepository: UserEventRepository,
 ) : TestPostgresConfig() {
 
     private val userEventHandler = UserEventHandler(
         userRepository = userEventRepository
+    )
+
+    private val userService = UserService(
+        userEventHandler = userEventHandler
     )
 
     @BeforeEach
@@ -28,7 +32,7 @@ class UserEventHandlerTest(
 
     @Test
     fun `adds new user event successfully`(): Unit = runBlocking {
-        val userDto = createUser(userDto = userDto)
+        val userDto = saveEvent(userDto = userDto)
 
         val userEvent = userEventRepository.findAll().toList()
 
@@ -54,19 +58,19 @@ class UserEventHandlerTest(
             return userDto
         }
 
-    private suspend fun createUser(userDto: UserDto): UserDto {
+    private suspend fun saveEvent(userDto: UserDto): UserDto {
 
-        userEventHandler.createUser(userDto = userDto)
+        userService.createUser(userDto = userDto)
         return userDto
     }
 
     @Test
     fun `adds new user with same uid should fail as user already exists`(): Unit = runBlocking {
-        createUser(userDto = userDto)
+        saveEvent(userDto = userDto)
 
         assertThatThrownBy {
             runBlocking {
-                createUser(
+                saveEvent(
                     userDto = UserDto(
                         uid = "123",
                         email = "user1@gmail.com",
@@ -84,16 +88,16 @@ class UserEventHandlerTest(
 
     @Test
     fun `adds new user with same email and phone should fail as user already exists`(): Unit = runBlocking {
-        createUser(userDto = userDto)
+        saveEvent(userDto = userDto)
 
-        assertThatThrownBy { runBlocking { createUser(userDto = userDto) } }
+        assertThatThrownBy { runBlocking { saveEvent(userDto = userDto) } }
             .isInstanceOf(IllegalArgumentException::class.java)
             .hasMessage("User with email ${userDto.email} or phone number ${userDto.phoneNumber} already exist")
     }
 
     @Test
     fun `find user by id returns user successfully`(): Unit = runBlocking {
-        val userDto = createUser(userDto = userDto)
+        val userDto = saveEvent(userDto = userDto)
 
         val user = userEventHandler.findUserById(userDto.uid)
 
@@ -108,9 +112,9 @@ class UserEventHandlerTest(
 
     @Test
     fun `find multiple users using uids successfully`(): Unit = runBlocking {
-        createUser(userDto = userDto)
+        saveEvent(userDto = userDto)
         val userDto2 = userDto.copy(uid = "124", email = "user2@gmail.com", phoneNumber = "+923001234568")
-        createUser(userDto = userDto2)
+        saveEvent(userDto = userDto2)
 
         val users = userEventHandler.findUsersByUids(listOf("123", "124")).toList()
 

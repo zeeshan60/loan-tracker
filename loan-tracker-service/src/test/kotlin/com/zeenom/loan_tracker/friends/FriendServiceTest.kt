@@ -2,10 +2,7 @@ package com.zeenom.loan_tracker.friends
 
 import com.zeenom.loan_tracker.transactions.AmountDto
 import com.zeenom.loan_tracker.transactions.TransactionReadModel
-import com.zeenom.loan_tracker.users.UserDto
-import com.zeenom.loan_tracker.users.UserEvent
-import com.zeenom.loan_tracker.users.UserEventHandler
-import com.zeenom.loan_tracker.users.UserEventRepository
+import com.zeenom.loan_tracker.users.*
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.toList
@@ -433,43 +430,53 @@ class FriendServiceTest(
             FriendsEventHandler(
                 eventRepository = eventRepository
             )
+
         val friendService = FriendService(
             userEventHandler = userEventHandler,
             transactionReadModel = transactionReadModel,
             friendsEventHandler = friendsEventHandler,
         )
         val (user1, user2) = friendData
-        userEventHandler.createUser(
-            UserDto(
+        userEventHandler.saveEvent(
+            UserEvent(
                 uid = "123",
                 email = "user123@gmail.com",
                 phoneNumber = "+923001234123",
                 displayName = "User 1",
                 photoUrl = user1.photo,
-                emailVerified = true
+                emailVerified = true,
+                createdAt = Instant.now(),
+                version = 1,
+                eventType = UserEventType.CREATE_USER,
             )
         )
         user1.photo?.let {
-            userEventHandler.createUser(
-                UserDto(
+            userEventHandler.saveEvent(
+                UserEvent(
                     uid = "124",
                     email = user1.email,
                     phoneNumber = user1.phone,
                     displayName = "User 2",
                     photoUrl = user1.photo,
-                    emailVerified = true
+                    emailVerified = true,
+                    createdAt = Instant.now(),
+                    version = 1,
+                    eventType = UserEventType.CREATE_USER,
                 )
             )
         }
         user2.photo?.let {
-            userEventHandler.createUser(
-                UserDto(
+            userEventHandler.saveEvent(
+                UserEvent(
                     uid = "125",
                     email = user2.email,
                     phoneNumber = user2.phone,
                     displayName = "User 3",
                     photoUrl = user2.photo,
-                    emailVerified = true
+                    emailVerified = true,
+                    createdAt = Instant.now(),
+                    version = 1,
+                    eventType = UserEventType.CREATE_USER,
                 )
             )
         }
