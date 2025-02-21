@@ -8,6 +8,7 @@ import { Friend } from './model'
 
 type FriendsState = {
   friends: Friend[],
+  selectedFriend: Friend | null
   loading: boolean,
 }
 
@@ -20,6 +21,7 @@ export type AddFriend = {
 const initialState: FriendsState = {
   friends: [],
   loading: false,
+  selectedFriend: null,
 }
 
 interface Methods extends MethodsDictionary {
@@ -63,11 +65,7 @@ export const FriendsStore = signalStore(
       }
     },
     async addFriend(friend: AddFriend): Promise<void> {
-      try {
-        await firstValueFrom(friendsService.addFriend(friend));
-      } catch (e) {
-        await helperService.showToast('Unable to create friend at the moment');
-      }
+      await firstValueFrom(friendsService.addFriend(friend));
     },
   }))
 );

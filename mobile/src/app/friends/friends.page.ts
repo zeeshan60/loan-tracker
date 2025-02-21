@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import {
   IonHeader,
   IonToolbar,
@@ -27,6 +27,15 @@ export class FriendsPage implements OnInit {
   constructor() {}
 
   async ngOnInit() {
+    console.log('friends initialized...')
+  }
+
+  ionViewDidEnter() {
+    console.log('User has entered the page');
+  }
+
+  ionViewDidLeave() {
+    console.log('User has left the page');
   }
 
   async addFriend() {

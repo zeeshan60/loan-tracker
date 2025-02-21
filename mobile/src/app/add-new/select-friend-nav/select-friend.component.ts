@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, computed, inject, model, OnInit, signal } from '@angular/core';
-import { DefineExpenseComponent } from '../define-expense/define-expense.component';
 import {
   IonAvatar, IonContent,
   IonHeader,
@@ -15,6 +14,7 @@ import { FriendsStore } from '../../friends/friends.store';
 import { CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Friend } from '../../friends/model';
+import { DefineExpenseComponent } from '../define-expense/define-expense.component';
 
 @Component({
   selector: 'app-select-friend',
@@ -32,9 +32,8 @@ import { Friend } from '../../friends/model';
     IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, FormsModule, IonList, IonItem, IonAvatar, IonLabel, CurrencyPipe, IonSearchbar,
   ],
 })
-export class SelectFriendComponent  implements OnInit {
+export class SelectFriendComponent {
   readonly nav = inject(IonNav);
-  readonly defineExpenseComponent = DefineExpenseComponent;
   modalCtrl = inject(ModalController);
   friendsStore = inject(FriendsStore);
   filter = model<string>('');
@@ -43,14 +42,8 @@ export class SelectFriendComponent  implements OnInit {
   ))
   constructor() { }
 
-  ngOnInit() {}
-
-  navigateToPageTwo(friend: Friend) {
-    this.nav.push(DefineExpenseComponent, { friend });
-  }
-
   async chooseFriend(friend: Friend) {
-    this.navigateToPageTwo(friend);
+    this.nav.push(DefineExpenseComponent, { friend });
   }
 
   async createNewFriend() {

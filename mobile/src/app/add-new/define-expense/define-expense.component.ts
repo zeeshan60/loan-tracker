@@ -1,19 +1,21 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
-import { NavParams } from '@ionic/angular';
+import { ChangeDetectionStrategy, Component, inject, Input, OnInit, signal } from '@angular/core';
 import {
-  IonBackButton, IonButton,
+  IonBackButton,
+  IonButton,
   IonButtons,
   IonContent,
   IonHeader,
   IonInput, IonItem, IonList, IonSelect, IonSelectOption, IonSpinner,
   IonTitle,
-  IonToolbar,
+  IonToolbar, ModalController,
 } from '@ionic/angular/standalone';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HelperService } from '../../helper.service';
 import { delay, firstValueFrom, timer } from 'rxjs';
 import { Router } from '@angular/router';
 import { FriendsStore } from '../../friends/friends.store';
+import { Friend } from '../../friends/model';
+import { NavParams } from '@ionic/angular';
 
 export enum SplitOptions {
   YouPaidSplitEqually,
@@ -35,7 +37,6 @@ export enum SplitOptions {
     IonHeader,
     IonToolbar,
     IonButtons,
-    IonBackButton,
     IonTitle,
     IonSpinner,
     IonButton,
@@ -43,9 +44,15 @@ export enum SplitOptions {
     IonSelectOption,
     IonList,
     IonItem,
+    IonBackButton,
   ],
 })
-export class DefineExpenseComponent  implements OnInit {
+export class DefineExpenseComponent {
+  @Input() friend!: Friend;
+  @Input() isDirectOpen = false;
+  readonly navParams = inject(NavParams).data;
+  readonly modalCtrl = inject(ModalController);
+  readonly selectedFriend = this.friend || this.navParams['friend'];
   readonly loading = signal(false);
   readonly helperService = inject(HelperService);
   readonly formBuilder = inject(FormBuilder);
@@ -53,7 +60,6 @@ export class DefineExpenseComponent  implements OnInit {
   readonly SplitOption = SplitOptions;
   readonly supportedCurrencies = ['PKR', 'USD', 'SGD'];
   readonly router = inject(Router);
-  navProps = inject(NavParams).data;
   defineExpenseForm = this.formBuilder.group({
     description: this.formBuilder.nonNullable.control('', [Validators.required, Validators.maxLength(1000)]),
     currency: this.formBuilder.nonNullable.control('PKR', [Validators.required]),
@@ -64,9 +70,10 @@ export class DefineExpenseComponent  implements OnInit {
     return [SplitOptions.YouPaidSplitEqually, SplitOptions.TheyOweYouAll]
       .includes(this.defineExpenseForm.value.whoOwesWho!);
   };
-  constructor() { }
+  constructor() {}
 
-  ngOnInit() {
+  closePopup() {
+    this.modalCtrl.dismiss();
   }
 
   async onSubmit() {
