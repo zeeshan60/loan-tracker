@@ -4,6 +4,7 @@ import com.zeenom.loan_tracker.events.CommandDao
 import com.zeenom.loan_tracker.events.CommandDto
 import com.zeenom.loan_tracker.events.CommandType
 import com.zeenom.loan_tracker.firebase.FirebaseService
+import com.zeenom.loan_tracker.friends.FriendService
 import com.zeenom.loan_tracker.friends.FriendsDto
 import com.zeenom.loan_tracker.friends.FriendsEventHandler
 import com.zeenom.loan_tracker.security.LoginRequest
@@ -30,7 +31,7 @@ class AuthControllerTest(
     @Autowired @MockitoSpyBean private val firebaseService: FirebaseService,
     @Autowired @MockitoBean private val commandDao: CommandDao,
     @Autowired @MockitoBean private val userEventHandler: UserEventHandler,
-    @Autowired @MockitoBean private val friendsEventHandler: FriendsEventHandler,
+    @Autowired @MockitoBean private val friendService: FriendService,
 ) {
 
     private val webTestClient = WebTestClient.bindToServer().baseUrl("http://localhost:$port").build()
@@ -54,8 +55,8 @@ class AuthControllerTest(
         ).whenever(firebaseService).userByVerifyingIdToken(idToken)
 
         Mockito.doReturn(Unit).whenever(userEventHandler).createUser(userDto)
-        Mockito.doReturn(Unit).whenever(friendsEventHandler).makeMyOwnersMyFriends("123")
-        whenever(friendsEventHandler.findAllByUserId("123")).thenReturn(FriendsDto(friends = emptyList()))
+        Mockito.doReturn(Unit).whenever(friendService).searchUsersImFriendOfAndAddThemAsMyFriends("123")
+        whenever(friendService.findAllByUserId("123")).thenReturn(FriendsDto(friends = emptyList()))
 
         Mockito.doReturn(Unit).whenever(commandDao).addCommand(
             CommandDto(
@@ -93,7 +94,7 @@ class AuthControllerTest(
             .createUser(userDtoCaptor.capture())
         assertThat(userDtoCaptor.firstValue).isEqualTo(userDto)
 
-        Mockito.verify(friendsEventHandler, Mockito.times(1)).makeMyOwnersMyFriends("123")
+        Mockito.verify(friendService, Mockito.times(1)).searchUsersImFriendOfAndAddThemAsMyFriends("123")
     }
 }
 

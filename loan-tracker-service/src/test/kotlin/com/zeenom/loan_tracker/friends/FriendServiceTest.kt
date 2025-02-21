@@ -10,7 +10,8 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
-import org.assertj.core.api.Assertions.*
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -27,7 +28,7 @@ import java.util.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DataR2dbcTest
-class FriendsEventHandlerTest(
+class FriendServiceTest(
     @Autowired private val eventRepository: FriendEventRepository,
     @Autowired private val userEventRepository: UserEventRepository,
 ) : TestPostgresConfig() {
@@ -38,6 +39,11 @@ class FriendsEventHandlerTest(
         FriendsEventHandler(
             eventRepository = eventRepository
         )
+    private val friendService = FriendService(
+        userEventHandler = userEventHandler,
+        transactionReadModel = transactionReadModel,
+        friendsEventHandler = friendsEventHandler,
+    )
 
 
     @BeforeEach
@@ -137,7 +143,7 @@ class FriendsEventHandlerTest(
             )
         )
 
-        friendsEventHandler.makeMyOwnersMyFriends("123")
+        friendService.searchUsersImFriendOfAndAddThemAsMyFriends("123")
 
         val events = eventRepository.findAll().toList()
 
@@ -215,7 +221,7 @@ class FriendsEventHandlerTest(
                 phoneNumber = "+923001234569"
             )
         )
-        val friendsDto = friendsEventHandler.findAllByUserId("123")
+        val friendsDto = friendService.findAllByUserId("123")
         assertThat(friendsDto.friends).hasSize(2)
 
         assertThat(friendsDto.friends[0].email).isEqualTo("user2@gmail.com")
@@ -427,6 +433,11 @@ class FriendsEventHandlerTest(
             FriendsEventHandler(
                 eventRepository = eventRepository
             )
+        val friendService = FriendService(
+            userEventHandler = userEventHandler,
+            transactionReadModel = transactionReadModel,
+            friendsEventHandler = friendsEventHandler,
+        )
         val (user1, user2) = friendData
         userEventHandler.createUser(
             UserDto(
@@ -478,7 +489,7 @@ class FriendsEventHandlerTest(
                 phoneNumber = user2.friendPhone
             )
         )
-        val friendsDto = friendsEventHandler.findAllByUserId("123")
+        val friendsDto = friendService.findAllByUserId("123")
         assertThat(friendsDto.friends).hasSize(2)
 
         assertThat(friendsDto.friends[0].email).isEqualTo(user1.friendEmail)
@@ -514,8 +525,8 @@ class FriendsEventHandlerTest(
             )
         ).`when`(userEventHandler).findUserById("123")
         val (friend1, friend2) = addFriendData
-        friendsEventHandler.saveFriend(
-            uid = "123",
+        friendService.createFriend(
+            userId = "123",
             friendDto = CreateFriendDto(
                 name = "John Doe",
                 email = friend1.email,
@@ -525,8 +536,8 @@ class FriendsEventHandlerTest(
 
         assertThatThrownBy {
             runBlocking {
-                friendsEventHandler.saveFriend(
-                    uid = "123",
+                friendService.createFriend(
+                    userId = "123",
                     friendDto = CreateFriendDto(
                         name = "John Doe 2",
                         email = friend1.email,
@@ -542,8 +553,8 @@ class FriendsEventHandlerTest(
     fun `add friend with no email and phone throws illegal argument`() {
         assertThatThrownBy {
             runBlocking {
-                friendsEventHandler.saveFriend(
-                    uid = "123",
+                friendService.createFriend(
+                    userId = "123",
                     friendDto = CreateFriendDto(
                         name = "John Doe",
                         email = null,
@@ -570,8 +581,8 @@ class FriendsEventHandlerTest(
         ).`when`(userEventHandler).findUserById("123")
         assertThatThrownBy {
             runBlocking {
-                friendsEventHandler.saveFriend(
-                    uid = "123",
+                friendService.createFriend(
+                    userId = "123",
                     friendDto = CreateFriendDto(
                         name = "John Doe",
                         email = friendData.friendEmail,
@@ -588,8 +599,8 @@ class FriendsEventHandlerTest(
         doReturn(null).`when`(userEventHandler).findUserById("123")
         assertThatThrownBy {
             runBlocking {
-                friendsEventHandler.saveFriend(
-                    uid = "123",
+                friendService.createFriend(
+                    userId = "123",
                     friendDto = CreateFriendDto(
                         name = "John Doe",
                         email = "user1@gmail.com",
@@ -655,7 +666,7 @@ class FriendsEventHandlerTest(
                 eventType = FriendEventType.FRIEND_CREATED,
             )
         )
-        val friends = friendsEventHandler.findAllByUserId("123")
+        val friends = friendService.findAllByUserId("123")
 
         assertThat(friends.friends).hasSize(1)
         assertThat(friends.friends[0].email).isEqualTo("friend1@gmail.com")
