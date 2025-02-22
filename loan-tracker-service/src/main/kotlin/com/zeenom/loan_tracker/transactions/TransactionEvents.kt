@@ -26,7 +26,7 @@ data class TransactionCreated(
         return TransactionEvent(
             userUid = userId,
             description = description,
-            amount = amount,
+            amount = splitType.apply(totalAmount),
             currency = currency,
             transactionType = transactionType,
             splitType = splitType,
@@ -48,10 +48,10 @@ data class TransactionCreated(
         return TransactionCreated(
             userId = recipientUserId,
             description = description,
-            amount = amount,
+            amount = splitType.apply(totalAmount),
             currency = currency,
             transactionType = if (transactionType == TransactionType.CREDIT) TransactionType.DEBIT else TransactionType.CREDIT,
-            splitType = splitType,
+            splitType = splitType.reverse(),
             totalAmount = totalAmount,
             recipientId = userStreamId
                 ?: throw IllegalArgumentException("Recipient ID is required for cross transaction"),

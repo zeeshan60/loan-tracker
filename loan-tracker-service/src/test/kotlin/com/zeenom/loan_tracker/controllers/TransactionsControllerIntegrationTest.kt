@@ -118,6 +118,7 @@ class TransactionsControllerIntegrationTest_MinimalScript(@LocalServerPort priva
         assertThat(result.data.transactions[0].amountResponse.isOwed).isTrue()
         assertThat(result.data.transactions[0].totalAmount).isEqualTo(100.0.toBigDecimal())
         assertThat(result.data.transactions[0].transactionId).isNotNull()
+        assertThat(result.data.transactions[0].splitType).isEqualTo(SplitType.YouPaidSplitEqually)
         assertThat(result.data.transactions[0].description).isEqualTo("Sample transaction")
         transactionId = result.data.transactions[0].transactionId
     }
@@ -157,6 +158,7 @@ class TransactionsControllerIntegrationTest_MinimalScript(@LocalServerPort priva
         assertThat(result.data.transactions[0].amountResponse.isOwed).isFalse()
         assertThat(result.data.transactions[0].totalAmount).isEqualTo(100.0.toBigDecimal())
         assertThat(result.data.transactions[0].transactionId).isNotNull()
+        assertThat(result.data.transactions[0].splitType).isEqualTo(SplitType.TheyPaidSplitEqually)
         assertThat(result.data.transactions[0].description).isEqualTo("Sample transaction")
         assertThat(result.data.transactions[0].history).isEmpty()
     }
@@ -203,6 +205,7 @@ class TransactionsControllerIntegrationTest_MinimalScript(@LocalServerPort priva
         assertThat(result.data.transactions[0].amountResponse.isOwed).isTrue()
         assertThat(result.data.transactions[0].totalAmount).isEqualTo(200.0.toBigDecimal())
         assertThat(result.data.transactions[0].transactionId).isNotNull()
+        assertThat(result.data.transactions[0].splitType).isEqualTo(SplitType.TheyOweYouAll)
         assertThat(result.data.transactions[0].description).isEqualTo("Sample transaction edited")
         assertThat(result.data.transactions[0].history).hasSize(4)
         val history1 = result.data.transactions[0].history[0]
@@ -251,6 +254,7 @@ class TransactionsControllerIntegrationTest_MinimalScript(@LocalServerPort priva
         assertThat(result.data.transactions[0].amountResponse.isOwed).isFalse()
         assertThat(result.data.transactions[0].totalAmount).isEqualTo(200.0.toBigDecimal())
         assertThat(result.data.transactions[0].transactionId).isNotNull()
+        assertThat(result.data.transactions[0].splitType).isEqualTo(SplitType.YouOweThemAll)
         assertThat(result.data.transactions[0].description).isEqualTo("Sample transaction edited")
         assertThat(result.data.transactions[0].history).hasSize(4)
         val history1 = result.data.transactions[0].history[0]
@@ -261,7 +265,7 @@ class TransactionsControllerIntegrationTest_MinimalScript(@LocalServerPort priva
         val history2 = result.data.transactions[0].history[1]
         assertThat(history2.type).isEqualTo(TransactionChangeType.SPLIT_TYPE)
         assertThat(history2.userId).isEqualTo(johnDto.uid)
-        assertThat(history2.oldValue).isEqualTo("YouPaidSplitEqually")
+        assertThat(history2.oldValue).isEqualTo("TheyPaidSplitEqually")
         assertThat(history2.newValue).isEqualTo("YouOweThemAll")
         val history3 = result.data.transactions[0].history[2]
         assertThat(history3.type).isEqualTo(TransactionChangeType.TOTAL_AMOUNT)

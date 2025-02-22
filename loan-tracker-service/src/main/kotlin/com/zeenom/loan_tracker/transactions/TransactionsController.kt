@@ -79,6 +79,7 @@ class TransactionsController(
                             totalAmount = transaction.originalAmount,
                             friendName = transaction.recipientName!!,
                             description = transaction.description,
+                            splitType = transaction.splitType,
                             history = transaction.history,
                         )
                     }
@@ -128,6 +129,7 @@ data class TransactionResponse(
     val description: String,
     val transactionId: UUID,
     val totalAmount: BigDecimal,
+    val splitType: SplitType,
     val friendName: String,
     val amountResponse: AmountResponse,
     val history: List<ChangeSummary> = emptyList(),
