@@ -328,4 +328,50 @@ class TransactionsControllerIntegrationTest_MinimalScript(@LocalServerPort priva
         assertThat(result.data.friends[0].loanAmount!!.isOwed).isFalse()
         assertThat(result.data.friends[0].photoUrl).isEqualTo(zeeDto.photoUrl)
     }
+
+    @Order(10)
+    @Test
+    fun `add new transaction as zee`() {
+        webTestClient.post()
+            .uri("/api/v1/transactions/add")
+            .header("Authorization", "Bearer $zeeToken")
+            .bodyValue(
+                TransactionRequest(
+                    amount = 100.0.toBigDecimal(),
+                    currency = "USD",
+                    type = SplitType.YouPaidSplitEqually,
+                    recipientId = johnFriendId,
+                    description = "Sample transaction"
+                )
+            )
+            .exchange()
+            .expectStatus().isOk
+            .expectBody().jsonPath("$.message").isEqualTo("Transaction added successfully")
+    }
+
+    @Order(11)
+    @Test
+    fun `get all transactions should return two transactions`() {
+        val result = webTestClient.get()
+            .uri("/api/v1/transactions/friend?friendId=$johnFriendId")
+            .header("Authorization", "Bearer $zeeToken")
+            .exchange()
+            .expectStatus().isOk
+            .expectBody(String::class.java)
+            .returnResult().responseBody!!.let {
+                objectMapper.readValue(
+                    it,
+                    object : TypeReference<Paginated<TransactionsResponse>>() {})
+            }
+
+        assertThat(result.data.transactions).hasSize(2)
+        assertThat(result.data.transactions[1].friendName).isEqualTo("john")
+        assertThat(result.data.transactions[1].amountResponse.amount).isEqualTo(50.0.toBigDecimal())
+        assertThat(result.data.transactions[1].amountResponse.currency).isEqualTo("USD")
+        assertThat(result.data.transactions[1].amountResponse.isOwed).isTrue()
+        assertThat(result.data.transactions[1].totalAmount).isEqualTo(100.0.toBigDecimal())
+        assertThat(result.data.transactions[1].transactionId).isNotNull()
+        assertThat(result.data.transactions[1].splitType).isEqualTo(SplitType.YouPaidSplitEqually)
+        assertThat(result.data.transactions[1].description).isEqualTo("Sample transaction")
+    }
 }

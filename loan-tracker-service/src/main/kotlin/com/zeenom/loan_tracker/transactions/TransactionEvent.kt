@@ -97,7 +97,7 @@ enum class TransactionEventType {
 
 @Repository
 interface TransactionEventRepository : CoroutineCrudRepository<TransactionEvent, UUID> {
-    suspend fun findAllByUserUidAndRecipientId(userId: String, recipientId: UUID): Flow<TransactionEvent>
+    suspend fun findAllByUserUidAndRecipientIdAndEventType(userId: String, recipientId: UUID, eventType: TransactionEventType): Flow<TransactionEvent>
     suspend fun findAllByUserUidAndRecipientIdInAndEventType(
         userId: String,
         recipientIds: List<UUID>,

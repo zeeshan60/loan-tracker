@@ -3,7 +3,7 @@ package com.zeenom.loan_tracker.transactions
 import com.zeenom.loan_tracker.common.events.IEvent
 import com.zeenom.loan_tracker.friends.FriendEventRepository
 import com.zeenom.loan_tracker.friends.FriendModel
-import kotlinx.coroutines.flow.first
+import io.swagger.v3.core.util.Json
 import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
@@ -70,6 +70,7 @@ class TransactionEventHandler(
 
         val transactions = findAllByUserIdFriendId(userId, friend.streamId)
 
+        Json.prettyPrint(transactions)
         val byStreamId = transactions.groupBy { it.streamId }
         val models = byStreamId.map { (_, events) ->
             resolveStream(events)
@@ -108,10 +109,24 @@ class TransactionEventHandler(
     private suspend fun findAllByUserIdFriendId(
         userId: String,
         friendStreamId: UUID,
-    ) = transactionEventRepository
-        .findAllByUserUidAndRecipientId(userId, friendStreamId).first()
-        .let { transactionEventRepository.findAllByUserUidAndStreamId(userId, it.streamId) }.toList()
+    ) = findAllEventsByUserIdFriendId(userId, friendStreamId)
         .map { it.toEvent() }
+
+    private suspend fun findAllEventsByUserIdFriendId(
+        userId: String,
+        friendStreamId: UUID,
+    ): List<TransactionEvent> {
+        return transactionEventRepository
+            .findAllByUserUidAndRecipientIdAndEventType(
+                userId,
+                friendStreamId,
+                TransactionEventType.TRANSACTION_CREATED
+            ).toList()
+            .map {
+                Json.prettyPrint(it)
+                transactionEventRepository.findAllByUserUidAndStreamId(userId, it.streamId).toList()
+            }.flatten()
+    }
 
     suspend fun balancesOfFriends(userId: String, friendIds: List<UUID>): Map<UUID, AmountDto> {
 
@@ -160,8 +175,9 @@ class TransactionEventHandler(
         friendStreamid: UUID,
     ) {
 
-        transactionEventRepository.findAllByUserUidAndRecipientId(friendUid, myStreamId).toList()
+        findAllEventsByUserIdFriendId(friendUid, myStreamId)
             .map { it.reverse(myUid, friendStreamid) }.let {
+                Json.prettyPrint(it)
                 transactionEventRepository.saveAll(it).toList()
             }
     }
