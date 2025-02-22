@@ -18,6 +18,9 @@ class TransactionEventHandlerTest {
         val friendStreamId = UUID.randomUUID()
         val transactionEventHandler = TransactionEventHandler(
             transactionEventRepository = mock {
+                val sampleTransactions = sampleTransactions(
+                    friendStreamId
+                )
                 on {
                     runBlocking {
                         findAllByUserUidAndRecipientIdInAndEventType(
@@ -26,9 +29,16 @@ class TransactionEventHandlerTest {
                             TransactionEventType.TRANSACTION_CREATED
                         )
                     }
-                } doReturn sampleTransactions(
-                    friendStreamId
-                ).asFlow()
+                } doReturn sampleTransactions.filter { it.eventType == TransactionEventType.TRANSACTION_CREATED }
+                    .asFlow()
+                sampleTransactions.forEach { sample ->
+                    on {
+                        runBlocking {
+                            findAllByUserUidAndStreamId("123", sample.streamId)
+                        }
+                    } doReturn sampleTransactions.filter { it.streamId == sample.streamId && it.userUid == "123" }
+                        .asFlow()
+                }
             },
             friendEventRepository = mock {
                 on {
@@ -59,19 +69,30 @@ class TransactionEventHandlerTest {
     fun `given multiple friends return their respective balances`(): Unit = runBlocking {
         val friendStreamId1 = UUID.randomUUID()
         val friendStreamId2 = UUID.randomUUID()
-        val transactionEventHandler = TransactionEventHandler(mock {
-            on {
-                runBlocking {
-                    findAllByUserUidAndRecipientIdInAndEventType(
-                        "123",
-                        listOf(friendStreamId1, friendStreamId2),
-                        TransactionEventType.TRANSACTION_CREATED
-                    )
+        val transactionEventHandler = TransactionEventHandler(
+            transactionEventRepository = mock {
+                val sampleTransactions = sampleTransactions(
+                    friendStreamId1
+                ) + sampleTransactions(friendStreamId2)
+                on {
+                    runBlocking {
+                        findAllByUserUidAndRecipientIdInAndEventType(
+                            "123",
+                            listOf(friendStreamId1, friendStreamId2),
+                            TransactionEventType.TRANSACTION_CREATED
+                        )
+                    }
+                } doReturn sampleTransactions.filter { it.eventType == TransactionEventType.TRANSACTION_CREATED }
+                    .asFlow()
+                sampleTransactions.forEach { sample ->
+                    on {
+                        runBlocking {
+                            findAllByUserUidAndStreamId("123", sample.streamId)
+                        }
+                    } doReturn sampleTransactions.filter { it.streamId == sample.streamId && it.userUid == "123" }
+                        .asFlow()
                 }
-            } doReturn sampleTransactions(
-                friendStreamId1
-            ).plus(sampleTransactions(friendStreamId2)).asFlow()
-        },
+            },
             friendEventRepository = mock {
                 on {
                     runBlocking {
