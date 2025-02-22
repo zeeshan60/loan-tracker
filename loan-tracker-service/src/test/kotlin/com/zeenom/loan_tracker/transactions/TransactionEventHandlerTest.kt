@@ -308,6 +308,7 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
                     Currency.getInstance("USD"),
                     true
                 ),
+                originalAmount = 200.0.toBigDecimal(),
                 transactionStreamId = transactionStreamId
             )
         )
@@ -377,10 +378,11 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
 
 
         assertThat(transactionEvent[2].userUid).isEqualTo("123")
-        assertThat(transactionEvent[2].amount).isEqualTo(200.0.toBigDecimal())
-        assertThat(transactionEvent[2].currency).isEqualTo(transactionDto.amount.currency.toString())
-        assertThat(transactionEvent[2].transactionType).isEqualTo(TransactionType.CREDIT)
-        assertThat(transactionEvent[2].recipientId).isEqualTo(friendEventStreamId)
+        assertThat(transactionEvent[2].amount).isNull()
+        assertThat(transactionEvent[2].totalAmount).isEqualTo(200.0.toBigDecimal())
+        assertThat(transactionEvent[2].currency).isNull()
+        assertThat(transactionEvent[2].transactionType).isNull()
+        assertThat(transactionEvent[2].recipientId).isNull()
         assertThat(transactionEvent[2].createdAt).isNotNull
         assertThat(transactionEvent[2].createdBy).isEqualTo("123")
         assertThat(transactionEvent[2].streamId).isNotNull()
@@ -388,13 +390,14 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
 
 
         assertThat(transactionEvent[3].userUid).isEqualTo("124")
-        assertThat(transactionEvent[3].amount).isEqualTo(200.0.toBigDecimal())
-        assertThat(transactionEvent[3].currency).isEqualTo(transactionDto.amount.currency.toString())
-        assertThat(transactionEvent[3].transactionType).isEqualTo(TransactionType.DEBIT)
-        assertThat(transactionEvent[3].recipientId).isEqualTo(myStreamId)
-        assertThat(transactionEvent[3].createdAt).isNotNull
-        assertThat(transactionEvent[3].createdBy).isEqualTo("123")
-        assertThat(transactionEvent[3].streamId).isNotNull()
-        assertThat(transactionEvent[3].version).isEqualTo(2)
+        assertThat(transactionEvent[2].amount).isNull()
+        assertThat(transactionEvent[2].totalAmount).isEqualTo(200.0.toBigDecimal())
+        assertThat(transactionEvent[2].currency).isNull()
+        assertThat(transactionEvent[2].transactionType).isNull()
+        assertThat(transactionEvent[2].recipientId).isNull()
+        assertThat(transactionEvent[2].createdAt).isNotNull
+        assertThat(transactionEvent[2].createdBy).isEqualTo("123")
+        assertThat(transactionEvent[2].streamId).isNotNull()
+        assertThat(transactionEvent[2].version).isEqualTo(2)
     }
 }

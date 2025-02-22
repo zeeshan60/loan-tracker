@@ -64,7 +64,7 @@ data class TransactionCreated(
         throw UnsupportedOperationException("Transaction created event cannot be applied to existing model")
     }
 
-    override fun crossTransaction(recipientUserId: String): IEvent<TransactionModel> {
+    override fun crossTransaction(recipientUserId: String, userStreamId: UUID?): IEvent<TransactionModel> {
         return TransactionCreated(
             userId = recipientUserId,
             description = description,
@@ -73,10 +73,11 @@ data class TransactionCreated(
             transactionType = if (transactionType == TransactionType.CREDIT) TransactionType.DEBIT else TransactionType.CREDIT,
             splitType = splitType,
             totalAmount = totalAmount,
-            recipientId = UUID.randomUUID(),
+            recipientId = userStreamId
+                ?: throw IllegalArgumentException("Recipient ID is required for cross transaction"),
             createdAt = createdAt,
             createdBy = createdBy,
-            streamId = UUID.randomUUID(),
+            streamId = streamId,
             version = version,
         )
     }
@@ -128,7 +129,7 @@ data class DescriptionChanged(
         )
     }
 
-    override fun crossTransaction(recipientUserId: String): IEvent<TransactionModel> {
+    override fun crossTransaction(recipientUserId: String, userStreamId: UUID?): IEvent<TransactionModel> {
         return DescriptionChanged(
             description = description,
             userId = recipientUserId,
@@ -160,7 +161,6 @@ data class TotalAmountChanged(
 
     override fun toEntity(): TransactionEvent {
         return TransactionEvent(
-            id = UUID.randomUUID(),
             userUid = userId,
             description = null,
             amount = null,
@@ -186,7 +186,7 @@ data class TotalAmountChanged(
         )
     }
 
-    override fun crossTransaction(recipientUserId: String): IEvent<TransactionModel> {
+    override fun crossTransaction(recipientUserId: String, userStreamId: UUID?): IEvent<TransactionModel> {
         return TotalAmountChanged(
             totalAmount = totalAmount,
             userId = recipientUserId,
@@ -243,7 +243,7 @@ data class CurrencyChanged(
         )
     }
 
-    override fun crossTransaction(recipientUserId: String): IEvent<TransactionModel> {
+    override fun crossTransaction(recipientUserId: String, userStreamId: UUID?): IEvent<TransactionModel> {
         return CurrencyChanged(
             currency = currency,
             userId = recipientUserId,
@@ -302,7 +302,7 @@ data class SplitTypeChanged(
         )
     }
 
-    override fun crossTransaction(recipientUserId: String): IEvent<TransactionModel> {
+    override fun crossTransaction(recipientUserId: String, userStreamId: UUID?): IEvent<TransactionModel> {
         return SplitTypeChanged(
             splitType = splitType.reverse(),
             userId = recipientUserId,
@@ -315,7 +315,7 @@ data class SplitTypeChanged(
 }
 
 interface CrossTransactionable {
-    fun crossTransaction(recipientUserId: String): IEvent<TransactionModel>
+    fun crossTransaction(recipientUserId: String, userStreamId: UUID? = null): IEvent<TransactionModel>
 }
 
 interface ITransactionChangeSummary {
@@ -437,7 +437,8 @@ class TransactionReadModel(
 
     suspend fun balancesOfFriends(userId: String, friendIds: List<UUID>): Map<UUID, AmountDto> {
 
-        return transactionEventRepository.findAllByUserUidAndRecipientIdIn(userId, friendIds).toList().map { it.toEvent() }
+        return transactionEventRepository.findAllByUserUidAndRecipientIdIn(userId, friendIds).toList()
+            .map { it.toEvent() }
             .groupBy { it.streamId }
             .map { (_, events) ->
                 resolveStream(events)

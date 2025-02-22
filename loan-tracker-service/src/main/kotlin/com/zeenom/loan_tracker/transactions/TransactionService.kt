@@ -1,9 +1,14 @@
 package com.zeenom.loan_tracker.transactions
 
+import com.zeenom.loan_tracker.common.apply
+import com.zeenom.loan_tracker.common.transactionType
 import com.zeenom.loan_tracker.friends.FriendsEventHandler
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventHandler
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
+import java.time.Instant
 import java.util.*
 
 @Service
@@ -15,38 +20,105 @@ class TransactionService(
     suspend fun addTransaction(
         userUid: String,
         transactionDto: TransactionDto,
-    ) {
+    ): Unit = withContext(Dispatchers.IO) {
 
         val (friendUser, userStreamId) = friendUserAndMyStreamId(
             userUid = userUid,
             recipientId = transactionDto.recipientId
         )
-        transactionEventHandler.addTransaction(
-            userUid = userUid,
-            friendUid = friendUser?.uid,
-            userStreamId = userStreamId,
-            transactionDto = transactionDto
+
+        val streamId = UUID.randomUUID()
+        val event = TransactionCreated(
+            userId = userUid,
+            description = transactionDto.description,
+            amount = transactionDto.splitType.apply(transactionDto.originalAmount),
+            currency = transactionDto.amount.currency.toString(),
+            transactionType = transactionDto.splitType.transactionType(),
+            splitType = transactionDto.splitType,
+            totalAmount = transactionDto.originalAmount,
+            recipientId = transactionDto.recipientId,
+            createdAt = Instant.now(),
+            createdBy = userUid,
+            streamId = streamId,
+            version = 1
         )
+        transactionEventHandler.addEvent(event)
+        friendUser?.let { transactionEventHandler.addEvent(event.crossTransaction(it.uid, userStreamId)) }
     }
 
     suspend fun updateTransaction(
         userUid: String,
         transactionDto: TransactionDto,
-    ) {
+    ): Unit = withContext(Dispatchers.IO) {
         val (friendUser, userStreamId) = friendUserAndMyStreamId(
             userUid = userUid,
             recipientId = transactionDto.recipientId
         )
-        transactionEventHandler.updateTransaction(
-            userStreamId = userStreamId,
-            transactionDto = transactionDto,
-            userUid = userUid,
-            friendUid = friendUser?.uid,
-        )
+
+        if (transactionDto.transactionStreamId == null) {
+            throw IllegalArgumentException("Transaction stream id is required")
+        }
+
+        val existing = transactionEventHandler.read(userUid, transactionDto.transactionStreamId)
+            ?: throw IllegalArgumentException("Transaction with id ${transactionDto.transactionStreamId} does not exist")
+
+        var eventVersion = existing.version + 1
+        if (existing.description != transactionDto.description) {
+            val event = DescriptionChanged(
+                userId = userUid,
+                description = transactionDto.description,
+                createdAt = Instant.now(),
+                createdBy = userUid,
+                streamId = existing.streamId,
+                version = eventVersion++
+            )
+            transactionEventHandler.addEvent(event)
+            friendUser?.let { transactionEventHandler.addEvent(event.crossTransaction(it.uid, userStreamId)) }
+        }
+
+        if (existing.splitType != transactionDto.splitType) {
+            val event = SplitTypeChanged(
+                userId = userUid,
+                splitType = transactionDto.splitType,
+                createdAt = Instant.now(),
+                createdBy = userUid,
+                streamId = existing.streamId,
+                version = eventVersion++
+            )
+            transactionEventHandler.addEvent(event)
+            friendUser?.let { transactionEventHandler.addEvent(event.crossTransaction(it.uid, userStreamId)) }
+        }
+
+        if (existing.totalAmount != transactionDto.originalAmount) {
+            val event = TotalAmountChanged(
+                userId = userUid,
+                totalAmount = transactionDto.originalAmount,
+                createdAt = Instant.now(),
+                createdBy = userUid,
+                streamId = existing.streamId,
+                version = eventVersion++
+            )
+            transactionEventHandler.addEvent(event)
+            friendUser?.let { transactionEventHandler.addEvent(event.crossTransaction(it.uid, userStreamId)) }
+        }
+
+        if (existing.currency != transactionDto.amount.currency.toString()) {
+            val event = CurrencyChanged(
+                userId = userUid,
+                currency = transactionDto.amount.currency.toString(),
+                createdAt = Instant.now(),
+                createdBy = userUid,
+                streamId = existing.streamId,
+                version = eventVersion
+            )
+            transactionEventHandler.addEvent(event)
+            friendUser?.let { transactionEventHandler.addEvent(event.crossTransaction(it.uid, userStreamId)) }
+        }
     }
 
-    suspend fun friendUserAndMyStreamId(userUid:String, recipientId: UUID): Pair<UserDto?, UUID?> {
-        val me = userEventHandler.findUserById(userUid) ?: throw IllegalArgumentException("User with id $userUid does not exist")
+    suspend fun friendUserAndMyStreamId(userUid: String, recipientId: UUID): Pair<UserDto?, UUID?> {
+        val me = userEventHandler.findUserById(userUid)
+            ?: throw IllegalArgumentException("User with id $userUid does not exist")
         val friend = friendsEventHandler.findFriendByUserIdAndFriendId(userUid, recipientId)
             ?: throw IllegalArgumentException("User with id $userUid does not have friend with id $recipientId")
         val friendUser = userEventHandler.findUserByEmailOrPhoneNumber(friend.email, friend.phoneNumber)
