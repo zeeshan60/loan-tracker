@@ -59,7 +59,7 @@ class TransactionEventHandler(
         eventType = eventType,
         createdBy = createdBy,
         description = description,
-        splitType = splitType.reverse(),
+        splitType = splitType?.reverse(),
         totalAmount = totalAmount,
     )
 

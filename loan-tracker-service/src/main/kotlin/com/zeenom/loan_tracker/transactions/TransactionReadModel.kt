@@ -36,28 +36,28 @@ class TransactionReadModel(
                 resolved.map {
                     TransactionDto(
                         amount = AmountDto(
-                            amount = it.amount,
+                            amount = it.amount!!,
                             currency = Currency.getInstance(it.currency),
                             isOwed = it.transactionType == TransactionType.CREDIT
                         ),
-                        recipientId = it.recipientId,
+                        recipientId = it.recipientId!!,
                         transactionStreamId = it.streamId,
-                        description = it.description,
-                        originalAmount = it.totalAmount,
-                        splitType = it.splitType,
+                        description = it.description!!,
+                        originalAmount = it.totalAmount!!,
+                        splitType = it.splitType!!,
                         recipientName = friend.friendDisplayName,
                         history = grouped[it.streamId]?.dropLast(1)?.map {
                             TransactionHistoryDto(
                                 amount = AmountDto(
-                                    amount = it.amount,
+                                    amount = it.amount!!,
                                     currency = Currency.getInstance(it.currency),
                                     isOwed = it.transactionType == TransactionType.CREDIT
                                 ),
-                                recipientId = it.recipientId,
+                                recipientId = it.recipientId!!,
                                 transactionStreamId = it.streamId,
-                                description = it.description,
-                                originalAmount = it.totalAmount,
-                                splitType = it.splitType,
+                                description = it.description!!,
+                                originalAmount = it.totalAmount!!,
+                                splitType = it.splitType!!,
                                 recipientName = friend.friendDisplayName
                             )
                         } ?: emptyList())
@@ -71,11 +71,11 @@ class TransactionReadModel(
             .let { this.resolveAll(it) }
             .groupBy { it.currency }.entries.firstOrNull()?.let {
                 val currency = it.key
-                it.value.groupBy { it.recipientId }
+                it.value.groupBy { it.recipientId!! }
                     .mapValues { (_, events) ->
                         val balance =
-                            events.map { if (it.transactionType == TransactionType.CREDIT) it.amount else -it.amount }
-                                .reduceOrNull { current, next -> current + next } ?: BigDecimal.ZERO
+                            events.map { if (it.transactionType == TransactionType.CREDIT) it.amount else -it.amount!! }
+                                .reduceOrNull { current, next -> current!! + next!! } ?: BigDecimal.ZERO
                         AmountDto(
                             amount = if (balance > BigDecimal.ZERO) balance else balance * BigDecimal(-1),
                             currency = Currency.getInstance(currency),
