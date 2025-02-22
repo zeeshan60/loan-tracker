@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/api/v1/friends")
 class FriendsController(
-    val queryFriendsService: QueryFriendsService,
+    val friendsQuery: FriendsQuery,
     val friendsAdapter: FriendsControllerAdapter,
     private val createFriendCommand: CreateFriendCommand
 ) {
@@ -29,7 +29,7 @@ class FriendsController(
         @AuthenticationPrincipal userId: String
     ): Paginated<FriendsResponse> {
         logger.info("Getting friends for user $userId")
-        return queryFriendsService.execute(PaginationDto(input = userId, next = next)).let { result ->
+        return friendsQuery.execute(PaginationDto(input = userId, next = next)).let { result ->
             friendsAdapter.fromDtoToPaginatedResponse(result)
         }
     }

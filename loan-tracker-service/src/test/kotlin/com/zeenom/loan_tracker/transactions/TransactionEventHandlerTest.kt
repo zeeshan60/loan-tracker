@@ -20,9 +20,10 @@ class TransactionEventHandlerTest {
             transactionEventRepository = mock {
                 on {
                     runBlocking {
-                        findAllByUserUidAndRecipientIdIn(
+                        findAllByUserUidAndRecipientIdInAndEventType(
                             "123",
-                            listOf(friendStreamId)
+                            listOf(friendStreamId),
+                            TransactionEventType.TRANSACTION_CREATED
                         )
                     }
                 } doReturn sampleTransactions(
@@ -61,9 +62,10 @@ class TransactionEventHandlerTest {
         val transactionEventHandler = TransactionEventHandler(mock {
             on {
                 runBlocking {
-                    findAllByUserUidAndRecipientIdIn(
+                    findAllByUserUidAndRecipientIdInAndEventType(
                         "123",
-                        listOf(friendStreamId1, friendStreamId2)
+                        listOf(friendStreamId1, friendStreamId2),
+                        TransactionEventType.TRANSACTION_CREATED
                     )
                 }
             } doReturn sampleTransactions(

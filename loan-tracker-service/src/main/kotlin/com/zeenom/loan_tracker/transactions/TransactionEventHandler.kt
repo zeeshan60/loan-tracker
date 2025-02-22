@@ -115,7 +115,12 @@ class TransactionEventHandler(
 
     suspend fun balancesOfFriends(userId: String, friendIds: List<UUID>): Map<UUID, AmountDto> {
 
-        val toList = transactionEventRepository.findAllByUserUidAndRecipientIdIn(userId, friendIds).toList()
+        val toList = transactionEventRepository.findAllByUserUidAndRecipientIdInAndEventType(
+            userId,
+            friendIds,
+            TransactionEventType.TRANSACTION_CREATED
+        ).toList().map { transactionEventRepository.findAllByUserUidAndStreamId(userId, it.streamId).toList() }
+            .flatten()
         return toList
             .map { it.toEvent() }
             .groupBy { it.streamId }

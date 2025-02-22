@@ -3,6 +3,7 @@ package com.zeenom.loan_tracker.controllers
 import com.fasterxml.jackson.core.type.TypeReference
 import com.zeenom.loan_tracker.common.Paginated
 import com.zeenom.loan_tracker.friends.FriendEventRepository
+import com.zeenom.loan_tracker.friends.FriendsResponse
 import com.zeenom.loan_tracker.transactions.*
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventRepository
@@ -280,5 +281,51 @@ class TransactionsControllerIntegrationTest_MinimalScript(@LocalServerPort priva
         assertThat(history4.userId).isEqualTo(johnDto.uid)
         assertThat(history4.oldValue).isEqualTo("USD")
         assertThat(history4.newValue).isEqualTo("SGD")
+    }
+
+    @Order(8)
+    @Test
+    fun `get friends as zee now has updated balance amount`() {
+        val result = webTestClient.get()
+            .uri("/api/v1/friends")
+            .header("Authorization", "Bearer $zeeToken")
+            .exchange()
+            .expectStatus().isOk
+            .expectBody(String::class.java)
+            .returnResult().responseBody!!.let {
+                objectMapper.readValue(
+                    it,
+                    object : TypeReference<Paginated<FriendsResponse>>() {})
+            }
+
+        assertThat(result.data.friends).hasSize(1)
+        assertThat(result.data.friends[0].name).isEqualTo("john")
+        assertThat(result.data.friends[0].loanAmount).isNotNull
+        assertThat(result.data.friends[0].loanAmount!!.amount).isEqualTo(200.0.toBigDecimal())
+        assertThat(result.data.friends[0].loanAmount!!.isOwed).isTrue()
+        assertThat(result.data.friends[0].photoUrl).isEqualTo(johnDto.photoUrl)
+    }
+
+    @Order(9)
+    @Test
+    fun `get friends as john now has updated balance amount`() {
+        val result = webTestClient.get()
+            .uri("/api/v1/friends")
+            .header("Authorization", "Bearer $johnToken")
+            .exchange()
+            .expectStatus().isOk
+            .expectBody(String::class.java)
+            .returnResult().responseBody!!.let {
+                objectMapper.readValue(
+                    it,
+                    object : TypeReference<Paginated<FriendsResponse>>() {})
+            }
+
+        assertThat(result.data.friends).hasSize(1)
+        assertThat(result.data.friends[0].name).isEqualTo("Zeeshan Tufail")
+        assertThat(result.data.friends[0].loanAmount).isNotNull
+        assertThat(result.data.friends[0].loanAmount!!.amount).isEqualTo(200.0.toBigDecimal())
+        assertThat(result.data.friends[0].loanAmount!!.isOwed).isFalse()
+        assertThat(result.data.friends[0].photoUrl).isEqualTo(zeeDto.photoUrl)
     }
 }

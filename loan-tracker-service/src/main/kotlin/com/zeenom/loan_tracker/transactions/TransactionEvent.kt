@@ -43,6 +43,7 @@ data class TransactionEvent(
                 streamId = streamId,
                 version = version,
             )
+
             TransactionEventType.DESCRIPTION_CHANGED -> DescriptionChanged(
                 userId = userUid,
                 description = description ?: throw IllegalStateException("Description is required"),
@@ -51,6 +52,7 @@ data class TransactionEvent(
                 streamId = streamId,
                 version = version,
             )
+
             TransactionEventType.SPLIT_TYPE_CHANGED -> SplitTypeChanged(
                 userId = userUid,
                 splitType = splitType ?: throw IllegalStateException("Split type is required"),
@@ -59,6 +61,7 @@ data class TransactionEvent(
                 streamId = streamId,
                 version = version,
             )
+
             TransactionEventType.TOTAL_AMOUNT_CHANGED -> TotalAmountChanged(
                 userId = userUid,
                 totalAmount = totalAmount ?: throw IllegalStateException("Total amount is required"),
@@ -67,6 +70,7 @@ data class TransactionEvent(
                 streamId = streamId,
                 version = version,
             )
+
             TransactionEventType.CURRENCY_CHANGED -> CurrencyChanged(
                 userId = userUid,
                 currency = currency ?: throw IllegalStateException("Currency is required"),
@@ -94,6 +98,11 @@ enum class TransactionEventType {
 @Repository
 interface TransactionEventRepository : CoroutineCrudRepository<TransactionEvent, UUID> {
     suspend fun findAllByUserUidAndRecipientId(userId: String, recipientId: UUID): Flow<TransactionEvent>
-    suspend fun findAllByUserUidAndRecipientIdIn(userId: String, recipientIds: List<UUID>): Flow<TransactionEvent>
+    suspend fun findAllByUserUidAndRecipientIdInAndEventType(
+        userId: String,
+        recipientIds: List<UUID>,
+        eventType: TransactionEventType
+    ): Flow<TransactionEvent>
+
     suspend fun findAllByUserUidAndStreamId(userId: String, streamId: UUID): Flow<TransactionEvent>
 }
