@@ -70,7 +70,7 @@ data class DescriptionChanged(
     override val version: Int,
     override val createdAt: Instant,
     override val createdBy: String,
-) : IEvent<TransactionModel>, ITransactionChangeSummary, CrossTransactionable {
+) : IEvent<TransactionModel>, TransactionChangeSummary, CrossTransactionable {
 
     override fun applyEvent(existing: TransactionModel): TransactionModel {
         return existing.copy(
@@ -127,7 +127,7 @@ data class TotalAmountChanged(
     override val version: Int,
     override val createdAt: Instant,
     override val createdBy: String,
-) : IEvent<TransactionModel>, ITransactionChangeSummary, CrossTransactionable {
+) : IEvent<TransactionModel>, TransactionChangeSummary, CrossTransactionable {
     override fun applyEvent(existing: TransactionModel): TransactionModel {
         return existing.copy(
             totalAmount = totalAmount,
@@ -184,7 +184,7 @@ data class CurrencyChanged(
     override val version: Int,
     override val createdAt: Instant,
     override val createdBy: String,
-) : IEvent<TransactionModel>, ITransactionChangeSummary, CrossTransactionable {
+) : IEvent<TransactionModel>, TransactionChangeSummary, CrossTransactionable {
     override fun applyEvent(existing: TransactionModel): TransactionModel {
         return existing.copy(
             currency = currency,
@@ -240,7 +240,7 @@ data class SplitTypeChanged(
     override val version: Int,
     override val createdAt: Instant,
     override val createdBy: String,
-) : IEvent<TransactionModel>, ITransactionChangeSummary, CrossTransactionable {
+) : IEvent<TransactionModel>, TransactionChangeSummary, CrossTransactionable {
     override fun applyEvent(existing: TransactionModel): TransactionModel {
         return existing.copy(
             amount = splitType.apply(existing.totalAmount),
@@ -295,7 +295,7 @@ interface CrossTransactionable {
     fun crossTransaction(recipientUserId: String, userStreamId: UUID? = null): IEvent<TransactionModel>
 }
 
-interface ITransactionChangeSummary {
+interface TransactionChangeSummary {
     fun changeSummary(existing: TransactionModel): ChangeSummary
 }
 

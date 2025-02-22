@@ -3,7 +3,6 @@ package com.zeenom.loan_tracker.transactions
 import com.zeenom.loan_tracker.common.events.IEvent
 import com.zeenom.loan_tracker.friends.FriendEventRepository
 import com.zeenom.loan_tracker.friends.FriendModel
-import io.swagger.v3.core.util.Json
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
@@ -81,7 +80,7 @@ class TransactionEventHandler(
             val baseModel = baseModel(events.first())
             val history = mutableListOf<ChangeSummary>()
             events.drop(1).forEach {
-                if (it is ITransactionChangeSummary) {
+                if (it is TransactionChangeSummary) {
                     history.add(it.changeSummary(baseModel))
                 }
             }
