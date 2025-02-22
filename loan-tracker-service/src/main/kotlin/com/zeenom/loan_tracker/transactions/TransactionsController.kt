@@ -38,15 +38,16 @@ class TransactionsController(
     }
 
     @Operation(summary = "Update a transaction")
-    @PutMapping("/update")
+    @PutMapping("/update/transactionId/{transactionId}")
     suspend fun updateTransaction(
+        @PathVariable transactionId: UUID,
         @RequestBody transactionRequest: TransactionRequest,
         @AuthenticationPrincipal userId: String,
     ): MessageResponse {
         updateTransactionCommand.execute(
             CommandDto(
                 userId = userId,
-                payload = requestToDto(transactionRequest),
+                payload = requestToDto(transactionRequest).copy(transactionStreamId = transactionId),
                 commandType = CommandType.UPDATE_TRANSACTION
             )
         )
@@ -77,7 +78,8 @@ class TransactionsController(
                             ),
                             totalAmount = transaction.originalAmount,
                             friendName = transaction.recipientName!!,
-                            description = transaction.description
+                            description = transaction.description,
+                            history = transaction.history,
                         )
                     }
                 ),
@@ -128,6 +130,7 @@ data class TransactionResponse(
     val totalAmount: BigDecimal,
     val friendName: String,
     val amountResponse: AmountResponse,
+    val history: List<ChangeSummary> = emptyList(),
 )
 
 data class AmountResponse(

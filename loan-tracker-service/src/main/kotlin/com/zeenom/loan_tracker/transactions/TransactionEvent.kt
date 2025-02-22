@@ -12,7 +12,7 @@ import java.util.*
 
 @Table("transaction_events")
 data class TransactionEvent(
-    @Id val id: UUID? = null,
+    @Id private val id: UUID? = null,
     val userUid: String,
     val description: String?,
     val amount: BigDecimal?,

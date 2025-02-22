@@ -15,16 +15,6 @@ data class TransactionDto(
     val history: List<ChangeSummary> = emptyList()
 ) : CommandPayloadDto
 
-data class TransactionHistoryDto(
-    val amount: AmountDto,
-    val description: String,
-    val originalAmount: BigDecimal,
-    val splitType: SplitType,
-    val recipientId: UUID,
-    val recipientName: String?,
-    val transactionStreamId: UUID
-)
-
 data class AmountDto(
     val amount: BigDecimal,
     val currency: Currency,

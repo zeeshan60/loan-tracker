@@ -17,6 +17,9 @@ class UpdateTransactionCommand(
         CoroutineScope(Dispatchers.IO).launch {
             commandDao.addCommand(commandDto)
         }
+        if (commandDto.payload.transactionStreamId == null) {
+            throw IllegalArgumentException("Transaction stream id is required")
+        }
         transactionService.updateTransaction(
             userUid = commandDto.userId,
             transactionDto = commandDto.payload

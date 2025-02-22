@@ -83,7 +83,6 @@ data class DescriptionChanged(
 
     override fun toEntity(): TransactionEvent {
         return TransactionEvent(
-            id = UUID.randomUUID(),
             userUid = userId,
             description = description,
             amount = null,
@@ -197,7 +196,6 @@ data class CurrencyChanged(
 
     override fun toEntity(): TransactionEvent {
         return TransactionEvent(
-            id = UUID.randomUUID(),
             userUid = userId,
             description = null,
             amount = null,
@@ -265,7 +263,6 @@ data class SplitTypeChanged(
 
     override fun toEntity(): TransactionEvent {
         return TransactionEvent(
-            id = UUID.randomUUID(),
             userUid = userId,
             description = null,
             amount = null,

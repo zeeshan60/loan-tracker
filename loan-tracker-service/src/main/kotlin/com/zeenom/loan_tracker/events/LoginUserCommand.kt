@@ -34,10 +34,6 @@ class LoginUserCommand(
                     recipientId = friend.friendId
                 )
 
-                println("Friend uid: ${friendEvent?.uid}")
-                println("User stream id: $userStreamId")
-                println("Friend stream id: ${friend.friendId}")
-                println("User uid: ${commandDto.payload.uid}")
                 transactionEventHandler.addReverseEventsForUserAndFriend(
                     myUid = commandDto.payload.uid,
                     myStreamId = userStreamId!!,
