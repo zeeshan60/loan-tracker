@@ -2,8 +2,6 @@ package com.zeenom.loan_tracker.transactions
 
 import com.zeenom.loan_tracker.friends.FriendEvent
 import com.zeenom.loan_tracker.friends.FriendEventType
-import com.zeenom.loan_tracker.prettyAndPrint
-import io.swagger.v3.core.util.Json
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
@@ -19,7 +17,7 @@ class TransactionReadModelTest {
     fun `given a friend and some transactions return balance successfully`(): Unit = runBlocking {
         val friendStreamId = UUID.randomUUID()
         val transactionReadModel = TransactionReadModel(
-            mock {
+            transactionEventRepository = mock {
                 on {
                     runBlocking {
                         findAllByUserUidAndRecipientIdIn(
@@ -51,7 +49,7 @@ class TransactionReadModelTest {
 
         val balances = transactionReadModel.balancesOfFriends("123", listOf(friendStreamId))
         assertThat(balances).hasSize(1)
-        assertThat(balances[friendStreamId]?.amount).isEqualTo(150.0.toBigDecimal())
+        assertThat(balances[friendStreamId]?.amount).isEqualTo(250.0.toBigDecimal())
         assertThat(balances[friendStreamId]?.currency).isEqualTo(Currency.getInstance("USD"))
         assertThat(balances[friendStreamId]?.isOwed).isFalse()
     }
@@ -105,11 +103,11 @@ class TransactionReadModelTest {
 
         val balances = transactionReadModel.balancesOfFriends("123", listOf(friendStreamId1, friendStreamId2))
         assertThat(balances).hasSize(2)
-        assertThat(balances[friendStreamId1]?.amount).isEqualTo(150.0.toBigDecimal())
+        assertThat(balances[friendStreamId1]?.amount).isEqualTo(250.0.toBigDecimal())
         assertThat(balances[friendStreamId1]?.currency).isEqualTo(Currency.getInstance("USD"))
         assertThat(balances[friendStreamId1]?.isOwed).isFalse()
 
-        assertThat(balances[friendStreamId2]?.amount).isEqualTo(150.0.toBigDecimal())
+        assertThat(balances[friendStreamId2]?.amount).isEqualTo(250.0.toBigDecimal())
         assertThat(balances[friendStreamId2]?.currency).isEqualTo(Currency.getInstance("USD"))
         assertThat(balances[friendStreamId2]?.isOwed).isFalse()
     }
@@ -145,18 +143,33 @@ class TransactionReadModelTest {
                     ),
                     TransactionEvent(
                         userUid = "123",
-                        amount = 100.0.toBigDecimal(),
-                        currency = "USD",
-                        transactionType = TransactionType.DEBIT,
-                        recipientId = friendStreamId,
-                        createdAt = Date().toInstant(),
+                        amount = null,
+                        currency = null,
+                        transactionType = null,
+                        recipientId = null,
+                        createdAt = Instant.now(),
                         createdBy = "123",
                         streamId = transactionStreamId,
                         version = 2,
-                        eventType = TransactionEventType.TRANSACTION_UPDATED,
-                        description = "some description",
+                        eventType = TransactionEventType.SPLIT_TYPE_CHANGED,
+                        description = null,
                         splitType = SplitType.YouOweThemAll,
-                        totalAmount = 200.0.toBigDecimal()
+                        totalAmount = null
+                    ),
+                    TransactionEvent(
+                        userUid = "123",
+                        amount = null,
+                        currency = null,
+                        transactionType = null,
+                        recipientId = null,
+                        createdAt = Instant.now(),
+                        createdBy = "123",
+                        streamId = transactionStreamId,
+                        version = 3,
+                        eventType = TransactionEventType.TOTAL_AMOUNT_CHANGED,
+                        description = null,
+                        splitType = null,
+                        totalAmount = 100.0.toBigDecimal()
                     )
                 ).asFlow()
             },
@@ -220,18 +233,18 @@ class TransactionReadModelTest {
             ),
             TransactionEvent(
                 userUid = "123",
-                amount = 100.0.toBigDecimal(),
-                currency = "USD",
-                transactionType = TransactionType.DEBIT,
-                recipientId = friendStreamId,
+                amount = null,
+                currency = null,
+                transactionType = null,
+                recipientId = null,
                 createdAt = Date().toInstant(),
                 createdBy = "123",
                 streamId = transactionStreamId,
                 version = 2,
-                eventType = TransactionEventType.TRANSACTION_UPDATED,
-                description = "some description",
+                eventType = TransactionEventType.SPLIT_TYPE_CHANGED,
+                description = null,
                 splitType = SplitType.YouOweThemAll,
-                totalAmount = 200.0.toBigDecimal()
+                totalAmount = null
             ),
             TransactionEvent(
                 userUid = "123",

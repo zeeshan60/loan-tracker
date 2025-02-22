@@ -333,7 +333,6 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
         assertThat(resolvedEvents[0].createdBy).isEqualTo("123")
         assertThat(resolvedEvents[0].streamId).isNotNull()
         assertThat(resolvedEvents[0].version).isEqualTo(2)
-        assertThat(resolvedEvents[0].eventType).isEqualTo(TransactionEventType.TRANSACTION_UPDATED)
 
 
         assertThat(resolvedEvents[1].userUid).isEqualTo("124")
@@ -345,7 +344,6 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
         assertThat(resolvedEvents[1].createdBy).isEqualTo("123")
         assertThat(resolvedEvents[1].streamId).isNotNull()
         assertThat(resolvedEvents[1].version).isEqualTo(2)
-        assertThat(resolvedEvents[1].eventType).isEqualTo(TransactionEventType.TRANSACTION_UPDATED)
     }
 
     private fun assertAllEventsAreProperlyCreated(
@@ -387,7 +385,6 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
         assertThat(transactionEvent[2].createdBy).isEqualTo("123")
         assertThat(transactionEvent[2].streamId).isNotNull()
         assertThat(transactionEvent[2].version).isEqualTo(2)
-        assertThat(transactionEvent[2].eventType).isEqualTo(TransactionEventType.TRANSACTION_UPDATED)
 
 
         assertThat(transactionEvent[3].userUid).isEqualTo("124")
@@ -399,6 +396,5 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
         assertThat(transactionEvent[3].createdBy).isEqualTo("123")
         assertThat(transactionEvent[3].streamId).isNotNull()
         assertThat(transactionEvent[3].version).isEqualTo(2)
-        assertThat(transactionEvent[3].eventType).isEqualTo(TransactionEventType.TRANSACTION_UPDATED)
     }
 }

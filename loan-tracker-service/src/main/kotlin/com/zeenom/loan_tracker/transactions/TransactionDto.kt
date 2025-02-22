@@ -12,7 +12,7 @@ data class TransactionDto(
     val recipientId: UUID,
     val recipientName: String?,
     val transactionStreamId: UUID? = null,
-    val history: List<TransactionHistoryDto> = emptyList()
+    val history: List<ChangeSummary> = emptyList()
 ) : CommandPayloadDto
 
 data class TransactionHistoryDto(

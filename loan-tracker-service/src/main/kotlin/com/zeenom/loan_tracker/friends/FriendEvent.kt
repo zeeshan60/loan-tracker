@@ -9,6 +9,43 @@ import org.springframework.stereotype.Repository
 import java.time.Instant
 import java.util.*
 
+data class FriendModel(
+    val userId: String,
+    val streamId: UUID,
+    val friendEmail: String?,
+    val friendPhoneNumber: String?,
+    val friendDisplayName: String,
+)
+
+data class FriendCreated(
+    override val userId: String,
+    val friendEmail: String?,
+    val friendPhoneNumber: String?,
+    val friendDisplayName: String,
+    override val createdAt: Instant,
+    override val streamId: UUID,
+    override val version: Int,
+) : IEvent<FriendModel> {
+    override val createdBy: String = userId
+
+    override fun toEntity(): FriendEvent {
+        return FriendEvent(
+            userUid = userId,
+            friendEmail = friendEmail,
+            friendPhoneNumber = friendPhoneNumber,
+            friendDisplayName = friendDisplayName,
+            createdAt = createdAt,
+            streamId = streamId,
+            version = version,
+            eventType = FriendEventType.FRIEND_CREATED,
+        )
+    }
+
+    override fun applyEvent(existing: FriendModel): FriendModel {
+        throw UnsupportedOperationException("Friend created event is not supported")
+    }
+}
+
 @Table("friend_events")
 data class FriendEvent(
     @Id val id: UUID? = null,
@@ -17,10 +54,24 @@ data class FriendEvent(
     val friendPhoneNumber: String?,
     val friendDisplayName: String,
     val createdAt: Instant,
-    override val streamId: UUID,
-    override val version: Int,
+    val streamId: UUID,
+    val version: Int,
     val eventType: FriendEventType,
-): IEvent
+) {
+    fun toEvent(): IEvent<FriendModel> {
+        return when (eventType) {
+            FriendEventType.FRIEND_CREATED -> FriendCreated(
+                userId = userUid,
+                friendEmail = friendEmail,
+                friendPhoneNumber = friendPhoneNumber,
+                friendDisplayName = friendDisplayName,
+                createdAt = createdAt,
+                streamId = streamId,
+                version = version,
+            )
+        }
+    }
+}
 
 enum class FriendEventType {
     FRIEND_CREATED

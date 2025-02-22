@@ -1,5 +1,6 @@
 package com.zeenom.loan_tracker.transactions
 
+import com.zeenom.loan_tracker.common.events.IEvent
 import com.zeenom.loan_tracker.common.reverse
 import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
@@ -11,6 +12,14 @@ class TransactionEventHandler(
     private val transactionEventRepository: TransactionEventRepository,
     private val transactionReadModel: TransactionReadModel,
 ) {
+
+    suspend fun addEvent(event: IEvent<TransactionEvent>) {
+        val entity = event.toEntity()
+        if (entity is TransactionEvent)
+            transactionEventRepository.save(entity)
+        else throw IllegalArgumentException("Invalid event type ${entity.javaClass}")
+    }
+
     suspend fun addTransaction(
         userUid: String,
         friendUid: String?,
@@ -85,7 +94,7 @@ class TransactionEventHandler(
             createdAt = Instant.now(),
             streamId = transactionDto.transactionStreamId,
             version = existingTransaction.version + 1,
-            eventType = TransactionEventType.TRANSACTION_UPDATED,
+            eventType = TransactionEventType.SPLIT_TYPE_CHANGED,
             createdBy = userUid,
             description = transactionDto.description,
             splitType = transactionDto.splitType,

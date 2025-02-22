@@ -23,10 +23,61 @@ data class TransactionEvent(
     val recipientId: UUID?,
     val createdAt: Instant,
     val createdBy: String,
-    override val streamId: UUID,
-    override val version: Int,
+    val streamId: UUID,
+    val version: Int,
     val eventType: TransactionEventType,
-) : IEvent
+) {
+    fun toEvent(): IEvent<TransactionModel> {
+        return when (eventType) {
+            TransactionEventType.TRANSACTION_CREATED -> TransactionCreated(
+                userId = userUid,
+                description = description ?: throw IllegalStateException("Description is required"),
+                amount = amount ?: throw IllegalStateException("Amount is required"),
+                currency = currency ?: throw IllegalStateException("Currency is required"),
+                transactionType = transactionType ?: throw IllegalStateException("Transaction type is required"),
+                splitType = splitType ?: throw IllegalStateException("Split type is required"),
+                totalAmount = totalAmount ?: throw IllegalStateException("Total amount is required"),
+                recipientId = recipientId ?: throw IllegalStateException("Recipient ID is required"),
+                createdAt = createdAt,
+                createdBy = createdBy,
+                streamId = streamId,
+                version = version,
+            )
+            TransactionEventType.DESCRIPTION_CHANGED -> DescriptionChanged(
+                userId = userUid,
+                description = description ?: throw IllegalStateException("Description is required"),
+                createdAt = createdAt,
+                createdBy = createdBy,
+                streamId = streamId,
+                version = version,
+            )
+            TransactionEventType.SPLIT_TYPE_CHANGED -> SplitTypeChanged(
+                userId = userUid,
+                splitType = splitType ?: throw IllegalStateException("Split type is required"),
+                createdAt = createdAt,
+                createdBy = createdBy,
+                streamId = streamId,
+                version = version,
+            )
+            TransactionEventType.TOTAL_AMOUNT_CHANGED -> TotalAmountChanged(
+                userId = userUid,
+                totalAmount = totalAmount ?: throw IllegalStateException("Total amount is required"),
+                createdAt = createdAt,
+                createdBy = createdBy,
+                streamId = streamId,
+                version = version,
+            )
+            TransactionEventType.CURRENCY_CHANGED -> CurrencyChanged(
+                userId = userUid,
+                currency = currency ?: throw IllegalStateException("Currency is required"),
+                createdAt = createdAt,
+                createdBy = createdBy,
+                streamId = streamId,
+                version = version,
+            )
+        }
+    }
+}
 
 enum class TransactionType {
     CREDIT, DEBIT
@@ -34,7 +85,10 @@ enum class TransactionType {
 
 enum class TransactionEventType {
     TRANSACTION_CREATED,
-    TRANSACTION_UPDATED
+    DESCRIPTION_CHANGED,
+    SPLIT_TYPE_CHANGED,
+    TOTAL_AMOUNT_CHANGED,
+    CURRENCY_CHANGED
 }
 
 @Repository

@@ -1,6 +1,7 @@
 package com.zeenom.loan_tracker.common
 
 import com.zeenom.loan_tracker.transactions.SplitType
+import com.zeenom.loan_tracker.transactions.TransactionType
 import java.math.BigDecimal
 import java.net.URI
 import java.time.Instant
@@ -132,6 +133,24 @@ fun SplitType.reverse(): SplitType {
         SplitType.YouOweThemAll -> SplitType.TheyOweYouAll
         SplitType.YouPaidSplitEqually -> SplitType.TheyPaidSplitEqually
         SplitType.TheyPaidSplitEqually -> SplitType.YouPaidSplitEqually
+    }
+}
+
+fun SplitType.apply(amount: BigDecimal): BigDecimal {
+    return when (this) {
+        SplitType.TheyOweYouAll -> amount
+        SplitType.YouOweThemAll -> amount
+        SplitType.YouPaidSplitEqually -> amount / 2.toBigDecimal()
+        SplitType.TheyPaidSplitEqually -> amount / 2.toBigDecimal()
+    }
+}
+
+fun SplitType.transactionType(): TransactionType {
+    return when (this) {
+        SplitType.TheyOweYouAll -> TransactionType.CREDIT
+        SplitType.YouOweThemAll -> TransactionType.DEBIT
+        SplitType.YouPaidSplitEqually -> TransactionType.CREDIT
+        SplitType.TheyPaidSplitEqually -> TransactionType.DEBIT
     }
 }
 
