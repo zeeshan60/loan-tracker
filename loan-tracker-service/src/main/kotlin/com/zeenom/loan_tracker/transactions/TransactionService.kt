@@ -45,6 +45,10 @@ class TransactionService(
         )
     }
 
+    suspend fun transactionsByFriendId(userUid: String, friendId: UUID): List<TransactionDto> {
+        return transactionEventHandler.transactionsByFriendId(userUid, friendId)
+    }
+
     suspend fun friendUserAndMyStreamId(userUid:String, recipientId: UUID): Pair<UserDto?, UUID?> {
         val me = userEventHandler.findUserById(userUid) ?: throw IllegalArgumentException("User with id $userUid does not exist")
         val friend = friendsEventHandler.findFriendByUserIdAndFriendId(userUid, recipientId)

@@ -11,8 +11,19 @@ data class TransactionDto(
     val splitType: SplitType,
     val recipientId: UUID,
     val recipientName: String?,
-    val transactionStreamId: UUID? = null
+    val transactionStreamId: UUID? = null,
+    val history: List<TransactionHistoryDto> = emptyList()
 ) : CommandPayloadDto
+
+data class TransactionHistoryDto(
+    val amount: AmountDto,
+    val description: String,
+    val originalAmount: BigDecimal,
+    val splitType: SplitType,
+    val recipientId: UUID,
+    val recipientName: String?,
+    val transactionStreamId: UUID
+)
 
 data class AmountDto(
     val amount: BigDecimal,

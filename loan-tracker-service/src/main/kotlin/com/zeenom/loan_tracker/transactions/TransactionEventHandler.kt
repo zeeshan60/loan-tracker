@@ -106,7 +106,7 @@ class TransactionEventHandler(
         myUid: String,
         myStreamId: UUID,
         friendUid: String,
-        friendStreamid: UUID
+        friendStreamid: UUID,
     ) {
         transactionEventRepository.findAllByUserUidAndRecipientId(friendUid, myStreamId).toList()
             .forEach {
@@ -118,4 +118,7 @@ class TransactionEventHandler(
                 )
             }
     }
+
+    suspend fun transactionsByFriendId(userUid: String, friendId: UUID): List<TransactionDto> =
+        transactionReadModel.transactionsByFriendId(userUid, friendId)
 }

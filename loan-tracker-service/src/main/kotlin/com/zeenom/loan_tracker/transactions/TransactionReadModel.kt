@@ -30,20 +30,38 @@ class TransactionReadModel(
             "Friend not found"
         )
         return transactionEventRepository
-            .findAllByUserUidAndRecipientId(userId, friendId).toList().let { this.resolveAll(it) }.map {
-                TransactionDto(
-                    amount = AmountDto(
-                        amount = it.amount,
-                        currency = Currency.getInstance(it.currency),
-                        isOwed = it.transactionType == TransactionType.CREDIT
-                    ),
-                    recipientId = it.recipientId,
-                    transactionStreamId = it.streamId,
-                    description = it.description,
-                    originalAmount = it.totalAmount,
-                    splitType = it.splitType,
-                    recipientName = friend.friendDisplayName
-                )
+            .findAllByUserUidAndRecipientId(userId, friendId).toList()
+            .let { Pair(it.groupBy { it.streamId }, this.resolveAll(it)) }.let {
+                val (grouped, resolved) = it
+                resolved.map {
+                    TransactionDto(
+                        amount = AmountDto(
+                            amount = it.amount,
+                            currency = Currency.getInstance(it.currency),
+                            isOwed = it.transactionType == TransactionType.CREDIT
+                        ),
+                        recipientId = it.recipientId,
+                        transactionStreamId = it.streamId,
+                        description = it.description,
+                        originalAmount = it.totalAmount,
+                        splitType = it.splitType,
+                        recipientName = friend.friendDisplayName,
+                        history = grouped[it.streamId]?.dropLast(1)?.map {
+                            TransactionHistoryDto(
+                                amount = AmountDto(
+                                    amount = it.amount,
+                                    currency = Currency.getInstance(it.currency),
+                                    isOwed = it.transactionType == TransactionType.CREDIT
+                                ),
+                                recipientId = it.recipientId,
+                                transactionStreamId = it.streamId,
+                                description = it.description,
+                                originalAmount = it.totalAmount,
+                                splitType = it.splitType,
+                                recipientName = friend.friendDisplayName
+                            )
+                        } ?: emptyList())
+                }
             }
     }
 
