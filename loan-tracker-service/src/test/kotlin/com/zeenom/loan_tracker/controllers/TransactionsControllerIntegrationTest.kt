@@ -17,12 +17,15 @@ import java.util.UUID
 
 /**
  * Minimal Test case script
- * 1. Login as a new user during setup
- * 2. Add a friend
+ * 1. Setup. Login as a new user
+ * 2. Setup. Add a friend
  * 3. Add a transaction
  * 4. Get all transactions
  * 5. Create friend as a user
  * 6. Get all transactions by friend user
+ * 7. Update transaction
+ * 8. Get all transactions by main user
+ * 9. Get all transactions by friend user
  */
 class TransactionsControllerIntegrationTest_MinimalScript(@LocalServerPort private val port: Int) :
     BaseIntegration(port) {
