@@ -1,403 +1,266 @@
 package com.zeenom.loan_tracker.transactions
 
-import com.zeenom.loan_tracker.friends.FriendEventRepository
-import com.zeenom.loan_tracker.friends.FriendId
-import com.zeenom.loan_tracker.friends.FriendsEventHandler
-import com.zeenom.loan_tracker.friends.TestPostgresConfig
-import com.zeenom.loan_tracker.users.UserDto
-import com.zeenom.loan_tracker.users.UserEventHandler
-import kotlinx.coroutines.flow.toList
+import com.zeenom.loan_tracker.friends.FriendEvent
+import com.zeenom.loan_tracker.friends.FriendEventType
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatThrownBy
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest
+import java.time.Instant
 import java.util.*
 
-@DataR2dbcTest
-class TransactionServiceTest(@Autowired private val transactionEventRepository: TransactionEventRepository) :
-    TestPostgresConfig() {
-    private val userEventHandler = mock<UserEventHandler>()
-    private val friendEventHandler = mock<FriendsEventHandler>()
-    private val friendEventRepository = mock<FriendEventRepository>()
-    private val transactionReadModel =
-        TransactionReadModel(transactionEventRepository, friendEventRepository = friendEventRepository)
-
-    private val transactionService = TransactionService(
-        transactionEventHandler = TransactionEventHandler(
-            transactionEventRepository = transactionEventRepository,
-            transactionReadModel = transactionReadModel
-        ),
-        userEventHandler = userEventHandler,
-        friendsEventHandler = friendEventHandler
-    )
-
-    @BeforeEach
-    fun setUp(): Unit = runBlocking {
-        transactionEventRepository.deleteAll()
-    }
+class TransactionEventHandlerTest {
 
     @Test
-    fun `given user and friend save only one transaction when friend is not a user`(): Unit = runBlocking {
-        doReturn(
-            UserDto(
-                uid = "123",
-                email = "user@gmail.com",
-                phoneNumber = "+923001234567",
-                displayName = "Test User",
-                photoUrl = "https://test.com",
-                emailVerified = true
-            )
-        ).`when`(userEventHandler).findUserById("123")
-
-        val friendEventStreamId = UUID.randomUUID()
-        doReturn(
-            FriendId(
-                email = "friend@gmail.com",
-                phoneNumber = "+923001234568",
-                name = "Friend"
-            )
-        ).`when`(friendEventHandler).findFriendByUserIdAndFriendId("123", friendEventStreamId)
-        val transactionDto = TransactionDto(
-            amount = AmountDto(
-                currency = Currency.getInstance("USD"),
-                amount = 100.0.toBigDecimal(),
-                isOwed = true
-            ),
-            recipientId = friendEventStreamId,
-            description = "Test Transaction",
-            splitType = SplitType.TheyOweYouAll,
-            originalAmount = 100.0.toBigDecimal(),
-            recipientName = "Friend"
-        )
-
-        transactionService.addTransaction(
-            userUid = "123",
-            transactionDto = transactionDto
-        )
-
-        val transactionEvent = transactionEventRepository.findAll().toList()
-
-        assertThat(transactionEvent).hasSize(1)
-        assertThat(transactionEvent[0].userUid).isEqualTo("123")
-        assertThat(transactionEvent[0].amount).isEqualTo(transactionDto.amount.amount)
-        assertThat(transactionEvent[0].currency).isEqualTo(transactionDto.amount.currency.toString())
-        assertThat(transactionEvent[0].transactionType).isEqualTo(TransactionType.CREDIT)
-        assertThat(transactionEvent[0].recipientId).isEqualTo(transactionDto.recipientId)
-        assertThat(transactionEvent[0].createdAt).isNotNull
-        assertThat(transactionEvent[0].createdBy).isEqualTo("123")
-        assertThat(transactionEvent[0].streamId).isNotNull()
-        assertThat(transactionEvent[0].version).isEqualTo(1)
-        assertThat(transactionEvent[0].eventType).isEqualTo(TransactionEventType.TRANSACTION_CREATED)
-    }
-
-    @Test
-    fun `given user and friend save two transactions when friend is a user`(): Unit = runBlocking {
-        doReturn(
-            UserDto(
-                uid = "123",
-                email = "user@gmail.com",
-                phoneNumber = "+923001234567",
-                displayName = "Test User",
-                photoUrl = "https://test.com",
-                emailVerified = true
-            )
-        ).`when`(userEventHandler).findUserById("123")
-
-        val friendEventStreamId = UUID.randomUUID()
-        whenever(friendEventHandler.findFriendByUserIdAndFriendId("123", friendEventStreamId)).thenReturn(
-            FriendId(
-                email = "friend@gmail.com",
-                phoneNumber = "+923001234568",
-                name = "Friend"
-            )
-        )
-        val myStreamId = UUID.randomUUID()
-        doReturn(myStreamId).`when`(friendEventHandler).findFriendStreamIdByEmailOrPhoneNumber(
-            "124",
-            "user@gmail.com",
-            "+923001234567"
-        )
-        doReturn(
-            UserDto(
-                uid = "124",
-                email = "friend@gmail.com",
-                phoneNumber = "+923001234568",
-                displayName = "Friend",
-                photoUrl = "https://test.com",
-                emailVerified = true
-            )
-        ).`when`(userEventHandler).findUserByEmailOrPhoneNumber("friend@gmail.com", "+923001234568")
-        val transactionDto = TransactionDto(
-            amount = AmountDto(
-                currency = Currency.getInstance("USD"),
-                amount = 100.0.toBigDecimal(),
-                isOwed = true
-            ),
-            recipientId = friendEventStreamId,
-            description = "Test Transaction",
-            splitType = SplitType.TheyOweYouAll,
-            originalAmount = 100.0.toBigDecimal(),
-            recipientName = "Friend"
-        )
-
-        transactionService.addTransaction(
-            userUid = "123",
-            transactionDto = transactionDto
-        )
-
-        val transactionEvent = transactionEventRepository.findAll().toList()
-
-        assertThat(transactionEvent).hasSize(2)
-        assertThat(transactionEvent[0].userUid).isEqualTo("123")
-        assertThat(transactionEvent[0].amount).isEqualTo(transactionDto.amount.amount)
-        assertThat(transactionEvent[0].currency).isEqualTo(transactionDto.amount.currency.toString())
-        assertThat(transactionEvent[0].transactionType).isEqualTo(TransactionType.CREDIT)
-        assertThat(transactionEvent[0].recipientId).isEqualTo(friendEventStreamId)
-        assertThat(transactionEvent[0].createdAt).isNotNull
-        assertThat(transactionEvent[0].createdBy).isEqualTo("123")
-        assertThat(transactionEvent[0].streamId).isNotNull()
-        assertThat(transactionEvent[0].version).isEqualTo(1)
-        assertThat(transactionEvent[0].eventType).isEqualTo(TransactionEventType.TRANSACTION_CREATED)
-
-
-        assertThat(transactionEvent[1].userUid).isEqualTo("124")
-        assertThat(transactionEvent[1].amount).isEqualTo(transactionDto.amount.amount)
-        assertThat(transactionEvent[1].currency).isEqualTo(transactionDto.amount.currency.toString())
-        assertThat(transactionEvent[1].transactionType).isEqualTo(TransactionType.DEBIT)
-        assertThat(transactionEvent[1].recipientId).isEqualTo(myStreamId)
-        assertThat(transactionEvent[1].createdAt).isNotNull
-        assertThat(transactionEvent[1].createdBy).isEqualTo("123")
-        assertThat(transactionEvent[1].streamId).isNotNull()
-        assertThat(transactionEvent[1].version).isEqualTo(1)
-        assertThat(transactionEvent[1].eventType).isEqualTo(TransactionEventType.TRANSACTION_CREATED)
-    }
-
-    @Test
-    fun `save transaction should fail when user is not found`(): Unit = runBlocking {
-        doReturn(null).`when`(userEventHandler).findUserById("1234")
-
-        val friendEventStreamId = UUID.randomUUID()
-        doReturn(true).`when`(friendEventHandler).friendExistsByUserIdAndFriendId("1234", friendEventStreamId)
-        val transactionDto = TransactionDto(
-            amount = AmountDto(
-                currency = Currency.getInstance("USD"),
-                amount = 100.0.toBigDecimal(),
-                isOwed = true
-            ),
-            recipientId = friendEventStreamId,
-            description = "Test Transaction",
-            splitType = SplitType.TheyOweYouAll,
-            originalAmount = 100.0.toBigDecimal(),
-            recipientName = "Friend"
-        )
-
-        assertThatThrownBy {
-            runBlocking {
-                transactionService.addTransaction(
-                    userUid = "1234",
-                    transactionDto = transactionDto
+    fun `given a friend and some transactions return balance successfully`(): Unit = runBlocking {
+        val friendStreamId = UUID.randomUUID()
+        val transactionEventHandler = TransactionEventHandler(
+            transactionEventRepository = mock {
+                on {
+                    runBlocking {
+                        findAllByUserUidAndRecipientIdIn(
+                            "123",
+                            listOf(friendStreamId)
+                        )
+                    }
+                } doReturn sampleTransactions(
+                    friendStreamId
+                ).asFlow()
+            },
+            friendEventRepository = mock {
+                on {
+                    runBlocking {
+                        findByUserUidAndStreamId("123", friendStreamId)
+                    }
+                } doReturn FriendEvent(
+                    friendDisplayName = "John Doe",
+                    userUid = "124",
+                    friendEmail = "John@gmail.com",
+                    friendPhoneNumber = "+923001234567",
+                    createdAt = Instant.now(),
+                    streamId = friendStreamId,
+                    version = 1,
+                    eventType = FriendEventType.FRIEND_CREATED,
                 )
             }
-        }.isInstanceOf(IllegalArgumentException::class.java)
-            .hasMessage("User with id 1234 does not exist")
+        )
+
+        val balances = transactionEventHandler.balancesOfFriends("123", listOf(friendStreamId))
+        assertThat(balances).hasSize(1)
+        assertThat(balances[friendStreamId]?.amount).isEqualTo(250.0.toBigDecimal())
+        assertThat(balances[friendStreamId]?.currency).isEqualTo(Currency.getInstance("USD"))
+        assertThat(balances[friendStreamId]?.isOwed).isFalse()
     }
 
     @Test
-    fun `save transaction should fail if friend is not available`(): Unit = runBlocking {
-        doReturn(
-            UserDto(
-                uid = "123",
-                email = "user@gmail.com",
-                phoneNumber = "+923001234567",
-                displayName = "Test User",
-                photoUrl = "https://test.com",
-                emailVerified = true
-            )
-        ).`when`(userEventHandler).findUserById("123")
-        val friendEventStreamId = UUID.randomUUID()
-        doReturn(false).`when`(friendEventHandler).friendExistsByUserIdAndFriendId("123", friendEventStreamId)
+    fun `given multiple friends return their respective balances`(): Unit = runBlocking {
+        val friendStreamId1 = UUID.randomUUID()
+        val friendStreamId2 = UUID.randomUUID()
+        val transactionEventHandler = TransactionEventHandler(mock {
+            on {
+                runBlocking {
+                    findAllByUserUidAndRecipientIdIn(
+                        "123",
+                        listOf(friendStreamId1, friendStreamId2)
+                    )
+                }
+            } doReturn sampleTransactions(
+                friendStreamId1
+            ).plus(sampleTransactions(friendStreamId2)).asFlow()
+        },
+            friendEventRepository = mock {
+                on {
+                    runBlocking {
+                        findByUserUidAndStreamId("123", friendStreamId1)
+                    }
+                } doReturn FriendEvent(
+                    friendDisplayName = "John Doe",
+                    userUid = "123",
+                    friendEmail = "John@gmail.com",
+                    friendPhoneNumber = "+923001234567",
+                    createdAt = Instant.now(),
+                    streamId = friendStreamId1,
+                    version = 1,
+                    eventType = FriendEventType.FRIEND_CREATED,
+                )
+                on {
+                    runBlocking {
+                        findByUserUidAndStreamId("123", friendStreamId2)
+                    }
+                } doReturn FriendEvent(
+                    friendDisplayName = "John Doe 2",
+                    userUid = "123",
+                    friendEmail = "John2@gmail.com",
+                    friendPhoneNumber = "+923001234568",
+                    createdAt = Instant.now(),
+                    streamId = friendStreamId2,
+                    version = 1,
+                    eventType = FriendEventType.FRIEND_CREATED,
+                )
+            })
 
-        val transactionDto = TransactionDto(
-            amount = AmountDto(
-                currency = Currency.getInstance("USD"),
-                amount = 100.0.toBigDecimal(),
-                isOwed = true
-            ),
-            recipientId = friendEventStreamId,
-            description = "Test Transaction",
-            splitType = SplitType.TheyOweYouAll,
-            originalAmount = 100.0.toBigDecimal(),
-            recipientName = "Friend"
-        )
+        val balances = transactionEventHandler.balancesOfFriends("123", listOf(friendStreamId1, friendStreamId2))
+        assertThat(balances).hasSize(2)
+        assertThat(balances[friendStreamId1]?.amount).isEqualTo(250.0.toBigDecimal())
+        assertThat(balances[friendStreamId1]?.currency).isEqualTo(Currency.getInstance("USD"))
+        assertThat(balances[friendStreamId1]?.isOwed).isFalse()
 
-        assertThatThrownBy { runBlocking { transactionService.addTransaction("123", transactionDto) } }
-            .isInstanceOf(IllegalArgumentException::class.java)
-            .hasMessage("User with id 123 does not have friend with id $friendEventStreamId")
+        assertThat(balances[friendStreamId2]?.amount).isEqualTo(250.0.toBigDecimal())
+        assertThat(balances[friendStreamId2]?.currency).isEqualTo(Currency.getInstance("USD"))
+        assertThat(balances[friendStreamId2]?.isOwed).isFalse()
     }
 
     @Test
-    fun `given existing transaction updates transaction successfully`(): Unit = runBlocking {
-        doReturn(
-            UserDto(
-                uid = "123",
-                email = "user@gmail.com",
-                phoneNumber = "+923001234567",
-                displayName = "Test User",
-                photoUrl = "https://test.com",
-                emailVerified = true
-            )
-        ).`when`(userEventHandler).findUserById("123")
-
-        val friendEventStreamId = UUID.randomUUID()
-        whenever(friendEventHandler.findFriendByUserIdAndFriendId("123", friendEventStreamId)).thenReturn(
-            FriendId(
-                email = "friend@gmail.com",
-                phoneNumber = "+923001234568",
-                name = "Friend"
-            )
+    fun `read single transaction stream successfully`(): Unit = runBlocking {
+        val transactionStreamId = UUID.randomUUID()
+        val friendStreamId = UUID.randomUUID()
+        val transactionEventHandler = TransactionEventHandler(
+            mock {
+                on {
+                    runBlocking {
+                        findAllByUserUidAndStreamId(
+                            "123",
+                            transactionStreamId
+                        )
+                    }
+                } doReturn listOf(
+                    TransactionEvent(
+                        userUid = "123",
+                        amount = 200.0.toBigDecimal(),
+                        currency = "USD",
+                        transactionType = TransactionType.CREDIT,
+                        recipientId = friendStreamId,
+                        createdAt = Date().toInstant(),
+                        createdBy = "123",
+                        streamId = transactionStreamId,
+                        version = 1,
+                        eventType = TransactionEventType.TRANSACTION_CREATED,
+                        description = "some description",
+                        splitType = SplitType.TheyOweYouAll,
+                        totalAmount = 200.0.toBigDecimal()
+                    ),
+                    TransactionEvent(
+                        userUid = "123",
+                        amount = null,
+                        currency = null,
+                        transactionType = null,
+                        recipientId = null,
+                        createdAt = Instant.now(),
+                        createdBy = "123",
+                        streamId = transactionStreamId,
+                        version = 2,
+                        eventType = TransactionEventType.SPLIT_TYPE_CHANGED,
+                        description = null,
+                        splitType = SplitType.YouOweThemAll,
+                        totalAmount = null
+                    ),
+                    TransactionEvent(
+                        userUid = "123",
+                        amount = null,
+                        currency = null,
+                        transactionType = null,
+                        recipientId = null,
+                        createdAt = Instant.now(),
+                        createdBy = "123",
+                        streamId = transactionStreamId,
+                        version = 3,
+                        eventType = TransactionEventType.TOTAL_AMOUNT_CHANGED,
+                        description = null,
+                        splitType = null,
+                        totalAmount = 100.0.toBigDecimal()
+                    )
+                ).asFlow()
+            },
+            friendEventRepository = mock {
+                on {
+                    runBlocking {
+                        findByUserUidAndStreamId("123", friendStreamId)
+                    }
+                } doReturn FriendEvent(
+                    friendDisplayName = "John Doe",
+                    userUid = "124",
+                    friendEmail = "John@gmail.com",
+                    friendPhoneNumber = "+923001234567",
+                    createdAt = Instant.now(),
+                    streamId = friendStreamId,
+                    version = 1,
+                    eventType = FriendEventType.FRIEND_CREATED,
+                )
+            }
         )
-        val myStreamId = UUID.randomUUID()
-        doReturn(myStreamId).`when`(friendEventHandler).findFriendStreamIdByEmailOrPhoneNumber(
-            "124",
-            "user@gmail.com",
-            "+923001234567"
-        )
-        doReturn(
-            UserDto(
-                uid = "124",
-                email = "friend@gmail.com",
-                phoneNumber = "+923001234568",
-                displayName = "Friend",
-                photoUrl = "https://test.com",
-                emailVerified = true
-            )
-        ).`when`(userEventHandler).findUserByEmailOrPhoneNumber("friend@gmail.com", "+923001234568")
-        val transactionDto = TransactionDto(
-            amount = AmountDto(
-                currency = Currency.getInstance("USD"),
-                amount = 100.0.toBigDecimal(),
-                isOwed = true
-            ),
-            recipientId = friendEventStreamId,
-            description = "Test Transaction",
-            splitType = SplitType.TheyOweYouAll,
-            originalAmount = 100.0.toBigDecimal(),
-            recipientName = "Friend"
-        )
 
-        transactionService.addTransaction(
-            userUid = "123",
-            transactionDto = transactionDto
-        )
-
-        val events = transactionEventRepository.findAll().toList()
-        assertThat(events).hasSize(2)
-        val transactionStreamId = events[0].streamId
-
-        transactionService.updateTransaction(
-            userUid = "123",
-            transactionDto = transactionDto.copy(
-                amount = AmountDto(
-                    200.0.toBigDecimal(),
-                    Currency.getInstance("USD"),
-                    true
-                ),
-                originalAmount = 200.0.toBigDecimal(),
-                transactionStreamId = transactionStreamId
-            )
-        )
-
-        val transactionEvent = transactionEventRepository.findAll().toList()
-
-        assertThat(transactionEvent).hasSize(4)
-        assertAllEventsAreProperlyCreated(transactionEvent, transactionDto, friendEventStreamId, myStreamId)
-
-        val resolvedEvents = listOf(
-            transactionReadModel.read("123", transactionStreamId)!!, transactionReadModel.read(
-                "124",
-                transactionStreamId
-            )!!
-        )
-        assertThat(resolvedEvents).hasSize(2)
-        assertThat(resolvedEvents[0].userUid).isEqualTo("123")
-        assertThat(resolvedEvents[0].amount).isEqualTo(200.0.toBigDecimal())
-        assertThat(resolvedEvents[0].currency).isEqualTo(transactionDto.amount.currency.toString())
-        assertThat(resolvedEvents[0].transactionType).isEqualTo(TransactionType.CREDIT)
-        assertThat(resolvedEvents[0].recipientId).isEqualTo(friendEventStreamId)
-        assertThat(resolvedEvents[0].createdAt).isNotNull
-        assertThat(resolvedEvents[0].createdBy).isEqualTo("123")
-        assertThat(resolvedEvents[0].streamId).isNotNull()
-        assertThat(resolvedEvents[0].version).isEqualTo(2)
-
-
-        assertThat(resolvedEvents[1].userUid).isEqualTo("124")
-        assertThat(resolvedEvents[1].amount).isEqualTo(200.0.toBigDecimal())
-        assertThat(resolvedEvents[1].currency).isEqualTo(transactionDto.amount.currency.toString())
-        assertThat(resolvedEvents[1].transactionType).isEqualTo(TransactionType.DEBIT)
-        assertThat(resolvedEvents[1].recipientId).isEqualTo(myStreamId)
-        assertThat(resolvedEvents[1].createdAt).isNotNull
-        assertThat(resolvedEvents[1].createdBy).isEqualTo("123")
-        assertThat(resolvedEvents[1].streamId).isNotNull()
-        assertThat(resolvedEvents[1].version).isEqualTo(2)
+        val transaction = transactionEventHandler.read("123", transactionStreamId)
+        assertThat(transaction).isNotNull
+        assertThat(transaction?.amount).isEqualTo(100.0.toBigDecimal())
+        assertThat(transaction?.currency).isEqualTo("USD")
+        assertThat(transaction?.transactionType).isEqualTo(TransactionType.DEBIT)
     }
 
-    private fun assertAllEventsAreProperlyCreated(
-        transactionEvent: List<TransactionEvent>,
-        transactionDto: TransactionDto,
-        friendEventStreamId: UUID?,
-        myStreamId: UUID?,
-    ) {
-        assertThat(transactionEvent[0].userUid).isEqualTo("123")
-        assertThat(transactionEvent[0].amount).isEqualTo(100.0.toBigDecimal())
-        assertThat(transactionEvent[0].currency).isEqualTo(transactionDto.amount.currency.toString())
-        assertThat(transactionEvent[0].transactionType).isEqualTo(TransactionType.CREDIT)
-        assertThat(transactionEvent[0].recipientId).isEqualTo(friendEventStreamId)
-        assertThat(transactionEvent[0].createdAt).isNotNull
-        assertThat(transactionEvent[0].createdBy).isEqualTo("123")
-        assertThat(transactionEvent[0].streamId).isNotNull()
-        assertThat(transactionEvent[0].version).isEqualTo(1)
-        assertThat(transactionEvent[0].eventType).isEqualTo(TransactionEventType.TRANSACTION_CREATED)
-
-
-        assertThat(transactionEvent[1].userUid).isEqualTo("124")
-        assertThat(transactionEvent[1].amount).isEqualTo(100.0.toBigDecimal())
-        assertThat(transactionEvent[1].currency).isEqualTo(transactionDto.amount.currency.toString())
-        assertThat(transactionEvent[1].transactionType).isEqualTo(TransactionType.DEBIT)
-        assertThat(transactionEvent[1].recipientId).isEqualTo(myStreamId)
-        assertThat(transactionEvent[1].createdAt).isNotNull
-        assertThat(transactionEvent[1].createdBy).isEqualTo("123")
-        assertThat(transactionEvent[1].streamId).isNotNull()
-        assertThat(transactionEvent[1].version).isEqualTo(1)
-        assertThat(transactionEvent[1].eventType).isEqualTo(TransactionEventType.TRANSACTION_CREATED)
-
-
-        assertThat(transactionEvent[2].userUid).isEqualTo("123")
-        assertThat(transactionEvent[2].amount).isNull()
-        assertThat(transactionEvent[2].totalAmount).isEqualTo(200.0.toBigDecimal())
-        assertThat(transactionEvent[2].currency).isNull()
-        assertThat(transactionEvent[2].transactionType).isNull()
-        assertThat(transactionEvent[2].recipientId).isNull()
-        assertThat(transactionEvent[2].createdAt).isNotNull
-        assertThat(transactionEvent[2].createdBy).isEqualTo("123")
-        assertThat(transactionEvent[2].streamId).isNotNull()
-        assertThat(transactionEvent[2].version).isEqualTo(2)
-
-
-        assertThat(transactionEvent[3].userUid).isEqualTo("124")
-        assertThat(transactionEvent[2].amount).isNull()
-        assertThat(transactionEvent[2].totalAmount).isEqualTo(200.0.toBigDecimal())
-        assertThat(transactionEvent[2].currency).isNull()
-        assertThat(transactionEvent[2].transactionType).isNull()
-        assertThat(transactionEvent[2].recipientId).isNull()
-        assertThat(transactionEvent[2].createdAt).isNotNull
-        assertThat(transactionEvent[2].createdBy).isEqualTo("123")
-        assertThat(transactionEvent[2].streamId).isNotNull()
-        assertThat(transactionEvent[2].version).isEqualTo(2)
+    private fun sampleTransactions(friendStreamId: UUID): List<TransactionEvent> {
+        val transactionStreamId = UUID.randomUUID()
+        return listOf(
+            TransactionEvent(
+                userUid = "123",
+                amount = 100.0.toBigDecimal(),
+                currency = "USD",
+                transactionType = TransactionType.CREDIT,
+                recipientId = friendStreamId,
+                createdAt = Date().toInstant(),
+                createdBy = "123",
+                streamId = UUID.randomUUID(),
+                version = 1,
+                eventType = TransactionEventType.TRANSACTION_CREATED,
+                description = "some description",
+                splitType = SplitType.TheyOweYouAll,
+                totalAmount = 100.0.toBigDecimal()
+            ),
+            TransactionEvent(
+                userUid = "123",
+                amount = 200.0.toBigDecimal(),
+                currency = "USD",
+                transactionType = TransactionType.CREDIT,
+                recipientId = friendStreamId,
+                createdAt = Date().toInstant(),
+                createdBy = "123",
+                streamId = transactionStreamId,
+                version = 1,
+                eventType = TransactionEventType.TRANSACTION_CREATED,
+                description = "some description",
+                splitType = SplitType.TheyOweYouAll,
+                totalAmount = 200.0.toBigDecimal()
+            ),
+            TransactionEvent(
+                userUid = "123",
+                amount = null,
+                currency = null,
+                transactionType = null,
+                recipientId = null,
+                createdAt = Date().toInstant(),
+                createdBy = "123",
+                streamId = transactionStreamId,
+                version = 2,
+                eventType = TransactionEventType.SPLIT_TYPE_CHANGED,
+                description = null,
+                splitType = SplitType.YouOweThemAll,
+                totalAmount = null
+            ),
+            TransactionEvent(
+                userUid = "123",
+                amount = 150.0.toBigDecimal(),
+                currency = "USD",
+                transactionType = TransactionType.DEBIT,
+                recipientId = friendStreamId,
+                createdAt = Date().toInstant(),
+                createdBy = "123",
+                streamId = UUID.randomUUID(),
+                version = 1,
+                eventType = TransactionEventType.TRANSACTION_CREATED,
+                description = "some description",
+                splitType = SplitType.YouOweThemAll,
+                totalAmount = 150.0.toBigDecimal()
+            )
+        )
     }
 }

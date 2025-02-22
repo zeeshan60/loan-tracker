@@ -128,4 +128,8 @@ class TransactionService(
         }
         return Pair(friendUser, userStreamId)
     }
+
+    suspend fun transactionsByFriendId(userId: String, friendId: UUID): List<TransactionDto> {
+        return transactionEventHandler.transactionsByFriendId(userId, friendId)
+    }
 }

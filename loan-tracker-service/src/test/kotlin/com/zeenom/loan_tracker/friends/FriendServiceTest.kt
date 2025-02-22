@@ -1,7 +1,7 @@
 package com.zeenom.loan_tracker.friends
 
 import com.zeenom.loan_tracker.transactions.AmountDto
-import com.zeenom.loan_tracker.transactions.TransactionReadModel
+import com.zeenom.loan_tracker.transactions.TransactionEventHandler
 import com.zeenom.loan_tracker.users.*
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -31,14 +31,14 @@ class FriendServiceTest(
 ) : TestPostgresConfig() {
 
     private val userEventHandler = mock<UserEventHandler>()
-    private val transactionReadModel = mock<TransactionReadModel>()
+    private val transactionEventHandler = mock<TransactionEventHandler>()
     private val friendsEventHandler =
         FriendsEventHandler(
             eventRepository = eventRepository
         )
     private val friendService = FriendService(
         userEventHandler = userEventHandler,
-        transactionReadModel = transactionReadModel,
+        transactionEventHandler = transactionEventHandler,
         friendsEventHandler = friendsEventHandler,
     )
 
@@ -46,7 +46,7 @@ class FriendServiceTest(
     @BeforeEach
     fun setUp(): Unit = runBlocking {
         eventRepository.deleteAll()
-        doReturn(emptyMap<UUID, AmountDto>()).whenever(transactionReadModel).balancesOfFriends(any(), any())
+        doReturn(emptyMap<UUID, AmountDto>()).whenever(transactionEventHandler).balancesOfFriends(any(), any())
     }
 
     @Test
@@ -433,7 +433,7 @@ class FriendServiceTest(
 
         val friendService = FriendService(
             userEventHandler = userEventHandler,
-            transactionReadModel = transactionReadModel,
+            transactionEventHandler = transactionEventHandler,
             friendsEventHandler = friendsEventHandler,
         )
         val (user1, user2) = friendData
@@ -635,7 +635,7 @@ class FriendServiceTest(
         )
 
 
-        whenever(transactionReadModel.balancesOfFriends("123", listOf(friendStreamId))).thenReturn(
+        whenever(transactionEventHandler.balancesOfFriends("123", listOf(friendStreamId))).thenReturn(
             mapOf(
                 friendStreamId to AmountDto(
                     currency = Currency.getInstance("USD"),

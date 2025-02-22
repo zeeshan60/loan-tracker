@@ -1,6 +1,6 @@
 package com.zeenom.loan_tracker.friends
 
-import com.zeenom.loan_tracker.transactions.TransactionReadModel
+import com.zeenom.loan_tracker.transactions.TransactionEventHandler
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventHandler
 import kotlinx.coroutines.Dispatchers
@@ -15,11 +15,11 @@ import java.util.*
 class FriendService(
     private val friendsEventHandler: FriendsEventHandler,
     private val userEventHandler: UserEventHandler,
-    private val transactionReadModel: TransactionReadModel,
+    private val transactionEventHandler: TransactionEventHandler,
 ) {
     suspend fun findAllByUserId(userId: String): FriendsDto = withContext(Dispatchers.IO) {
         val events = friendsEventHandler.findAllEventsByUserId(userId).toList()
-        val amountsPerFriend = async { transactionReadModel.balancesOfFriends(userId, events.map { it.streamId }) }
+        val amountsPerFriend = async { transactionEventHandler.balancesOfFriends(userId, events.map { it.streamId }) }
         val usersByPhones =
             userEventHandler.findUsersByPhoneNumbers(events.mapNotNull { it.friendPhoneNumber }).toList()
                 .associateBy { it.phoneNumber }
