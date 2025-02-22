@@ -1,6 +1,7 @@
 package com.zeenom.loan_tracker.friends
 
 import com.zeenom.loan_tracker.transactions.TransactionReadModel
+import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -8,6 +9,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 class FriendService(
@@ -71,6 +73,23 @@ class FriendService(
             userEventHandler.findUsersByUids(myFriendIds).toList()
 
         friendsEventHandler.saveAllUsersAsFriends(uid, friends)
+    }
+
+
+    suspend fun findFriendAndUserStreamId(
+        userUid: String,
+        userEmail: String?,
+        userPhone: String?,
+        recipientId: UUID,
+    ): Pair<UserDto?, UUID?> {
+        val friend = friendsEventHandler.findFriendByUserIdAndFriendId(userUid, recipientId)
+            ?: throw IllegalArgumentException("User with id $userUid does not have friend with id $recipientId")
+        val friendUser = userEventHandler.findUserByEmailOrPhoneNumber(friend.email, friend.phoneNumber)
+        val userStreamId = friendUser?.let {
+            friendsEventHandler.findFriendStreamIdByEmailOrPhoneNumber(friendUser.uid, userEmail, userPhone)
+                ?: throw IllegalArgumentException("Friend with email ${friend.email} or phone number ${friend.phoneNumber} does not exist")
+        }
+        return Pair(friendUser, userStreamId)
     }
 
 }

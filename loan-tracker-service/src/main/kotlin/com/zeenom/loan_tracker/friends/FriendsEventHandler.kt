@@ -22,6 +22,7 @@ class FriendsEventHandler(
         return eventRepository.findByUserUidAndFriendPhoneNumber(userUid, phoneNumber)
     }
 
+
     suspend fun saveFriend(uid: String, friendDto: CreateFriendDto) {
         eventRepository.save(
             FriendEvent(

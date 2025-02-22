@@ -2,6 +2,7 @@ package com.zeenom.loan_tracker.events
 
 import com.zeenom.loan_tracker.common.Command
 import com.zeenom.loan_tracker.friends.FriendService
+import com.zeenom.loan_tracker.friends.FriendsEventHandler
 import com.zeenom.loan_tracker.transactions.TransactionEventHandler
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventHandler
@@ -10,6 +11,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 class LoginUserCommand(
@@ -24,10 +26,21 @@ class LoginUserCommand(
             userService.createUser(userDto = commandDto.payload)
             friendService.searchUsersImFriendOfAndAddThemAsMyFriends(commandDto.userId)
 
-            transactionEventHandler.addReverseTransactions(
-                commandDto.payload,
-                friendService.findAllByUserId(commandDto.userId).friends
-            )
+            friendService.findAllByUserId(commandDto.userId).friends.forEach { friend ->
+                val (friendEvent, userStreamId) = friendService.findFriendAndUserStreamId(
+                    userUid = commandDto.payload.uid,
+                    userEmail = commandDto.payload.email,
+                    userPhone = commandDto.payload.phoneNumber,
+                    recipientId = friend.friendId
+                )
+
+                transactionEventHandler.addReverseEventsForUserAndFriend(
+                    myUid = commandDto.payload.uid,
+                    myStreamId = userStreamId!!,
+                    friendUid = friendEvent!!.uid,
+                    friendStreamid = friend.friendId
+                )
+            }
         }
     }
 }

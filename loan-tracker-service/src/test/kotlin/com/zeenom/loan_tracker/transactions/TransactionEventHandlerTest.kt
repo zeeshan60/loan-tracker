@@ -20,7 +20,7 @@ import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest
 import java.util.*
 
 @DataR2dbcTest
-class TransactionEventHandlerTest(@Autowired private val transactionEventRepository: TransactionEventRepository) :
+class TransactionServiceTest(@Autowired private val transactionEventRepository: TransactionEventRepository) :
     TestPostgresConfig() {
     private val userEventHandler = mock<UserEventHandler>()
     private val friendEventHandler = mock<FriendsEventHandler>()
@@ -28,11 +28,13 @@ class TransactionEventHandlerTest(@Autowired private val transactionEventReposit
     private val transactionReadModel =
         TransactionReadModel(transactionEventRepository, friendEventRepository = friendEventRepository)
 
-    private val transactionEventHandler = TransactionEventHandler(
-        transactionEventRepository = transactionEventRepository,
+    private val transactionService = TransactionService(
+        transactionEventHandler = TransactionEventHandler(
+            transactionEventRepository = transactionEventRepository,
+            transactionReadModel = transactionReadModel
+        ),
         userEventHandler = userEventHandler,
-        friendEventHandler = friendEventHandler,
-        transactionReadModel = transactionReadModel
+        friendsEventHandler = friendEventHandler
     )
 
     @BeforeEach
@@ -74,7 +76,7 @@ class TransactionEventHandlerTest(@Autowired private val transactionEventReposit
             recipientName = "Friend"
         )
 
-        transactionEventHandler.addTransaction(
+        transactionService.addTransaction(
             userUid = "123",
             transactionDto = transactionDto
         )
@@ -144,7 +146,7 @@ class TransactionEventHandlerTest(@Autowired private val transactionEventReposit
             recipientName = "Friend"
         )
 
-        transactionEventHandler.addTransaction(
+        transactionService.addTransaction(
             userUid = "123",
             transactionDto = transactionDto
         )
@@ -197,7 +199,7 @@ class TransactionEventHandlerTest(@Autowired private val transactionEventReposit
 
         assertThatThrownBy {
             runBlocking {
-                transactionEventHandler.addTransaction(
+                transactionService.addTransaction(
                     userUid = "1234",
                     transactionDto = transactionDto
                 )
@@ -234,7 +236,7 @@ class TransactionEventHandlerTest(@Autowired private val transactionEventReposit
             recipientName = "Friend"
         )
 
-        assertThatThrownBy { runBlocking { transactionEventHandler.addTransaction("123", transactionDto) } }
+        assertThatThrownBy { runBlocking { transactionService.addTransaction("123", transactionDto) } }
             .isInstanceOf(IllegalArgumentException::class.java)
             .hasMessage("User with id 123 does not have friend with id $friendEventStreamId")
     }
@@ -289,7 +291,7 @@ class TransactionEventHandlerTest(@Autowired private val transactionEventReposit
             recipientName = "Friend"
         )
 
-        transactionEventHandler.addTransaction(
+        transactionService.addTransaction(
             userUid = "123",
             transactionDto = transactionDto
         )
@@ -298,7 +300,7 @@ class TransactionEventHandlerTest(@Autowired private val transactionEventReposit
         assertThat(events).hasSize(2)
         val transactionStreamId = events[0].streamId
 
-        transactionEventHandler.updateTransaction(
+        transactionService.updateTransaction(
             userUid = "123",
             transactionDto = transactionDto.copy(
                 amount = AmountDto(

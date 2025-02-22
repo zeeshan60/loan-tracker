@@ -10,13 +10,16 @@ import org.springframework.stereotype.Service
 
 @Service
 class UpdateTransactionCommand(
-    private val transactionEventHandler: TransactionEventHandler,
     private val commandDao: CommandDao,
+    private val transactionService: TransactionService,
 ) : Command<TransactionDto> {
     override suspend fun execute(commandDto: CommandDto<TransactionDto>) {
         CoroutineScope(Dispatchers.IO).launch {
             commandDao.addCommand(commandDto)
         }
-        transactionEventHandler.updateTransaction(commandDto.userId, commandDto.payload)
+        transactionService.updateTransaction(
+            userUid = commandDto.userId,
+            transactionDto = commandDto.payload
+        )
     }
 }

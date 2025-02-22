@@ -11,14 +11,18 @@ import java.util.*
 
 @Service
 class CreateTransactionCommand(
-    private val transactionEventHandler: TransactionEventHandler,
     private val commandDao: CommandDao,
+    private val transactionService: TransactionService
 ) : Command<TransactionDto> {
     override suspend fun execute(commandDto: CommandDto<TransactionDto>) {
         CoroutineScope(Dispatchers.IO).launch {
             commandDao.addCommand(commandDto)
         }
-        transactionEventHandler.addTransaction(commandDto.userId, commandDto.payload)
+
+        transactionService.addTransaction(
+            userUid = commandDto.userId,
+            transactionDto = commandDto.payload
+        )
     }
 }
 
