@@ -43,7 +43,8 @@ class TransactionService(
             version = 1
         )
         transactionEventHandler.addEvent(event)
-        friendUser?.let { transactionEventHandler.addEvent(event.crossTransaction(it.uid, userStreamId)) }
+        if (friendUser != null && userStreamId != null)
+            transactionEventHandler.addEvent(event.crossTransaction(friendUser.uid, userStreamId))
     }
 
     suspend fun updateTransaction(
@@ -70,10 +71,12 @@ class TransactionService(
                 createdAt = Instant.now(),
                 createdBy = userUid,
                 streamId = existing.streamId,
-                version = eventVersion++
+                version = eventVersion++,
+                recipientId = transactionDto.recipientId
             )
             transactionEventHandler.addEvent(event)
-            friendUser?.let { transactionEventHandler.addEvent(event.crossTransaction(it.uid, userStreamId)) }
+            if (friendUser != null && userStreamId != null)
+                transactionEventHandler.addEvent(event.crossTransaction(friendUser.uid, userStreamId))
         }
 
         if (existing.splitType != transactionDto.splitType) {
@@ -83,10 +86,12 @@ class TransactionService(
                 createdAt = Instant.now(),
                 createdBy = userUid,
                 streamId = existing.streamId,
-                version = eventVersion++
+                version = eventVersion++,
+                recipientId = transactionDto.recipientId
             )
             transactionEventHandler.addEvent(event)
-            friendUser?.let { transactionEventHandler.addEvent(event.crossTransaction(it.uid, userStreamId)) }
+            if (friendUser != null && userStreamId != null)
+                transactionEventHandler.addEvent(event.crossTransaction(friendUser.uid, userStreamId))
         }
 
         if (existing.totalAmount != transactionDto.originalAmount) {
@@ -96,10 +101,12 @@ class TransactionService(
                 createdAt = Instant.now(),
                 createdBy = userUid,
                 streamId = existing.streamId,
-                version = eventVersion++
+                version = eventVersion++,
+                recipientId = transactionDto.recipientId
             )
             transactionEventHandler.addEvent(event)
-            friendUser?.let { transactionEventHandler.addEvent(event.crossTransaction(it.uid, userStreamId)) }
+            if (friendUser != null && userStreamId != null)
+                transactionEventHandler.addEvent(event.crossTransaction(friendUser.uid, userStreamId))
         }
 
         if (existing.currency != transactionDto.amount.currency.toString()) {
@@ -109,10 +116,12 @@ class TransactionService(
                 createdAt = Instant.now(),
                 createdBy = userUid,
                 streamId = existing.streamId,
-                version = eventVersion
+                version = eventVersion,
+                recipientId = transactionDto.recipientId
             )
             transactionEventHandler.addEvent(event)
-            friendUser?.let { transactionEventHandler.addEvent(event.crossTransaction(it.uid, userStreamId)) }
+            if (friendUser != null && userStreamId != null)
+                transactionEventHandler.addEvent(event.crossTransaction(friendUser.uid, userStreamId))
         }
     }
 

@@ -380,7 +380,7 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
         assertThat(transactionEvent[2].totalAmount).isEqualTo(200.0.toBigDecimal())
         assertThat(transactionEvent[2].currency).isNull()
         assertThat(transactionEvent[2].transactionType).isNull()
-        assertThat(transactionEvent[2].recipientId).isNull()
+        assertThat(transactionEvent[2].recipientId).isNotNull()
         assertThat(transactionEvent[2].createdAt).isNotNull
         assertThat(transactionEvent[2].createdBy).isEqualTo("123")
         assertThat(transactionEvent[2].streamId).isNotNull()
@@ -392,7 +392,7 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
         assertThat(transactionEvent[2].totalAmount).isEqualTo(200.0.toBigDecimal())
         assertThat(transactionEvent[2].currency).isNull()
         assertThat(transactionEvent[2].transactionType).isNull()
-        assertThat(transactionEvent[2].recipientId).isNull()
+        assertThat(transactionEvent[2].recipientId).isNotNull()
         assertThat(transactionEvent[2].createdAt).isNotNull
         assertThat(transactionEvent[2].createdBy).isEqualTo("123")
         assertThat(transactionEvent[2].streamId).isNotNull()

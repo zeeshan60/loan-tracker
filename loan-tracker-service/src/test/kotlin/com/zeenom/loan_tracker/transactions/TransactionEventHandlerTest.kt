@@ -18,27 +18,16 @@ class TransactionEventHandlerTest {
         val friendStreamId = UUID.randomUUID()
         val transactionEventHandler = TransactionEventHandler(
             transactionEventRepository = mock {
-                val sampleTransactions = sampleTransactions(
-                    friendStreamId
-                )
                 on {
                     runBlocking {
-                        findAllByUserUidAndRecipientIdInAndEventType(
+                        findAllByUserUidAndRecipientIdIn(
                             "123",
-                            listOf(friendStreamId),
-                            TransactionEventType.TRANSACTION_CREATED
+                            listOf(friendStreamId)
                         )
                     }
-                } doReturn sampleTransactions.filter { it.eventType == TransactionEventType.TRANSACTION_CREATED }
-                    .asFlow()
-                sampleTransactions.forEach { sample ->
-                    on {
-                        runBlocking {
-                            findAllByUserUidAndStreamId("123", sample.streamId)
-                        }
-                    } doReturn sampleTransactions.filter { it.streamId == sample.streamId && it.userUid == "123" }
-                        .asFlow()
-                }
+                } doReturn sampleTransactions(
+                    friendStreamId
+                ).asFlow()
             },
             friendEventRepository = mock {
                 on {
@@ -71,27 +60,16 @@ class TransactionEventHandlerTest {
         val friendStreamId2 = UUID.randomUUID()
         val transactionEventHandler = TransactionEventHandler(
             transactionEventRepository = mock {
-                val sampleTransactions = sampleTransactions(
-                    friendStreamId1
-                ) + sampleTransactions(friendStreamId2)
                 on {
                     runBlocking {
-                        findAllByUserUidAndRecipientIdInAndEventType(
+                        findAllByUserUidAndRecipientIdIn(
                             "123",
-                            listOf(friendStreamId1, friendStreamId2),
-                            TransactionEventType.TRANSACTION_CREATED
+                            listOf(friendStreamId1, friendStreamId2)
                         )
                     }
-                } doReturn sampleTransactions.filter { it.eventType == TransactionEventType.TRANSACTION_CREATED }
-                    .asFlow()
-                sampleTransactions.forEach { sample ->
-                    on {
-                        runBlocking {
-                            findAllByUserUidAndStreamId("123", sample.streamId)
-                        }
-                    } doReturn sampleTransactions.filter { it.streamId == sample.streamId && it.userUid == "123" }
-                        .asFlow()
-                }
+                } doReturn sampleTransactions(
+                    friendStreamId1
+                ).plus(sampleTransactions(friendStreamId2)).asFlow()
             },
             friendEventRepository = mock {
                 on {
@@ -169,7 +147,7 @@ class TransactionEventHandlerTest {
                         amount = null,
                         currency = null,
                         transactionType = null,
-                        recipientId = null,
+                        recipientId = friendStreamId,
                         createdAt = Instant.now(),
                         createdBy = "123",
                         streamId = transactionStreamId,
@@ -184,7 +162,7 @@ class TransactionEventHandlerTest {
                         amount = null,
                         currency = null,
                         transactionType = null,
-                        recipientId = null,
+                        recipientId = friendStreamId,
                         createdAt = Instant.now(),
                         createdBy = "123",
                         streamId = transactionStreamId,
@@ -259,7 +237,7 @@ class TransactionEventHandlerTest {
                 amount = null,
                 currency = null,
                 transactionType = null,
-                recipientId = null,
+                recipientId = friendStreamId,
                 createdAt = Date().toInstant(),
                 createdBy = "123",
                 streamId = transactionStreamId,

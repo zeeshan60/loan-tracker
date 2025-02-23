@@ -117,25 +117,18 @@ class TransactionEventHandler(
         friendStreamId: UUID,
     ): List<TransactionEvent> {
         return transactionEventRepository
-            .findAllByUserUidAndRecipientIdAndEventType(
+            .findAllByUserUidAndRecipientId(
                 userId,
-                friendStreamId,
-                TransactionEventType.TRANSACTION_CREATED
+                friendStreamId
             ).toList()
-            .map {
-                Json.prettyPrint(it)
-                transactionEventRepository.findAllByUserUidAndStreamId(userId, it.streamId).toList()
-            }.flatten()
     }
 
     suspend fun balancesOfFriends(userId: String, friendIds: List<UUID>): Map<UUID, AmountDto> {
 
-        val toList = transactionEventRepository.findAllByUserUidAndRecipientIdInAndEventType(
+        val toList = transactionEventRepository.findAllByUserUidAndRecipientIdIn(
             userId,
-            friendIds,
-            TransactionEventType.TRANSACTION_CREATED
-        ).toList().map { transactionEventRepository.findAllByUserUidAndStreamId(userId, it.streamId).toList() }
-            .flatten()
+            friendIds
+        ).toList()
         return toList
             .map { it.toEvent() }
             .groupBy { it.streamId }

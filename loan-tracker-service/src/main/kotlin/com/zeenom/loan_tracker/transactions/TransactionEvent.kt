@@ -20,7 +20,7 @@ data class TransactionEvent(
     val transactionType: TransactionType?,
     val splitType: SplitType?,
     val totalAmount: BigDecimal?,
-    val recipientId: UUID?,
+    val recipientId: UUID,
     val createdAt: Instant,
     val createdBy: String,
     val streamId: UUID,
@@ -51,6 +51,7 @@ data class TransactionEvent(
                 createdBy = createdBy,
                 streamId = streamId,
                 version = version,
+                recipientId = recipientId,
             )
 
             TransactionEventType.SPLIT_TYPE_CHANGED -> SplitTypeChanged(
@@ -60,6 +61,7 @@ data class TransactionEvent(
                 createdBy = createdBy,
                 streamId = streamId,
                 version = version,
+                recipientId = recipientId
             )
 
             TransactionEventType.TOTAL_AMOUNT_CHANGED -> TotalAmountChanged(
@@ -69,6 +71,7 @@ data class TransactionEvent(
                 createdBy = createdBy,
                 streamId = streamId,
                 version = version,
+                recipientId = recipientId,
             )
 
             TransactionEventType.CURRENCY_CHANGED -> CurrencyChanged(
@@ -78,6 +81,7 @@ data class TransactionEvent(
                 createdBy = createdBy,
                 streamId = streamId,
                 version = version,
+                recipientId = recipientId
             )
         }
     }
@@ -97,11 +101,10 @@ enum class TransactionEventType {
 
 @Repository
 interface TransactionEventRepository : CoroutineCrudRepository<TransactionEvent, UUID> {
-    suspend fun findAllByUserUidAndRecipientIdAndEventType(userId: String, recipientId: UUID, eventType: TransactionEventType): Flow<TransactionEvent>
-    suspend fun findAllByUserUidAndRecipientIdInAndEventType(
+    suspend fun findAllByUserUidAndRecipientId(userId: String, recipientId: UUID): Flow<TransactionEvent>
+    suspend fun findAllByUserUidAndRecipientIdIn(
         userId: String,
-        recipientIds: List<UUID>,
-        eventType: TransactionEventType
+        recipientIds: List<UUID>
     ): Flow<TransactionEvent>
 
     suspend fun findAllByUserUidAndStreamId(userId: String, streamId: UUID): Flow<TransactionEvent>
