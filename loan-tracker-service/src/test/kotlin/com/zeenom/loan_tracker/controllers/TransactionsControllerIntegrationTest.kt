@@ -199,26 +199,30 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
         assertThat(result.perMonth[0].transactions[0].splitType).isEqualTo(SplitType.TheyOweYouAll)
         assertThat(result.perMonth[0].transactions[0].description).isEqualTo("Sample transaction edited")
         assertThat(result.perMonth[0].transactions[0].history[0].changes).hasSize(4)
-        val history1 = result.perMonth[0].transactions[0].history[0].changes[0]
-        assertThat(history1.type).isEqualTo(TransactionChangeType.DESCRIPTION)
+        val history1 = result.perMonth[0].transactions[0].history[0]
+        val history1Changes = result.perMonth[0].transactions[0].history[0].changes[0]
+        assertThat(history1Changes.type).isEqualTo(TransactionChangeType.DESCRIPTION)
         assertThat(history1.userId).isEqualTo(zeeDto.uid)
-        assertThat(history1.oldValue).isEqualTo("Sample transaction")
-        assertThat(history1.newValue).isEqualTo("Sample transaction edited")
-        val history2 = result.perMonth[0].transactions[0].history[0].changes[1]
-        assertThat(history2.type).isEqualTo(TransactionChangeType.SPLIT_TYPE)
+        assertThat(history1Changes.oldValue).isEqualTo("Sample transaction")
+        assertThat(history1Changes.newValue).isEqualTo("Sample transaction edited")
+        val history2 = result.perMonth[0].transactions[0].history[0]
+        val history2Changes = result.perMonth[0].transactions[0].history[0].changes[1]
+        assertThat(history2Changes.type).isEqualTo(TransactionChangeType.SPLIT_TYPE)
         assertThat(history2.userId).isEqualTo(zeeDto.uid)
-        assertThat(history2.oldValue).isEqualTo("YouPaidSplitEqually")
-        assertThat(history2.newValue).isEqualTo("TheyOweYouAll")
-        val history3 = result.perMonth[0].transactions[0].history[0].changes[2]
-        assertThat(history3.type).isEqualTo(TransactionChangeType.TOTAL_AMOUNT)
+        assertThat(history2Changes.oldValue).isEqualTo("YouPaidSplitEqually")
+        assertThat(history2Changes.newValue).isEqualTo("TheyOweYouAll")
+        val history3 = result.perMonth[0].transactions[0].history[0]
+        val history3Changes = result.perMonth[0].transactions[0].history[0].changes[2]
+        assertThat(history3Changes.type).isEqualTo(TransactionChangeType.TOTAL_AMOUNT)
         assertThat(history3.userId).isEqualTo(zeeDto.uid)
-        assertThat(history3.oldValue).isEqualTo("100.0")
-        assertThat(history3.newValue).isEqualTo("200.0")
-        val history4 = result.perMonth[0].transactions[0].history[0].changes[3]
-        assertThat(history4.type).isEqualTo(TransactionChangeType.CURRENCY)
+        assertThat(history3Changes.oldValue).isEqualTo("100.0")
+        assertThat(history3Changes.newValue).isEqualTo("200.0")
+        val history4 = result.perMonth[0].transactions[0].history[0]
+        val history4Changes = result.perMonth[0].transactions[0].history[0].changes[3]
+        assertThat(history4Changes.type).isEqualTo(TransactionChangeType.CURRENCY)
         assertThat(history4.userId).isEqualTo(zeeDto.uid)
-        assertThat(history4.oldValue).isEqualTo("USD")
-        assertThat(history4.newValue).isEqualTo("SGD")
+        assertThat(history4Changes.oldValue).isEqualTo("USD")
+        assertThat(history4Changes.newValue).isEqualTo("SGD")
 
 
     }
@@ -248,26 +252,30 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
         assertThat(result.perMonth[0].transactions[0].splitType).isEqualTo(SplitType.YouOweThemAll)
         assertThat(result.perMonth[0].transactions[0].description).isEqualTo("Sample transaction edited")
         assertThat(result.perMonth[0].transactions[0].history[0].changes).hasSize(4)
-        val history1 = result.perMonth[0].transactions[0].history[0].changes[0]
-        assertThat(history1.type).isEqualTo(TransactionChangeType.DESCRIPTION)
+        val history1 = result.perMonth[0].transactions[0].history[0]
+        val history1Changes = result.perMonth[0].transactions[0].history[0].changes[0]
+        assertThat(history1Changes.type).isEqualTo(TransactionChangeType.DESCRIPTION)
         assertThat(history1.userId).isEqualTo(johnDto.uid)
-        assertThat(history1.oldValue).isEqualTo("Sample transaction")
-        assertThat(history1.newValue).isEqualTo("Sample transaction edited")
-        val history2 = result.perMonth[0].transactions[0].history[0].changes[1]
-        assertThat(history2.type).isEqualTo(TransactionChangeType.SPLIT_TYPE)
+        assertThat(history1Changes.oldValue).isEqualTo("Sample transaction")
+        assertThat(history1Changes.newValue).isEqualTo("Sample transaction edited")
+        val history2 = result.perMonth[0].transactions[0].history[0]
+        val history2Changes = result.perMonth[0].transactions[0].history[0].changes[1]
+        assertThat(history2Changes.type).isEqualTo(TransactionChangeType.SPLIT_TYPE)
         assertThat(history2.userId).isEqualTo(johnDto.uid)
-        assertThat(history2.oldValue).isEqualTo("TheyPaidSplitEqually")
-        assertThat(history2.newValue).isEqualTo("YouOweThemAll")
-        val history3 = result.perMonth[0].transactions[0].history[0].changes[2]
-        assertThat(history3.type).isEqualTo(TransactionChangeType.TOTAL_AMOUNT)
+        assertThat(history2Changes.oldValue).isEqualTo("TheyPaidSplitEqually")
+        assertThat(history2Changes.newValue).isEqualTo("YouOweThemAll")
+        val history3 = result.perMonth[0].transactions[0].history[0]
+        val history3Changes = result.perMonth[0].transactions[0].history[0].changes[2]
+        assertThat(history3Changes.type).isEqualTo(TransactionChangeType.TOTAL_AMOUNT)
         assertThat(history3.userId).isEqualTo(johnDto.uid)
-        assertThat(history3.oldValue).isEqualTo("100.0")
-        assertThat(history3.newValue).isEqualTo("200.0")
-        val history4 = result.perMonth[0].transactions[0].history[0].changes[3]
-        assertThat(history4.type).isEqualTo(TransactionChangeType.CURRENCY)
+        assertThat(history3Changes.oldValue).isEqualTo("100.0")
+        assertThat(history3Changes.newValue).isEqualTo("200.0")
+        val history4 = result.perMonth[0].transactions[0].history[0]
+        val history4Changes = result.perMonth[0].transactions[0].history[0].changes[3]
+        assertThat(history4Changes.type).isEqualTo(TransactionChangeType.CURRENCY)
         assertThat(history4.userId).isEqualTo(johnDto.uid)
-        assertThat(history4.oldValue).isEqualTo("USD")
-        assertThat(history4.newValue).isEqualTo("SGD")
+        assertThat(history4Changes.oldValue).isEqualTo("USD")
+        assertThat(history4Changes.newValue).isEqualTo("SGD")
     }
 
     @Order(8)
