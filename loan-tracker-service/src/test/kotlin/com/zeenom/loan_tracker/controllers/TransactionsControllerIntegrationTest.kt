@@ -73,7 +73,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
             .uri("/api/v1/transactions/add")
             .header("Authorization", "Bearer $zeeToken")
             .bodyValue(
-                TransactionRequest(
+                TransactionCreateRequest(
                     amount = 100.0.toBigDecimal(),
                     currency = "USD",
                     type = SplitType.YouPaidSplitEqually,
@@ -162,11 +162,10 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
             .uri("/api/v1/transactions/update/transactionId/$transactionId")
             .header("Authorization", "Bearer $zeeToken")
             .bodyValue(
-                TransactionRequest(
+                TransactionUpdateRequest(
                     amount = 200.0.toBigDecimal(),
                     currency = "SGD",
                     type = SplitType.TheyOweYouAll,
-                    recipientId = johnFriendId,
                     description = "Sample transaction edited"
                 )
             )
@@ -324,7 +323,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
             .uri("/api/v1/transactions/add")
             .header("Authorization", "Bearer $zeeToken")
             .bodyValue(
-                TransactionRequest(
+                TransactionCreateRequest(
                     amount = 100.0.toBigDecimal(),
                     currency = "USD",
                     type = SplitType.YouPaidSplitEqually,

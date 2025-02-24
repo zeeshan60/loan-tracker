@@ -9,7 +9,7 @@ data class TransactionDto(
     val description: String,
     val originalAmount: BigDecimal,
     val splitType: SplitType,
-    val recipientId: UUID,
+    val recipientId: UUID?,
     val recipientName: String?,
     val transactionStreamId: UUID? = null,
     val history: List<ChangeSummary> = emptyList()

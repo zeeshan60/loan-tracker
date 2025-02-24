@@ -7,7 +7,6 @@ import com.zeenom.loan_tracker.common.isOwed
 import com.zeenom.loan_tracker.events.CommandDto
 import com.zeenom.loan_tracker.events.CommandType
 import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.media.Schema
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import java.math.BigDecimal
@@ -24,7 +23,7 @@ class TransactionsController(
     @Operation(summary = "Add a transaction")
     @PostMapping("/add")
     suspend fun addTransaction(
-        @RequestBody transactionRequest: TransactionRequest,
+        @RequestBody transactionRequest: TransactionCreateRequest,
         @AuthenticationPrincipal userId: String,
     ): MessageResponse {
         createTransactionCommand.execute(
@@ -41,7 +40,7 @@ class TransactionsController(
     @PutMapping("/update/transactionId/{transactionId}")
     suspend fun updateTransaction(
         @PathVariable transactionId: UUID,
-        @RequestBody transactionRequest: TransactionRequest,
+        @RequestBody transactionRequest: TransactionUpdateRequest,
         @AuthenticationPrincipal userId: String,
     ): MessageResponse {
         updateTransactionCommand.execute(
@@ -89,14 +88,14 @@ class TransactionsController(
         }
     }
 
-    private fun requestToDto(transactionRequest: TransactionRequest) =
+    private fun requestToDto(transactionRequest: TransactionBaseRequest) =
         TransactionDto(
             amount = AmountDto(
                 amount = transactionRequest.type.amountForYou(transactionRequest.amount),
                 currency = Currency.getInstance(transactionRequest.currency),
                 isOwed = transactionRequest.type.isOwed()
             ),
-            recipientId = transactionRequest.recipientId,
+            recipientId = if (transactionRequest is TransactionCreateRequest) transactionRequest.recipientId else null,
             description = transactionRequest.description,
             splitType = transactionRequest.type,
             originalAmount = transactionRequest.amount,
@@ -105,14 +104,27 @@ class TransactionsController(
 }
 
 
-data class TransactionRequest(
-    val amount: BigDecimal,
-    val currency: String,
-    val type: SplitType,
-    @Schema(description = "For updates recipient id must be same as the original recipient id")
-    val recipientId: UUID,
-    val description: String,
-)
+interface TransactionBaseRequest {
+    val amount: BigDecimal
+    val currency: String
+    val type: SplitType
+    val description: String
+}
+
+data class TransactionCreateRequest(
+    override val amount: BigDecimal,
+    override val currency: String,
+    override val type: SplitType,
+    val recipientId: UUID?,
+    override val description: String,
+) : TransactionBaseRequest
+
+data class TransactionUpdateRequest(
+    override val amount: BigDecimal,
+    override val currency: String,
+    override val type: SplitType,
+    override val description: String,
+) : TransactionBaseRequest
 
 enum class SplitType {
     YouPaidSplitEqually,

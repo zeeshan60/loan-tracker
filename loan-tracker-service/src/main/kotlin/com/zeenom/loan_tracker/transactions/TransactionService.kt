@@ -25,6 +25,7 @@ class TransactionService(
         val (friendUser, userStreamId) = friendUserAndMyStreamId(
             userUid = userUid,
             recipientId = transactionDto.recipientId
+                ?: throw IllegalArgumentException("Recipient id is required to add new transaction")
         )
 
         val streamId = UUID.randomUUID()
@@ -51,10 +52,6 @@ class TransactionService(
         userUid: String,
         transactionDto: TransactionDto,
     ): Unit = withContext(Dispatchers.IO) {
-        val (friendUser, userStreamId) = friendUserAndMyStreamId(
-            userUid = userUid,
-            recipientId = transactionDto.recipientId
-        )
 
         if (transactionDto.transactionStreamId == null) {
             throw IllegalArgumentException("Transaction stream id is required")
@@ -63,6 +60,11 @@ class TransactionService(
         val existing = transactionEventHandler.read(userUid, transactionDto.transactionStreamId)
             ?: throw IllegalArgumentException("Transaction with id ${transactionDto.transactionStreamId} does not exist")
 
+        val recipientId = existing.recipientId
+        val (friendUser, userStreamId) = friendUserAndMyStreamId(
+            userUid = userUid,
+            recipientId = recipientId
+        )
         var eventVersion = existing.version + 1
         if (existing.description != transactionDto.description) {
             val event = DescriptionChanged(
@@ -72,7 +74,7 @@ class TransactionService(
                 createdBy = userUid,
                 streamId = existing.streamId,
                 version = eventVersion++,
-                recipientId = transactionDto.recipientId
+                recipientId = recipientId
             )
             transactionEventHandler.addEvent(event)
             if (friendUser != null && userStreamId != null)
@@ -87,7 +89,7 @@ class TransactionService(
                 createdBy = userUid,
                 streamId = existing.streamId,
                 version = eventVersion++,
-                recipientId = transactionDto.recipientId
+                recipientId = recipientId
             )
             transactionEventHandler.addEvent(event)
             if (friendUser != null && userStreamId != null)
@@ -102,7 +104,7 @@ class TransactionService(
                 createdBy = userUid,
                 streamId = existing.streamId,
                 version = eventVersion++,
-                recipientId = transactionDto.recipientId
+                recipientId = recipientId
             )
             transactionEventHandler.addEvent(event)
             if (friendUser != null && userStreamId != null)
@@ -117,7 +119,7 @@ class TransactionService(
                 createdBy = userUid,
                 streamId = existing.streamId,
                 version = eventVersion,
-                recipientId = transactionDto.recipientId
+                recipientId = recipientId
             )
             transactionEventHandler.addEvent(event)
             if (friendUser != null && userStreamId != null)
