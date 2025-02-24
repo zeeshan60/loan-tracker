@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package com.zeenom.loan_tracker.common
 
 import com.zeenom.loan_tracker.transactions.SplitType

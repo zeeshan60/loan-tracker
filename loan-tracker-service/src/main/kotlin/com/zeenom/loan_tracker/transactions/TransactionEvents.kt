@@ -1,13 +1,12 @@
 package com.zeenom.loan_tracker.transactions
 
-import com.zeenom.loan_tracker.common.apply
 import com.zeenom.loan_tracker.common.events.IEvent
 import com.zeenom.loan_tracker.common.reverse
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.*
 
-interface ITransactionEvent: IEvent<TransactionModel>, TransactionChangeSummary, CrossTransactionable {
+interface ITransactionEvent : IEvent<TransactionModel>, TransactionChangeSummary, CrossTransactionable {
     val recipientId: UUID
 }
 

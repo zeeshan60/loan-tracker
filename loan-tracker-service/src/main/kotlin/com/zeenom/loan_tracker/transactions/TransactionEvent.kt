@@ -33,7 +33,7 @@ data class TransactionEvent(
                 currency = currency ?: throw IllegalStateException("Currency is required"),
                 splitType = splitType ?: throw IllegalStateException("Split type is required"),
                 totalAmount = totalAmount ?: throw IllegalStateException("Total amount is required"),
-                recipientId = recipientId ?: throw IllegalStateException("Recipient ID is required"),
+                recipientId = recipientId,
                 createdAt = createdAt,
                 createdBy = createdBy,
                 streamId = streamId,

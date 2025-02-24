@@ -1,4 +1,4 @@
-package com.zeenom.loan_tracker.transactions;
+package com.zeenom.loan_tracker.transactions
 
 import com.zeenom.loan_tracker.common.*
 import com.zeenom.loan_tracker.events.CommandDto
