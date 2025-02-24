@@ -166,6 +166,10 @@ data class TransactionsResponse(
 )
 
 data class TransactionsPerMonth(
+    @Schema(
+        description = "This will be first day at 00:00 of the month in passed timezone",
+        example = "2021-01-01T00:00:00Z"
+    )
     val date: Instant,
     val transactions: List<TransactionResponse>,
 )
