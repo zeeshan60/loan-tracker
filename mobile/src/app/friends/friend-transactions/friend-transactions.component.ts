@@ -8,10 +8,12 @@ import {
   IonHeader,
   IonIcon,
   IonItem,
-  IonLabel, IonList, IonSpinner, IonTitle, IonToolbar,
+  IonLabel, IonList, IonNav, IonSpinner, IonTitle, IonToolbar,
 } from '@ionic/angular/standalone';
 import { NavParams } from '@ionic/angular';
 import { Friend } from '../model';
+import { TransactionDetailsComponent } from '../transaction-details/transaction-details.component';
+import { FriendsStore } from '../friends.store';
 
 @Component({
   selector: 'app-friend-transactions',
@@ -37,22 +39,30 @@ import { Friend } from '../model';
 })
 export class FriendTransactionsComponent  implements OnInit {
   readonly friend: Friend = inject(NavParams).data?.['friend'];
+  readonly nav = inject(IonNav);
+  readonly friendsStore = inject(FriendsStore);
+  readonly transactionDetails = TransactionDetailsComponent;
+  readonly transactions = [
+    { name: 'bablu ko diye' },
+    { name: 'mom ka kharcha' },
+  ]
 
   constructor() {
-    console.log(this.friend);
   }
 
   ngOnInit() {}
 
+  openTransactionDetails(transaction: any) {
+    this.nav.push(this.transactionDetails, {
+      transaction
+    });
+  }
+
   ionViewDidEnter() {
-    console.log('Transactions page did enter');
+    this.friendsStore.setSelectedFriend(this.friend || null);
   }
 
   ionViewDidLeave() {
-    console.log('Transactions page did leave');
-  }
-
-  ionTabsDidChange(event: any) {
-    console.log('tabs changed..');
+    this.friendsStore.setSelectedFriend(null);
   }
 }

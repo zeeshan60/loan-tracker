@@ -60,12 +60,4 @@ export class ListFriendsComponent  implements OnInit {
       this.friendsStore.loadFriends();
     }
   }
-
-  ionViewDidEnter() {
-    console.log('List friends page did enter');
-  }
-
-  ionViewDidLeave() {
-    console.log('List friends page did leave');
-  }
 }

@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ListFriendsComponent } from './list-friends/list-friends.component';
-import { IonicModule } from '@ionic/angular';
 import { IonNav } from '@ionic/angular/standalone';
 
 @Component({

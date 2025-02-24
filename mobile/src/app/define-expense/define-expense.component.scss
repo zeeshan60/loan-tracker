@@ -9,6 +9,13 @@
   }
 }
 
+.choose-friend-item {
+  ion-button {
+    display: inline;
+    margin-top: 10px;
+  }
+}
+
 ion-select.split-option-select {
   &::part(text) {
     color: red;

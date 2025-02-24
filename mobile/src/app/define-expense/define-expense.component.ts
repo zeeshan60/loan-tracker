@@ -1,21 +1,22 @@
-import { ChangeDetectionStrategy, Component, inject, Input, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, Input, model, OnInit, signal } from '@angular/core';
 import {
   IonBackButton,
   IonButton,
   IonButtons,
   IonContent,
   IonHeader,
-  IonInput, IonItem, IonList, IonSelect, IonSelectOption, IonSpinner,
+  IonInput, IonItem, IonLabel, IonList, IonSelect, IonSelectOption, IonSpinner,
   IonTitle,
   IonToolbar, ModalController,
 } from '@ionic/angular/standalone';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { HelperService } from '../../helper.service';
-import { delay, firstValueFrom, timer } from 'rxjs';
+import { firstValueFrom, timer } from 'rxjs';
 import { Router } from '@angular/router';
-import { FriendsStore } from '../../friends/friends.store';
-import { Friend } from '../../friends/model';
-import { NavParams } from '@ionic/angular';
+import { HelperService } from '../helper.service';
+import { FriendsStore } from '../friends/friends.store';
+import { Friend } from '../friends/model';
+import { SelectFriendComponent } from './select-friend/select-friend.component';
+import { JsonPipe } from '@angular/common';
 
 export enum SplitOptions {
   YouPaidSplitEqually,
@@ -45,16 +46,15 @@ export enum SplitOptions {
     IonList,
     IonItem,
     IonBackButton,
+    JsonPipe,
+    IonLabel,
   ],
 })
 export class DefineExpenseComponent {
-  @Input() friend!: Friend;
-  @Input() isDirectOpen = false;
-  readonly navParams = inject(NavParams).data;
-  readonly modalCtrl = inject(ModalController);
-  readonly selectedFriend = this.friend || this.navParams['friend'];
+  readonly friend = model<Friend|null>(null);
   readonly loading = signal(false);
-  readonly helperService = inject(HelperService);
+  readonly modalCtrl = inject(ModalController);
+  readonly helperService = inject<HelperService>(HelperService);
   readonly formBuilder = inject(FormBuilder);
   readonly friendsStore = inject(FriendsStore);
   readonly SplitOption = SplitOptions;
@@ -64,7 +64,7 @@ export class DefineExpenseComponent {
     description: this.formBuilder.nonNullable.control('', [Validators.required, Validators.maxLength(1000)]),
     currency: this.formBuilder.nonNullable.control('PKR', [Validators.required]),
     expense: this.formBuilder.nonNullable.control(null, [Validators.required, Validators.min(1)]),
-    whoOwesWho: this.formBuilder.nonNullable.control(SplitOptions.YouPaidSplitEqually, [Validators.required]),
+    whoOwesWho: this.formBuilder.nonNullable.control({ value: SplitOptions.YouPaidSplitEqually, disabled: !this.friend }, [Validators.required]),
   });
   isOwed = () => {
     return [SplitOptions.YouPaidSplitEqually, SplitOptions.TheyOweYouAll]
@@ -91,6 +91,18 @@ export class DefineExpenseComponent {
     } else {
       this.defineExpenseForm.markAllAsTouched();
       await this.helperService.showToast('Please fill in the correct values');
+    }
+  }
+
+  async chooseFriend() {
+    const modal = await this.modalCtrl.create({
+      component: SelectFriendComponent,
+    })
+    modal.present();
+
+    const { data, role } = await modal.onWillDismiss();
+    if (role === 'confirm') {
+      this.friend.set(data['friend']);
     }
   }
 

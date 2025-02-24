@@ -21,7 +21,9 @@ bootstrapApplication(AppComponent, {
     provideHttpClient(
       withInterceptorsFromDi(),
     ),
-    provideIonicAngular(),
+    provideIonicAngular({
+      useSetInputAPI: true
+    }),
     provideRouter(routes, withPreloading(PreloadAllModules)),
     provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
     provideAuth(() => getAuth())

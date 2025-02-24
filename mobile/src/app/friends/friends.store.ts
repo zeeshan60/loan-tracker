@@ -27,6 +27,7 @@ const initialState: FriendsState = {
 interface Methods extends MethodsDictionary {
   loadFriends(): Promise<void>;
   addFriend(friend: AddFriend): Promise<void>;
+  setSelectedFriend(friend: Friend|null): Promise<void>;
 }
 
 export const FriendsStore = signalStore(
@@ -67,5 +68,8 @@ export const FriendsStore = signalStore(
     async addFriend(friend: AddFriend): Promise<void> {
       await firstValueFrom(friendsService.addFriend(friend));
     },
+    async setSelectedFriend(friend: Friend|null) {
+      patchState(store, { selectedFriend: friend })
+    }
   }))
 );

@@ -20,7 +20,7 @@
       </ion-label>
     </ion-item>
     @for( friend of friends(); track friend.name) {
-      <ion-item (click)="chooseFriend(friend)" button>
+      <ion-item (click)="chooseFriend(friend)">
         <ion-avatar slot="start">
           @if (friend.photoUrl) {
             <img [src]="friend.photoUrl" alt="Friend's photo" />

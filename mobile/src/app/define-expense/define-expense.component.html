@@ -1,26 +1,30 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      @if (isDirectOpen) {
-        <ion-button color="medium" (click)="closePopup()">Cancel</ion-button>
-      } @else {
-        <ion-back-button></ion-back-button>
-      }
+      <ion-button color="medium" (click)="closePopup()">Cancel</ion-button>
     </ion-buttons>
-    <ion-title>With you and {{selectedFriend['name']}}</ion-title>
+    <ion-title>With you and {{friend()?.['name']}}</ion-title>
     <ion-buttons slot="end">
       @if (loading()) {
         <ion-spinner></ion-spinner>
       } @else {
-        <ion-button type="submit" form="add-selectedFriend-form" [strong]="true">Save</ion-button>
+        <ion-button type="submit" form="add-friend-form" [strong]="true">Save</ion-button>
       }
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 <ion-content class="ion-padding">
   <h1>Define expense details</h1>
-  <form [formGroup]="defineExpenseForm" (ngSubmit)="onSubmit()" id="add-selectedFriend-form">
+  <form [formGroup]="defineExpenseForm" (ngSubmit)="onSubmit()" id="add-friend-form">
   <ion-list>
+    <ion-item class="choose-friend-item">
+      <ion-label>
+        <h1>With you and&nbsp;<ion-label color="primary">{{friend()?.['name'] || ''}}</ion-label></h1>
+        @if (!friend()) {
+          <ion-button (click)="chooseFriend()">Choose friend</ion-button>
+        }
+      </ion-label>
+    </ion-item>
     <ion-item>
       <ion-input
         type="text"
@@ -55,9 +59,9 @@
     <ion-item>
       <ion-select formControlName="whoOwesWho" class="split-option-select" [class.is-owed]="isOwed()" color="green" placeholder="place holder .." label="Who owes who" label-placement="stacked" interface="action-sheet">
         <ion-select-option class="green" [value]="SplitOption.YouPaidSplitEqually">Paid by you and split equally</ion-select-option>
-        <ion-select-option  class="green" [value]="SplitOption.TheyOweYouAll">{{selectedFriend['name']}} owes you the full amount</ion-select-option>
-        <ion-select-option  class="red" [value]="SplitOption.TheyPaidSplitEqually">Paid by {{selectedFriend['name']}} and split equally</ion-select-option>
-        <ion-select-option  class="red" [value]="SplitOption.YouOweThemAll">You owe {{selectedFriend['name']}} the full amount</ion-select-option>
+        <ion-select-option  class="green" [value]="SplitOption.TheyOweYouAll">{{friend()?.['name']}} owes you the full amount</ion-select-option>
+        <ion-select-option  class="red" [value]="SplitOption.TheyPaidSplitEqually">Paid by {{friend()?.['name']}} and split equally</ion-select-option>
+        <ion-select-option  class="red" [value]="SplitOption.YouOweThemAll">You owe {{friend()?.['name']}} the full amount</ion-select-option>
       </ion-select>
     </ion-item>
   </ion-list>

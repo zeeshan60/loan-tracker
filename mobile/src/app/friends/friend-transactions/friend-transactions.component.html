@@ -9,12 +9,12 @@
 
 <ion-content [fullscreen]="true">
   <ion-list>
-<!--    @for( transaction of []; track transaction.name) {-->
-<!--      <ion-item>-->
-<!--        <ion-label>-->
-<!--          <h2>{{ transaction.name }}</h2>-->
-<!--        </ion-label>-->
-<!--      </ion-item>-->
-<!--    }-->
+    @for( transaction of transactions; track transaction.name) {
+      <ion-item (click)="openTransactionDetails(transaction)" button>
+        <ion-label>
+          <h2>{{ transaction.name }}</h2>
+        </ion-label>
+      </ion-item>
+    }
   </ion-list>
 </ion-content>
