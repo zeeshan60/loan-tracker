@@ -96,7 +96,11 @@ class TransactionsController(
                                 currency = transaction.amount.currency.currencyCode,
                                 isOwed = transaction.splitType.isOwed()
                             ),
-                            history = transaction.history
+                            history = transaction.history.groupBy { it.date.looseNanonSeconds() }.map {
+                                ChangeSummaryResponse(
+                                    changes = it.value
+                                )
+                            }
                         )
                     }
                 )
@@ -167,7 +171,11 @@ data class TransactionResponse(
     val splitType: SplitType,
     val friendName: String,
     val amountResponse: AmountResponse,
-    val history: List<ChangeSummary> = emptyList(),
+    val history: List<ChangeSummaryResponse>,
+)
+
+data class ChangeSummaryResponse(
+    val changes: List<ChangeSummary>,
 )
 
 data class AmountResponse(

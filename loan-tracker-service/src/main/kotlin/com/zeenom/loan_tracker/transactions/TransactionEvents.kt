@@ -112,7 +112,8 @@ data class DescriptionChanged(
             userId = userId,
             oldValue = existing.description,
             newValue = description,
-            type = TransactionChangeType.DESCRIPTION
+            type = TransactionChangeType.DESCRIPTION,
+            date = createdAt
         )
     }
 
@@ -171,7 +172,8 @@ data class TotalAmountChanged(
             userId = userId,
             oldValue = existing.totalAmount.toString(),
             newValue = totalAmount.toString(),
-            type = TransactionChangeType.TOTAL_AMOUNT
+            type = TransactionChangeType.TOTAL_AMOUNT,
+            date = createdAt
         )
     }
 
@@ -229,7 +231,8 @@ data class CurrencyChanged(
             userId = userId,
             oldValue = existing.currency,
             newValue = currency,
-            type = TransactionChangeType.CURRENCY
+            type = TransactionChangeType.CURRENCY,
+            date = createdAt
         )
     }
 
@@ -271,7 +274,8 @@ data class SplitTypeChanged(
             userId = userId,
             oldValue = existing.splitType.toString(),
             newValue = splitType.toString(),
-            type = TransactionChangeType.SPLIT_TYPE
+            type = TransactionChangeType.SPLIT_TYPE,
+            date = createdAt
         )
     }
 
@@ -315,6 +319,7 @@ interface TransactionChangeSummary {
 }
 
 data class ChangeSummary(
+    val date: Instant,
     val userId: String,
     val oldValue: String,
     val newValue: String,
