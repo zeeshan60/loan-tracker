@@ -66,11 +66,12 @@ class TransactionService(
             recipientId = recipientId
         )
         var eventVersion = existing.version + 1
+        val createdAt = Instant.now()
         if (existing.description != transactionDto.description) {
             val event = DescriptionChanged(
                 userId = userUid,
                 description = transactionDto.description,
-                createdAt = Instant.now(),
+                createdAt = createdAt,
                 createdBy = userUid,
                 streamId = existing.streamId,
                 version = eventVersion++,
@@ -85,7 +86,7 @@ class TransactionService(
             val event = SplitTypeChanged(
                 userId = userUid,
                 splitType = transactionDto.splitType,
-                createdAt = Instant.now(),
+                createdAt = createdAt,
                 createdBy = userUid,
                 streamId = existing.streamId,
                 version = eventVersion++,
@@ -100,7 +101,7 @@ class TransactionService(
             val event = TotalAmountChanged(
                 userId = userUid,
                 totalAmount = transactionDto.originalAmount,
-                createdAt = Instant.now(),
+                createdAt = createdAt,
                 createdBy = userUid,
                 streamId = existing.streamId,
                 version = eventVersion++,
@@ -115,7 +116,7 @@ class TransactionService(
             val event = CurrencyChanged(
                 userId = userUid,
                 currency = transactionDto.amount.currency.toString(),
-                createdAt = Instant.now(),
+                createdAt = createdAt,
                 createdBy = userUid,
                 streamId = existing.streamId,
                 version = eventVersion,
