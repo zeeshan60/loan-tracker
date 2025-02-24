@@ -48,6 +48,12 @@ dependencies {
     implementation("org.flywaydb:flyway-database-postgresql")
     implementation("org.postgresql:postgresql")
 
+    // Resolving vulnerabilities
+    implementation("com.google.protobuf:protobuf-java:4.28.2")
+    implementation("io.netty:netty-handler:4.1.118.Final")
+    implementation("io.netty:netty-common:4.1.118.Final")
+    implementation("org.apache.commons:commons-compress:1.26.0")
+
     //This is to mute some validator warnings
     implementation("org.hibernate.validator:hibernate-validator:8.0.1.Final")
     implementation("org.glassfish:jakarta.el:4.0.2")
