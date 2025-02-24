@@ -97,41 +97,7 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
 
     @Test
     fun `given user and friend save two transactions when friend is a user`(): Unit = runBlocking {
-        doReturn(
-            UserDto(
-                uid = "123",
-                email = "user@gmail.com",
-                phoneNumber = "+923001234567",
-                displayName = "Test User",
-                photoUrl = "https://test.com",
-                emailVerified = true
-            )
-        ).`when`(userEventHandler).findUserById("123")
-
-        val friendEventStreamId = UUID.randomUUID()
-        whenever(friendEventHandler.findFriendByUserIdAndFriendId("123", friendEventStreamId)).thenReturn(
-            FriendId(
-                email = "friend@gmail.com",
-                phoneNumber = "+923001234568",
-                name = "Friend"
-            )
-        )
-        val myStreamId = UUID.randomUUID()
-        doReturn(myStreamId).`when`(friendEventHandler).findFriendStreamIdByEmailOrPhoneNumber(
-            "124",
-            "user@gmail.com",
-            "+923001234567"
-        )
-        doReturn(
-            UserDto(
-                uid = "124",
-                email = "friend@gmail.com",
-                phoneNumber = "+923001234568",
-                displayName = "Friend",
-                photoUrl = "https://test.com",
-                emailVerified = true
-            )
-        ).`when`(userEventHandler).findUserByEmailOrPhoneNumber("friend@gmail.com", "+923001234568")
+        val (friendEventStreamId, myStreamId) = setupFriends()
         val transactionDto = TransactionDto(
             amount = AmountDto(
                 currency = Currency.getInstance("USD"),
@@ -245,41 +211,7 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
 
     @Test
     fun `given existing transaction updates transaction successfully`(): Unit = runBlocking {
-        doReturn(
-            UserDto(
-                uid = "123",
-                email = "user@gmail.com",
-                phoneNumber = "+923001234567",
-                displayName = "Test User",
-                photoUrl = "https://test.com",
-                emailVerified = true
-            )
-        ).`when`(userEventHandler).findUserById("123")
-
-        val friendEventStreamId = UUID.randomUUID()
-        whenever(friendEventHandler.findFriendByUserIdAndFriendId("123", friendEventStreamId)).thenReturn(
-            FriendId(
-                email = "friend@gmail.com",
-                phoneNumber = "+923001234568",
-                name = "Friend"
-            )
-        )
-        val myStreamId = UUID.randomUUID()
-        doReturn(myStreamId).`when`(friendEventHandler).findFriendStreamIdByEmailOrPhoneNumber(
-            "124",
-            "user@gmail.com",
-            "+923001234567"
-        )
-        doReturn(
-            UserDto(
-                uid = "124",
-                email = "friend@gmail.com",
-                phoneNumber = "+923001234568",
-                displayName = "Friend",
-                photoUrl = "https://test.com",
-                emailVerified = true
-            )
-        ).`when`(userEventHandler).findUserByEmailOrPhoneNumber("friend@gmail.com", "+923001234568")
+        val (friendEventStreamId, myStreamId) = setupFriends()
         val transactionDto = TransactionDto(
             amount = AmountDto(
                 currency = Currency.getInstance("USD"),
@@ -348,6 +280,125 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
         assertThat(resolvedEvents[1].createdBy).isEqualTo("123")
         assertThat(resolvedEvents[1].streamId).isNotNull()
         assertThat(resolvedEvents[1].version).isEqualTo(2)
+    }
+
+    @Test
+    fun `given existing transaction deletes transaction successfully`(): Unit = runBlocking {
+        val (friendEventStreamId, myStreamId) = setupFriends()
+        val transactionDto = TransactionDto(
+            amount = AmountDto(
+                currency = Currency.getInstance("USD"),
+                amount = 100.0.toBigDecimal(),
+                isOwed = true
+            ),
+            recipientId = friendEventStreamId,
+            description = "Test Transaction",
+            splitType = SplitType.TheyOweYouAll,
+            originalAmount = 100.0.toBigDecimal(),
+            recipientName = "Friend",
+            updatedAt = null
+        )
+
+        transactionService.addTransaction(
+            userUid = "123",
+            transactionDto = transactionDto
+        )
+
+        val events = transactionEventRepository.findAll().toList()
+        assertThat(events).hasSize(2)
+        val transactionStreamId = events[0].streamId
+
+        transactionService.updateTransaction(
+            userUid = "123",
+            transactionDto = transactionDto.copy(
+                amount = AmountDto(
+                    200.0.toBigDecimal(),
+                    Currency.getInstance("USD"),
+                    true
+                ),
+                originalAmount = 200.0.toBigDecimal(),
+                transactionStreamId = transactionStreamId
+            )
+        )
+
+        transactionService.deleteTransaction(
+            userUid = "123",
+            transactionStreamId = transactionStreamId
+        )
+
+        val transactionEvent = transactionEventRepository.findAll().toList()
+
+        assertThat(transactionEvent).hasSize(6)
+        assertAllEventsAreProperlyCreated(transactionEvent, transactionDto, friendEventStreamId, myStreamId)
+
+        val resolvedEvents = listOf(
+            transactionEventHandler.read("123", transactionStreamId)!!, transactionEventHandler.read(
+                "124",
+                transactionStreamId
+            )!!
+        )
+        assertThat(resolvedEvents).hasSize(2)
+        assertThat(resolvedEvents[0].userUid).isEqualTo("123")
+        assertThat(resolvedEvents[0].amount).isEqualTo(200.0.toBigDecimal())
+        assertThat(resolvedEvents[0].currency).isEqualTo(transactionDto.amount.currency.toString())
+        assertThat(resolvedEvents[0].transactionType).isEqualTo(TransactionType.CREDIT)
+        assertThat(resolvedEvents[0].recipientId).isEqualTo(friendEventStreamId)
+        assertThat(resolvedEvents[0].createdAt).isNotNull
+        assertThat(resolvedEvents[0].createdBy).isEqualTo("123")
+        assertThat(resolvedEvents[0].streamId).isNotNull()
+        assertThat(resolvedEvents[0].version).isEqualTo(3)
+        assertThat(resolvedEvents[0].deleted).isTrue()
+
+
+        assertThat(resolvedEvents[1].userUid).isEqualTo("124")
+        assertThat(resolvedEvents[1].amount).isEqualTo(200.0.toBigDecimal())
+        assertThat(resolvedEvents[1].currency).isEqualTo(transactionDto.amount.currency.toString())
+        assertThat(resolvedEvents[1].transactionType).isEqualTo(TransactionType.DEBIT)
+        assertThat(resolvedEvents[1].recipientId).isEqualTo(myStreamId)
+        assertThat(resolvedEvents[1].createdAt).isNotNull
+        assertThat(resolvedEvents[1].createdBy).isEqualTo("123")
+        assertThat(resolvedEvents[1].streamId).isNotNull()
+        assertThat(resolvedEvents[1].version).isEqualTo(3)
+        assertThat(resolvedEvents[1].deleted).isTrue()
+    }
+
+    private suspend fun setupFriends(): Pair<UUID, UUID> {
+        doReturn(
+            UserDto(
+                uid = "123",
+                email = "user@gmail.com",
+                phoneNumber = "+923001234567",
+                displayName = "Test User",
+                photoUrl = "https://test.com",
+                emailVerified = true
+            )
+        ).`when`(userEventHandler).findUserById("123")
+
+        val friendEventStreamId = UUID.randomUUID()
+        whenever(friendEventHandler.findFriendByUserIdAndFriendId("123", friendEventStreamId)).thenReturn(
+            FriendId(
+                email = "friend@gmail.com",
+                phoneNumber = "+923001234568",
+                name = "Friend"
+            )
+        )
+        val myStreamId = UUID.randomUUID()
+        doReturn(myStreamId).`when`(friendEventHandler).findFriendStreamIdByEmailOrPhoneNumber(
+            "124",
+            "user@gmail.com",
+            "+923001234567"
+        )
+        doReturn(
+            UserDto(
+                uid = "124",
+                email = "friend@gmail.com",
+                phoneNumber = "+923001234568",
+                displayName = "Friend",
+                photoUrl = "https://test.com",
+                emailVerified = true
+            )
+        ).`when`(userEventHandler).findUserByEmailOrPhoneNumber("friend@gmail.com", "+923001234568")
+        return Pair(friendEventStreamId, myStreamId)
     }
 
     private fun assertAllEventsAreProperlyCreated(

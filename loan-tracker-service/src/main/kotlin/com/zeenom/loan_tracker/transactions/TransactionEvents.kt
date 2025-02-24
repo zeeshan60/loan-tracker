@@ -130,6 +130,64 @@ data class DescriptionChanged(
     }
 }
 
+data class TransactionDeleted(
+    override val recipientId: UUID,
+    override val userId: String,
+    override val streamId: UUID,
+    override val version: Int,
+    override val createdAt: Instant,
+    override val createdBy: String,
+) : ITransactionEvent {
+    override fun applyEvent(existing: TransactionModel): TransactionModel {
+        return existing.copy(
+            version = version,
+            createdBy = createdBy,
+            createdAt = createdAt,
+            deleted = true
+        )
+    }
+
+    override fun toEntity(): TransactionEvent {
+        return TransactionEvent(
+            userUid = userId,
+            description = null,
+            amount = null,
+            currency = null,
+            transactionType = null,
+            splitType = null,
+            totalAmount = null,
+            recipientId = recipientId,
+            createdAt = createdAt,
+            createdBy = createdBy,
+            streamId = streamId,
+            version = version,
+            eventType = TransactionEventType.TRANSACTION_DELETED,
+        )
+    }
+
+    override fun changeSummary(existing: TransactionModel): ChangeSummary {
+        return ChangeSummary(
+            userId = userId,
+            oldValue = "Not Deleted",
+            newValue = "Deleted",
+            type = TransactionChangeType.DELETED,
+            date = createdAt
+        )
+    }
+
+    override fun crossTransaction(recipientUserId: String, userStreamId: UUID): IEvent<TransactionModel> {
+        return TransactionDeleted(
+            userId = recipientUserId,
+            streamId = streamId,
+            version = version,
+            createdAt = createdAt,
+            createdBy = createdBy,
+            recipientId = userStreamId
+        )
+    }
+}
+
+
 data class TotalAmountChanged(
     val totalAmount: BigDecimal,
     override val recipientId: UUID,
@@ -331,4 +389,5 @@ enum class TransactionChangeType {
     TOTAL_AMOUNT,
     CURRENCY,
     SPLIT_TYPE,
+    DELETED,
 }

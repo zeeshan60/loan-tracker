@@ -16,6 +16,7 @@ data class TransactionModel(
     val recipientId: UUID,
     val createdAt: Instant,
     val createdBy: String,
+    val deleted: Boolean = false,
     val streamId: UUID,
     val version: Int,
 )

@@ -44,8 +44,12 @@ class TransactionService(
             version = 1
         )
         transactionEventHandler.addEvent(event)
-        if (friendUser != null && userStreamId != null)
-            transactionEventHandler.addEvent(event.crossTransaction(friendUser.uid, userStreamId))
+        if (friendUser != null && userStreamId != null) transactionEventHandler.addEvent(
+            event.crossTransaction(
+                friendUser.uid,
+                userStreamId
+            )
+        )
     }
 
     suspend fun updateTransaction(
@@ -57,13 +61,14 @@ class TransactionService(
             throw IllegalArgumentException("Transaction stream id is required")
         }
 
-        val existing = transactionEventHandler.read(userUid, transactionDto.transactionStreamId)
-            ?: throw IllegalArgumentException("Transaction with id ${transactionDto.transactionStreamId} does not exist")
+        val existing =
+            transactionEventHandler.read(userUid, transactionDto.transactionStreamId) ?: throw IllegalArgumentException(
+                "Transaction with id ${transactionDto.transactionStreamId} does not exist"
+            )
 
         val recipientId = existing.recipientId
         val (friendUser, userStreamId) = friendUserAndMyStreamId(
-            userUid = userUid,
-            recipientId = recipientId
+            userUid = userUid, recipientId = recipientId
         )
         var eventVersion = existing.version + 1
         val createdAt = Instant.now()
@@ -78,8 +83,12 @@ class TransactionService(
                 recipientId = recipientId
             )
             transactionEventHandler.addEvent(event)
-            if (friendUser != null && userStreamId != null)
-                transactionEventHandler.addEvent(event.crossTransaction(friendUser.uid, userStreamId))
+            if (friendUser != null && userStreamId != null) transactionEventHandler.addEvent(
+                event.crossTransaction(
+                    friendUser.uid,
+                    userStreamId
+                )
+            )
         }
 
         if (existing.splitType != transactionDto.splitType) {
@@ -93,8 +102,12 @@ class TransactionService(
                 recipientId = recipientId
             )
             transactionEventHandler.addEvent(event)
-            if (friendUser != null && userStreamId != null)
-                transactionEventHandler.addEvent(event.crossTransaction(friendUser.uid, userStreamId))
+            if (friendUser != null && userStreamId != null) transactionEventHandler.addEvent(
+                event.crossTransaction(
+                    friendUser.uid,
+                    userStreamId
+                )
+            )
         }
 
         if (existing.totalAmount != transactionDto.originalAmount) {
@@ -108,8 +121,12 @@ class TransactionService(
                 recipientId = recipientId
             )
             transactionEventHandler.addEvent(event)
-            if (friendUser != null && userStreamId != null)
-                transactionEventHandler.addEvent(event.crossTransaction(friendUser.uid, userStreamId))
+            if (friendUser != null && userStreamId != null) transactionEventHandler.addEvent(
+                event.crossTransaction(
+                    friendUser.uid,
+                    userStreamId
+                )
+            )
         }
 
         if (existing.currency != transactionDto.amount.currency.toString()) {
@@ -123,8 +140,12 @@ class TransactionService(
                 recipientId = recipientId
             )
             transactionEventHandler.addEvent(event)
-            if (friendUser != null && userStreamId != null)
-                transactionEventHandler.addEvent(event.crossTransaction(friendUser.uid, userStreamId))
+            if (friendUser != null && userStreamId != null) transactionEventHandler.addEvent(
+                event.crossTransaction(
+                    friendUser.uid,
+                    userStreamId
+                )
+            )
         }
     }
 
@@ -144,4 +165,32 @@ class TransactionService(
     suspend fun transactionsByFriendId(userId: String, friendId: UUID): List<TransactionDto> {
         return transactionEventHandler.transactionsByFriendId(userId, friendId)
     }
+
+    suspend fun deleteTransaction(userUid: String, transactionStreamId: UUID) {
+        val existing = transactionEventHandler.read(userUid, transactionStreamId)
+            ?: throw IllegalArgumentException("Transaction with id $transactionStreamId does not exist")
+
+        val recipientId = existing.recipientId
+        val (friendUser, userStreamId) = friendUserAndMyStreamId(
+            userUid = userUid, recipientId = recipientId
+        )
+        val event = TransactionDeleted(
+            userId = userUid,
+            createdAt = Instant.now(),
+            createdBy = userUid,
+            streamId = transactionStreamId,
+            version = existing.version + 1,
+            recipientId = recipientId
+        )
+        transactionEventHandler.addEvent(
+            event
+        )
+        if (friendUser != null && userStreamId != null) transactionEventHandler.addEvent(
+            event.crossTransaction(
+                friendUser.uid,
+                userStreamId
+            )
+        )
+    }
 }
+

@@ -17,5 +17,5 @@ data class CommandDto<T : CommandPayloadDto?>(
 interface CommandPayloadDto
 
 enum class CommandType {
-    LOGIN, CREATE_TRANSACTION, ADD_FRIEND, UPDATE_TRANSACTION
+    LOGIN, CREATE_TRANSACTION, ADD_FRIEND, UPDATE_TRANSACTION, DELETE_TRANSACTION
 }

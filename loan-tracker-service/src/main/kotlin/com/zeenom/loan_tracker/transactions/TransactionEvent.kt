@@ -83,6 +83,15 @@ data class TransactionEvent(
                 version = version,
                 recipientId = recipientId
             )
+
+            TransactionEventType.TRANSACTION_DELETED -> TransactionDeleted(
+                userId = userUid,
+                createdAt = createdAt,
+                createdBy = createdBy,
+                streamId = streamId,
+                version = version,
+                recipientId = recipientId
+            )
         }
     }
 }
@@ -96,7 +105,8 @@ enum class TransactionEventType {
     DESCRIPTION_CHANGED,
     SPLIT_TYPE_CHANGED,
     TOTAL_AMOUNT_CHANGED,
-    CURRENCY_CHANGED
+    CURRENCY_CHANGED,
+    TRANSACTION_DELETED
 }
 
 @Repository

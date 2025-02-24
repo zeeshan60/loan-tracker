@@ -18,6 +18,7 @@ class TransactionsController(
     private val createTransactionCommand: CreateTransactionCommand,
     private val updateTransactionCommand: UpdateTransactionCommand,
     private val transactionQuery: TransactionQuery,
+    private val deleteTransactionCommand: DeleteTransactionCommand,
 ) {
 
     @Operation(summary = "Add a transaction")
@@ -51,6 +52,22 @@ class TransactionsController(
             )
         )
         return MessageResponse("Transaction updated successfully")
+    }
+
+    @Operation(summary = "Delete a transaction")
+    @DeleteMapping("/delete/transactionId/{transactionId}")
+    suspend fun deleteTransaction(
+        @PathVariable transactionId: UUID,
+        @AuthenticationPrincipal userId: String,
+    ): MessageResponse {
+        deleteTransactionCommand.execute(
+            CommandDto(
+                userId = userId,
+                payload = TransactionId(transactionStreamId = transactionId),
+                commandType = CommandType.DELETE_TRANSACTION
+            )
+        )
+        return MessageResponse("Transaction deleted successfully")
     }
 
     @Operation(
