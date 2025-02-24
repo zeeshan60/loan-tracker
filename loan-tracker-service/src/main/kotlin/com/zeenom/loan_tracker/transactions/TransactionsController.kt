@@ -57,7 +57,6 @@ class TransactionsController(
         summary = "Get transactions list per page for friend id",
         description = "The `timeZone` parameter should be a valid IANA timezone ID. You can find the full list at: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones"
     )
-
     @GetMapping("/friend/byMonth")
     suspend fun getTransactions(
         @RequestParam friendId: UUID,
