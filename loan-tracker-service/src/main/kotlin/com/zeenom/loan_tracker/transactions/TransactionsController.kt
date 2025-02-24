@@ -90,7 +90,7 @@ class TransactionsController(
                 friendId = friendId
             )
         ).let {
-            it.data.groupBy {
+            it.data.filter { !it.deleted }.groupBy {
                 it.updatedAt?.startOfMonth(timeZone)
                     ?: throw IllegalStateException("Transaction date is required for month grouping")
             }.map {

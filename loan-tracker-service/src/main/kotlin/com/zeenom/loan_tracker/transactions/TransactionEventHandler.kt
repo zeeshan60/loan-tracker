@@ -102,6 +102,7 @@ class TransactionEventHandler(
                 splitType = it.splitType,
                 recipientName = friend.friendDisplayName,
                 updatedAt = it.createdAt,
+                deleted = it.deleted,
                 history = historyByStream[it.streamId] ?: emptyList()
             )
         }

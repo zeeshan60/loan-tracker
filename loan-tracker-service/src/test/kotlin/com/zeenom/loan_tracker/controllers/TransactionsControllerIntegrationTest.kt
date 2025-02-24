@@ -369,4 +369,41 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
         assertThat(result.perMonth[0].transactions[1].splitType).isEqualTo(SplitType.YouPaidSplitEqually)
         assertThat(result.perMonth[0].transactions[1].description).isEqualTo("Sample transaction")
     }
+
+    @Order(12)
+    @Test
+    fun `delete transaction as zee`() {
+        webTestClient.delete()
+            .uri("/api/v1/transactions/delete/transactionId/$transactionId")
+            .header("Authorization", "Bearer $zeeToken")
+            .exchange()
+            .expectStatus().isOk
+            .expectBody().jsonPath("$.message").isEqualTo("Transaction deleted successfully")
+    }
+
+    @Order(13)
+    @Test
+    fun `get all transactions should return one transaction`() {
+        val result = webTestClient.get()
+            .uri("/api/v1/transactions/friend/byMonth?friendId=$johnFriendId&timeZone=Asia/Singapore")
+            .header("Authorization", "Bearer $zeeToken")
+            .exchange()
+            .expectStatus().isOk
+            .expectBody(String::class.java)
+            .returnResult().responseBody!!.let {
+                objectMapper.readValue(
+                    it,
+                    object : TypeReference<TransactionsResponse>() {})
+            }
+
+        assertThat(result.perMonth[0].transactions).hasSize(1)
+        assertThat(result.perMonth[0].transactions[0].friendName).isEqualTo("john")
+        assertThat(result.perMonth[0].transactions[0].amountResponse.amount).isEqualTo(50.0.toBigDecimal())
+        assertThat(result.perMonth[0].transactions[0].amountResponse.currency).isEqualTo("USD")
+        assertThat(result.perMonth[0].transactions[0].amountResponse.isOwed).isTrue()
+        assertThat(result.perMonth[0].transactions[0].totalAmount).isEqualTo(100.0.toBigDecimal())
+        assertThat(result.perMonth[0].transactions[0].transactionId).isNotNull()
+        assertThat(result.perMonth[0].transactions[0].splitType).isEqualTo(SplitType.YouPaidSplitEqually)
+        assertThat(result.perMonth[0].transactions[0].description).isEqualTo("Sample transaction")
+    }
 }
