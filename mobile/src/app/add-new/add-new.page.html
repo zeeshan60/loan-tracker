@@ -1,4 +1,4 @@
 <ion-nav
-  [root]="!selectedFriend ? selectFriendComponent: defineExpenseComponent"
-  [rootParams]="{ friend: selectedFriend, isDirectOpen: true }"
+  [root]="selectedFriend ? defineExpenseComponent : selectFriendComponent"
+  [rootParams]="{ friend: selectedFriend, isDirectOpen: !!selectedFriend }"
 ></ion-nav>

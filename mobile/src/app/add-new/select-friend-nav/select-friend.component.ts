@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, model, OnInit, signal } from '@angular/core';
 import {
-  IonAvatar, IonContent,
+  IonAvatar, IonButton, IonButtons, IonContent,
   IonHeader,
   IonIcon,
   IonItem,
@@ -29,7 +29,7 @@ import { DefineExpenseComponent } from '../define-expense/define-expense.compone
     IonItem,
     IonLabel,
     IonList,
-    IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, FormsModule, IonList, IonItem, IonAvatar, IonLabel, CurrencyPipe, IonSearchbar,
+    IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, FormsModule, IonList, IonItem, IonAvatar, IonLabel, CurrencyPipe, IonSearchbar, IonButton, IonButtons,
   ],
 })
 export class SelectFriendComponent {
@@ -44,6 +44,10 @@ export class SelectFriendComponent {
 
   async chooseFriend(friend: Friend) {
     this.nav.push(DefineExpenseComponent, { friend });
+  }
+
+  closePopup() {
+    this.modalCtrl.dismiss();
   }
 
   async createNewFriend() {

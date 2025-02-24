@@ -2,7 +2,7 @@
   <ion-toolbar>
     <ion-buttons slot="start">
       @if (isDirectOpen) {
-        <ion-back-button (click)="closePopup()" defaultHref="/#"></ion-back-button>
+        <ion-button color="medium" (click)="closePopup()">Cancel</ion-button>
       } @else {
         <ion-back-button></ion-back-button>
       }

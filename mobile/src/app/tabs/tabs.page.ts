@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, viewChild } from '@angular/core';
 import { IonTabs, IonTabBar, IonTabButton, IonIcon, ModalController } from '@ionic/angular/standalone';
 import { AddNewPage } from '../add-new/add-new.page';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-tabs',
@@ -12,16 +13,18 @@ import { AddNewPage } from '../add-new/add-new.page';
 })
 export class TabsPage {
   readonly modalCtrl = inject(ModalController);
+  readonly router = inject(Router);
   constructor() {
   }
 
   async addNewExpense() {
-    console.log('add new expense...');
+    let selectedFriend = null;
+    if (this.router.url.endsWith('tabs/friends')) {
+      selectedFriend = { name: 'Zeeshan' };
+    }
     const modal = await this.modalCtrl.create({
       component: AddNewPage,
-      componentProps: {
-        selectedFriend: { name: 'Zeeshan'}
-      }
+      componentProps: { selectedFriend }
     })
     modal.present();
   }

@@ -12,7 +12,6 @@ import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@a
 import { AuthInterceptor } from './app/auth.interceptor';
 import { IonicStorageModule } from '@ionic/storage-angular';
 import { importProvidersFrom } from '@angular/core';
-import { Drivers, Storage } from '@ionic/storage';
 
 bootstrapApplication(AppComponent, {
   providers: [

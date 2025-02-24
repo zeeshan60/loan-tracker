@@ -30,8 +30,8 @@
     </ion-toolbar>
   </ion-header>
   <ion-list>
-    @for( friend of friendsStore.unSettledFriends(); track friend.name) {
-      <ion-item>
+    @for( friend of friendsStore.friends(); track friend.name) {
+      <ion-item (click)="chooseFriend(friend)" button>
         <ion-avatar slot="start">
           @if (friend.photoUrl) {
             <img [src]="friend.photoUrl" alt="Friend's photo" />
