@@ -2,6 +2,7 @@ package com.zeenom.loan_tracker.transactions
 
 import com.zeenom.loan_tracker.events.CommandPayloadDto
 import java.math.BigDecimal
+import java.time.Instant
 import java.util.*
 
 data class TransactionDto(
@@ -12,6 +13,7 @@ data class TransactionDto(
     val recipientId: UUID?,
     val recipientName: String?,
     val transactionStreamId: UUID? = null,
+    val updatedAt: Instant?,
     val history: List<ChangeSummary> = emptyList()
 ) : CommandPayloadDto
 

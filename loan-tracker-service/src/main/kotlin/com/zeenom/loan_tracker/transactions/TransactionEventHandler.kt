@@ -101,6 +101,7 @@ class TransactionEventHandler(
                 originalAmount = it.totalAmount,
                 splitType = it.splitType,
                 recipientName = friend.friendDisplayName,
+                updatedAt = it.createdAt,
                 history = historyByStream[it.streamId] ?: emptyList()
             )
         }

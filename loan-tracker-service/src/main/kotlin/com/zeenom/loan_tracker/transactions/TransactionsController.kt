@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import java.math.BigDecimal
+import java.time.Instant
 import java.util.*
 
 @RestController
@@ -79,6 +80,8 @@ class TransactionsController(
                             friendName = transaction.recipientName!!,
                             description = transaction.description,
                             splitType = transaction.splitType,
+                            date = transaction.updatedAt
+                                ?: throw IllegalStateException("Transaction date is required in get transactions response"),
                             history = transaction.history,
                         )
                     }
@@ -99,7 +102,8 @@ class TransactionsController(
             description = transactionRequest.description,
             splitType = transactionRequest.type,
             originalAmount = transactionRequest.amount,
-            recipientName = null
+            recipientName = null,
+            updatedAt = null
         )
 }
 
@@ -137,7 +141,14 @@ data class TransactionsResponse(
     val transactions: List<TransactionResponse>,
 )
 
+data class TransactionsPerMonth(
+    val month: Int,
+    val year: Int,
+    val transactions: List<TransactionResponse>,
+)
+
 data class TransactionResponse(
+    val date: Instant,
     val description: String,
     val transactionId: UUID,
     val totalAmount: BigDecimal,

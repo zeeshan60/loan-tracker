@@ -71,7 +71,8 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
             description = "Test Transaction",
             splitType = SplitType.TheyOweYouAll,
             originalAmount = 100.0.toBigDecimal(),
-            recipientName = "Friend"
+            recipientName = "Friend",
+            updatedAt = null
         )
 
         transactionService.addTransaction(
@@ -141,7 +142,8 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
             description = "Test Transaction",
             splitType = SplitType.TheyOweYouAll,
             originalAmount = 100.0.toBigDecimal(),
-            recipientName = "Friend"
+            recipientName = "Friend",
+            updatedAt = null
         )
 
         transactionService.addTransaction(
@@ -192,7 +194,8 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
             description = "Test Transaction",
             splitType = SplitType.TheyOweYouAll,
             originalAmount = 100.0.toBigDecimal(),
-            recipientName = "Friend"
+            recipientName = "Friend",
+            updatedAt = null
         )
 
         assertThatThrownBy {
@@ -231,7 +234,8 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
             description = "Test Transaction",
             splitType = SplitType.TheyOweYouAll,
             originalAmount = 100.0.toBigDecimal(),
-            recipientName = "Friend"
+            recipientName = "Friend",
+            updatedAt = null
         )
 
         assertThatThrownBy { runBlocking { transactionService.addTransaction("123", transactionDto) } }
@@ -286,7 +290,8 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
             description = "Test Transaction",
             splitType = SplitType.TheyOweYouAll,
             originalAmount = 100.0.toBigDecimal(),
-            recipientName = "Friend"
+            recipientName = "Friend",
+            updatedAt = null
         )
 
         transactionService.addTransaction(
