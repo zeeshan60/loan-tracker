@@ -153,4 +153,25 @@ class TransactionsControllerTest(@LocalServerPort private val port: Int) : BaseI
         Assertions.assertThat(result.perMonth[1].transactions[1].splitType).isEqualTo(SplitType.YouPaidSplitEqually)
         Assertions.assertThat(result.perMonth[1].transactions[1].description).isEqualTo("transaction 2")
     }
+
+    @Test
+    fun `invalid zone id throws bad request error`() {
+        webTestClient.get()
+            .uri("/api/v1/transactions/friend/byMonth?friendId=${UUID.randomUUID()}&timeZone=Asia/invalid")
+            .header("Authorization", "Bearer ${authService.generateJwt("123")}")
+            .exchange()
+            .expectStatus().isBadRequest
+            .expectBody().jsonPath("$.error.message").isEqualTo("Invalid timezone")
+
+    }
+
+    @Test
+    fun `send a requried query param as null throws bad request`() {
+        webTestClient.get()
+            .uri("/api/v1/transactions/friend/byMonth?timeZone=Asia/Singapore")
+            .header("Authorization", "Bearer ${authService.generateJwt("123")}")
+            .exchange()
+            .expectStatus().isBadRequest
+            .expectBody().jsonPath("$.error.message").isEqualTo("400 BAD_REQUEST \"Required query parameter 'friendId' is not present.\"")
+    }
 }

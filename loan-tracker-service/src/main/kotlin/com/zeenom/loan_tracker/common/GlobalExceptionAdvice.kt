@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.server.MissingRequestValueException
+import org.springframework.web.server.ServerWebInputException
 
 @RestControllerAdvice
 class GlobalExceptionAdvice {
@@ -39,6 +41,13 @@ class GlobalExceptionAdvice {
         logger.info("Error occurred", ex)
         val errorResponse = ErrorResponse(ErrorMessage(ex.message ?: "Unauthorized"))
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse)
+    }
+
+    @ExceptionHandler(ServerWebInputException::class)
+    suspend fun handleMissingRequestValue(ex: MissingRequestValueException): ResponseEntity<ErrorResponse> {
+        logger.info("Error occurred", ex)
+        val errorResponse = ErrorResponse(ErrorMessage(ex.message))
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse)
     }
 
     @ExceptionHandler(Exception::class)
