@@ -11,7 +11,6 @@ import java.math.BigDecimal
 import java.time.Instant
 import java.time.ZoneId
 import java.util.*
-import kotlin.apply
 
 @RestController
 @RequestMapping("api/v1/transactions")
@@ -86,10 +85,12 @@ class TransactionsController(
                             date = transaction.updatedAt
                                 ?: throw IllegalStateException("Transaction date is required for transactions response"),
                             description = transaction.description,
-                            transactionId = transaction.transactionStreamId!!,
+                            transactionId = transaction.transactionStreamId
+                                ?: throw IllegalStateException("Transaction stream id is required in transactions response"),
                             totalAmount = transaction.originalAmount,
                             splitType = transaction.splitType,
-                            friendName = transaction.recipientName!!,
+                            friendName = transaction.recipientName
+                                ?: throw IllegalStateException("Friend name is required in transactions response"),
                             amountResponse = AmountResponse(
                                 amount = transaction.splitType.apply(transaction.originalAmount),
                                 currency = transaction.amount.currency.currencyCode,
