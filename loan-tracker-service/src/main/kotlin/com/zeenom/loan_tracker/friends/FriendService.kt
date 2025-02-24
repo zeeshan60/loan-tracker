@@ -19,7 +19,8 @@ class FriendService(
 ) {
     suspend fun findAllByUserId(userId: String): FriendsDto = withContext(Dispatchers.IO) {
         val events = friendsEventHandler.findAllEventsByUserId(userId).toList()
-        val amountsPerFriend = async { transactionEventHandler.balancesOfFriends(userId, events.map { it.streamId }) }
+        val amountsPerFriend =
+            async { transactionEventHandler.balancesOfFriendsByCurrency(userId, events.map { it.streamId }) }
         val usersByPhones =
             userEventHandler.findUsersByPhoneNumbers(events.mapNotNull { it.friendPhoneNumber }).toList()
                 .associateBy { it.phoneNumber }
@@ -35,7 +36,8 @@ class FriendService(
                 phoneNumber = it.friendPhoneNumber,
                 name = it.friendDisplayName,
                 photoUrl = user?.photoUrl,
-                loanAmount = amountsPerFriend.await()[it.streamId]
+                mainCurrency = null, //TODO implement main currency
+                balances = amountsPerFriend.await()[it.streamId]?.values?.toList() ?: emptyList()
             )
         }
         FriendsDto(friends)

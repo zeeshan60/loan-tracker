@@ -44,7 +44,8 @@ class FriendsControllerTest(
                     name = "John Doe",
                     email = "sample@gmail.com",
                     phoneNumber = "+923001234567",
-                    loanAmount = AmountDto(1000.0.toBigDecimal(), Currency.getInstance("USD"), true),
+                    balances = listOf(AmountDto(1000.0.toBigDecimal(), Currency.getInstance("USD"), true)),
+                    mainCurrency = Currency.getInstance("USD"),
                     photoUrl = "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl2",
                     friendId = UUID.randomUUID()
                 )
@@ -67,8 +68,8 @@ class FriendsControllerTest(
 
         assertThat(result.data.friends).hasSize(1)
         assertThat(result.data.friends[0].name).isEqualTo("John Doe")
-        assertThat(result.data.friends[0].loanAmount?.amount).isEqualTo(1000.0.toBigDecimal())
-        assertThat(result.data.friends[0].loanAmount?.isOwed).isTrue()
+        assertThat(result.data.friends[0].mainBalance?.amount).isEqualTo(1000.0.toBigDecimal())
+        assertThat(result.data.friends[0].mainBalance?.isOwed).isTrue()
         assertThat(result.data.friends[0].photoUrl).isEqualTo("https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl2")
         assertThat(result.data.friends[0].friendId).isNotNull()
     }

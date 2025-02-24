@@ -146,6 +146,31 @@ class TransactionEventHandler(
             }
     }
 
+    suspend fun balancesOfFriendsByCurrency(userId: String, friendIds: List<UUID>): Map<UUID, Map<String, AmountDto>> {
+        val transactions = transactionEventRepository.findAllByUserUidAndRecipientIdIn(userId, friendIds).toList()
+            .map { it.toEvent() }
+
+        return transactions
+            .groupBy { it.streamId }
+            .values
+            .map { resolveStream(it) }
+            .groupBy { it.recipientId }
+            .mapValues { (_, transactionsByFriend) ->
+                transactionsByFriend
+                    .groupBy { it.currency }
+                    .mapValues { (_, transactionsByCurrency) ->
+                        val balance = transactionsByCurrency
+                            .sumOf { if (it.transactionType == TransactionType.CREDIT) it.amount else -it.amount }
+                        AmountDto(
+                            amount = balance.abs(),
+                            currency = Currency.getInstance(transactionsByCurrency.first().currency),
+                            isOwed = balance > BigDecimal.ZERO
+                        )
+                    }
+            }
+    }
+
+
     suspend fun addEvent(event: IEvent<TransactionModel>) {
         val entity = event.toEntity()
         if (entity is TransactionEvent)

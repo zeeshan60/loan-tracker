@@ -122,7 +122,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
         val queryFriend = queryFriend(johnToken)
         zeeFriendId = queryFriend.data.friends.first().friendId
         assertThat(zeeFriendId).isNotNull()
-        val loanAmount = queryFriend.data.friends.first().loanAmount
+        val loanAmount = queryFriend.data.friends.first().mainBalance
         assertThat(loanAmount).isNotNull
         assertThat(loanAmount!!.amount).isEqualTo(50.0.toBigDecimal())
         assertThat(loanAmount.isOwed).isFalse()
@@ -295,9 +295,9 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
 
         assertThat(result.data.friends).hasSize(1)
         assertThat(result.data.friends[0].name).isEqualTo("john")
-        assertThat(result.data.friends[0].loanAmount).isNotNull
-        assertThat(result.data.friends[0].loanAmount!!.amount).isEqualTo(200.0.toBigDecimal())
-        assertThat(result.data.friends[0].loanAmount!!.isOwed).isTrue()
+        assertThat(result.data.friends[0].mainBalance).isNotNull
+        assertThat(result.data.friends[0].mainBalance!!.amount).isEqualTo(200.0.toBigDecimal())
+        assertThat(result.data.friends[0].mainBalance!!.isOwed).isTrue()
         assertThat(result.data.friends[0].photoUrl).isEqualTo(johnDto.photoUrl)
     }
 
@@ -318,9 +318,9 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
 
         assertThat(result.data.friends).hasSize(1)
         assertThat(result.data.friends[0].name).isEqualTo("Zeeshan Tufail")
-        assertThat(result.data.friends[0].loanAmount).isNotNull
-        assertThat(result.data.friends[0].loanAmount!!.amount).isEqualTo(200.0.toBigDecimal())
-        assertThat(result.data.friends[0].loanAmount!!.isOwed).isFalse()
+        assertThat(result.data.friends[0].mainBalance).isNotNull
+        assertThat(result.data.friends[0].mainBalance!!.amount).isEqualTo(200.0.toBigDecimal())
+        assertThat(result.data.friends[0].mainBalance!!.isOwed).isFalse()
         assertThat(result.data.friends[0].photoUrl).isEqualTo(zeeDto.photoUrl)
     }
 

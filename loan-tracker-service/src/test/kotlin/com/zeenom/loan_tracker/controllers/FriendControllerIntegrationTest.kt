@@ -84,7 +84,8 @@ class FriendControllerIntegrationTest(@LocalServerPort val port: Int) : BaseInte
         assertThat(friendResponse.data.friends).hasSize(1)
         assertThat(friendResponse.data.friends[0].name).isEqualTo("John Doe")
         assertThat(friendResponse.data.friends[0].photoUrl).isNull()
-        assertThat(friendResponse.data.friends[0].loanAmount).isNull()
+        assertThat(friendResponse.data.friends[0].mainBalance).isNull()
+        assertThat(friendResponse.data.friends[0].otherBalances).isEmpty()
         assertThat(friendResponse.data.friends[0].friendId).isNotNull()
 
     }
@@ -103,7 +104,8 @@ class FriendControllerIntegrationTest(@LocalServerPort val port: Int) : BaseInte
         assertThat(response.data.friends).hasSize(1)
         assertThat(response.data.friends[0].name).isEqualTo("Zeeshan Tufail")
         assertThat(response.data.friends[0].photoUrl).isNotNull()
-        assertThat(response.data.friends[0].loanAmount).isNull()
+        assertThat(response.data.friends[0].mainBalance).isNull()
+        assertThat(response.data.friends[0].otherBalances).isEmpty()
         assertThat(response.data.friends[0].friendId).isNotNull()
     }
 
@@ -115,7 +117,8 @@ class FriendControllerIntegrationTest(@LocalServerPort val port: Int) : BaseInte
         assertThat(response.data.friends).hasSize(1)
         assertThat(response.data.friends[0].name).isEqualTo("John Doe")
         assertThat(response.data.friends[0].photoUrl).isNotNull()
-        assertThat(response.data.friends[0].loanAmount).isNull()
+        assertThat(response.data.friends[0].mainBalance).isNull()
+        assertThat(response.data.friends[0].otherBalances).isEmpty()
         assertThat(response.data.friends[0].friendId).isNotNull()
     }
 }

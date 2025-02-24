@@ -46,7 +46,8 @@ class FriendServiceTest(
     @BeforeEach
     fun setUp(): Unit = runBlocking {
         eventRepository.deleteAll()
-        doReturn(emptyMap<UUID, AmountDto>()).whenever(transactionEventHandler).balancesOfFriends(any(), any())
+        doReturn(emptyMap<UUID, Map<String, AmountDto>>()).whenever(transactionEventHandler)
+            .balancesOfFriendsByCurrency(any(), any())
     }
 
     @Test
@@ -225,14 +226,14 @@ class FriendServiceTest(
         assertThat(friendsDto.friends[0].phoneNumber).isEqualTo("+923001234568")
         assertThat(friendsDto.friends[0].name).isEqualTo("User 2")
         assertThat(friendsDto.friends[0].photoUrl).isNull()
-        assertThat(friendsDto.friends[0].loanAmount).isNull()
+        assertThat(friendsDto.friends[0].balances).isEmpty()
         assertThat(friendsDto.friends[0].friendId).isNotNull()
 
         assertThat(friendsDto.friends[1].email).isEqualTo("user3@gmail.com")
         assertThat(friendsDto.friends[1].phoneNumber).isEqualTo("+923001234569")
         assertThat(friendsDto.friends[1].name).isEqualTo("User 3")
         assertThat(friendsDto.friends[1].photoUrl).isNull()
-        assertThat(friendsDto.friends[1].loanAmount).isNull()
+        assertThat(friendsDto.friends[1].balances).isEmpty()
         assertThat(friendsDto.friends[1].friendId).isNotNull()
     }
 
@@ -503,7 +504,7 @@ class FriendServiceTest(
         assertThat(friendsDto.friends[0].phoneNumber).isEqualTo(user1.friendPhone)
         assertThat(friendsDto.friends[0].name).isEqualTo("User 2")
         assertThat(friendsDto.friends[0].photoUrl).isEqualTo(user1.friendPhoto)
-        assertThat(friendsDto.friends[0].loanAmount).isNull()
+        assertThat(friendsDto.friends[0].balances).isEmpty()
         assertThat(friendsDto.friends[0].friendId).isNotNull()
 
 
@@ -511,7 +512,7 @@ class FriendServiceTest(
         assertThat(friendsDto.friends[1].phoneNumber).isEqualTo(user2.friendPhone)
         assertThat(friendsDto.friends[1].name).isEqualTo("User 3")
         assertThat(friendsDto.friends[1].photoUrl).isEqualTo(user2.friendPhoto)
-        assertThat(friendsDto.friends[1].loanAmount).isNull()
+        assertThat(friendsDto.friends[1].balances).isEmpty()
         assertThat(friendsDto.friends[1].friendId).isNotNull()
     }
 
@@ -635,12 +636,14 @@ class FriendServiceTest(
         )
 
 
-        whenever(transactionEventHandler.balancesOfFriends("123", listOf(friendStreamId))).thenReturn(
+        whenever(transactionEventHandler.balancesOfFriendsByCurrency("123", listOf(friendStreamId))).thenReturn(
             mapOf(
-                friendStreamId to AmountDto(
-                    currency = Currency.getInstance("USD"),
-                    amount = 100.0.toBigDecimal(),
-                    isOwed = true
+                friendStreamId to mapOf(
+                    "USD" to AmountDto(
+                        amount = 100.0.toBigDecimal(),
+                        currency = Currency.getInstance("USD"),
+                        isOwed = true
+                    )
                 )
             )
         )
@@ -680,9 +683,9 @@ class FriendServiceTest(
         assertThat(friends.friends[0].phoneNumber).isEqualTo("+923001234568")
         assertThat(friends.friends[0].name).isEqualTo("Friend 1")
         assertThat(friends.friends[0].photoUrl).isEqualTo("https://test.com")
-        assertThat(friends.friends[0].loanAmount!!.amount).isEqualTo(100.0.toBigDecimal())
-        assertThat(friends.friends[0].loanAmount!!.currency).isEqualTo(Currency.getInstance("USD"))
-        assertThat(friends.friends[0].loanAmount!!.isOwed).isTrue()
+        assertThat(friends.friends[0].balances.first().amount).isEqualTo(100.0.toBigDecimal())
+        assertThat(friends.friends[0].balances.first().currency).isEqualTo(Currency.getInstance("USD"))
+        assertThat(friends.friends[0].balances.first().isOwed).isTrue()
         assertThat(friends.friends[0].friendId).isNotNull
     }
 }
