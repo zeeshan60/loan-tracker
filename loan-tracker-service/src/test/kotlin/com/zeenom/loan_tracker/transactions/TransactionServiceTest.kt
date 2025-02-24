@@ -62,11 +62,7 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
             )
         ).`when`(friendEventHandler).findFriendByUserIdAndFriendId("123", friendEventStreamId)
         val transactionDto = TransactionDto(
-            amount = AmountDto(
-                currency = Currency.getInstance("USD"),
-                amount = 100.0.toBigDecimal(),
-                isOwed = true
-            ),
+            currency = Currency.getInstance("USD"),
             recipientId = friendEventStreamId,
             description = "Test Transaction",
             splitType = SplitType.TheyOweYouAll,
@@ -84,8 +80,7 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
 
         assertThat(transactionEvent).hasSize(1)
         assertThat(transactionEvent[0].userUid).isEqualTo("123")
-        assertThat(transactionEvent[0].amount).isEqualTo(transactionDto.amount.amount)
-        assertThat(transactionEvent[0].currency).isEqualTo(transactionDto.amount.currency.toString())
+        assertThat(transactionEvent[0].currency).isEqualTo(transactionDto.currency.toString())
         assertThat(transactionEvent[0].transactionType).isEqualTo(TransactionType.CREDIT)
         assertThat(transactionEvent[0].recipientId).isEqualTo(transactionDto.recipientId)
         assertThat(transactionEvent[0].createdAt).isNotNull
@@ -99,11 +94,7 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
     fun `given user and friend save two transactions when friend is a user`(): Unit = runBlocking {
         val (friendEventStreamId, myStreamId) = setupFriends()
         val transactionDto = TransactionDto(
-            amount = AmountDto(
-                currency = Currency.getInstance("USD"),
-                amount = 100.0.toBigDecimal(),
-                isOwed = true
-            ),
+            currency = Currency.getInstance("USD"),
             recipientId = friendEventStreamId,
             description = "Test Transaction",
             splitType = SplitType.TheyOweYouAll,
@@ -121,8 +112,7 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
 
         assertThat(transactionEvent).hasSize(2)
         assertThat(transactionEvent[0].userUid).isEqualTo("123")
-        assertThat(transactionEvent[0].amount).isEqualTo(transactionDto.amount.amount)
-        assertThat(transactionEvent[0].currency).isEqualTo(transactionDto.amount.currency.toString())
+        assertThat(transactionEvent[0].currency).isEqualTo(transactionDto.currency.toString())
         assertThat(transactionEvent[0].transactionType).isEqualTo(TransactionType.CREDIT)
         assertThat(transactionEvent[0].recipientId).isEqualTo(friendEventStreamId)
         assertThat(transactionEvent[0].createdAt).isNotNull
@@ -133,8 +123,7 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
 
 
         assertThat(transactionEvent[1].userUid).isEqualTo("124")
-        assertThat(transactionEvent[1].amount).isEqualTo(transactionDto.amount.amount)
-        assertThat(transactionEvent[1].currency).isEqualTo(transactionDto.amount.currency.toString())
+        assertThat(transactionEvent[1].currency).isEqualTo(transactionDto.currency.toString())
         assertThat(transactionEvent[1].transactionType).isEqualTo(TransactionType.DEBIT)
         assertThat(transactionEvent[1].recipientId).isEqualTo(myStreamId)
         assertThat(transactionEvent[1].createdAt).isNotNull
@@ -151,11 +140,7 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
         val friendEventStreamId = UUID.randomUUID()
         doReturn(true).`when`(friendEventHandler).friendExistsByUserIdAndFriendId("1234", friendEventStreamId)
         val transactionDto = TransactionDto(
-            amount = AmountDto(
-                currency = Currency.getInstance("USD"),
-                amount = 100.0.toBigDecimal(),
-                isOwed = true
-            ),
+            currency = Currency.getInstance("USD"),
             recipientId = friendEventStreamId,
             description = "Test Transaction",
             splitType = SplitType.TheyOweYouAll,
@@ -191,11 +176,7 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
         doReturn(false).`when`(friendEventHandler).friendExistsByUserIdAndFriendId("123", friendEventStreamId)
 
         val transactionDto = TransactionDto(
-            amount = AmountDto(
-                currency = Currency.getInstance("USD"),
-                amount = 100.0.toBigDecimal(),
-                isOwed = true
-            ),
+            currency = Currency.getInstance("USD"),
             recipientId = friendEventStreamId,
             description = "Test Transaction",
             splitType = SplitType.TheyOweYouAll,
@@ -213,11 +194,7 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
     fun `given existing transaction updates transaction successfully`(): Unit = runBlocking {
         val (friendEventStreamId, myStreamId) = setupFriends()
         val transactionDto = TransactionDto(
-            amount = AmountDto(
-                currency = Currency.getInstance("USD"),
-                amount = 100.0.toBigDecimal(),
-                isOwed = true
-            ),
+            currency = Currency.getInstance("USD"),
             recipientId = friendEventStreamId,
             description = "Test Transaction",
             splitType = SplitType.TheyOweYouAll,
@@ -238,11 +215,6 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
         transactionService.updateTransaction(
             userUid = "123",
             transactionDto = transactionDto.copy(
-                amount = AmountDto(
-                    200.0.toBigDecimal(),
-                    Currency.getInstance("USD"),
-                    true
-                ),
                 originalAmount = 200.0.toBigDecimal(),
                 transactionStreamId = transactionStreamId
             )
@@ -261,9 +233,9 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
         )
         assertThat(resolvedEvents).hasSize(2)
         assertThat(resolvedEvents[0].userUid).isEqualTo("123")
-        assertThat(resolvedEvents[0].amount).isEqualTo(200.0.toBigDecimal())
-        assertThat(resolvedEvents[0].currency).isEqualTo(transactionDto.amount.currency.toString())
-        assertThat(resolvedEvents[0].transactionType).isEqualTo(TransactionType.CREDIT)
+        assertThat(resolvedEvents[0].totalAmount).isEqualTo(200.0.toBigDecimal())
+        assertThat(resolvedEvents[0].currency).isEqualTo(transactionDto.currency.toString())
+        assertThat(resolvedEvents[0].splitType).isEqualTo(SplitType.TheyOweYouAll)
         assertThat(resolvedEvents[0].recipientId).isEqualTo(friendEventStreamId)
         assertThat(resolvedEvents[0].createdAt).isNotNull
         assertThat(resolvedEvents[0].createdBy).isEqualTo("123")
@@ -272,9 +244,9 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
 
 
         assertThat(resolvedEvents[1].userUid).isEqualTo("124")
-        assertThat(resolvedEvents[1].amount).isEqualTo(200.0.toBigDecimal())
-        assertThat(resolvedEvents[1].currency).isEqualTo(transactionDto.amount.currency.toString())
-        assertThat(resolvedEvents[1].transactionType).isEqualTo(TransactionType.DEBIT)
+        assertThat(resolvedEvents[1].totalAmount).isEqualTo(200.0.toBigDecimal())
+        assertThat(resolvedEvents[1].currency).isEqualTo(transactionDto.currency.toString())
+        assertThat(resolvedEvents[1].splitType).isEqualTo(SplitType.YouOweThemAll)
         assertThat(resolvedEvents[1].recipientId).isEqualTo(myStreamId)
         assertThat(resolvedEvents[1].createdAt).isNotNull
         assertThat(resolvedEvents[1].createdBy).isEqualTo("123")
@@ -286,11 +258,7 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
     fun `given existing transaction deletes transaction successfully`(): Unit = runBlocking {
         val (friendEventStreamId, myStreamId) = setupFriends()
         val transactionDto = TransactionDto(
-            amount = AmountDto(
-                currency = Currency.getInstance("USD"),
-                amount = 100.0.toBigDecimal(),
-                isOwed = true
-            ),
+            currency = Currency.getInstance("USD"),
             recipientId = friendEventStreamId,
             description = "Test Transaction",
             splitType = SplitType.TheyOweYouAll,
@@ -311,11 +279,6 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
         transactionService.updateTransaction(
             userUid = "123",
             transactionDto = transactionDto.copy(
-                amount = AmountDto(
-                    200.0.toBigDecimal(),
-                    Currency.getInstance("USD"),
-                    true
-                ),
                 originalAmount = 200.0.toBigDecimal(),
                 transactionStreamId = transactionStreamId
             )
@@ -339,9 +302,8 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
         )
         assertThat(resolvedEvents).hasSize(2)
         assertThat(resolvedEvents[0].userUid).isEqualTo("123")
-        assertThat(resolvedEvents[0].amount).isEqualTo(200.0.toBigDecimal())
-        assertThat(resolvedEvents[0].currency).isEqualTo(transactionDto.amount.currency.toString())
-        assertThat(resolvedEvents[0].transactionType).isEqualTo(TransactionType.CREDIT)
+        assertThat(resolvedEvents[0].currency).isEqualTo(transactionDto.currency.toString())
+        assertThat(resolvedEvents[0].splitType).isEqualTo(SplitType.TheyOweYouAll)
         assertThat(resolvedEvents[0].recipientId).isEqualTo(friendEventStreamId)
         assertThat(resolvedEvents[0].createdAt).isNotNull
         assertThat(resolvedEvents[0].createdBy).isEqualTo("123")
@@ -351,9 +313,8 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
 
 
         assertThat(resolvedEvents[1].userUid).isEqualTo("124")
-        assertThat(resolvedEvents[1].amount).isEqualTo(200.0.toBigDecimal())
-        assertThat(resolvedEvents[1].currency).isEqualTo(transactionDto.amount.currency.toString())
-        assertThat(resolvedEvents[1].transactionType).isEqualTo(TransactionType.DEBIT)
+        assertThat(resolvedEvents[1].currency).isEqualTo(transactionDto.currency.toString())
+        assertThat(resolvedEvents[1].splitType).isEqualTo(SplitType.YouOweThemAll)
         assertThat(resolvedEvents[1].recipientId).isEqualTo(myStreamId)
         assertThat(resolvedEvents[1].createdAt).isNotNull
         assertThat(resolvedEvents[1].createdBy).isEqualTo("123")
@@ -409,7 +370,7 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
     ) {
         assertThat(transactionEvent[0].userUid).isEqualTo("123")
         assertThat(transactionEvent[0].amount).isEqualTo(100.0.toBigDecimal())
-        assertThat(transactionEvent[0].currency).isEqualTo(transactionDto.amount.currency.toString())
+        assertThat(transactionEvent[0].currency).isEqualTo(transactionDto.currency.toString())
         assertThat(transactionEvent[0].transactionType).isEqualTo(TransactionType.CREDIT)
         assertThat(transactionEvent[0].recipientId).isEqualTo(friendEventStreamId)
         assertThat(transactionEvent[0].createdAt).isNotNull
@@ -421,7 +382,7 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
 
         assertThat(transactionEvent[1].userUid).isEqualTo("124")
         assertThat(transactionEvent[1].amount).isEqualTo(100.0.toBigDecimal())
-        assertThat(transactionEvent[1].currency).isEqualTo(transactionDto.amount.currency.toString())
+        assertThat(transactionEvent[1].currency).isEqualTo(transactionDto.currency.toString())
         assertThat(transactionEvent[1].transactionType).isEqualTo(TransactionType.DEBIT)
         assertThat(transactionEvent[1].recipientId).isEqualTo(myStreamId)
         assertThat(transactionEvent[1].createdAt).isNotNull

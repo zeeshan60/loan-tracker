@@ -47,11 +47,11 @@ class TransactionEventHandlerTest {
             }
         )
 
-        val balances = transactionEventHandler.balancesOfFriends("123", listOf(friendStreamId))
+        val balances = transactionEventHandler.balancesOfFriendsByCurrency("123", listOf(friendStreamId))
         assertThat(balances).hasSize(1)
-        assertThat(balances[friendStreamId]?.amount).isEqualTo(250.0.toBigDecimal())
-        assertThat(balances[friendStreamId]?.currency).isEqualTo(Currency.getInstance("USD"))
-        assertThat(balances[friendStreamId]?.isOwed).isFalse()
+        assertThat(balances[friendStreamId]?.get("USD")?.amount).isEqualTo(250.0.toBigDecimal())
+        assertThat(balances[friendStreamId]?.get("USD")?.currency).isEqualTo(Currency.getInstance("USD"))
+        assertThat(balances[friendStreamId]?.get("USD")?.isOwed).isFalse()
     }
 
     @Test
@@ -102,15 +102,15 @@ class TransactionEventHandlerTest {
                 )
             })
 
-        val balances = transactionEventHandler.balancesOfFriends("123", listOf(friendStreamId1, friendStreamId2))
+        val balances = transactionEventHandler.balancesOfFriendsByCurrency("123", listOf(friendStreamId1, friendStreamId2))
         assertThat(balances).hasSize(2)
-        assertThat(balances[friendStreamId1]?.amount).isEqualTo(250.0.toBigDecimal())
-        assertThat(balances[friendStreamId1]?.currency).isEqualTo(Currency.getInstance("USD"))
-        assertThat(balances[friendStreamId1]?.isOwed).isFalse()
+        assertThat(balances[friendStreamId1]?.get("USD")?.amount).isEqualTo(250.0.toBigDecimal())
+        assertThat(balances[friendStreamId1]?.get("USD")?.currency).isEqualTo(Currency.getInstance("USD"))
+        assertThat(balances[friendStreamId1]?.get("USD")?.isOwed).isFalse()
 
-        assertThat(balances[friendStreamId2]?.amount).isEqualTo(250.0.toBigDecimal())
-        assertThat(balances[friendStreamId2]?.currency).isEqualTo(Currency.getInstance("USD"))
-        assertThat(balances[friendStreamId2]?.isOwed).isFalse()
+        assertThat(balances[friendStreamId2]?.get("USD")?.amount).isEqualTo(250.0.toBigDecimal())
+        assertThat(balances[friendStreamId2]?.get("USD")?.currency).isEqualTo(Currency.getInstance("USD"))
+        assertThat(balances[friendStreamId2]?.get("USD")?.isOwed).isFalse()
     }
 
     @Test
@@ -194,9 +194,9 @@ class TransactionEventHandlerTest {
 
         val transaction = transactionEventHandler.read("123", transactionStreamId)
         assertThat(transaction).isNotNull
-        assertThat(transaction?.amount).isEqualTo(100.0.toBigDecimal())
+        assertThat(transaction?.totalAmount).isEqualTo(100.0.toBigDecimal())
         assertThat(transaction?.currency).isEqualTo("USD")
-        assertThat(transaction?.transactionType).isEqualTo(TransactionType.DEBIT)
+        assertThat(transaction?.splitType).isEqualTo(SplitType.YouOweThemAll)
     }
 
     private fun sampleTransactions(friendStreamId: UUID): List<TransactionEvent> {

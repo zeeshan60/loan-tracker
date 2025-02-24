@@ -1,13 +1,12 @@
 package com.zeenom.loan_tracker.events
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.zeenom.loan_tracker.transactions.AmountDto
 import com.zeenom.loan_tracker.common.JacksonConfig
 import com.zeenom.loan_tracker.common.SecondInstant
-import com.zeenom.loan_tracker.transactions.TransactionDto
 import com.zeenom.loan_tracker.common.r2dbc.toClass
 import com.zeenom.loan_tracker.friends.TestPostgresConfig
 import com.zeenom.loan_tracker.transactions.SplitType
+import com.zeenom.loan_tracker.transactions.TransactionDto
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
@@ -38,11 +37,7 @@ class CommandDaoTest(
         val commandDto = CommandDto(
             commandType = CommandType.CREATE_TRANSACTION,
             payload = TransactionDto(
-                amount = AmountDto(
-                    currency = Currency.getInstance("USD"),
-                    amount = 100.0.toBigDecimal(),
-                    isOwed = true
-                ),
+                currency = Currency.getInstance("USD"),
                 recipientId = UUID.randomUUID(),
                 description = "test",
                 originalAmount = 100.0.toBigDecimal(),

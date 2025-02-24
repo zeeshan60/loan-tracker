@@ -42,11 +42,7 @@ class TransactionsControllerTest(@LocalServerPort private val port: Int) : BaseI
             Paginated(
                 listOf(
                     TransactionDto(
-                        amount = AmountDto(
-                            amount = 100.0.toBigDecimal(),
-                            currency = Currency.getInstance("SGD"),
-                            isOwed = true
-                        ),
+                        currency = Currency.getInstance("SGD"),
                         description = "transaction 1",
                         originalAmount = 200.0.toBigDecimal(),
                         splitType = SplitType.YouPaidSplitEqually,
@@ -57,11 +53,7 @@ class TransactionsControllerTest(@LocalServerPort private val port: Int) : BaseI
                         history = emptyList()
                     ),
                     TransactionDto(
-                        amount = AmountDto(
-                            amount = 50.0.toBigDecimal(),
-                            currency = Currency.getInstance("SGD"),
-                            isOwed = true
-                        ),
+                        currency = Currency.getInstance("SGD"),
                         description = "transaction 2",
                         originalAmount = 100.0.toBigDecimal(),
                         splitType = SplitType.YouPaidSplitEqually,
@@ -73,11 +65,7 @@ class TransactionsControllerTest(@LocalServerPort private val port: Int) : BaseI
                     ),
 
                     TransactionDto(
-                        amount = AmountDto(
-                            amount = 50.0.toBigDecimal(),
-                            currency = Currency.getInstance("SGD"),
-                            isOwed = true
-                        ),
+                        currency = Currency.getInstance("SGD"),
                         description = "transaction 1",
                         originalAmount = 50.0.toBigDecimal(),
                         splitType = SplitType.TheyOweYouAll,
@@ -89,11 +77,7 @@ class TransactionsControllerTest(@LocalServerPort private val port: Int) : BaseI
                     ),
 
                     TransactionDto(
-                        amount = AmountDto(
-                            amount = 150.0.toBigDecimal(),
-                            currency = Currency.getInstance("SGD"),
-                            isOwed = true
-                        ),
+                        currency = Currency.getInstance("SGD"),
                         description = "transaction 2",
                         originalAmount = 300.0.toBigDecimal(),
                         splitType = SplitType.YouPaidSplitEqually,

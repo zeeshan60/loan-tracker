@@ -6,7 +6,7 @@ import java.time.Instant
 import java.util.*
 
 data class TransactionDto(
-    val amount: AmountDto,
+    val currency: Currency,
     val description: String,
     val originalAmount: BigDecimal,
     val splitType: SplitType,

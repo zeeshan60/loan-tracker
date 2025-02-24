@@ -1,6 +1,8 @@
 package com.zeenom.loan_tracker.transactions
 
+import com.zeenom.loan_tracker.common.apply
 import com.zeenom.loan_tracker.common.events.IEvent
+import com.zeenom.loan_tracker.common.isOwed
 import com.zeenom.loan_tracker.friends.FriendEventRepository
 import com.zeenom.loan_tracker.friends.FriendModel
 import io.swagger.v3.core.util.Json
@@ -52,9 +54,7 @@ class TransactionEventHandler(
                 id = it.streamId,
                 userUid = it.userId,
                 description = it.description,
-                amount = it.amount,
                 currency = it.currency,
-                transactionType = it.transactionType,
                 splitType = it.splitType,
                 totalAmount = it.totalAmount,
                 recipientId = it.recipientId,
@@ -90,11 +90,7 @@ class TransactionEventHandler(
 
         return models.map {
             TransactionDto(
-                amount = AmountDto(
-                    amount = it.amount,
-                    currency = Currency.getInstance(it.currency),
-                    isOwed = it.transactionType == TransactionType.CREDIT
-                ),
+                currency = Currency.getInstance(it.currency),
                 recipientId = it.recipientId,
                 transactionStreamId = it.streamId,
                 description = it.description,
@@ -125,28 +121,6 @@ class TransactionEventHandler(
             ).toList()
     }
 
-    suspend fun balancesOfFriends(userId: String, friendIds: List<UUID>): Map<UUID, AmountDto> {
-
-        val toList = transactionEventRepository.findAllByUserUidAndRecipientIdIn(
-            userId,
-            friendIds
-        ).toList()
-        return toList
-            .map { it.toEvent() }
-            .groupBy { it.streamId }
-            .map { (_, events) ->
-                resolveStream(events)
-            }.groupBy { it.recipientId }.mapValues { (_, events) ->
-                val balance = events.map { if (it.transactionType == TransactionType.CREDIT) it.amount else -it.amount }
-                    .reduceOrNull { current, next -> current + next } ?: BigDecimal.ZERO
-                AmountDto(
-                    amount = if (balance > BigDecimal.ZERO) balance else balance * BigDecimal(-1),
-                    currency = Currency.getInstance(events.first().currency),
-                    isOwed = balance > BigDecimal.ZERO
-                )
-            }
-    }
-
     suspend fun balancesOfFriendsByCurrency(userId: String, friendIds: List<UUID>): Map<UUID, Map<String, AmountDto>> {
         val transactions = transactionEventRepository.findAllByUserUidAndRecipientIdIn(userId, friendIds).toList()
             .map { it.toEvent() }
@@ -161,7 +135,10 @@ class TransactionEventHandler(
                     .groupBy { it.currency }
                     .mapValues { (_, transactionsByCurrency) ->
                         val balance = transactionsByCurrency
-                            .sumOf { if (it.transactionType == TransactionType.CREDIT) it.amount else -it.amount }
+                            .sumOf {
+                                val amount = it.splitType.apply(it.totalAmount)
+                                if (it.splitType.isOwed()) amount else -amount
+                            }
                         AmountDto(
                             amount = balance.abs(),
                             currency = Currency.getInstance(transactionsByCurrency.first().currency),

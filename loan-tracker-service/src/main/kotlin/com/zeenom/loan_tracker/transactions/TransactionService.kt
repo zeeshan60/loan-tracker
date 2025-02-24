@@ -33,7 +33,7 @@ class TransactionService(
             userId = userUid,
             description = transactionDto.description,
             amount = transactionDto.splitType.apply(transactionDto.originalAmount),
-            currency = transactionDto.amount.currency.toString(),
+            currency = transactionDto.currency.toString(),
             transactionType = transactionDto.splitType.transactionType(),
             splitType = transactionDto.splitType,
             totalAmount = transactionDto.originalAmount,
@@ -129,10 +129,10 @@ class TransactionService(
             )
         }
 
-        if (existing.currency != transactionDto.amount.currency.toString()) {
+        if (existing.currency != transactionDto.currency.toString()) {
             val event = CurrencyChanged(
                 userId = userUid,
-                currency = transactionDto.amount.currency.toString(),
+                currency = transactionDto.currency.toString(),
                 createdAt = createdAt,
                 createdBy = userUid,
                 streamId = existing.streamId,

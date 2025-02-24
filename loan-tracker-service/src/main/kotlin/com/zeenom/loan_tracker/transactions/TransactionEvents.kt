@@ -200,7 +200,6 @@ data class TotalAmountChanged(
     override fun applyEvent(existing: TransactionModel): TransactionModel {
         return existing.copy(
             totalAmount = totalAmount,
-            amount = existing.splitType.apply(totalAmount),
             version = version,
             createdBy = createdBy,
             createdAt = createdAt
@@ -318,8 +317,6 @@ data class SplitTypeChanged(
 ) : ITransactionEvent {
     override fun applyEvent(existing: TransactionModel): TransactionModel {
         return existing.copy(
-            amount = splitType.apply(existing.totalAmount),
-            transactionType = splitType.transactionType(),
             splitType = splitType,
             version = version,
             createdBy = createdBy,

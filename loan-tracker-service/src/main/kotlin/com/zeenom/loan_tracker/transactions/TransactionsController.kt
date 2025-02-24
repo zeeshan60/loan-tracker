@@ -109,7 +109,7 @@ class TransactionsController(
                                 ?: throw IllegalStateException("Friend name is required in transactions response"),
                             amountResponse = AmountResponse(
                                 amount = transaction.splitType.apply(transaction.originalAmount),
-                                currency = transaction.amount.currency.currencyCode,
+                                currency = transaction.currency.currencyCode,
                                 isOwed = transaction.splitType.isOwed()
                             ),
                             history = transaction.history.groupBy { Pair(it.date.looseNanonSeconds(), it.userId) }.map {
@@ -133,15 +133,11 @@ class TransactionsController(
 
     private fun requestToDto(transactionRequest: TransactionBaseRequest) =
         TransactionDto(
-            amount = AmountDto(
-                amount = transactionRequest.type.amountForYou(transactionRequest.amount),
-                currency = Currency.getInstance(transactionRequest.currency),
-                isOwed = transactionRequest.type.isOwed()
-            ),
             recipientId = if (transactionRequest is TransactionCreateRequest) transactionRequest.recipientId else null,
             description = transactionRequest.description,
             splitType = transactionRequest.type,
             originalAmount = transactionRequest.amount,
+            currency = Currency.getInstance(transactionRequest.currency),
             recipientName = null,
             updatedAt = null
         )
