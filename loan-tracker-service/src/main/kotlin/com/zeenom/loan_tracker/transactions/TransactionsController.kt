@@ -1,17 +1,17 @@
 package com.zeenom.loan_tracker.transactions;
 
-import com.zeenom.loan_tracker.common.MessageResponse
-import com.zeenom.loan_tracker.common.Paginated
-import com.zeenom.loan_tracker.common.amountForYou
-import com.zeenom.loan_tracker.common.isOwed
+import com.zeenom.loan_tracker.common.*
 import com.zeenom.loan_tracker.events.CommandDto
 import com.zeenom.loan_tracker.events.CommandType
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.Schema
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import java.math.BigDecimal
 import java.time.Instant
+import java.time.ZoneId
 import java.util.*
+import kotlin.apply
 
 @RestController
 @RequestMapping("api/v1/transactions")
@@ -54,40 +54,52 @@ class TransactionsController(
         return MessageResponse("Transaction updated successfully")
     }
 
-    @Operation(summary = "Get transactions list per page for friend id")
-    @GetMapping("/friend")
+    @Operation(
+        summary = "Get transactions list per page for friend id",
+        description = "The `timeZone` parameter should be a valid IANA timezone ID. You can find the full list at: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones"
+    )
+
+    @GetMapping("/friend/byMonth")
     suspend fun getTransactions(
         @RequestParam friendId: UUID,
+        @Schema(description = "Timezone", example = "Asia/Singapore")
+        @RequestParam timeZone: String,
         @AuthenticationPrincipal userId: String,
-    ): Paginated<TransactionsResponse> {
+    ): TransactionsResponse {
+        if (timeZone !in ZoneId.getAvailableZoneIds()) {
+            throw IllegalArgumentException("Invalid timezone")
+        }
         return transactionQuery.execute(
             FriendTransactionQueryDto(
                 userId = userId,
                 friendId = friendId
             )
         ).let {
-            Paginated(
-                TransactionsResponse(
-                    transactions = it.data.map { transaction ->
+            it.data.groupBy {
+                it.updatedAt?.startOfMonth(timeZone)
+                    ?: throw IllegalStateException("Transaction date is required for month grouping")
+            }.map {
+                TransactionsPerMonth(
+                    date = it.key,
+                    transactions = it.value.map { transaction ->
                         TransactionResponse(
-                            transactionId = transaction.transactionStreamId!!,
-                            amountResponse = AmountResponse(
-                                amount = transaction.amount.amount,
-                                currency = transaction.amount.currency.toString(),
-                                isOwed = transaction.amount.isOwed
-                            ),
-                            totalAmount = transaction.originalAmount,
-                            friendName = transaction.recipientName!!,
-                            description = transaction.description,
-                            splitType = transaction.splitType,
                             date = transaction.updatedAt
-                                ?: throw IllegalStateException("Transaction date is required in get transactions response"),
-                            history = transaction.history,
+                                ?: throw IllegalStateException("Transaction date is required for transactions response"),
+                            description = transaction.description,
+                            transactionId = transaction.transactionStreamId!!,
+                            totalAmount = transaction.originalAmount,
+                            splitType = transaction.splitType,
+                            friendName = transaction.recipientName!!,
+                            amountResponse = AmountResponse(
+                                amount = transaction.splitType.apply(transaction.originalAmount),
+                                currency = transaction.amount.currency.currencyCode,
+                                isOwed = transaction.splitType.isOwed()
+                            ),
+                            history = transaction.history
                         )
                     }
-                ),
-                it.next
-            )
+                )
+            }.let { TransactionsResponse(it) }
         }
     }
 
@@ -138,12 +150,11 @@ enum class SplitType {
 }
 
 data class TransactionsResponse(
-    val transactions: List<TransactionResponse>,
+    val perMonth: List<TransactionsPerMonth>,
 )
 
 data class TransactionsPerMonth(
-    val month: Int,
-    val year: Int,
+    val date: Instant,
     val transactions: List<TransactionResponse>,
 )
 

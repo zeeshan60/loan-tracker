@@ -23,6 +23,13 @@ fun Instant.toReadableDateFormat(): String {
     return formatter.format(this)
 }
 
+fun Instant.startOfMonth(timeZone: String): Instant {
+    val zoneId = ZoneId.of(timeZone)
+    val dateTime = this.atZone(zoneId)
+    val startOfMonth = dateTime.toLocalDate().withDayOfMonth(1).atStartOfDay(zoneId)
+    return startOfMonth.toInstant()
+}
+
 fun Instant.singaporeStartOfDay(): Instant {
     val sgZone = ZoneId.of("Asia/Singapore")
     val singaporeDateTime = this.atZone(sgZone)

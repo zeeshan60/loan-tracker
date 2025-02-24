@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.web.server.LocalServerPort
-import java.util.UUID
+import java.util.*
 
 class TransactionsControllerIntegrationTest(@LocalServerPort private val port: Int) :
     BaseIntegration(port) {
@@ -92,7 +92,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
     @Test
     fun `get all transactions`() {
         val result = webTestClient.get()
-            .uri("/api/v1/transactions/friend?friendId=$johnFriendId")
+            .uri("/api/v1/transactions/friend/byMonth?friendId=$johnFriendId&timeZone=Asia/Singapore")
             .header("Authorization", "Bearer $zeeToken")
             .exchange()
             .expectStatus().isOk
@@ -100,19 +100,19 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
             .returnResult().responseBody!!.let {
                 objectMapper.readValue(
                     it,
-                    object : TypeReference<Paginated<TransactionsResponse>>() {})
+                    object : TypeReference<TransactionsResponse>() {})
             }
 
-        assertThat(result.data.transactions).hasSize(1)
-        assertThat(result.data.transactions[0].friendName).isEqualTo("john")
-        assertThat(result.data.transactions[0].amountResponse.amount).isEqualTo(50.0.toBigDecimal())
-        assertThat(result.data.transactions[0].amountResponse.currency).isEqualTo("USD")
-        assertThat(result.data.transactions[0].amountResponse.isOwed).isTrue()
-        assertThat(result.data.transactions[0].totalAmount).isEqualTo(100.0.toBigDecimal())
-        assertThat(result.data.transactions[0].transactionId).isNotNull()
-        assertThat(result.data.transactions[0].splitType).isEqualTo(SplitType.YouPaidSplitEqually)
-        assertThat(result.data.transactions[0].description).isEqualTo("Sample transaction")
-        transactionId = result.data.transactions[0].transactionId
+        assertThat(result.perMonth).hasSize(1)
+        assertThat(result.perMonth[0].transactions[0].friendName).isEqualTo("john")
+        assertThat(result.perMonth[0].transactions[0].amountResponse.amount).isEqualTo(50.0.toBigDecimal())
+        assertThat(result.perMonth[0].transactions[0].amountResponse.currency).isEqualTo("USD")
+        assertThat(result.perMonth[0].transactions[0].amountResponse.isOwed).isTrue()
+        assertThat(result.perMonth[0].transactions[0].totalAmount).isEqualTo(100.0.toBigDecimal())
+        assertThat(result.perMonth[0].transactions[0].transactionId).isNotNull()
+        assertThat(result.perMonth[0].transactions[0].splitType).isEqualTo(SplitType.YouPaidSplitEqually)
+        assertThat(result.perMonth[0].transactions[0].description).isEqualTo("Sample transaction")
+        transactionId = result.perMonth[0].transactions[0].transactionId
     }
 
     @Order(3)
@@ -132,7 +132,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
     @Test
     fun `get all transactions as john`() {
         val result = webTestClient.get()
-            .uri("/api/v1/transactions/friend?friendId=$zeeFriendId")
+            .uri("/api/v1/transactions/friend/byMonth?friendId=$zeeFriendId&timeZone=Asia/Singapore")
             .header("Authorization", "Bearer $johnToken")
             .exchange()
             .expectStatus().isOk
@@ -140,19 +140,19 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
             .returnResult().responseBody!!.let {
                 objectMapper.readValue(
                     it,
-                    object : TypeReference<Paginated<TransactionsResponse>>() {})
+                    object : TypeReference<TransactionsResponse>() {})
             }
 
-        assertThat(result.data.transactions).hasSize(1)
-        assertThat(result.data.transactions[0].friendName).isEqualTo("Zeeshan Tufail")
-        assertThat(result.data.transactions[0].amountResponse.amount).isEqualTo(50.0.toBigDecimal())
-        assertThat(result.data.transactions[0].amountResponse.currency).isEqualTo("USD")
-        assertThat(result.data.transactions[0].amountResponse.isOwed).isFalse()
-        assertThat(result.data.transactions[0].totalAmount).isEqualTo(100.0.toBigDecimal())
-        assertThat(result.data.transactions[0].transactionId).isNotNull()
-        assertThat(result.data.transactions[0].splitType).isEqualTo(SplitType.TheyPaidSplitEqually)
-        assertThat(result.data.transactions[0].description).isEqualTo("Sample transaction")
-        assertThat(result.data.transactions[0].history).isEmpty()
+        assertThat(result.perMonth).hasSize(1)
+        assertThat(result.perMonth[0].transactions[0].friendName).isEqualTo("Zeeshan Tufail")
+        assertThat(result.perMonth[0].transactions[0].amountResponse.amount).isEqualTo(50.0.toBigDecimal())
+        assertThat(result.perMonth[0].transactions[0].amountResponse.currency).isEqualTo("USD")
+        assertThat(result.perMonth[0].transactions[0].amountResponse.isOwed).isFalse()
+        assertThat(result.perMonth[0].transactions[0].totalAmount).isEqualTo(100.0.toBigDecimal())
+        assertThat(result.perMonth[0].transactions[0].transactionId).isNotNull()
+        assertThat(result.perMonth[0].transactions[0].splitType).isEqualTo(SplitType.TheyPaidSplitEqually)
+        assertThat(result.perMonth[0].transactions[0].description).isEqualTo("Sample transaction")
+        assertThat(result.perMonth[0].transactions[0].history).isEmpty()
     }
 
     @Order(5)
@@ -178,7 +178,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
     @Test
     fun `get all transactions as zee has history now`() {
         val result = webTestClient.get()
-            .uri("/api/v1/transactions/friend?friendId=$johnFriendId")
+            .uri("/api/v1/transactions/friend/byMonth?friendId=$johnFriendId&timeZone=Asia/Singapore")
             .header("Authorization", "Bearer $zeeToken")
             .exchange()
             .expectStatus().isOk
@@ -186,35 +186,35 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
             .returnResult().responseBody!!.let {
                 objectMapper.readValue(
                     it,
-                    object : TypeReference<Paginated<TransactionsResponse>>() {})
+                    object : TypeReference<TransactionsResponse>() {})
             }
 
-        assertThat(result.data.transactions).hasSize(1)
-        assertThat(result.data.transactions[0].friendName).isEqualTo("john")
-        assertThat(result.data.transactions[0].amountResponse.amount).isEqualTo(200.0.toBigDecimal())
-        assertThat(result.data.transactions[0].amountResponse.currency).isEqualTo("SGD")
-        assertThat(result.data.transactions[0].amountResponse.isOwed).isTrue()
-        assertThat(result.data.transactions[0].totalAmount).isEqualTo(200.0.toBigDecimal())
-        assertThat(result.data.transactions[0].transactionId).isNotNull()
-        assertThat(result.data.transactions[0].splitType).isEqualTo(SplitType.TheyOweYouAll)
-        assertThat(result.data.transactions[0].description).isEqualTo("Sample transaction edited")
-        assertThat(result.data.transactions[0].history).hasSize(4)
-        val history1 = result.data.transactions[0].history[0]
+        assertThat(result.perMonth).hasSize(1)
+        assertThat(result.perMonth[0].transactions[0].friendName).isEqualTo("john")
+        assertThat(result.perMonth[0].transactions[0].amountResponse.amount).isEqualTo(200.0.toBigDecimal())
+        assertThat(result.perMonth[0].transactions[0].amountResponse.currency).isEqualTo("SGD")
+        assertThat(result.perMonth[0].transactions[0].amountResponse.isOwed).isTrue()
+        assertThat(result.perMonth[0].transactions[0].totalAmount).isEqualTo(200.0.toBigDecimal())
+        assertThat(result.perMonth[0].transactions[0].transactionId).isNotNull()
+        assertThat(result.perMonth[0].transactions[0].splitType).isEqualTo(SplitType.TheyOweYouAll)
+        assertThat(result.perMonth[0].transactions[0].description).isEqualTo("Sample transaction edited")
+        assertThat(result.perMonth[0].transactions[0].history).hasSize(4)
+        val history1 = result.perMonth[0].transactions[0].history[0]
         assertThat(history1.type).isEqualTo(TransactionChangeType.DESCRIPTION)
         assertThat(history1.userId).isEqualTo(zeeDto.uid)
         assertThat(history1.oldValue).isEqualTo("Sample transaction")
         assertThat(history1.newValue).isEqualTo("Sample transaction edited")
-        val history2 = result.data.transactions[0].history[1]
+        val history2 = result.perMonth[0].transactions[0].history[1]
         assertThat(history2.type).isEqualTo(TransactionChangeType.SPLIT_TYPE)
         assertThat(history2.userId).isEqualTo(zeeDto.uid)
         assertThat(history2.oldValue).isEqualTo("YouPaidSplitEqually")
         assertThat(history2.newValue).isEqualTo("TheyOweYouAll")
-        val history3 = result.data.transactions[0].history[2]
+        val history3 = result.perMonth[0].transactions[0].history[2]
         assertThat(history3.type).isEqualTo(TransactionChangeType.TOTAL_AMOUNT)
         assertThat(history3.userId).isEqualTo(zeeDto.uid)
         assertThat(history3.oldValue).isEqualTo("100.0")
         assertThat(history3.newValue).isEqualTo("200.0")
-        val history4 = result.data.transactions[0].history[3]
+        val history4 = result.perMonth[0].transactions[0].history[3]
         assertThat(history4.type).isEqualTo(TransactionChangeType.CURRENCY)
         assertThat(history4.userId).isEqualTo(zeeDto.uid)
         assertThat(history4.oldValue).isEqualTo("USD")
@@ -227,7 +227,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
     @Test
     fun `get all transactions as john has history now`() {
         val result = webTestClient.get()
-            .uri("/api/v1/transactions/friend?friendId=$zeeFriendId")
+            .uri("/api/v1/transactions/friend/byMonth?friendId=$zeeFriendId&timeZone=Asia/Singapore")
             .header("Authorization", "Bearer $johnToken")
             .exchange()
             .expectStatus().isOk
@@ -235,35 +235,35 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
             .returnResult().responseBody!!.let {
                 objectMapper.readValue(
                     it,
-                    object : TypeReference<Paginated<TransactionsResponse>>() {})
+                    object : TypeReference<TransactionsResponse>() {})
             }
 
-        assertThat(result.data.transactions).hasSize(1)
-        assertThat(result.data.transactions[0].friendName).isEqualTo("Zeeshan Tufail")
-        assertThat(result.data.transactions[0].amountResponse.amount).isEqualTo(200.0.toBigDecimal())
-        assertThat(result.data.transactions[0].amountResponse.currency).isEqualTo("SGD")
-        assertThat(result.data.transactions[0].amountResponse.isOwed).isFalse()
-        assertThat(result.data.transactions[0].totalAmount).isEqualTo(200.0.toBigDecimal())
-        assertThat(result.data.transactions[0].transactionId).isNotNull()
-        assertThat(result.data.transactions[0].splitType).isEqualTo(SplitType.YouOweThemAll)
-        assertThat(result.data.transactions[0].description).isEqualTo("Sample transaction edited")
-        assertThat(result.data.transactions[0].history).hasSize(4)
-        val history1 = result.data.transactions[0].history[0]
+        assertThat(result.perMonth).hasSize(1)
+        assertThat(result.perMonth[0].transactions[0].friendName).isEqualTo("Zeeshan Tufail")
+        assertThat(result.perMonth[0].transactions[0].amountResponse.amount).isEqualTo(200.0.toBigDecimal())
+        assertThat(result.perMonth[0].transactions[0].amountResponse.currency).isEqualTo("SGD")
+        assertThat(result.perMonth[0].transactions[0].amountResponse.isOwed).isFalse()
+        assertThat(result.perMonth[0].transactions[0].totalAmount).isEqualTo(200.0.toBigDecimal())
+        assertThat(result.perMonth[0].transactions[0].transactionId).isNotNull()
+        assertThat(result.perMonth[0].transactions[0].splitType).isEqualTo(SplitType.YouOweThemAll)
+        assertThat(result.perMonth[0].transactions[0].description).isEqualTo("Sample transaction edited")
+        assertThat(result.perMonth[0].transactions[0].history).hasSize(4)
+        val history1 = result.perMonth[0].transactions[0].history[0]
         assertThat(history1.type).isEqualTo(TransactionChangeType.DESCRIPTION)
         assertThat(history1.userId).isEqualTo(johnDto.uid)
         assertThat(history1.oldValue).isEqualTo("Sample transaction")
         assertThat(history1.newValue).isEqualTo("Sample transaction edited")
-        val history2 = result.data.transactions[0].history[1]
+        val history2 = result.perMonth[0].transactions[0].history[1]
         assertThat(history2.type).isEqualTo(TransactionChangeType.SPLIT_TYPE)
         assertThat(history2.userId).isEqualTo(johnDto.uid)
         assertThat(history2.oldValue).isEqualTo("TheyPaidSplitEqually")
         assertThat(history2.newValue).isEqualTo("YouOweThemAll")
-        val history3 = result.data.transactions[0].history[2]
+        val history3 = result.perMonth[0].transactions[0].history[2]
         assertThat(history3.type).isEqualTo(TransactionChangeType.TOTAL_AMOUNT)
         assertThat(history3.userId).isEqualTo(johnDto.uid)
         assertThat(history3.oldValue).isEqualTo("100.0")
         assertThat(history3.newValue).isEqualTo("200.0")
-        val history4 = result.data.transactions[0].history[3]
+        val history4 = result.perMonth[0].transactions[0].history[3]
         assertThat(history4.type).isEqualTo(TransactionChangeType.CURRENCY)
         assertThat(history4.userId).isEqualTo(johnDto.uid)
         assertThat(history4.oldValue).isEqualTo("USD")
@@ -340,7 +340,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
     @Test
     fun `get all transactions should return two transactions`() {
         val result = webTestClient.get()
-            .uri("/api/v1/transactions/friend?friendId=$johnFriendId")
+            .uri("/api/v1/transactions/friend/byMonth?friendId=$johnFriendId&timeZone=Asia/Singapore")
             .header("Authorization", "Bearer $zeeToken")
             .exchange()
             .expectStatus().isOk
@@ -348,17 +348,17 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
             .returnResult().responseBody!!.let {
                 objectMapper.readValue(
                     it,
-                    object : TypeReference<Paginated<TransactionsResponse>>() {})
+                    object : TypeReference<TransactionsResponse>() {})
             }
 
-        assertThat(result.data.transactions).hasSize(2)
-        assertThat(result.data.transactions[1].friendName).isEqualTo("john")
-        assertThat(result.data.transactions[1].amountResponse.amount).isEqualTo(50.0.toBigDecimal())
-        assertThat(result.data.transactions[1].amountResponse.currency).isEqualTo("USD")
-        assertThat(result.data.transactions[1].amountResponse.isOwed).isTrue()
-        assertThat(result.data.transactions[1].totalAmount).isEqualTo(100.0.toBigDecimal())
-        assertThat(result.data.transactions[1].transactionId).isNotNull()
-        assertThat(result.data.transactions[1].splitType).isEqualTo(SplitType.YouPaidSplitEqually)
-        assertThat(result.data.transactions[1].description).isEqualTo("Sample transaction")
+        assertThat(result.perMonth[0].transactions).hasSize(2)
+        assertThat(result.perMonth[0].transactions[1].friendName).isEqualTo("john")
+        assertThat(result.perMonth[0].transactions[1].amountResponse.amount).isEqualTo(50.0.toBigDecimal())
+        assertThat(result.perMonth[0].transactions[1].amountResponse.currency).isEqualTo("USD")
+        assertThat(result.perMonth[0].transactions[1].amountResponse.isOwed).isTrue()
+        assertThat(result.perMonth[0].transactions[1].totalAmount).isEqualTo(100.0.toBigDecimal())
+        assertThat(result.perMonth[0].transactions[1].transactionId).isNotNull()
+        assertThat(result.perMonth[0].transactions[1].splitType).isEqualTo(SplitType.YouPaidSplitEqually)
+        assertThat(result.perMonth[0].transactions[1].description).isEqualTo("Sample transaction")
     }
 }
