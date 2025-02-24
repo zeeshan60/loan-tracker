@@ -15,6 +15,7 @@ import {
   mailOutline,
   callOutline,
   listOutline,
+  receiptOutline,
 } from 'ionicons/icons';
 import { signalMethod } from '@ngrx/signals';
 import { FriendsStore } from './friends/friends.store';
@@ -69,7 +70,8 @@ export class AppComponent implements OnInit {
       person,
       mailOutline,
       callOutline,
-      listOutline
+      listOutline,
+      receiptOutline
     });
 
     this.activateLoaderWhen(this.friendsStore.loading);

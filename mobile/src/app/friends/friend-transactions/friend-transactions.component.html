@@ -3,18 +3,46 @@
     <ion-buttons slot="start">
       <ion-back-button></ion-back-button>
     </ion-buttons>
-    <ion-title>With you and {{friend['name']}}</ion-title>
+    <ion-title>With you and {{friend['name'] | shortenName}}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-list>
-    @for( transaction of transactions; track transaction.name) {
-      <ion-item (click)="openTransactionDetails(transaction)" button>
-        <ion-label>
-          <h2>{{ transaction.name }}</h2>
-        </ion-label>
-      </ion-item>
-    }
-  </ion-list>
+  @for(transactionsByMonth of transactions(); track transactionsByMonth.date) {
+    <ion-list>
+      @for(transaction of transactionsByMonth.transactions; track transaction.transactionId) {
+        <ion-item (click)="openTransactionDetails(transaction)" button>
+          <p slot="start" class="date-wrapper">
+            24<br> FEB
+          </p>
+          <ion-avatar>
+            <ion-icon color="medium" size="large" name="receipt-outline"></ion-icon>
+          </ion-avatar>
+          <ion-label class="description-wrapper">
+            <h2>{{ transaction.description }}</h2>
+            <p>
+              @if (transaction.amountResponse.isOwed) {
+                You paid:
+              } @else {
+                {{friend.name | shortenName}} paid:
+              }
+              {{ transaction.totalAmount | currency: transaction.amountResponse.currency: 'symbol' }}
+            </p>
+          </ion-label>
+          <p class="amount-wrapper">
+            <ion-label class="type" [color]="transaction.amountResponse.isOwed ? 'success': 'danger'">
+              @if (transaction.amountResponse.isOwed) {
+                You lent
+              } @else {
+                You borrowed
+              }
+            </ion-label>
+            <ion-label [color]="transaction.amountResponse.isOwed ? 'success': 'danger'">
+              {{ transaction.amountResponse.amount | currency: transaction.amountResponse.currency: 'symbol' }}
+            </ion-label>
+          </p>
+        </ion-item>
+      }
+    </ion-list>
+  }
 </ion-content>

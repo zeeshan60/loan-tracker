@@ -10,9 +10,10 @@
 }
 
 .choose-friend-item {
-  ion-button {
+  ion-label.selected-friend-label {
     display: inline;
-    margin-top: 10px;
+    border-bottom: 2px dashed;
+    cursor: pointer;
   }
 }
 

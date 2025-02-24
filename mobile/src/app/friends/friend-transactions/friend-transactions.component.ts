@@ -14,6 +14,9 @@ import { NavParams } from '@ionic/angular';
 import { Friend } from '../model';
 import { TransactionDetailsComponent } from '../transaction-details/transaction-details.component';
 import { FriendsStore } from '../friends.store';
+import { HelperService } from '../../helper.service';
+import { shortName } from '../../utility-functions';
+import { ShortenNamePipe } from '../../pipes/shorten-name.pipe';
 
 @Component({
   selector: 'app-friend-transactions',
@@ -35,6 +38,7 @@ import { FriendsStore } from '../friends.store';
     IonToolbar,
     IonBackButton,
     IonSpinner,
+    ShortenNamePipe,
   ],
 })
 export class FriendTransactionsComponent  implements OnInit {
@@ -42,10 +46,8 @@ export class FriendTransactionsComponent  implements OnInit {
   readonly nav = inject(IonNav);
   readonly friendsStore = inject(FriendsStore);
   readonly transactionDetails = TransactionDetailsComponent;
-  readonly transactions = [
-    { name: 'bablu ko diye' },
-    { name: 'mom ka kharcha' },
-  ]
+  readonly transactions = this.friendsStore.selectedTransactions;
+  protected readonly shortName = shortName;
 
   constructor() {
   }
@@ -58,11 +60,12 @@ export class FriendTransactionsComponent  implements OnInit {
     });
   }
 
-  ionViewDidEnter() {
+  ionViewWillEnter() {
     this.friendsStore.setSelectedFriend(this.friend || null);
+    this.friendsStore.loadSelectedTransactions();
   }
 
-  ionViewDidLeave() {
+  ionViewWillLeave() {
     this.friendsStore.setSelectedFriend(null);
   }
 }

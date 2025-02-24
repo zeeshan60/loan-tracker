@@ -17,12 +17,15 @@ import { FriendsStore } from '../friends/friends.store';
 import { Friend } from '../friends/model';
 import { SelectFriendComponent } from './select-friend/select-friend.component';
 import { JsonPipe } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { PRIVATE_API } from '../constants';
+import { ShortenNamePipe } from '../pipes/shorten-name.pipe';
 
 export enum SplitOptions {
-  YouPaidSplitEqually,
-  TheyPaidSplitEqually,
-  TheyOweYouAll,
-  YouOweThemAll
+  YouPaidSplitEqually = 'YouPaidSplitEqually',
+  TheyPaidSplitEqually = 'TheyPaidSplitEqually',
+  TheyOweYouAll = 'TheyOweYouAll',
+  YouOweThemAll = 'YouOweThemAll'
 }
 
 @Component({
@@ -48,11 +51,13 @@ export enum SplitOptions {
     IonBackButton,
     JsonPipe,
     IonLabel,
+    ShortenNamePipe,
   ],
 })
 export class DefineExpenseComponent {
   readonly friend = model<Friend|null>(null);
   readonly loading = signal(false);
+  readonly http = inject(HttpClient);
   readonly modalCtrl = inject(ModalController);
   readonly helperService = inject<HelperService>(HelperService);
   readonly formBuilder = inject(FormBuilder);
@@ -63,12 +68,12 @@ export class DefineExpenseComponent {
   defineExpenseForm = this.formBuilder.group({
     description: this.formBuilder.nonNullable.control('', [Validators.required, Validators.maxLength(1000)]),
     currency: this.formBuilder.nonNullable.control('PKR', [Validators.required]),
-    expense: this.formBuilder.nonNullable.control(null, [Validators.required, Validators.min(1)]),
-    whoOwesWho: this.formBuilder.nonNullable.control({ value: SplitOptions.YouPaidSplitEqually, disabled: !this.friend }, [Validators.required]),
+    amount: this.formBuilder.nonNullable.control(null, [Validators.required, Validators.min(1)]),
+    type: this.formBuilder.nonNullable.control({ value: SplitOptions.YouPaidSplitEqually, disabled: !this.friend }, [Validators.required]),
   });
   isOwed = () => {
     return [SplitOptions.YouPaidSplitEqually, SplitOptions.TheyOweYouAll]
-      .includes(this.defineExpenseForm.value.whoOwesWho!);
+      .includes(this.defineExpenseForm.value.type!);
   };
   constructor() {}
 
@@ -77,12 +82,16 @@ export class DefineExpenseComponent {
   }
 
   async onSubmit() {
+    if (!this.friend()) {
+      await this.helperService.showToast('Please select a friend first.');
+      return;
+    }
     if (this.defineExpenseForm.valid) {
       try {
         this.loading.set(true);
         await this.saveExpense(this.defineExpenseForm.getRawValue());
         await this.friendsStore.loadFriends();
-        this.router.navigate(['/'])
+        this.modalCtrl.dismiss(null, 'confirm');
       } catch (e) {
         await this.helperService.showToast('Unable to add friend at the moment');
       } finally {
@@ -109,9 +118,12 @@ export class DefineExpenseComponent {
   async saveExpense(formValue: {
     description: string,
     currency: string,
-    expense: number|null,
-    whoOwesWho: SplitOptions
+    amount: number|null,
+    type: SplitOptions
   }) {
-    return firstValueFrom(timer(1000));
+    return firstValueFrom(this.http.post(`${PRIVATE_API}/transactions/add`, {
+      ...formValue,
+      recipientId: this.friend()!.friendId
+    }));
   }
 }

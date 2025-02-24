@@ -25,16 +25,16 @@
           @if (friend.photoUrl) {
             <img [src]="friend.photoUrl" alt="Friend's photo" />
           } @else {
-            <ion-icon size="large" name="person" [color]="friend.loanAmount?.isOwed ? 'success': 'danger'"></ion-icon>
+            <ion-icon size="large" name="person" [color]="friend.mainBalance?.isOwed ? 'success': 'danger'"></ion-icon>
           }
         </ion-avatar>
         <ion-label>
           <h2>{{ friend.name }}</h2>
         </ion-label>
-        @if (friend.loanAmount) {
+        @if (friend.mainBalance) {
           <p>
-            <ion-label [color]="friend.loanAmount.isOwed ? 'success': 'danger'">
-              {{ friend.loanAmount.amount | currency }}
+            <ion-label [color]="friend.mainBalance.isOwed ? 'success': 'danger'">
+              {{ friend.mainBalance.amount | currency }}
             </ion-label>
           </p>
         }

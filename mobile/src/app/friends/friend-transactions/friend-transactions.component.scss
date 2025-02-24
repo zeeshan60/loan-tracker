@@ -1,0 +1,21 @@
+@import "variables.scss";
+
+ion-item {
+  .date-wrapper {
+    color: $light-color;
+  }
+  ion-icon {
+    margin-top: 3px;
+  }
+}
+.description-wrapper {
+  h2 {
+    font-size: 14px;
+  }
+}
+.amount-wrapper {
+  text-align: right;
+  .type {
+    font-size: 12px;
+  }
+}

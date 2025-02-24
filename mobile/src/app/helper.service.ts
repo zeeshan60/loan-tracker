@@ -26,4 +26,8 @@ export class HelperService {
   async getUser() {
     return getAuth().currentUser;
   }
+
+  getTimeZone() {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone
+  }
 }

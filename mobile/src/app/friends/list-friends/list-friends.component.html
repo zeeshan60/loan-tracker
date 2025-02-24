@@ -10,7 +10,7 @@
     </ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="addFriend()">
-        <ion-icon name="add-outline"></ion-icon>
+        Add Friend
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -30,22 +30,22 @@
     </ion-toolbar>
   </ion-header>
   <ion-list>
-    @for( friend of friendsStore.friends(); track friend.name) {
+    @for( friend of friendsStore.unSettledFriends(); track friend.name) {
       <ion-item (click)="chooseFriend(friend)" button>
         <ion-avatar slot="start">
           @if (friend.photoUrl) {
             <img [src]="friend.photoUrl" alt="Friend's photo" />
           } @else {
-            <ion-icon size="large" name="person" [color]="friend.loanAmount?.isOwed ? 'success': 'danger'"></ion-icon>
+            <ion-icon size="large" name="person" [color]="friend.mainBalance?.isOwed ? 'success': 'danger'"></ion-icon>
           }
         </ion-avatar>
         <ion-label>
           <h2>{{ friend.name }}</h2>
         </ion-label>
-        @if (friend.loanAmount) {
+        @if (friend.mainBalance) {
           <p>
-            <ion-label [color]="friend.loanAmount.isOwed ? 'success': 'danger'">
-              {{ friend.loanAmount.amount | currency }}
+            <ion-label [color]="friend.mainBalance.isOwed ? 'success': 'danger'">
+              {{ friend.mainBalance.amount | currency }}
             </ion-label>
           </p>
         }
