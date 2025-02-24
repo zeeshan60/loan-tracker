@@ -3,7 +3,6 @@ package com.zeenom.loan_tracker.transactions
 import com.zeenom.loan_tracker.common.apply
 import com.zeenom.loan_tracker.common.events.IEvent
 import com.zeenom.loan_tracker.common.reverse
-import com.zeenom.loan_tracker.common.transactionType
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.*
@@ -15,9 +14,7 @@ interface ITransactionEvent: IEvent<TransactionModel>, TransactionChangeSummary,
 data class TransactionCreated(
     override val userId: String,
     val description: String,
-    val amount: BigDecimal,
     val currency: String,
-    val transactionType: TransactionType,
     val splitType: SplitType,
     val totalAmount: BigDecimal,
     override val recipientId: UUID,
@@ -30,9 +27,7 @@ data class TransactionCreated(
         return TransactionEvent(
             userUid = userId,
             description = description,
-            amount = splitType.apply(totalAmount),
             currency = currency,
-            transactionType = transactionType,
             splitType = splitType,
             totalAmount = totalAmount,
             recipientId = recipientId,
@@ -52,9 +47,7 @@ data class TransactionCreated(
         return TransactionCreated(
             userId = recipientUserId,
             description = description,
-            amount = splitType.apply(totalAmount),
             currency = currency,
-            transactionType = if (transactionType == TransactionType.CREDIT) TransactionType.DEBIT else TransactionType.CREDIT,
             splitType = splitType.reverse(),
             totalAmount = totalAmount,
             recipientId = userStreamId,
@@ -93,9 +86,7 @@ data class DescriptionChanged(
         return TransactionEvent(
             userUid = userId,
             description = description,
-            amount = null,
             currency = null,
-            transactionType = null,
             splitType = null,
             totalAmount = null,
             recipientId = recipientId,
@@ -151,9 +142,7 @@ data class TransactionDeleted(
         return TransactionEvent(
             userUid = userId,
             description = null,
-            amount = null,
             currency = null,
-            transactionType = null,
             splitType = null,
             totalAmount = null,
             recipientId = recipientId,
@@ -210,9 +199,7 @@ data class TotalAmountChanged(
         return TransactionEvent(
             userUid = userId,
             description = null,
-            amount = null,
             currency = null,
-            transactionType = null,
             splitType = null,
             totalAmount = totalAmount,
             recipientId = recipientId,
@@ -269,9 +256,7 @@ data class CurrencyChanged(
         return TransactionEvent(
             userUid = userId,
             description = null,
-            amount = null,
             currency = currency,
-            transactionType = null,
             splitType = null,
             totalAmount = null,
             recipientId = recipientId,
@@ -338,9 +323,7 @@ data class SplitTypeChanged(
         return TransactionEvent(
             userUid = userId,
             description = null,
-            amount = null,
             currency = null,
-            transactionType = null,
             splitType = splitType,
             totalAmount = null,
             recipientId = recipientId,

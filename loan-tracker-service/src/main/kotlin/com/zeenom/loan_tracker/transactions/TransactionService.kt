@@ -1,7 +1,5 @@
 package com.zeenom.loan_tracker.transactions
 
-import com.zeenom.loan_tracker.common.apply
-import com.zeenom.loan_tracker.common.transactionType
 import com.zeenom.loan_tracker.friends.FriendsEventHandler
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventHandler
@@ -32,9 +30,7 @@ class TransactionService(
         val event = TransactionCreated(
             userId = userUid,
             description = transactionDto.description,
-            amount = transactionDto.splitType.apply(transactionDto.originalAmount),
             currency = transactionDto.currency.toString(),
-            transactionType = transactionDto.splitType.transactionType(),
             splitType = transactionDto.splitType,
             totalAmount = transactionDto.originalAmount,
             recipientId = transactionDto.recipientId,

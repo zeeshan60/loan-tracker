@@ -81,7 +81,8 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
         assertThat(transactionEvent).hasSize(1)
         assertThat(transactionEvent[0].userUid).isEqualTo("123")
         assertThat(transactionEvent[0].currency).isEqualTo(transactionDto.currency.toString())
-        assertThat(transactionEvent[0].transactionType).isEqualTo(TransactionType.CREDIT)
+        assertThat(transactionEvent[0].totalAmount).isEqualTo(transactionDto.originalAmount)
+        assertThat(transactionEvent[0].splitType).isEqualTo(transactionDto.splitType)
         assertThat(transactionEvent[0].recipientId).isEqualTo(transactionDto.recipientId)
         assertThat(transactionEvent[0].createdAt).isNotNull
         assertThat(transactionEvent[0].createdBy).isEqualTo("123")
@@ -113,7 +114,8 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
         assertThat(transactionEvent).hasSize(2)
         assertThat(transactionEvent[0].userUid).isEqualTo("123")
         assertThat(transactionEvent[0].currency).isEqualTo(transactionDto.currency.toString())
-        assertThat(transactionEvent[0].transactionType).isEqualTo(TransactionType.CREDIT)
+        assertThat(transactionEvent[0].totalAmount).isEqualTo(transactionDto.originalAmount)
+        assertThat(transactionEvent[0].splitType).isEqualTo(transactionDto.splitType)
         assertThat(transactionEvent[0].recipientId).isEqualTo(friendEventStreamId)
         assertThat(transactionEvent[0].createdAt).isNotNull
         assertThat(transactionEvent[0].createdBy).isEqualTo("123")
@@ -124,7 +126,8 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
 
         assertThat(transactionEvent[1].userUid).isEqualTo("124")
         assertThat(transactionEvent[1].currency).isEqualTo(transactionDto.currency.toString())
-        assertThat(transactionEvent[1].transactionType).isEqualTo(TransactionType.DEBIT)
+        assertThat(transactionEvent[1].totalAmount).isEqualTo(transactionDto.originalAmount)
+        assertThat(transactionEvent[1].splitType).isEqualTo(SplitType.YouOweThemAll)
         assertThat(transactionEvent[1].recipientId).isEqualTo(myStreamId)
         assertThat(transactionEvent[1].createdAt).isNotNull
         assertThat(transactionEvent[1].createdBy).isEqualTo("123")
@@ -369,9 +372,9 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
         myStreamId: UUID?,
     ) {
         assertThat(transactionEvent[0].userUid).isEqualTo("123")
-        assertThat(transactionEvent[0].amount).isEqualTo(100.0.toBigDecimal())
+        assertThat(transactionEvent[0].totalAmount).isEqualTo(transactionDto.originalAmount)
         assertThat(transactionEvent[0].currency).isEqualTo(transactionDto.currency.toString())
-        assertThat(transactionEvent[0].transactionType).isEqualTo(TransactionType.CREDIT)
+        assertThat(transactionEvent[0].splitType).isEqualTo(transactionDto.splitType)
         assertThat(transactionEvent[0].recipientId).isEqualTo(friendEventStreamId)
         assertThat(transactionEvent[0].createdAt).isNotNull
         assertThat(transactionEvent[0].createdBy).isEqualTo("123")
@@ -381,9 +384,9 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
 
 
         assertThat(transactionEvent[1].userUid).isEqualTo("124")
-        assertThat(transactionEvent[1].amount).isEqualTo(100.0.toBigDecimal())
+        assertThat(transactionEvent[1].totalAmount).isEqualTo(transactionDto.originalAmount)
         assertThat(transactionEvent[1].currency).isEqualTo(transactionDto.currency.toString())
-        assertThat(transactionEvent[1].transactionType).isEqualTo(TransactionType.DEBIT)
+        assertThat(transactionEvent[1].splitType).isEqualTo(SplitType.YouOweThemAll)
         assertThat(transactionEvent[1].recipientId).isEqualTo(myStreamId)
         assertThat(transactionEvent[1].createdAt).isNotNull
         assertThat(transactionEvent[1].createdBy).isEqualTo("123")
@@ -393,10 +396,9 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
 
 
         assertThat(transactionEvent[2].userUid).isEqualTo("123")
-        assertThat(transactionEvent[2].amount).isNull()
         assertThat(transactionEvent[2].totalAmount).isEqualTo(200.0.toBigDecimal())
         assertThat(transactionEvent[2].currency).isNull()
-        assertThat(transactionEvent[2].transactionType).isNull()
+        assertThat(transactionEvent[2].splitType).isNull()
         assertThat(transactionEvent[2].recipientId).isNotNull()
         assertThat(transactionEvent[2].createdAt).isNotNull
         assertThat(transactionEvent[2].createdBy).isEqualTo("123")
@@ -405,10 +407,9 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
 
 
         assertThat(transactionEvent[3].userUid).isEqualTo("124")
-        assertThat(transactionEvent[2].amount).isNull()
         assertThat(transactionEvent[2].totalAmount).isEqualTo(200.0.toBigDecimal())
         assertThat(transactionEvent[2].currency).isNull()
-        assertThat(transactionEvent[2].transactionType).isNull()
+        assertThat(transactionEvent[2].splitType).isNull()
         assertThat(transactionEvent[2].recipientId).isNotNull()
         assertThat(transactionEvent[2].createdAt).isNotNull
         assertThat(transactionEvent[2].createdBy).isEqualTo("123")

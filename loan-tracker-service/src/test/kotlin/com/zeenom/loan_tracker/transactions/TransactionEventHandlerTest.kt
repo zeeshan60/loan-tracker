@@ -129,9 +129,7 @@ class TransactionEventHandlerTest {
                 } doReturn listOf(
                     TransactionEvent(
                         userUid = "123",
-                        amount = 200.0.toBigDecimal(),
                         currency = "USD",
-                        transactionType = TransactionType.CREDIT,
                         recipientId = friendStreamId,
                         createdAt = Date().toInstant(),
                         createdBy = "123",
@@ -144,9 +142,7 @@ class TransactionEventHandlerTest {
                     ),
                     TransactionEvent(
                         userUid = "123",
-                        amount = null,
                         currency = null,
-                        transactionType = null,
                         recipientId = friendStreamId,
                         createdAt = Instant.now(),
                         createdBy = "123",
@@ -159,9 +155,7 @@ class TransactionEventHandlerTest {
                     ),
                     TransactionEvent(
                         userUid = "123",
-                        amount = null,
                         currency = null,
-                        transactionType = null,
                         recipientId = friendStreamId,
                         createdAt = Instant.now(),
                         createdBy = "123",
@@ -204,9 +198,7 @@ class TransactionEventHandlerTest {
         return listOf(
             TransactionEvent(
                 userUid = "123",
-                amount = 100.0.toBigDecimal(),
                 currency = "USD",
-                transactionType = TransactionType.CREDIT,
                 recipientId = friendStreamId,
                 createdAt = Date().toInstant(),
                 createdBy = "123",
@@ -219,9 +211,7 @@ class TransactionEventHandlerTest {
             ),
             TransactionEvent(
                 userUid = "123",
-                amount = 200.0.toBigDecimal(),
                 currency = "USD",
-                transactionType = TransactionType.CREDIT,
                 recipientId = friendStreamId,
                 createdAt = Date().toInstant(),
                 createdBy = "123",
@@ -234,9 +224,7 @@ class TransactionEventHandlerTest {
             ),
             TransactionEvent(
                 userUid = "123",
-                amount = null,
                 currency = null,
-                transactionType = null,
                 recipientId = friendStreamId,
                 createdAt = Date().toInstant(),
                 createdBy = "123",
@@ -249,9 +237,7 @@ class TransactionEventHandlerTest {
             ),
             TransactionEvent(
                 userUid = "123",
-                amount = 150.0.toBigDecimal(),
                 currency = "USD",
-                transactionType = TransactionType.DEBIT,
                 recipientId = friendStreamId,
                 createdAt = Date().toInstant(),
                 createdBy = "123",

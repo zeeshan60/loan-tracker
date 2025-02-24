@@ -15,9 +15,7 @@ data class TransactionEvent(
     @Id private val id: UUID? = null,
     val userUid: String,
     val description: String?,
-    val amount: BigDecimal?,
     val currency: String?,
-    val transactionType: TransactionType?,
     val splitType: SplitType?,
     val totalAmount: BigDecimal?,
     val recipientId: UUID,
@@ -32,9 +30,7 @@ data class TransactionEvent(
             TransactionEventType.TRANSACTION_CREATED -> TransactionCreated(
                 userId = userUid,
                 description = description ?: throw IllegalStateException("Description is required"),
-                amount = amount ?: throw IllegalStateException("Amount is required"),
                 currency = currency ?: throw IllegalStateException("Currency is required"),
-                transactionType = transactionType ?: throw IllegalStateException("Transaction type is required"),
                 splitType = splitType ?: throw IllegalStateException("Split type is required"),
                 totalAmount = totalAmount ?: throw IllegalStateException("Total amount is required"),
                 recipientId = recipientId ?: throw IllegalStateException("Recipient ID is required"),
@@ -94,10 +90,6 @@ data class TransactionEvent(
             )
         }
     }
-}
-
-enum class TransactionType {
-    CREDIT, DEBIT
 }
 
 enum class TransactionEventType {
