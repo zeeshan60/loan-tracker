@@ -3,10 +3,44 @@
     <ion-buttons slot="start">
       <ion-back-button></ion-back-button>
     </ion-buttons>
-    <ion-title>{{transaction.name}}</ion-title>
+    <ion-title>Details</ion-title>
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon name="create-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-label>{{transaction.name}}</ion-label>
+  <ion-list lines="none">
+    <ion-item>
+      <ion-label>
+        {{ transaction.description }}
+      </ion-label>
+    </ion-item>
+    <ion-item>
+      <ion-label>
+        <h1>
+          {{ transaction.amountResponse.amount | currency: transaction.amountResponse.currency: 'symbol-narrow' }}
+        </h1>
+<!--        <p>Added by {{transaction.createdBy.name}} on {{transaction.createdAt|date}}</p>-->
+<!--        @if (transaction.updatedBy?.name) {-->
+<!--          <p>Updated by {{transaction.updatedBy.name}} on {{transaction.updatedAt|date}}</p>-->
+<!--        }-->
+      </ion-label>
+    </ion-item>
+    <ion-item>
+      <ion-label>
+        You paid PKR 1200.00
+        <p>Zeeshan T. owes you PKR 1200</p>
+      </ion-label>
+    </ion-item>
+    <ion-item>
+      <ion-button fill="solid" color="danger" size="small">
+        <ion-icon slot="start" name="trash-outline"></ion-icon>
+        Delete
+      </ion-button>
+    </ion-item>
+  </ion-list>
 </ion-content>

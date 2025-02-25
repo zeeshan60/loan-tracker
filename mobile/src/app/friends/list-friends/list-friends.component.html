@@ -1,12 +1,7 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
     <ion-title slot="start">
-      Friends
-      @if (friendsStore['finalAmount']()) {
-        : <ion-label
-          [color]="friendsStore['finalAmount']() > 0 ? 'success' : 'danger'"
-        >{{friendsStore['finalAmount']() | currency}}</ion-label>
-      }
+      Friends summary
     </ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="addFriend()">
@@ -17,19 +12,26 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">
-        Friends
-        @if (friendsStore['finalAmount']()) {
-          : <ion-label
-            [color]="friendsStore['finalAmount']() > 0 ? 'success' : 'danger'"
-          >{{friendsStore['finalAmount']() | currency}}</ion-label>
-        }
-      </ion-title>
-    </ion-toolbar>
-  </ion-header>
   <ion-list>
+    <ion-item class="overall-balance-wrapper">
+      <ion-label>
+          Overall balance:
+      </ion-label>
+      @if (friendsStore['finalAmount']()) {
+        <p>
+          <ion-label
+            [color]="friendsStore['finalAmount']() > 0 ? 'success' : 'danger'"
+          >
+            {{friendsStore['finalAmount']() | currency}}
+            <ul class="other-balances-list">
+              <ion-label  [color]="true ? 'success': 'danger'">
+                {{'1234' | currency: 'PKR': 'symbol-narrow'}}
+              </ion-label>
+            </ul>
+          </ion-label>
+        </p>
+      }
+    </ion-item>
     @for( friend of friendsStore.unSettledFriends(); track friend.name) {
       <ion-item (click)="chooseFriend(friend)" button>
         <ion-avatar slot="start">

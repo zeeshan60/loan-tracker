@@ -10,6 +10,16 @@ export interface Friend {
 
 export interface Transaction {
   date: string,
+  createdAt: string,
+  updatedAt: string,
+  createdBy: {
+    name: string,
+    id: string,
+  },
+  updatedBy: {
+    name: string,
+    id: string,
+  },
   description: string,
   transactionId: string,
   totalAmount: number,

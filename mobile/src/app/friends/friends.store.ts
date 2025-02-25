@@ -8,17 +8,17 @@ import { Friend, TransactionsByMonth } from './model'
 import { HttpClient } from '@angular/common/http';
 import { PRIVATE_API } from '../constants';
 
+export type AddFriend = {
+  name: string,
+  email: string|null,
+  phoneNumber: string
+}
+
 type FriendsState = {
   friends: Friend[],
   selectedFriend: Friend | null,
   selectedTransactions: TransactionsByMonth[],
   loading: boolean,
-}
-
-export type AddFriend = {
-  name: string,
-  email: string|null,
-  phoneNumber: string
 }
 
 const initialState: FriendsState = {
