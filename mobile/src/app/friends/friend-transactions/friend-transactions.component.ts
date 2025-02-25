@@ -17,6 +17,7 @@ import { FriendsStore } from '../friends.store';
 import { HelperService } from '../../helper.service';
 import { shortName } from '../../utility-functions';
 import { ShortenNamePipe } from '../../pipes/shorten-name.pipe';
+import { DateFormatPipe } from '../../pipes/date-format.pipe';
 
 @Component({
   selector: 'app-friend-transactions',
@@ -39,6 +40,7 @@ import { ShortenNamePipe } from '../../pipes/shorten-name.pipe';
     IonBackButton,
     IonSpinner,
     ShortenNamePipe,
+    DateFormatPipe,
   ],
 })
 export class FriendTransactionsComponent  implements OnInit {

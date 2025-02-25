@@ -24,6 +24,7 @@ export class TabsPage {
     if (this.router.url.endsWith('tabs/friends')) {
       selectedFriend = this.friendsStore.selectedFriend();
     }
+    console.log(selectedFriend);
     const modal = await this.modalCtrl.create({
       component: DefineExpenseComponent,
       componentProps: { friend: selectedFriend }

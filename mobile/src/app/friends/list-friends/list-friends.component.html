@@ -41,11 +41,20 @@
         </ion-avatar>
         <ion-label>
           <h2>{{ friend.name }}</h2>
+          @if(friend.otherBalances.length) {
+            <ul class="other-balances-list">
+            @for(balance of friend.otherBalances; track balance.currency) {
+              <ion-label color="medium">
+                - {{!balance.isOwed ? 'You' : friend.name | shortenName}} owe: {{balance.amount | currency: balance.currency: 'symbol-narrow'}}
+              </ion-label>
+            }
+            </ul>
+          }
         </ion-label>
         @if (friend.mainBalance) {
           <p>
             <ion-label [color]="friend.mainBalance.isOwed ? 'success': 'danger'">
-              {{ friend.mainBalance.amount | currency }}
+              {{ friend.mainBalance.amount | currency: friend.mainBalance.currency: 'symbol-narrow' }}
             </ion-label>
           </p>
         }

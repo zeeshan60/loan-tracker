@@ -1,4 +1,14 @@
-import { ChangeDetectionStrategy, Component, inject, input, Input, model, OnInit, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  input,
+  Input,
+  model,
+  OnInit,
+  signal,
+} from '@angular/core';
 import {
   IonBackButton,
   IonButton,
@@ -10,7 +20,7 @@ import {
   IonToolbar, ModalController,
 } from '@ionic/angular/standalone';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { firstValueFrom, timer } from 'rxjs';
+import { firstValueFrom, takeUntil, timer } from 'rxjs';
 import { Router } from '@angular/router';
 import { HelperService } from '../helper.service';
 import { FriendsStore } from '../friends/friends.store';
@@ -20,6 +30,8 @@ import { JsonPipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { PRIVATE_API } from '../constants';
 import { ShortenNamePipe } from '../pipes/shorten-name.pipe';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { ComponentDestroyedMixin } from '../component-destroyed.mixin';
 
 export enum SplitOptions {
   YouPaidSplitEqually = 'YouPaidSplitEqually',
@@ -54,7 +66,7 @@ export enum SplitOptions {
     ShortenNamePipe,
   ],
 })
-export class DefineExpenseComponent {
+export class DefineExpenseComponent extends ComponentDestroyedMixin() {
   readonly friend = model<Friend|null>(null);
   readonly loading = signal(false);
   readonly http = inject(HttpClient);
@@ -69,13 +81,27 @@ export class DefineExpenseComponent {
     description: this.formBuilder.nonNullable.control('', [Validators.required, Validators.maxLength(1000)]),
     currency: this.formBuilder.nonNullable.control('PKR', [Validators.required]),
     amount: this.formBuilder.nonNullable.control(null, [Validators.required, Validators.min(1)]),
-    type: this.formBuilder.nonNullable.control({ value: SplitOptions.YouPaidSplitEqually, disabled: !this.friend }, [Validators.required]),
+    type: this.formBuilder.nonNullable.control({ value: SplitOptions.YouPaidSplitEqually, disabled: !this.friend() }, [Validators.required]),
   });
   isOwed = () => {
     return [SplitOptions.YouPaidSplitEqually, SplitOptions.TheyOweYouAll]
       .includes(this.defineExpenseForm.value.type!);
   };
-  constructor() {}
+  constructor() {
+    super();
+
+    toObservable(this.friend)
+      .pipe(
+        takeUntil(this.componentDestroyed)
+      )
+      .subscribe(value => {
+        if (!value) {
+          this.defineExpenseForm.get('type')?.disable();
+        } else {
+          this.defineExpenseForm.get('type')?.enable();
+        }
+      })
+  }
 
   closePopup() {
     this.modalCtrl.dismiss();

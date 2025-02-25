@@ -10,10 +10,14 @@
 <ion-content [fullscreen]="true">
   @for(transactionsByMonth of transactions(); track transactionsByMonth.date) {
     <ion-list>
+      <ion-item class="group-label-item">
+        <ion-label color="medium">{{transactionsByMonth.date | dateFormat:'month': 'year'}}</ion-label>
+      </ion-item>
       @for(transaction of transactionsByMonth.transactions; track transaction.transactionId) {
         <ion-item (click)="openTransactionDetails(transaction)" button>
           <p slot="start" class="date-wrapper">
-            24<br> FEB
+            {{transaction.date | dateFormat: 'day'}}<br>
+            {{transaction.date | dateFormat: 'month'}}
           </p>
           <ion-avatar>
             <ion-icon color="medium" size="large" name="receipt-outline"></ion-icon>
@@ -26,7 +30,7 @@
               } @else {
                 {{friend.name | shortenName}} paid:
               }
-              {{ transaction.totalAmount | currency: transaction.amountResponse.currency: 'symbol' }}
+              {{ transaction.totalAmount | currency: transaction.amountResponse.currency: 'symbol-narrow' }}
             </p>
           </ion-label>
           <p class="amount-wrapper">
@@ -38,7 +42,7 @@
               }
             </ion-label>
             <ion-label [color]="transaction.amountResponse.isOwed ? 'success': 'danger'">
-              {{ transaction.amountResponse.amount | currency: transaction.amountResponse.currency: 'symbol' }}
+              {{ transaction.amountResponse.amount | currency: transaction.amountResponse.currency: 'symbol-narrow' }}
             </ion-label>
           </p>
         </ion-item>

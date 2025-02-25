@@ -4,8 +4,8 @@ export interface Friend {
   friendId: string;
   photoUrl: string|null;
   name: string;
-  mainBalance: { amount: number, isOwed: boolean } | null;
-  otherBalances: { amount: number, isOwed: boolean }[]
+  mainBalance: { amount: number, currency: string, isOwed: boolean } | null;
+  otherBalances: { amount: number, currency: string, isOwed: boolean }[]
 }
 
 export interface Transaction {

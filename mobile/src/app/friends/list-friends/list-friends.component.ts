@@ -15,6 +15,7 @@ import { FriendsStore } from '../friends.store';
 import { FormsModule } from '@angular/forms';
 import { Friend } from '../model';
 import { FriendTransactionsComponent } from '../friend-transactions/friend-transactions.component';
+import { ShortenNamePipe } from '../../pipes/shorten-name.pipe';
 
 @Component({
   selector: 'app-list-friends',
@@ -34,7 +35,8 @@ import { FriendTransactionsComponent } from '../friend-transactions/friend-trans
     IonItem,
     IonAvatar,
     IonLabel,
-    CurrencyPipe
+    CurrencyPipe,
+    ShortenNamePipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
