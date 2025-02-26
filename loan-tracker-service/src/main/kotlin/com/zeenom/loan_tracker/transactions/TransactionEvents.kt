@@ -1,6 +1,8 @@
 package com.zeenom.loan_tracker.transactions
 
+import com.zeenom.loan_tracker.common.apply
 import com.zeenom.loan_tracker.common.events.IEvent
+import com.zeenom.loan_tracker.common.isOwed
 import com.zeenom.loan_tracker.common.reverse
 import java.math.BigDecimal
 import java.time.Instant
@@ -8,6 +10,7 @@ import java.util.*
 
 interface ITransactionEvent : IEvent<TransactionModel>, TransactionChangeSummary, CrossTransactionable {
     val recipientId: UUID
+    fun activityLog(current: TransactionModel): ActivityLog
 }
 
 data class TransactionCreated(
@@ -54,6 +57,32 @@ data class TransactionCreated(
             createdBy = createdBy,
             streamId = streamId,
             version = version,
+        )
+    }
+
+    override fun activityLog(current: TransactionModel): ActivityLog {
+        return ActivityLog(
+            userUid = userId,
+            activityType = ActivityType.CREATED,
+            amount = splitType.apply(totalAmount),
+            currency = currency,
+            isOwed = splitType.isOwed(),
+            date = createdAt,
+            transactionModel = TransactionModel(
+                id = streamId,
+                userUid = userId,
+                description = description,
+                currency = currency,
+                splitType = splitType,
+                totalAmount = totalAmount,
+                recipientId = recipientId,
+                createdAt = createdAt,
+                createdBy = createdBy,
+                streamId = streamId,
+                version = version,
+            ),
+            activityByUid = createdBy,
+            description = description
         )
     }
 
@@ -118,6 +147,20 @@ data class DescriptionChanged(
             recipientId = userStreamId
         )
     }
+
+    override fun activityLog(current: TransactionModel): ActivityLog {
+        return ActivityLog(
+            userUid = userId,
+            activityType = ActivityType.UPDATED,
+            amount = current.splitType.apply(current.totalAmount),
+            currency = current.currency,
+            isOwed = current.splitType.isOwed(),
+            date = createdAt,
+            activityByUid = createdBy,
+            description = description,
+            transactionModel = current
+        )
+    }
 }
 
 data class TransactionDeleted(
@@ -171,6 +214,20 @@ data class TransactionDeleted(
             createdAt = createdAt,
             createdBy = createdBy,
             recipientId = userStreamId
+        )
+    }
+
+    override fun activityLog(current: TransactionModel): ActivityLog {
+        return ActivityLog(
+            userUid = userId,
+            activityType = ActivityType.DELETED,
+            amount = current.splitType.apply(current.totalAmount),
+            currency = current.currency,
+            isOwed = current.splitType.isOwed(),
+            date = createdAt,
+            transactionModel = current,
+            activityByUid = createdBy,
+            description = current.description
         )
     }
 }
@@ -231,6 +288,20 @@ data class TotalAmountChanged(
             recipientId = userStreamId
         )
     }
+
+    override fun activityLog(current: TransactionModel): ActivityLog {
+        return ActivityLog(
+            userUid = userId,
+            activityType = ActivityType.UPDATED,
+            currency = current.currency,
+            date = createdAt,
+            transactionModel = current,
+            activityByUid = createdBy,
+            description = current.description,
+            amount = current.splitType.apply(totalAmount),
+            isOwed = current.splitType.isOwed(),
+        )
+    }
 }
 
 data class CurrencyChanged(
@@ -288,6 +359,20 @@ data class CurrencyChanged(
             recipientId = userStreamId
         )
     }
+
+    override fun activityLog(current: TransactionModel): ActivityLog {
+        return ActivityLog(
+            userUid = userId,
+            activityType = ActivityType.UPDATED,
+            currency = currency,
+            date = createdAt,
+            transactionModel = current,
+            activityByUid = createdBy,
+            description = current.description,
+            amount = current.splitType.apply(current.totalAmount),
+            isOwed = current.splitType.isOwed(),
+        )
+    }
 }
 
 data class SplitTypeChanged(
@@ -343,6 +428,20 @@ data class SplitTypeChanged(
             createdAt = createdAt,
             createdBy = createdBy,
             recipientId = userStreamId
+        )
+    }
+
+    override fun activityLog(current: TransactionModel): ActivityLog {
+        return ActivityLog(
+            userUid = userId,
+            activityType = ActivityType.UPDATED,
+            currency = current.currency,
+            date = createdAt,
+            transactionModel = current,
+            activityByUid = createdBy,
+            description = current.description,
+            amount = current.splitType.apply(current.totalAmount),
+            isOwed = current.splitType.isOwed(),
         )
     }
 }

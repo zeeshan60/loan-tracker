@@ -18,3 +18,21 @@ data class TransactionModel(
     val streamId: UUID,
     val version: Int,
 )
+
+data class ActivityLog(
+    val userUid: String,
+    val activityByUid: String,
+    val description: String,
+    val activityType: ActivityType,
+    val amount: BigDecimal,
+    val currency: String,
+    val isOwed: Boolean,
+    val date: Instant,
+    val transactionModel: TransactionModel,
+)
+
+enum class ActivityType {
+    CREATED,
+    UPDATED,
+    DELETED,
+}

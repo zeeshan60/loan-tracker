@@ -1,11 +1,13 @@
 package com.zeenom.loan_tracker.transactions
 
+import com.zeenom.loan_tracker.friends.FriendFinderStrategy
 import com.zeenom.loan_tracker.friends.FriendsEventHandler
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
+import java.math.BigDecimal
 import java.time.Instant
 import java.util.*
 
@@ -14,6 +16,7 @@ class TransactionService(
     private val transactionEventHandler: TransactionEventHandler,
     private val userEventHandler: UserEventHandler,
     private val friendsEventHandler: FriendsEventHandler,
+    private val friendFinderStrategy: FriendFinderStrategy,
 ) {
     suspend fun addTransaction(
         userUid: String,
@@ -188,5 +191,62 @@ class TransactionService(
             )
         )
     }
+
+    suspend fun transactionActivityLogs(userId: String): List<ActivityLogWithFriendInfo> {
+        val findUserFriends = friendFinderStrategy.findUserFriends(userId)
+        val friendUsersByUid =
+            findUserFriends.filter { it.friendUid != null }
+                .associateBy {
+                    requireNotNull(it.friendUid)
+                    it.friendUid
+                }
+        val friendUsersByStreamId = findUserFriends.associateBy { it.friendStreamId }
+        val transactionsWithLogs = transactionEventHandler.transactionsWithActivityLogs(userId)
+
+        return transactionsWithLogs.map { transactionWithLogs ->
+            transactionWithLogs.activityLogs.map {
+                ActivityLogWithFriendInfo(
+                    userUid = userId,
+                    activityByUid = it.activityByUid,
+                    activityByName = friendUsersByUid[it.activityByUid]?.name,
+                    activityByPhoto = friendUsersByUid[it.activityByUid]?.photoUrl,
+                    description = it.description,
+                    activityType = it.activityType,
+                    amount = it.amount,
+                    currency = it.currency,
+                    isOwed = it.isOwed,
+                    date = it.date,
+                    transactionDto = transactionWithLogs.transactionModel.let {
+                        TransactionDto(
+                            transactionStreamId = it.id,
+                            recipientId = it.recipientId,
+                            description = it.description,
+                            currency = Currency.getInstance(it.currency),
+                            splitType = it.splitType,
+                            originalAmount = it.totalAmount,
+                            recipientName = friendUsersByStreamId[it.recipientId]?.name,
+                            updatedAt = it.createdAt,
+                            deleted = it.deleted,
+                            history = transactionWithLogs.changeSummary
+                        )
+                    },
+                )
+            }
+        }.flatten()
+    }
 }
+
+data class ActivityLogWithFriendInfo(
+    val userUid: String,
+    val activityByUid: String,
+    val activityByName: String?,
+    val activityByPhoto: String?,
+    val description: String,
+    val activityType: ActivityType,
+    val amount: BigDecimal,
+    val currency: String,
+    val isOwed: Boolean,
+    val date: Instant,
+    val transactionDto: TransactionDto,
+)
 

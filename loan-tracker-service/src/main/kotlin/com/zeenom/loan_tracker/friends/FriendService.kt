@@ -16,28 +16,22 @@ class FriendService(
     private val friendsEventHandler: FriendsEventHandler,
     private val userEventHandler: UserEventHandler,
     private val transactionEventHandler: TransactionEventHandler,
+    private val friendFinderStrategy: FriendFinderStrategy
 ) {
+
     suspend fun findAllByUserId(userId: String): FriendsDto = withContext(Dispatchers.IO) {
-        val events = friendsEventHandler.findAllEventsByUserId(userId).toList()
+        val events = friendFinderStrategy.findUserFriends(userId)
         val amountsPerFriend =
-            async { transactionEventHandler.balancesOfFriendsByCurrency(userId, events.map { it.streamId }) }
-        val usersByPhones =
-            userEventHandler.findUsersByPhoneNumbers(events.mapNotNull { it.friendPhoneNumber }).toList()
-                .associateBy { it.phoneNumber }
-        val usersByEmails =
-            userEventHandler.findUsersByEmails(events.filter { it.friendPhoneNumber !in usersByPhones.keys }
-                .mapNotNull { it.friendEmail }).toList().associateBy { it.email }
+            async { transactionEventHandler.balancesOfFriendsByCurrency(userId, events.map { it.friendStreamId }) }
         val friends = events.map {
-            val user =
-                it.friendPhoneNumber?.let { usersByPhones[it] } ?: it.friendEmail?.let { usersByEmails[it] }
             FriendDto(
-                friendId = it.streamId,
-                email = it.friendEmail,
-                phoneNumber = it.friendPhoneNumber,
-                name = it.friendDisplayName,
-                photoUrl = user?.photoUrl,
+                friendId = it.friendStreamId,
+                email = it.email,
+                phoneNumber = it.phoneNumber,
+                name = it.name,
+                photoUrl = it.photoUrl,
                 mainCurrency = null, //TODO implement main currency
-                balances = amountsPerFriend.await()[it.streamId]?.values?.toList() ?: emptyList()
+                balances = amountsPerFriend.await()[it.friendStreamId]?.values?.toList() ?: emptyList()
             )
         }
         FriendsDto(friends)

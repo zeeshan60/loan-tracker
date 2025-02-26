@@ -48,6 +48,17 @@ class TransactionEventHandler(
         return model
     }
 
+    fun resolveStreamAndGenerateLogs(events: List<ITransactionEvent>): Pair<TransactionModel, List<ActivityLog>> {
+        val firstEvent = events.first()
+        var model: TransactionModel = baseModel(firstEvent)
+        val logs = mutableListOf(firstEvent.activityLog(model))
+        events.drop(1).forEach {
+            model = it.applyEvent(model)
+            logs.add(it.activityLog(model))
+        }
+        return model to logs.reversed()
+    }
+
     private fun baseModel(firstEvent: IEvent<TransactionModel>): TransactionModel {
         return if (firstEvent is TransactionCreated) firstEvent.let {
             TransactionModel(
@@ -70,23 +81,12 @@ class TransactionEventHandler(
 
         val transactions = findAllByUserIdFriendId(userId, friend.streamId)
 
-        Json.prettyPrint(transactions)
         val byStreamId = transactions.groupBy { it.streamId }
         val models = byStreamId.map { (_, events) ->
             resolveStream(events)
         }
 
-        val historyByStream = byStreamId.map { (streamId, events) ->
-
-            val baseModel = baseModel(events.first())
-            val history = mutableListOf<ChangeSummary>()
-            events.drop(1).forEach {
-                if (it is TransactionChangeSummary) {
-                    history.add(it.changeSummary(baseModel))
-                }
-            }
-            streamId to history
-        }.toMap()
+        val historyByStream = changeSummaryByTransactionId(transactions)
 
         return models.map {
             TransactionDto(
@@ -104,11 +104,37 @@ class TransactionEventHandler(
         }
     }
 
+    private fun changeSummaryByTransactionId(transactionEvents: List<ITransactionEvent>): Map<UUID, List<ChangeSummary>> {
+
+        val byStreamId = transactionEvents.groupBy { Pair(it.streamId, it.recipientId) }
+        return byStreamId.map { (streamId, events) ->
+
+            val baseModel = baseModel(events.first())
+            val history = mutableListOf<ChangeSummary>()
+            events.drop(1).forEach {
+                history.add(it.changeSummary(baseModel))
+            }
+            streamId.first to history
+        }.toMap()
+    }
+
+    suspend fun transactionsWithActivityLogs(userId: String): List<TransactionModelWithActivityLogs> {
+
+        val transactions = transactionEventRepository.findAllByUserUid(userId).toList()
+            .map { it.toEvent() as ITransactionEvent }
+        val changeSummaryByTransactionId = changeSummaryByTransactionId(transactions)
+        val byStreamId = transactions.groupBy { Pair(it.streamId, it.recipientId) }
+        return byStreamId.map { (_, events) ->
+            val (model, logs) = resolveStreamAndGenerateLogs(events)
+            TransactionModelWithActivityLogs(model, logs, changeSummaryByTransactionId[model.streamId] ?: emptyList())
+        }
+    }
+
     private suspend fun findAllByUserIdFriendId(
         userId: String,
         friendStreamId: UUID,
     ) = findAllEventsByUserIdFriendId(userId, friendStreamId)
-        .map { it.toEvent() }
+        .map { it.toEvent() as ITransactionEvent }
 
     private suspend fun findAllEventsByUserIdFriendId(
         userId: String,
@@ -179,3 +205,9 @@ class TransactionEventHandler(
             }
     }
 }
+
+data class TransactionModelWithActivityLogs(
+    val transactionModel: TransactionModel,
+    val activityLogs: List<ActivityLog>,
+    val changeSummary: List<ChangeSummary>,
+)

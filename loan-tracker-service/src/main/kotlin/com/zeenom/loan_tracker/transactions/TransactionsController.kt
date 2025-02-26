@@ -19,6 +19,7 @@ class TransactionsController(
     private val updateTransactionCommand: UpdateTransactionCommand,
     private val transactionQuery: TransactionQuery,
     private val deleteTransactionCommand: DeleteTransactionCommand,
+    private val activityLogsQuery: ActivityLogsQuery,
 ) {
 
     @Operation(summary = "Add a transaction")
@@ -129,6 +130,13 @@ class TransactionsController(
                 )
             }.let { TransactionsResponse(it) }
         }
+    }
+
+    @GetMapping("/activityLogs")
+    suspend fun getTransactionActivityLogs(
+        @AuthenticationPrincipal userId: String,
+    ): Paginated<List<ActivityLogsResponse>> {
+        return activityLogsQuery.execute(userId)
     }
 
     private fun requestToDto(transactionRequest: TransactionBaseRequest) =

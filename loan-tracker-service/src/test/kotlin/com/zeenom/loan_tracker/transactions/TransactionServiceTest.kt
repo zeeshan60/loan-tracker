@@ -32,7 +32,8 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
     private val transactionService = TransactionService(
         transactionEventHandler = transactionEventHandler,
         userEventHandler = userEventHandler,
-        friendsEventHandler = friendEventHandler
+        friendsEventHandler = friendEventHandler,
+        friendFinderStrategy = mock()
     )
 
     @BeforeEach
