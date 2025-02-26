@@ -40,7 +40,7 @@ class FriendServiceTest(
         userEventHandler = userEventHandler,
         transactionEventHandler = transactionEventHandler,
         friendsEventHandler = friendsEventHandler,
-        friendFinderStrategy = mock(),
+        friendFinderStrategy = FriendFinderStrategy(friendsEventHandler, userEventHandler),
     )
 
 
@@ -437,7 +437,10 @@ class FriendServiceTest(
             userEventHandler = userEventHandler,
             transactionEventHandler = transactionEventHandler,
             friendsEventHandler = friendsEventHandler,
-            friendFinderStrategy = mock(),
+            friendFinderStrategy = FriendFinderStrategy(
+                friendsEventHandler,
+                userEventHandler
+            ),
         )
         val (user1, user2) = friendData
         userEventHandler.saveEvent(

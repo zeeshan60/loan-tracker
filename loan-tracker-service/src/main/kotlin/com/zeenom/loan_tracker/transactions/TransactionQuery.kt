@@ -15,15 +15,14 @@ class TransactionQuery(
 @Service
 class ActivityLogsQuery(
     private val transactionService: TransactionService,
-) : Query<String, Paginated<List<ActivityLogsResponse>>> {
-    override suspend fun execute(input: String): Paginated<List<ActivityLogsResponse>> {
+) : Query<String, Paginated<List<ActivityLogResponse>>> {
+    override suspend fun execute(input: String): Paginated<List<ActivityLogResponse>> {
         return Paginated(transactionService.transactionActivityLogs(userId = input).map {
             requireNotNull(it.transactionDto.updatedAt) { "Transaction updated at is required" }
             requireNotNull(it.transactionDto.transactionStreamId) { "Transaction stream id is required" }
             requireNotNull(it.transactionDto.recipientName) { "Recipient name is required" }
-            ActivityLogsResponse(
+            ActivityLogResponse(
                 userUid = it.userUid,
-                activityByUid = it.activityByUid,
                 activityByName = it.activityByName,
                 activityByPhoto = it.activityByPhoto,
                 description = it.description,

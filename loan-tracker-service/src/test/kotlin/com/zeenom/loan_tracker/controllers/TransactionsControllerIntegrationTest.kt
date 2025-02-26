@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.zeenom.loan_tracker.common.Paginated
 import com.zeenom.loan_tracker.friends.FriendEventRepository
 import com.zeenom.loan_tracker.friends.FriendsResponse
+import com.zeenom.loan_tracker.prettyAndPrint
 import com.zeenom.loan_tracker.transactions.*
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventRepository
@@ -372,6 +373,26 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
 
     @Order(12)
     @Test
+    fun `update transaction as john`() {
+        webTestClient.put()
+            .uri("/api/v1/transactions/update/transactionId/$transactionId")
+            .header("Authorization", "Bearer $johnToken")
+            .bodyValue(
+                TransactionUpdateRequest(
+                    amount = 300.0.toBigDecimal(),
+                    currency = "SGD",
+                    type = SplitType.TheyOweYouAll,
+                    description = "Sample transaction edited by john"
+                )
+            )
+            .exchange()
+            .expectStatus().isOk
+            .expectBody().jsonPath("$.message").isEqualTo("Transaction updated successfully")
+    }
+
+
+    @Order(13)
+    @Test
     fun `delete transaction as zee`() {
         webTestClient.delete()
             .uri("/api/v1/transactions/delete/transactionId/$transactionId")
@@ -381,7 +402,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
             .expectBody().jsonPath("$.message").isEqualTo("Transaction deleted successfully")
     }
 
-    @Order(13)
+    @Order(14)
     @Test
     fun `get all transactions should return one transaction`() {
         val result = webTestClient.get()
@@ -405,5 +426,78 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
         assertThat(result.perMonth[0].transactions[0].transactionId).isNotNull()
         assertThat(result.perMonth[0].transactions[0].splitType).isEqualTo(SplitType.YouPaidSplitEqually)
         assertThat(result.perMonth[0].transactions[0].description).isEqualTo("Sample transaction")
+    }
+
+
+    @Order(15)
+    @Test
+    fun `get activity logs for approval`() {
+
+        val result = webTestClient.get()
+            .uri("/api/v1/transactions/activityLogs")
+            .header("Authorization", "Bearer $zeeToken")
+            .exchange()
+            .expectStatus().isOk
+            .expectBody(String::class.java)
+            .returnResult().responseBody!!.let {
+                objectMapper.readValue(
+                    it,
+                    object : TypeReference<Paginated<List<ActivityLogResponse>>>() {})
+            }
+
+        result.prettyAndPrint(objectMapper)
+
+        assertThat(result.data).hasSize(5)
+
+        // First Activity Log (DELETED)
+        assertThat(result.data[0].activityType).isEqualTo(ActivityType.DELETED)
+        assertThat(result.data[0].amount).isEqualTo(300.0.toBigDecimal())
+        assertThat(result.data[0].currency).isEqualTo("SGD")
+        assertThat(result.data[0].description).isEqualTo("Sample transaction edited by john")
+        assertThat(result.data[0].activityByName).isEqualTo(zeeDto.displayName)
+        assertThat(result.data[0].activityByPhoto).isEqualTo(zeeDto.photoUrl)
+
+        // Second Activity Log (UPDATED)
+        assertThat(result.data[1].activityType).isEqualTo(ActivityType.UPDATED)
+        assertThat(result.data[1].amount).isEqualTo(300.0.toBigDecimal())
+        assertThat(result.data[1].currency).isEqualTo("SGD")
+        assertThat(result.data[1].description).isEqualTo("Sample transaction edited by john")
+        assertThat(result.data[1].activityByName).isEqualTo("john")
+        assertThat(result.data[1].activityByPhoto).isEqualTo(johnDto.photoUrl)
+
+        // Third Activity Log (UPDATED with USD currency)
+        assertThat(result.data[2].activityType).isEqualTo(ActivityType.UPDATED)
+        assertThat(result.data[2].amount).isEqualTo(200.0.toBigDecimal())
+        assertThat(result.data[2].currency).isEqualTo("SGD")
+        assertThat(result.data[2].description).isEqualTo("Sample transaction edited")
+        assertThat(result.data[2].activityByName).isEqualTo(zeeDto.displayName)
+        assertThat(result.data[2].activityByPhoto).isEqualTo(zeeDto.photoUrl)
+
+        // Fourth Activity Log (UPDATED with amount 100.0)
+        assertThat(result.data[3].activityType).isEqualTo(ActivityType.CREATED)
+        assertThat(result.data[3].amount).isEqualTo(50.0.toBigDecimal())
+        assertThat(result.data[3].currency).isEqualTo("USD")
+        assertThat(result.data[3].description).isEqualTo("Sample transaction")
+        assertThat(result.data[3].activityByName).isEqualTo(zeeDto.displayName)
+        assertThat(result.data[3].activityByPhoto).isEqualTo(zeeDto.photoUrl)
+
+        // Fifth Activity Log (UPDATED with amount 50.0)
+        assertThat(result.data[4].activityType).isEqualTo(ActivityType.CREATED)
+        assertThat(result.data[4].amount).isEqualTo(50.0.toBigDecimal())
+        assertThat(result.data[4].currency).isEqualTo("USD")
+        assertThat(result.data[4].description).isEqualTo("Sample transaction")
+        assertThat(result.data[4].activityByName).isEqualTo(zeeDto.displayName)
+        assertThat(result.data[4].activityByPhoto).isEqualTo(zeeDto.photoUrl)
+
+        // Verify transaction response of the first activity log
+        val transactionResponse = result.data[0].transactionResponse
+        assertThat(transactionResponse.transactionId).isEqualTo(transactionId)
+        assertThat(transactionResponse.totalAmount).isEqualTo(300.0.toBigDecimal())
+        assertThat(transactionResponse.splitType.name).isEqualTo("YouOweThemAll")
+        assertThat(transactionResponse.friendName).isEqualTo("john")
+
+        // Verify history changes of the first activity log
+        val history = transactionResponse.history
+        assertThat(history).isNotEmpty
     }
 }

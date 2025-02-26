@@ -135,7 +135,7 @@ class TransactionsController(
     @GetMapping("/activityLogs")
     suspend fun getTransactionActivityLogs(
         @AuthenticationPrincipal userId: String,
-    ): Paginated<List<ActivityLogsResponse>> {
+    ): Paginated<List<ActivityLogResponse>> {
         return activityLogsQuery.execute(userId)
     }
 

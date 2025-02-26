@@ -1,6 +1,7 @@
 package com.zeenom.loan_tracker.transactions
 
 import com.zeenom.loan_tracker.friends.FriendFinderStrategy
+import com.zeenom.loan_tracker.friends.FriendUserDto
 import com.zeenom.loan_tracker.friends.FriendsEventHandler
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventHandler
@@ -193,6 +194,8 @@ class TransactionService(
     }
 
     suspend fun transactionActivityLogs(userId: String): List<ActivityLogWithFriendInfo> {
+        val user = userEventHandler.findUserById(userId)
+        requireNotNull(user) { "User with id $userId does not exist" }
         val findUserFriends = friendFinderStrategy.findUserFriends(userId)
         val friendUsersByUid =
             findUserFriends.filter { it.friendUid != null }
@@ -204,12 +207,12 @@ class TransactionService(
         val transactionsWithLogs = transactionEventHandler.transactionsWithActivityLogs(userId)
 
         return transactionsWithLogs.map { transactionWithLogs ->
-            transactionWithLogs.activityLogs.map {
+            transactionWithLogs.activityLogs.distinctBy { it.date }.map {
                 ActivityLogWithFriendInfo(
                     userUid = userId,
                     activityByUid = it.activityByUid,
-                    activityByName = friendUsersByUid[it.activityByUid]?.name,
-                    activityByPhoto = friendUsersByUid[it.activityByUid]?.photoUrl,
+                    activityByName = if (it.activityByUid == userId) user.displayName else friendUsersByUid[it.activityByUid]?.name,
+                    activityByPhoto = if (it.activityByUid == userId) user.photoUrl else friendUsersByUid[it.activityByUid]?.photoUrl,
                     description = it.description,
                     activityType = it.activityType,
                     amount = it.amount,
