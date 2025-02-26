@@ -80,6 +80,7 @@ data class TransactionCreated(
                 createdBy = createdBy,
                 streamId = streamId,
                 version = version,
+                firstCreatedAt = createdAt
             ),
             activityByUid = createdBy,
             description = description

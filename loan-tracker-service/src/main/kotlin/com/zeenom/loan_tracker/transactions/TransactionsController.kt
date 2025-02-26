@@ -147,7 +147,15 @@ class TransactionsController(
             originalAmount = transactionRequest.amount,
             currency = Currency.getInstance(transactionRequest.currency),
             recipientName = null,
-            updatedAt = null
+            updatedAt = null,
+            createdAt = null,
+            createdBy = null,
+            updatedBy = null,
+            updatedByName = null,
+            transactionStreamId = null,
+            createdByName = null,
+            deleted = false,
+            history = emptyList(),
         )
 }
 

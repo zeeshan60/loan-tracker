@@ -69,7 +69,13 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
             splitType = SplitType.TheyOweYouAll,
             originalAmount = 100.0.toBigDecimal(),
             recipientName = "Friend",
-            updatedAt = null
+            updatedAt = null,
+            createdAt = null,
+            createdBy = null,
+            createdByName = null,
+            updatedBy = null,
+            updatedByName = null,
+            deleted = false,
         )
 
         transactionService.addTransaction(
@@ -102,7 +108,13 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
             splitType = SplitType.TheyOweYouAll,
             originalAmount = 100.0.toBigDecimal(),
             recipientName = "Friend",
-            updatedAt = null
+            updatedAt = null,
+            createdAt = null,
+            createdBy = null,
+            createdByName = null,
+            updatedBy = null,
+            updatedByName = null,
+            deleted = false,
         )
 
         transactionService.addTransaction(
@@ -150,7 +162,13 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
             splitType = SplitType.TheyOweYouAll,
             originalAmount = 100.0.toBigDecimal(),
             recipientName = "Friend",
-            updatedAt = null
+            updatedAt = null,
+            createdAt = null,
+            createdBy = null,
+            createdByName = null,
+            updatedBy = null,
+            updatedByName = null,
+            deleted = false,
         )
 
         assertThatThrownBy {
@@ -186,7 +204,13 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
             splitType = SplitType.TheyOweYouAll,
             originalAmount = 100.0.toBigDecimal(),
             recipientName = "Friend",
-            updatedAt = null
+            updatedAt = null,
+            createdAt = null,
+            createdBy = null,
+            createdByName = null,
+            updatedBy = null,
+            updatedByName = null,
+            deleted = false,
         )
 
         assertThatThrownBy { runBlocking { transactionService.addTransaction("123", transactionDto) } }
@@ -204,7 +228,13 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
             splitType = SplitType.TheyOweYouAll,
             originalAmount = 100.0.toBigDecimal(),
             recipientName = "Friend",
-            updatedAt = null
+            updatedAt = null,
+            createdAt = null,
+            createdBy = null,
+            createdByName = null,
+            updatedBy = null,
+            updatedByName = null,
+            deleted = false,
         )
 
         transactionService.addTransaction(
@@ -268,7 +298,13 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
             splitType = SplitType.TheyOweYouAll,
             originalAmount = 100.0.toBigDecimal(),
             recipientName = "Friend",
-            updatedAt = null
+            updatedAt = null,
+            createdAt = null,
+            createdBy = null,
+            createdByName = null,
+            updatedBy = null,
+            updatedByName = null,
+            deleted = false,
         )
 
         transactionService.addTransaction(

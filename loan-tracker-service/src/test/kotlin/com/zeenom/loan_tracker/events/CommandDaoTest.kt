@@ -43,7 +43,13 @@ class CommandDaoTest(
                 originalAmount = 100.0.toBigDecimal(),
                 splitType = SplitType.TheyOweYouAll,
                 recipientName = "John Doe",
-                updatedAt = null
+                updatedAt = null,
+                createdAt = null,
+                createdBy = null,
+                createdByName = null,
+                updatedBy = null,
+                updatedByName = null,
+                deleted = false,
             ),
             userId = "123",
         )

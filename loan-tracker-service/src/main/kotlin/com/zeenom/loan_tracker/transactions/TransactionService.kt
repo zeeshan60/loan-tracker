@@ -230,7 +230,12 @@ class TransactionService(
                             recipientName = friendUsersByStreamId[it.recipientId]?.name,
                             updatedAt = it.createdAt,
                             deleted = it.deleted,
-                            history = transactionWithLogs.changeSummary
+                            history = transactionWithLogs.changeSummary,
+                            createdAt = it.createdAt,
+                            createdBy = it.createdBy,
+                            createdByName = null,
+                            updatedBy = it.userUid,
+                            updatedByName = null,
                         )
                     },
                 )

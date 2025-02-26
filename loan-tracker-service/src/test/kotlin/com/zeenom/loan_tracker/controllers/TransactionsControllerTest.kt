@@ -50,7 +50,13 @@ class TransactionsControllerTest(@LocalServerPort private val port: Int) : BaseI
                         recipientName = "John",
                         transactionStreamId = UUID.randomUUID(),
                         updatedAt = Instant.parse("2021-01-01T00:00:00Z"),
-                        history = emptyList()
+                        history = emptyList(),
+                        createdAt = null,
+                        createdBy = null,
+                        createdByName = null,
+                        updatedBy = null,
+                        updatedByName = null,
+                        deleted = false,
                     ),
                     TransactionDto(
                         currency = Currency.getInstance("SGD"),
@@ -61,7 +67,13 @@ class TransactionsControllerTest(@LocalServerPort private val port: Int) : BaseI
                         recipientName = "John",
                         transactionStreamId = UUID.randomUUID(),
                         updatedAt = Instant.parse("2021-01-02T00:00:00Z"),
-                        history = emptyList()
+                        history = emptyList(),
+                        createdAt = null,
+                        createdBy = null,
+                        createdByName = null,
+                        updatedBy = null,
+                        updatedByName = null,
+                        deleted = false,
                     ),
 
                     TransactionDto(
@@ -73,7 +85,13 @@ class TransactionsControllerTest(@LocalServerPort private val port: Int) : BaseI
                         recipientName = "John",
                         transactionStreamId = UUID.randomUUID(),
                         updatedAt = Instant.parse("2021-02-03T00:00:00Z"),
-                        history = emptyList()
+                        history = emptyList(),
+                        createdAt = null,
+                        createdBy = null,
+                        createdByName = null,
+                        updatedBy = null,
+                        updatedByName = null,
+                        deleted = false,
                     ),
 
                     TransactionDto(
@@ -85,7 +103,13 @@ class TransactionsControllerTest(@LocalServerPort private val port: Int) : BaseI
                         recipientName = "John",
                         transactionStreamId = UUID.randomUUID(),
                         updatedAt = Instant.parse("2021-02-01T00:00:00Z"),
-                        history = emptyList()
+                        history = emptyList(),
+                        createdAt = null,
+                        createdBy = null,
+                        createdByName = null,
+                        updatedBy = null,
+                        updatedByName = null,
+                        deleted = false,
                     )
                 ),
                 next = null

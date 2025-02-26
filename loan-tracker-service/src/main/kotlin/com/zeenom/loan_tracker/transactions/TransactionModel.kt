@@ -13,6 +13,7 @@ data class TransactionModel(
     val totalAmount: BigDecimal,
     val recipientId: UUID,
     val createdAt: Instant,
+    val firstCreatedAt: Instant,
     val createdBy: String,
     val deleted: Boolean = false,
     val streamId: UUID,

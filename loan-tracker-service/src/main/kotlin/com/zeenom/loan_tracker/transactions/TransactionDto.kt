@@ -14,6 +14,11 @@ data class TransactionDto(
     val recipientName: String?,
     val transactionStreamId: UUID? = null,
     val updatedAt: Instant?,
+    val createdAt: Instant?,
+    val createdBy: String?,
+    val createdByName: String?,
+    val updatedBy: String?,
+    val updatedByName: String?,
     val deleted: Boolean = false,
     val history: List<ChangeSummary> = emptyList()
 ) : CommandPayloadDto

@@ -73,6 +73,7 @@ class TransactionEventHandler(
                 createdBy = it.createdBy,
                 streamId = it.streamId,
                 version = it.version,
+                firstCreatedAt = it.createdAt
             )
         } else throw IllegalArgumentException("First event must be a transaction created event")
     }
@@ -99,9 +100,28 @@ class TransactionEventHandler(
                 recipientName = friend.friendDisplayName,
                 updatedAt = it.createdAt,
                 deleted = it.deleted,
-                history = historyByStream[it.streamId] ?: emptyList()
+                history = historyByStream[it.streamId] ?: emptyList(),
+                createdAt = it.firstCreatedAt,
+                createdBy = it.createdBy,
+                createdByName = null,
+                updatedBy = it.userUid,
+                updatedByName = null
             )
         }
+    }
+
+    suspend fun transactionModelsByFriend(userId: String, friend: FriendModel): List<TransactionModel> {
+
+        val transactions = findAllByUserIdFriendId(userId, friend.streamId)
+
+        val byStreamId = transactions.groupBy { it.streamId }
+        val models = byStreamId.map { (_, events) ->
+            resolveStream(events)
+        }
+
+        val historyByStream = changeSummaryByTransactionId(transactions)
+
+        return models
     }
 
     private fun changeSummaryByTransactionId(transactionEvents: List<ITransactionEvent>): Map<UUID, List<ChangeSummary>> {
