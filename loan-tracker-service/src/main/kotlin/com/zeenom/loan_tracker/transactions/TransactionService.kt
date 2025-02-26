@@ -163,7 +163,17 @@ class TransactionService(
     }
 
     suspend fun transactionsByFriendId(userId: String, friendId: UUID): List<TransactionDto> {
-        return transactionEventHandler.transactionsByFriendId(userId, friendId)
+        val (user, friendUsersByUid, friendUsersByStreamId) = userAndFriendInfo(userId)
+        val models = transactionEventHandler.transactionModelsByFriend(userId, friendId)
+
+        return models.map {
+            it.transactionModel.toTransactionDto(
+                friendUsersByStreamId = friendUsersByStreamId,
+                friendUsersByUserId = friendUsersByUid,
+                userDto = user,
+                history = it.changeSummary
+            )
+        }
     }
 
     suspend fun deleteTransaction(userUid: String, transactionStreamId: UUID) {
@@ -193,7 +203,7 @@ class TransactionService(
         )
     }
 
-    suspend fun transactionActivityLogs(userId: String): List<ActivityLogWithFriendInfo> {
+    private suspend fun userAndFriendInfo(userId: String): Triple<UserDto, Map<String, FriendUserDto>, Map<UUID, FriendUserDto>> {
         val user = userEventHandler.findUserById(userId)
         requireNotNull(user) { "User with id $userId does not exist" }
         val findUserFriends = friendFinderStrategy.findUserFriends(userId)
@@ -204,6 +214,12 @@ class TransactionService(
                     it.friendUid
                 }
         val friendUsersByStreamId = findUserFriends.associateBy { it.friendStreamId }
+
+        return Triple(user, friendUsersByUid, friendUsersByStreamId)
+    }
+
+    suspend fun transactionActivityLogs(userId: String): List<ActivityLogWithFriendInfo> {
+        val (user, friendUsersByUid, friendUsersByStreamId) = userAndFriendInfo(userId)
         val transactionsWithLogs = transactionEventHandler.transactionsWithActivityLogs(userId)
 
         return transactionsWithLogs.map { transactionWithLogs ->
@@ -219,28 +235,40 @@ class TransactionService(
                     currency = it.currency,
                     isOwed = it.isOwed,
                     date = it.date,
-                    transactionDto = transactionWithLogs.transactionModel.let {
-                        TransactionDto(
-                            transactionStreamId = it.id,
-                            recipientId = it.recipientId,
-                            description = it.description,
-                            currency = Currency.getInstance(it.currency),
-                            splitType = it.splitType,
-                            originalAmount = it.totalAmount,
-                            recipientName = friendUsersByStreamId[it.recipientId]?.name,
-                            updatedAt = it.createdAt,
-                            deleted = it.deleted,
-                            history = transactionWithLogs.changeSummary,
-                            createdAt = it.createdAt,
-                            createdBy = it.createdBy,
-                            createdByName = null,
-                            updatedBy = it.userUid,
-                            updatedByName = null,
-                        )
-                    },
+                    transactionDto = transactionWithLogs.transactionModel.toTransactionDto(
+                        friendUsersByStreamId = friendUsersByStreamId,
+                        friendUsersByUserId = friendUsersByUid,
+                        userDto = user,
+                        history = transactionWithLogs.changeSummary
+                    ),
                 )
             }
         }.flatten()
+    }
+
+    fun TransactionModel.toTransactionDto(
+        friendUsersByStreamId: Map<UUID, FriendUserDto>,
+        friendUsersByUserId: Map<String, FriendUserDto>,
+        userDto: UserDto,
+        history: List<ChangeSummary>,
+    ): TransactionDto {
+        return TransactionDto(
+            currency = Currency.getInstance(currency),
+            recipientId = recipientId,
+            transactionStreamId = id,
+            description = description,
+            originalAmount = totalAmount,
+            splitType = splitType,
+            recipientName = friendUsersByStreamId[recipientId]?.name,
+            updatedAt = createdAt,
+            deleted = deleted,
+            history = history,
+            createdAt = createdAt,
+            createdBy = createdBy,
+            createdByName = if (createdBy == userDto.uid) "You" else friendUsersByUserId[createdBy]?.name,
+            updatedBy = userUid,
+            updatedByName = if (userUid == userDto.uid) "You" else friendUsersByUserId[userUid]?.name,
+        )
     }
 }
 

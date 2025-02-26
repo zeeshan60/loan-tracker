@@ -110,18 +110,25 @@ class TransactionEventHandler(
         }
     }
 
-    suspend fun transactionModelsByFriend(userId: String, friend: FriendModel): List<TransactionModel> {
+    suspend fun transactionModelsByFriend(
+        userId: String,
+        friendStreamId: UUID,
+    ): List<TransactionModelWithChangeSummary> {
 
-        val transactions = findAllByUserIdFriendId(userId, friend.streamId)
+        val transactions = findAllByUserIdFriendId(userId, friendStreamId)
 
         val byStreamId = transactions.groupBy { it.streamId }
         val models = byStreamId.map { (_, events) ->
             resolveStream(events)
         }
-
         val historyByStream = changeSummaryByTransactionId(transactions)
 
-        return models
+        return models.map {
+            TransactionModelWithChangeSummary(
+                transactionModel = it,
+                changeSummary = historyByStream[it.streamId] ?: emptyList()
+            )
+        }
     }
 
     private fun changeSummaryByTransactionId(transactionEvents: List<ITransactionEvent>): Map<UUID, List<ChangeSummary>> {
@@ -229,5 +236,11 @@ class TransactionEventHandler(
 data class TransactionModelWithActivityLogs(
     val transactionModel: TransactionModel,
     val activityLogs: List<ActivityLog>,
+    val changeSummary: List<ChangeSummary>,
+)
+
+
+data class TransactionModelWithChangeSummary(
+    val transactionModel: TransactionModel,
     val changeSummary: List<ChangeSummary>,
 )
