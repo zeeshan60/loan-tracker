@@ -71,17 +71,17 @@ class TransactionService(
         val (friendUser, userStreamId) = friendUserAndMyStreamId(
             userUid = userUid, recipientId = recipientId
         )
-        var eventVersion = existing.version + 1
+        var eventVersion = existing.version
         val createdAt = Instant.now()
         if (existing.description != transactionDto.description) {
             val event = DescriptionChanged(
                 userId = userUid,
                 description = transactionDto.description,
-                transactionDate = Instant.now(),
+                transactionDate = createdAt,
                 createdAt = createdAt,
                 createdBy = userUid,
                 streamId = existing.streamId,
-                version = eventVersion++,
+                version = ++eventVersion,
                 recipientId = recipientId
             )
             transactionEventHandler.addEvent(event)
@@ -101,7 +101,7 @@ class TransactionService(
                 createdAt = createdAt,
                 createdBy = userUid,
                 streamId = existing.streamId,
-                version = eventVersion++,
+                version = ++eventVersion,
                 recipientId = recipientId
             )
             transactionEventHandler.addEvent(event)
@@ -121,7 +121,7 @@ class TransactionService(
                 createdAt = createdAt,
                 createdBy = userUid,
                 streamId = existing.streamId,
-                version = eventVersion++,
+                version = ++eventVersion,
                 recipientId = recipientId
             )
             transactionEventHandler.addEvent(event)
@@ -141,7 +141,7 @@ class TransactionService(
                 transactionDate = createdAt,
                 createdBy = userUid,
                 streamId = existing.streamId,
-                version = eventVersion,
+                version = ++eventVersion,
                 recipientId = recipientId
             )
             transactionEventHandler.addEvent(event)
