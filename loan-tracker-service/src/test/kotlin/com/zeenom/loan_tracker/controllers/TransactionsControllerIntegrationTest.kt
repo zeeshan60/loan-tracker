@@ -19,7 +19,6 @@ import org.springframework.boot.test.web.server.LocalServerPort
 import java.time.Instant
 import java.util.*
 
-@Disabled
 class TransactionsControllerIntegrationTest(@LocalServerPort private val port: Int) :
     BaseIntegration(port) {
 
