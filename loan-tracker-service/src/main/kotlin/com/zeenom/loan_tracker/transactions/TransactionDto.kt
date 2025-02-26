@@ -13,6 +13,7 @@ data class TransactionDto(
     val recipientId: UUID?,
     val recipientName: String?,
     val transactionStreamId: UUID? = null,
+    val transactionDate: Instant,
     val updatedAt: Instant?,
     val createdAt: Instant?,
     val createdBy: String?,

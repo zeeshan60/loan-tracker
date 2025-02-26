@@ -34,6 +34,7 @@ class TransactionService(
         val event = TransactionCreated(
             userId = userUid,
             description = transactionDto.description,
+            transactionDate = Instant.now(),
             currency = transactionDto.currency.toString(),
             splitType = transactionDto.splitType,
             totalAmount = transactionDto.originalAmount,
@@ -76,6 +77,7 @@ class TransactionService(
             val event = DescriptionChanged(
                 userId = userUid,
                 description = transactionDto.description,
+                transactionDate = Instant.now(),
                 createdAt = createdAt,
                 createdBy = userUid,
                 streamId = existing.streamId,
@@ -95,6 +97,7 @@ class TransactionService(
             val event = SplitTypeChanged(
                 userId = userUid,
                 splitType = transactionDto.splitType,
+                transactionDate = createdAt,
                 createdAt = createdAt,
                 createdBy = userUid,
                 streamId = existing.streamId,
@@ -114,6 +117,7 @@ class TransactionService(
             val event = TotalAmountChanged(
                 userId = userUid,
                 totalAmount = transactionDto.originalAmount,
+                transactionDate = createdAt,
                 createdAt = createdAt,
                 createdBy = userUid,
                 streamId = existing.streamId,
@@ -134,6 +138,7 @@ class TransactionService(
                 userId = userUid,
                 currency = transactionDto.currency.toString(),
                 createdAt = createdAt,
+                transactionDate = createdAt,
                 createdBy = userUid,
                 streamId = existing.streamId,
                 version = eventVersion,
@@ -187,6 +192,7 @@ class TransactionService(
         val event = TransactionDeleted(
             userId = userUid,
             createdAt = Instant.now(),
+            transactionDate = Instant.now(),
             createdBy = userUid,
             streamId = transactionStreamId,
             version = existing.version + 1,
@@ -260,14 +266,15 @@ class TransactionService(
             originalAmount = totalAmount,
             splitType = splitType,
             recipientName = friendUsersByStreamId[recipientId]?.name,
-            updatedAt = createdAt,
             deleted = deleted,
             history = history,
             createdAt = createdAt,
             createdBy = createdBy,
             createdByName = if (createdBy == userDto.uid) "You" else friendUsersByUserId[createdBy]?.name,
-            updatedBy = userUid,
-            updatedByName = if (userUid == userDto.uid) "You" else friendUsersByUserId[userUid]?.name,
+            updatedAt = updatedAt,
+            updatedBy = updatedBy,
+            updatedByName = if (updatedBy == userDto.uid) "You" else friendUsersByUserId[updatedBy]?.name,
+            transactionDate = transactionDate
         )
     }
 }

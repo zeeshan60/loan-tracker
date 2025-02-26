@@ -77,6 +77,7 @@ class TransactionEventHandler(
                 updatedAt = null,
                 updatedBy = null,
                 deleted = false,
+                transactionDate = it.transactionDate
             )
         } else throw IllegalArgumentException("First event must be a transaction created event")
     }
@@ -108,7 +109,8 @@ class TransactionEventHandler(
                 createdBy = it.createdBy,
                 createdByName = null,
                 updatedBy = it.userUid,
-                updatedByName = null
+                updatedByName = null,
+                transactionDate = it.transactionDate
             )
         }
     }

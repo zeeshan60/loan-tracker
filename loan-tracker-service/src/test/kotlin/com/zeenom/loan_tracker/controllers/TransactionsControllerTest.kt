@@ -57,6 +57,7 @@ class TransactionsControllerTest(@LocalServerPort private val port: Int) : BaseI
                         updatedBy = null,
                         updatedByName = null,
                         deleted = false,
+                        transactionDate = Instant.parse("2021-01-01T00:00:00Z")
                     ),
                     TransactionDto(
                         currency = Currency.getInstance("SGD"),
@@ -74,6 +75,8 @@ class TransactionsControllerTest(@LocalServerPort private val port: Int) : BaseI
                         updatedBy = null,
                         updatedByName = null,
                         deleted = false,
+                        transactionDate = Instant.parse("2021-01-02T00:00:00Z")
+
                     ),
 
                     TransactionDto(
@@ -92,6 +95,7 @@ class TransactionsControllerTest(@LocalServerPort private val port: Int) : BaseI
                         updatedBy = null,
                         updatedByName = null,
                         deleted = false,
+                        transactionDate = Instant.parse("2021-02-03T00:00:00Z")
                     ),
 
                     TransactionDto(
@@ -110,6 +114,7 @@ class TransactionsControllerTest(@LocalServerPort private val port: Int) : BaseI
                         updatedBy = null,
                         updatedByName = null,
                         deleted = false,
+                        transactionDate = Instant.parse("2021-02-01T00:00:00Z")
                     )
                 ),
                 next = null
@@ -131,35 +136,43 @@ class TransactionsControllerTest(@LocalServerPort private val port: Int) : BaseI
         result.prettyAndPrint(objectMapper)
         Assertions.assertThat(result.perMonth).hasSize(2)
         Assertions.assertThat(result.perMonth[0].transactions).hasSize(2)
-        Assertions.assertThat(result.perMonth[0].transactions[0].amountResponse.amount).isEqualTo(100.0.toBigDecimal())
-        Assertions.assertThat(result.perMonth[0].transactions[0].amountResponse.currency).isEqualTo("SGD")
-        Assertions.assertThat(result.perMonth[0].transactions[0].amountResponse.isOwed).isTrue()
-        Assertions.assertThat(result.perMonth[0].transactions[0].totalAmount).isEqualTo(200.0.toBigDecimal())
-        Assertions.assertThat(result.perMonth[0].transactions[0].transactionId).isNotNull()
-        Assertions.assertThat(result.perMonth[0].transactions[0].splitType).isEqualTo(SplitType.YouPaidSplitEqually)
-        Assertions.assertThat(result.perMonth[0].transactions[0].description).isEqualTo("transaction 1")
-        Assertions.assertThat(result.perMonth[0].transactions[1].amountResponse.amount).isEqualTo(50.0.toBigDecimal())
-        Assertions.assertThat(result.perMonth[0].transactions[1].amountResponse.currency).isEqualTo("SGD")
-        Assertions.assertThat(result.perMonth[0].transactions[1].amountResponse.isOwed).isTrue()
-        Assertions.assertThat(result.perMonth[0].transactions[1].totalAmount).isEqualTo(100.0.toBigDecimal())
-        Assertions.assertThat(result.perMonth[0].transactions[1].transactionId).isNotNull()
-        Assertions.assertThat(result.perMonth[0].transactions[1].splitType).isEqualTo(SplitType.YouPaidSplitEqually)
-        Assertions.assertThat(result.perMonth[0].transactions[1].description).isEqualTo("transaction 2")
+        val month1Transaction1 = result.perMonth[0].transactions[0]
+        Assertions.assertThat(month1Transaction1.amountResponse.amount).isEqualTo(50.0.toBigDecimal())
+        Assertions.assertThat(month1Transaction1.amountResponse.currency).isEqualTo("SGD")
+        Assertions.assertThat(month1Transaction1.amountResponse.isOwed).isTrue()
+        Assertions.assertThat(month1Transaction1.totalAmount).isEqualTo(50.0.toBigDecimal())
+        Assertions.assertThat(month1Transaction1.transactionId).isNotNull()
+        Assertions.assertThat(month1Transaction1.splitType).isEqualTo(SplitType.TheyOweYouAll)
+        Assertions.assertThat(month1Transaction1.description).isEqualTo("transaction 1")
+        Assertions.assertThat(month1Transaction1.date).isEqualTo(Instant.parse("2021-02-03T00:00:00Z"))
+        val month1Transaction2 = result.perMonth[0].transactions[1]
+        Assertions.assertThat(month1Transaction2.amountResponse.amount).isEqualTo(150.0.toBigDecimal())
+        Assertions.assertThat(month1Transaction2.amountResponse.currency).isEqualTo("SGD")
+        Assertions.assertThat(month1Transaction2.amountResponse.isOwed).isTrue()
+        Assertions.assertThat(month1Transaction2.totalAmount).isEqualTo(300.0.toBigDecimal())
+        Assertions.assertThat(month1Transaction2.transactionId).isNotNull()
+        Assertions.assertThat(month1Transaction2.splitType).isEqualTo(SplitType.YouPaidSplitEqually)
+        Assertions.assertThat(month1Transaction2.description).isEqualTo("transaction 2")
+        Assertions.assertThat(month1Transaction2.date).isEqualTo(Instant.parse("2021-02-01T00:00:00Z"))
         Assertions.assertThat(result.perMonth[1].transactions).hasSize(2)
-        Assertions.assertThat(result.perMonth[1].transactions[0].amountResponse.amount).isEqualTo(50.0.toBigDecimal())
-        Assertions.assertThat(result.perMonth[1].transactions[0].amountResponse.currency).isEqualTo("SGD")
-        Assertions.assertThat(result.perMonth[1].transactions[0].amountResponse.isOwed).isTrue()
-        Assertions.assertThat(result.perMonth[1].transactions[0].totalAmount).isEqualTo(50.0.toBigDecimal())
-        Assertions.assertThat(result.perMonth[1].transactions[0].transactionId).isNotNull()
-        Assertions.assertThat(result.perMonth[1].transactions[0].splitType).isEqualTo(SplitType.TheyOweYouAll)
-        Assertions.assertThat(result.perMonth[1].transactions[0].description).isEqualTo("transaction 1")
-        Assertions.assertThat(result.perMonth[1].transactions[1].amountResponse.amount).isEqualTo(150.0.toBigDecimal())
-        Assertions.assertThat(result.perMonth[1].transactions[1].amountResponse.currency).isEqualTo("SGD")
-        Assertions.assertThat(result.perMonth[1].transactions[1].amountResponse.isOwed).isTrue()
-        Assertions.assertThat(result.perMonth[1].transactions[1].totalAmount).isEqualTo(300.0.toBigDecimal())
-        Assertions.assertThat(result.perMonth[1].transactions[1].transactionId).isNotNull()
-        Assertions.assertThat(result.perMonth[1].transactions[1].splitType).isEqualTo(SplitType.YouPaidSplitEqually)
-        Assertions.assertThat(result.perMonth[1].transactions[1].description).isEqualTo("transaction 2")
+        val month2Transaction1 = result.perMonth[1].transactions[0]
+        Assertions.assertThat(month2Transaction1.amountResponse.amount).isEqualTo(50.0.toBigDecimal())
+        Assertions.assertThat(month2Transaction1.amountResponse.currency).isEqualTo("SGD")
+        Assertions.assertThat(month2Transaction1.amountResponse.isOwed).isTrue()
+        Assertions.assertThat(month2Transaction1.totalAmount).isEqualTo(100.0.toBigDecimal())
+        Assertions.assertThat(month2Transaction1.transactionId).isNotNull()
+        Assertions.assertThat(month2Transaction1.splitType).isEqualTo(SplitType.YouPaidSplitEqually)
+        Assertions.assertThat(month2Transaction1.description).isEqualTo("transaction 2")
+        Assertions.assertThat(month2Transaction1.date).isEqualTo(Instant.parse("2021-01-02T00:00:00Z"))
+        val month2Transaction2 = result.perMonth[1].transactions[1]
+        Assertions.assertThat(month2Transaction2.amountResponse.amount).isEqualTo(100.0.toBigDecimal())
+        Assertions.assertThat(month2Transaction2.amountResponse.currency).isEqualTo("SGD")
+        Assertions.assertThat(month2Transaction2.amountResponse.isOwed).isTrue()
+        Assertions.assertThat(month2Transaction2.totalAmount).isEqualTo(200.0.toBigDecimal())
+        Assertions.assertThat(month2Transaction2.transactionId).isNotNull()
+        Assertions.assertThat(month2Transaction2.splitType).isEqualTo(SplitType.YouPaidSplitEqually)
+        Assertions.assertThat(month2Transaction2.description).isEqualTo("transaction 1")
+        Assertions.assertThat(month2Transaction2.date).isEqualTo(Instant.parse("2021-01-01T00:00:00Z"))
     }
 
     @Test

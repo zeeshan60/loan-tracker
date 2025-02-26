@@ -20,6 +20,7 @@ data class TransactionModel(
     val deleted: Boolean = false,
     val streamId: UUID,
     val version: Int,
+    val transactionDate: Instant
 )
 
 data class ActivityLog(

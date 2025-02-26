@@ -14,6 +14,7 @@ import java.util.*
 data class TransactionEvent(
     @Id private val id: UUID? = null,
     val userUid: String,
+    val transactionDate: Instant,
     val description: String?,
     val currency: String?,
     val splitType: SplitType?,
@@ -38,6 +39,7 @@ data class TransactionEvent(
                 createdBy = createdBy,
                 streamId = streamId,
                 version = version,
+                transactionDate = transactionDate
             )
 
             TransactionEventType.DESCRIPTION_CHANGED -> DescriptionChanged(
@@ -47,6 +49,7 @@ data class TransactionEvent(
                 createdBy = createdBy,
                 streamId = streamId,
                 version = version,
+                transactionDate = transactionDate,
                 recipientId = recipientId,
             )
 
@@ -57,6 +60,7 @@ data class TransactionEvent(
                 createdBy = createdBy,
                 streamId = streamId,
                 version = version,
+                transactionDate = transactionDate,
                 recipientId = recipientId
             )
 
@@ -67,6 +71,7 @@ data class TransactionEvent(
                 createdBy = createdBy,
                 streamId = streamId,
                 version = version,
+                transactionDate = transactionDate,
                 recipientId = recipientId,
             )
 
@@ -77,6 +82,7 @@ data class TransactionEvent(
                 createdBy = createdBy,
                 streamId = streamId,
                 version = version,
+                transactionDate = transactionDate,
                 recipientId = recipientId
             )
 
@@ -86,6 +92,7 @@ data class TransactionEvent(
                 createdBy = createdBy,
                 streamId = streamId,
                 version = version,
+                transactionDate = transactionDate,
                 recipientId = recipientId
             )
         }

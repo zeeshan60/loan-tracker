@@ -91,16 +91,14 @@ class TransactionsController(
                 friendId = friendId
             )
         ).let {
-            it.data.filter { !it.deleted }.groupBy {
-                it.updatedAt?.startOfMonth(timeZone)
-                    ?: throw IllegalStateException("Transaction date is required for month grouping")
+            it.data.sortedByDescending { it.transactionDate }.filter { !it.deleted }.groupBy {
+                it.transactionDate.startOfMonth(timeZone)
             }.map {
                 TransactionsPerMonth(
                     date = it.key,
                     transactions = it.value.map { transaction ->
                         TransactionResponse(
-                            date = transaction.updatedAt
-                                ?: throw IllegalStateException("Transaction date is required for transactions response"),
+                            date = transaction.transactionDate,
                             description = transaction.description,
                             transactionId = transaction.transactionStreamId
                                 ?: throw IllegalStateException("Transaction stream id is required in transactions response"),
@@ -125,18 +123,20 @@ class TransactionsController(
                                     }
                                 )
                             },
-                            createdAt = transaction.createdAt ?: throw IllegalStateException("Transaction created at is required"),
+                            createdAt = transaction.createdAt ?: throw IllegalStateException("Created at is required"),
                             updatedAt = transaction.updatedAt,
                             createdBy = transaction.createdBy?.let {
                                 TransactionUserResponse(
                                     id = it,
-                                    name = transaction.createdByName ?: throw IllegalStateException("Created by name is required")
+                                    name = transaction.createdByName
+                                        ?: throw IllegalStateException("Created by name is required")
                                 )
                             } ?: throw IllegalStateException("Created by is required"),
                             updatedBy = transaction.updatedBy?.let {
                                 TransactionUserResponse(
                                     id = it,
-                                    name = transaction.updatedByName ?: throw IllegalStateException("Updated by name is required")
+                                    name = transaction.updatedByName
+                                        ?: throw IllegalStateException("Updated by name is required")
                                 )
                             },
                         )
@@ -170,11 +170,13 @@ class TransactionsController(
             createdByName = null,
             deleted = false,
             history = emptyList(),
+            transactionDate = transactionRequest.transactionDate
         )
 }
 
 
 interface TransactionBaseRequest {
+    val transactionDate: Instant
     val amount: BigDecimal
     val currency: String
     val type: SplitType
@@ -182,6 +184,7 @@ interface TransactionBaseRequest {
 }
 
 data class TransactionCreateRequest(
+    override val transactionDate: Instant,
     override val amount: BigDecimal,
     override val currency: String,
     override val type: SplitType,
@@ -190,6 +193,7 @@ data class TransactionCreateRequest(
 ) : TransactionBaseRequest
 
 data class TransactionUpdateRequest(
+    override val transactionDate: Instant,
     override val amount: BigDecimal,
     override val currency: String,
     override val type: SplitType,
@@ -233,7 +237,7 @@ data class TransactionResponse(
 
 data class TransactionUserResponse(
     val id: String,
-    val name: String
+    val name: String,
 )
 
 data class ChangeSummaryResponse(

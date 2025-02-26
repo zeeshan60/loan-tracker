@@ -17,6 +17,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest
+import java.time.Instant
 import java.util.*
 
 @DataR2dbcTest
@@ -76,6 +77,7 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
             updatedBy = null,
             updatedByName = null,
             deleted = false,
+            transactionDate = Instant.parse("2025-02-27T00:00:00Z")
         )
 
         transactionService.addTransaction(
@@ -115,6 +117,7 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
             updatedBy = null,
             updatedByName = null,
             deleted = false,
+            transactionDate = Instant.parse("2025-02-27T00:00:00Z")
         )
 
         transactionService.addTransaction(
@@ -169,6 +172,7 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
             updatedBy = null,
             updatedByName = null,
             deleted = false,
+            transactionDate = Instant.parse("2025-02-27T00:00:00Z")
         )
 
         assertThatThrownBy {
@@ -211,6 +215,7 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
             updatedBy = null,
             updatedByName = null,
             deleted = false,
+            transactionDate = Instant.parse("2025-02-27T00:00:00Z")
         )
 
         assertThatThrownBy { runBlocking { transactionService.addTransaction("123", transactionDto) } }
@@ -235,6 +240,7 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
             updatedBy = null,
             updatedByName = null,
             deleted = false,
+            transactionDate = Instant.parse("2025-02-27T00:00:00Z")
         )
 
         transactionService.addTransaction(
@@ -305,6 +311,7 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
             updatedBy = null,
             updatedByName = null,
             deleted = false,
+            transactionDate = Instant.parse("2025-02-27T00:00:00Z")
         )
 
         transactionService.addTransaction(

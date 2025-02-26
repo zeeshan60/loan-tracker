@@ -10,6 +10,7 @@ import java.util.*
 
 interface ITransactionEvent : IEvent<TransactionModel>, TransactionChangeSummary, CrossTransactionable {
     val recipientId: UUID
+    val transactionDate: Instant
     fun activityLog(current: TransactionModel): ActivityLog
 }
 
@@ -19,6 +20,7 @@ data class TransactionCreated(
     val currency: String,
     val splitType: SplitType,
     val totalAmount: BigDecimal,
+    override val transactionDate: Instant,
     override val recipientId: UUID,
     override val createdAt: Instant,
     override val createdBy: String,
@@ -38,6 +40,7 @@ data class TransactionCreated(
             streamId = streamId,
             version = version,
             eventType = TransactionEventType.TRANSACTION_CREATED,
+            transactionDate = transactionDate
         )
     }
 
@@ -57,6 +60,7 @@ data class TransactionCreated(
             createdBy = createdBy,
             streamId = streamId,
             version = version,
+            transactionDate = transactionDate
         )
     }
 
@@ -87,6 +91,7 @@ data class DescriptionChanged(
     override val version: Int,
     override val createdAt: Instant,
     override val createdBy: String,
+    override val transactionDate: Instant
 ) : ITransactionEvent {
 
     override fun applyEvent(existing: TransactionModel): TransactionModel {
@@ -111,6 +116,7 @@ data class DescriptionChanged(
             streamId = streamId,
             version = version,
             eventType = TransactionEventType.DESCRIPTION_CHANGED,
+            transactionDate = transactionDate
         )
     }
 
@@ -132,7 +138,8 @@ data class DescriptionChanged(
             version = version,
             createdAt = createdAt,
             createdBy = createdBy,
-            recipientId = userStreamId
+            recipientId = userStreamId,
+            transactionDate = transactionDate
         )
     }
 
@@ -158,6 +165,7 @@ data class TransactionDeleted(
     override val version: Int,
     override val createdAt: Instant,
     override val createdBy: String,
+    override val transactionDate: Instant
 ) : ITransactionEvent {
     override fun applyEvent(existing: TransactionModel): TransactionModel {
         return existing.copy(
@@ -181,6 +189,7 @@ data class TransactionDeleted(
             streamId = streamId,
             version = version,
             eventType = TransactionEventType.TRANSACTION_DELETED,
+            transactionDate = transactionDate
         )
     }
 
@@ -201,7 +210,8 @@ data class TransactionDeleted(
             version = version,
             createdAt = createdAt,
             createdBy = createdBy,
-            recipientId = userStreamId
+            recipientId = userStreamId,
+            transactionDate = transactionDate
         )
     }
 
@@ -229,6 +239,7 @@ data class TotalAmountChanged(
     override val version: Int,
     override val createdAt: Instant,
     override val createdBy: String,
+    override val transactionDate: Instant
 ) : ITransactionEvent {
     override fun applyEvent(existing: TransactionModel): TransactionModel {
         return existing.copy(
@@ -252,6 +263,7 @@ data class TotalAmountChanged(
             streamId = streamId,
             version = version,
             eventType = TransactionEventType.TOTAL_AMOUNT_CHANGED,
+            transactionDate = transactionDate
         )
     }
 
@@ -273,7 +285,8 @@ data class TotalAmountChanged(
             version = version,
             createdAt = createdAt,
             createdBy = createdBy,
-            recipientId = userStreamId
+            recipientId = userStreamId,
+            transactionDate = transactionDate
         )
     }
 
@@ -300,6 +313,7 @@ data class CurrencyChanged(
     override val version: Int,
     override val createdAt: Instant,
     override val createdBy: String,
+    override val transactionDate: Instant
 ) : ITransactionEvent {
     override fun applyEvent(existing: TransactionModel): TransactionModel {
         return existing.copy(
@@ -323,6 +337,7 @@ data class CurrencyChanged(
             streamId = streamId,
             version = version,
             eventType = TransactionEventType.CURRENCY_CHANGED,
+            transactionDate = transactionDate
         )
     }
 
@@ -344,7 +359,8 @@ data class CurrencyChanged(
             version = version,
             createdAt = createdAt,
             createdBy = createdBy,
-            recipientId = userStreamId
+            recipientId = userStreamId,
+            transactionDate = transactionDate
         )
     }
 
@@ -371,6 +387,7 @@ data class SplitTypeChanged(
     override val version: Int,
     override val createdAt: Instant,
     override val createdBy: String,
+    override val transactionDate: Instant
 ) : ITransactionEvent {
     override fun applyEvent(existing: TransactionModel): TransactionModel {
         return existing.copy(
@@ -404,6 +421,7 @@ data class SplitTypeChanged(
             streamId = streamId,
             version = version,
             eventType = TransactionEventType.SPLIT_TYPE_CHANGED,
+            transactionDate = transactionDate
         )
     }
 
@@ -415,7 +433,8 @@ data class SplitTypeChanged(
             version = version,
             createdAt = createdAt,
             createdBy = createdBy,
-            recipientId = userStreamId
+            recipientId = userStreamId,
+            transactionDate = transactionDate
         )
     }
 
