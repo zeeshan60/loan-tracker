@@ -40,9 +40,9 @@ class ActivityLogsQuery(
                         currency = it.transactionDto.currency.currencyCode,
                         isOwed = it.transactionDto.splitType.isOwed()
                     ),
-                    history = it.transactionDto.history.groupBy { Pair(it.date.looseNanonSeconds(), it.userId) }.map {
+                    history = it.transactionDto.history.groupBy { Pair(it.date.looseNanonSeconds(), it.changedBy) }.map {
                         ChangeSummaryResponse(
-                            userId = it.key.second,
+                            changedBy = it.key.second,
                             changes = it.value.map {
                                 ChangeSummaryByUserResponse(
                                     oldValue = it.oldValue,

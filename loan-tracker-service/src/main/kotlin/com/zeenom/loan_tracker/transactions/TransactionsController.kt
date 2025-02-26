@@ -113,9 +113,9 @@ class TransactionsController(
                                 currency = transaction.currency.currencyCode,
                                 isOwed = transaction.splitType.isOwed()
                             ),
-                            history = transaction.history.groupBy { Pair(it.date.looseNanonSeconds(), it.userId) }.map {
+                            history = transaction.history.groupBy { Pair(it.date, it.changedBy) }.map {
                                 ChangeSummaryResponse(
-                                    userId = it.key.second,
+                                    changedBy = it.key.second,
                                     changes = it.value.map {
                                         ChangeSummaryByUserResponse(
                                             oldValue = it.oldValue,
@@ -206,7 +206,7 @@ data class TransactionResponse(
 )
 
 data class ChangeSummaryResponse(
-    val userId: String,
+    val changedBy: String,
     val changes: List<ChangeSummaryByUserResponse>,
 )
 

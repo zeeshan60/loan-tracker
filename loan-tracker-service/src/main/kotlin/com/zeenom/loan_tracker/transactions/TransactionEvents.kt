@@ -128,7 +128,7 @@ data class DescriptionChanged(
 
     override fun changeSummary(existing: TransactionModel): ChangeSummary {
         return ChangeSummary(
-            userId = userId,
+            changedBy = createdBy,
             oldValue = existing.description,
             newValue = description,
             type = TransactionChangeType.DESCRIPTION,
@@ -198,7 +198,7 @@ data class TransactionDeleted(
 
     override fun changeSummary(existing: TransactionModel): ChangeSummary {
         return ChangeSummary(
-            userId = userId,
+            changedBy = createdBy,
             oldValue = "Not Deleted",
             newValue = "Deleted",
             type = TransactionChangeType.DELETED,
@@ -269,7 +269,7 @@ data class TotalAmountChanged(
 
     override fun changeSummary(existing: TransactionModel): ChangeSummary {
         return ChangeSummary(
-            userId = userId,
+            changedBy = createdBy,
             oldValue = existing.totalAmount.toString(),
             newValue = totalAmount.toString(),
             type = TransactionChangeType.TOTAL_AMOUNT,
@@ -340,7 +340,7 @@ data class CurrencyChanged(
 
     override fun changeSummary(existing: TransactionModel): ChangeSummary {
         return ChangeSummary(
-            userId = userId,
+            changedBy = createdBy,
             oldValue = existing.currency,
             newValue = currency,
             type = TransactionChangeType.CURRENCY,
@@ -395,7 +395,7 @@ data class SplitTypeChanged(
 
     override fun changeSummary(existing: TransactionModel): ChangeSummary {
         return ChangeSummary(
-            userId = userId,
+            changedBy = createdBy,
             oldValue = existing.splitType.toString(),
             newValue = splitType.toString(),
             type = TransactionChangeType.SPLIT_TYPE,
@@ -456,7 +456,7 @@ interface TransactionChangeSummary {
 
 data class ChangeSummary(
     val date: Instant,
-    val userId: String,
+    val changedBy: String,
     val oldValue: String,
     val newValue: String,
     val type: TransactionChangeType,

@@ -106,7 +106,7 @@ class TransactionEventHandler(
 
     private fun changeSummaryByTransactionId(transactionEvents: List<ITransactionEvent>): Map<UUID, List<ChangeSummary>> {
 
-        val byStreamId = transactionEvents.groupBy { Pair(it.streamId, it.recipientId) }
+        val byStreamId = transactionEvents.groupBy { it.streamId }
         return byStreamId.map { (streamId, events) ->
 
             val baseModel = baseModel(events.first())
@@ -114,7 +114,7 @@ class TransactionEventHandler(
             events.drop(1).forEach {
                 history.add(it.changeSummary(baseModel))
             }
-            streamId.first to history
+            streamId to history
         }.toMap()
     }
 
