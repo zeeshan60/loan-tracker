@@ -3,19 +3,25 @@
     <ion-buttons slot="start">
       <ion-button color="medium" (click)="closePopup()">Cancel</ion-button>
     </ion-buttons>
-    <ion-title>With you and {{(friend()?.['name'] || '') | shortenName}}</ion-title>
+    <ion-title>
+      @if (isUpdating()) {
+        Update transaction
+      } @else {
+        With you and {{(friend()?.['name'] || '') | shortenName}}
+      }
+    </ion-title>
     <ion-buttons slot="end">
       @if (loading()) {
         <ion-spinner></ion-spinner>
       } @else {
-        <ion-button type="submit" form="add-friend-form" [strong]="true">Save</ion-button>
+        <ion-button type="submit" form="define-expense-form" [strong]="true">Save</ion-button>
       }
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 <ion-content class="ion-padding">
   <h1>Define expense details</h1>
-  <form [formGroup]="defineExpenseForm" (ngSubmit)="onSubmit()" id="add-friend-form">
+  <form [formGroup]="defineExpenseForm" (ngSubmit)="onSubmit()" id="define-expense-form">
   <ion-list>
     <ion-item class="choose-friend-item">
       <ion-label>

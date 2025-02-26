@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button></ion-back-button>
     </ion-buttons>
-    <ion-title>With you and {{friend['name'] | shortenName}}</ion-title>
+    <ion-title>With you and {{friend()['name'] | shortenName}}</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -28,9 +28,9 @@
               @if (transaction.amountResponse.isOwed) {
                 You paid:
               } @else {
-                {{friend.name | shortenName}} paid:
+                {{friend().name | shortenName}} paid:
               }
-              {{ transaction.totalAmount | currency: transaction.amountResponse.currency: 'symbol-narrow' }}
+              {{ transaction.totalAmount | currency: transaction.amountResponse.currency: 'symbol' }}
             </p>
           </ion-label>
           <p class="amount-wrapper">
@@ -42,11 +42,24 @@
               }
             </ion-label>
             <ion-label [color]="transaction.amountResponse.isOwed ? 'success': 'danger'">
-              {{ transaction.amountResponse.amount | currency: transaction.amountResponse.currency: 'symbol-narrow' }}
+              {{ transaction.amountResponse.amount | currency: transaction.amountResponse.currency: 'symbol' }}
             </ion-label>
           </p>
         </ion-item>
       }
     </ion-list>
+  } @empty {
+    @if (!friendsStore.loading) {
+      <ion-list lines="none">
+        <ion-item>
+          <ion-label>
+            <p>No transactions yet.</p>
+          </ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-button (click)="addExpense()">Add now</ion-button>
+        </ion-item>
+      </ion-list>
+    }
   }
 </ion-content>

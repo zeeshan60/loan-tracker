@@ -1,19 +1,22 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, input, OnInit } from '@angular/core';
 import {
+  AlertController,
   IonAvatar,
   IonBackButton, IonButton,
   IonButtons,
   IonContent,
   IonHeader, IonIcon, IonItem, IonLabel,
-  IonList,
+  IonList, IonNav,
   IonTitle,
-  IonToolbar,
+  IonToolbar, ModalController,
 } from '@ionic/angular/standalone';
 import { Friend, Transaction } from '../model';
 import { NavParams } from '@ionic/angular';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { DateFormatPipe } from '../../pipes/date-format.pipe';
 import { ShortenNamePipe } from '../../pipes/shorten-name.pipe';
+import { DefineExpenseComponent, SplitOptions } from '../../define-expense/define-expense.component';
+import { FriendsStore } from '../friends.store';
 
 @Component({
     selector: 'app-transaction-details',
@@ -40,11 +43,39 @@ import { ShortenNamePipe } from '../../pipes/shorten-name.pipe';
   ],
 })
 export class TransactionDetailsComponent  implements OnInit {
-  readonly transaction: Transaction = inject(NavParams).data?.['transaction'];
+  readonly SplitOptions = SplitOptions;
+  readonly friendsStore = inject(FriendsStore);
+  readonly modalCtrl = inject(ModalController);
+  readonly nav = inject(IonNav);
+  readonly transaction = input.required<Transaction>();
+  readonly friend = input.required<Friend>();
   constructor() {
-    console.log(this.transaction);
   }
 
   ngOnInit() {}
 
+  ionViewWillEnter() {
+    this.friendsStore.setSelectedFriend(this.friend());
+  }
+
+  ionViewWillLeave() {
+    this.friendsStore.setSelectedFriend(null);
+  }
+
+  async deleteTransaction() {
+    await this.friendsStore.deleteTransaction(this.transaction());
+    this.nav.pop();
+  }
+
+  async updateTransaction() {
+    const modal = await this.modalCtrl.create({
+      component: DefineExpenseComponent,
+      componentProps: {
+        friend: { name: this.transaction().friendName },
+        isUpdating: true,
+        transaction: this.transaction(),
+      }
+    })
+    modal.present();
+  }
 }

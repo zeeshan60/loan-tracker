@@ -10,7 +10,7 @@ import {
   IonButton,
   IonButtons, IonContent,
   IonHeader,
-  IonInput, IonSpinner,
+  IonInput, IonLabel, IonSpinner,
   IonTitle,
   IonToolbar,
   ModalController,
@@ -36,6 +36,7 @@ import { FriendsStore } from '../friends/friends.store';
     IonContent,
     IonSpinner,
     ReactiveFormsModule,
+    IonLabel,
   ],
 })
 export class AddFriendComponent implements OnInit {

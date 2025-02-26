@@ -25,7 +25,7 @@
           @if (friend.photoUrl) {
             <img [src]="friend.photoUrl" alt="Friend's photo" />
           } @else {
-            <ion-icon size="large" name="person" [color]="friend.mainBalance?.isOwed ? 'success': 'danger'"></ion-icon>
+            <ion-icon size="large" name="person" [color]="friendBalanceColor(friend)"></ion-icon>
           }
         </ion-avatar>
         <ion-label>

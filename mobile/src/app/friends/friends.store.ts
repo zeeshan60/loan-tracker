@@ -1,12 +1,13 @@
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 import { computed, inject, Signal } from '@angular/core';
 import { FriendsService } from './friends.service';
-import { firstValueFrom, Observable } from 'rxjs';
+import { firstValueFrom, map, Observable } from 'rxjs';
 import { HelperService } from '../helper.service';
 import { MethodsDictionary } from '@ngrx/signals/src/signal-store-models';
-import { Friend, TransactionsByMonth } from './model'
+import { Friend, Transaction, TransactionsByMonth } from './model'
 import { HttpClient } from '@angular/common/http';
 import { PRIVATE_API } from '../constants';
+import { AlertController } from '@ionic/angular/standalone';
 
 export type AddFriend = {
   name: string,
@@ -14,8 +15,18 @@ export type AddFriend = {
   phoneNumber: string
 }
 
+type Balance = {
+  currency: string,
+  totalAmount: number,
+  isOwed: boolean
+}
+
 type FriendsState = {
   friends: Friend[],
+  overallBalance: {
+    main: Balance,
+    other: Balance[]
+  } | null,
   selectedFriend: Friend | null,
   selectedTransactions: TransactionsByMonth[],
   loading: boolean,
@@ -23,6 +34,7 @@ type FriendsState = {
 
 const initialState: FriendsState = {
   friends: [],
+  overallBalance: null,
   loading: false,
   selectedFriend: null,
   selectedTransactions: []
@@ -33,6 +45,7 @@ interface Methods extends MethodsDictionary {
   addFriend(friend: AddFriend): Promise<void>;
   setSelectedFriend(friend: Friend|null): void;
   loadSelectedTransactions(): Promise<void>;
+  deleteTransaction(transaction: Transaction): Promise<void>;
 }
 
 export const FriendsStore = signalStore(
@@ -42,16 +55,8 @@ export const FriendsStore = signalStore(
     const unSettledFriends = computed(() => {
       return friends().filter(friend => friend.mainBalance?.amount)
     });
-    const finalAmount = computed(() => {
-      return unSettledFriends().reduce((acc: number, friend: Friend) => {
-        return friend.mainBalance?.isOwed ?
-          acc + friend.mainBalance.amount :
-          acc - friend.mainBalance!.amount;
-      }, 0);
-    });
     return {
       unSettledFriends,
-      finalAmount,
     }
   }),
   withMethods((
@@ -59,12 +64,13 @@ export const FriendsStore = signalStore(
     friendsService = inject(FriendsService),
     helperService = inject(HelperService),
     http = inject(HttpClient),
+    alertCtrl = inject(AlertController),
   ): Methods => ({
     async loadFriends(): Promise<void> {
       patchState(store, { loading: true });
       try {
         const {data} = await firstValueFrom(friendsService.loadAllFriends());
-        patchState(store, { friends: data.friends })
+        patchState(store, { friends: data.friends, overallBalance: data.balance })
       } catch (e) {
         await helperService.showToast('Unable to load friends at the moment');
       } finally {
@@ -72,14 +78,18 @@ export const FriendsStore = signalStore(
       }
     },
     async addFriend(friend: AddFriend): Promise<void> {
-      await firstValueFrom(friendsService.addFriend(friend));
-    },
-    setSelectedFriend(friend: Friend|null) {
-      let updatedState: {[key: string]: any} = { selectedFriend: friend }
-      if (!friend) {
-        updatedState['selectedTransactions'] = [];
+      try {
+        await firstValueFrom(friendsService.addFriend(friend));
+        helperService.showToast('Friend created successfully');
+      } catch (e) {
+        helperService.showToast('Unable to add friend at the moment');
       }
-      patchState(store, { ...updatedState })
+    },
+    async setSelectedFriend(friend: Friend|null) {
+      if (store.selectedFriend()?.friendId !== friend?.friendId) {
+        patchState(store, { selectedFriend: friend })
+        await store.loadSelectedTransactions(); // todo: is ko karna hai abhi
+      }
     },
     async loadSelectedTransactions() {
       if (!store.selectedFriend()) {
@@ -87,7 +97,7 @@ export const FriendsStore = signalStore(
       }
       try {
         patchState(store, { loading: true })
-        const transactions = await firstValueFrom(http.get(
+        const transactions = await firstValueFrom(http.get<{ perMonth: TransactionsByMonth[]}>(
           `${PRIVATE_API}/transactions/friend/byMonth`,
           {
             params: {
@@ -95,11 +105,40 @@ export const FriendsStore = signalStore(
               timeZone: helperService.getTimeZone()
             }
           }
-        ) as Observable<{ perMonth: any[] }>)
+        )
+          .pipe(
+            map((response) => {
+              response.perMonth.forEach(tbm => {
+                tbm.transactions.forEach((transaction) => {
+                  transaction.createdAt = '2025-02-01T03:00:00+08:00';
+                  transaction.createdBy = { name: 'You', id: 'kdjfkjdf849384938' };
+                  transaction.updatedAt = '2025-02-01T03:00:00+08:00';
+                  transaction.updatedBy = { id: 'dkjfkdjfldkfjd', name: 'Zeeshi' }
+                });
+              })
+              return response;
+            })
+          ) as Observable<{ perMonth: TransactionsByMonth[] }>)
         patchState(store, { selectedTransactions: transactions.perMonth, loading: false })
+      } catch (e: any) {
+        patchState(store, { loading: false })
+        helperService.showToast(e.toString())
+      }
+    },
+    async deleteTransaction(transaction: Transaction): Promise<void> {
+      try {
+        const response = await helperService.showConfirmAlert()
+        if (response.role === 'confirm') {
+          patchState(store, { loading: true })
+          await firstValueFrom(http.delete(`${PRIVATE_API}/transactions/delete/transactionId/${transaction.transactionId}`))
+          // todo: load active transactions
+          helperService.showToast('Transaction deleted successfully');
+        }
       } catch (e) {
+        helperService.showToast('Unable to add friend at the moment');
+      } finally {
         patchState(store, { loading: false })
       }
-    }
+    },
   }))
 );

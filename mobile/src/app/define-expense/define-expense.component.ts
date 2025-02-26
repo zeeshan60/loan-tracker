@@ -10,6 +10,7 @@ import {
   signal,
 } from '@angular/core';
 import {
+  ActionSheetController,
   IonBackButton,
   IonButton,
   IonButtons,
@@ -24,7 +25,7 @@ import { firstValueFrom, takeUntil, timer } from 'rxjs';
 import { Router } from '@angular/router';
 import { HelperService } from '../helper.service';
 import { FriendsStore } from '../friends/friends.store';
-import { Friend } from '../friends/model';
+import { Friend, Transaction } from '../friends/model';
 import { SelectFriendComponent } from './select-friend/select-friend.component';
 import { JsonPipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
@@ -66,13 +67,16 @@ export enum SplitOptions {
     ShortenNamePipe,
   ],
 })
-export class DefineExpenseComponent extends ComponentDestroyedMixin() {
+export class DefineExpenseComponent extends ComponentDestroyedMixin() implements OnInit {
   readonly friend = model<Friend|null>(null);
   readonly loading = signal(false);
+  readonly isUpdating = input(false);
+  readonly transaction = input<Transaction>();
   readonly http = inject(HttpClient);
   readonly modalCtrl = inject(ModalController);
   readonly helperService = inject<HelperService>(HelperService);
   readonly formBuilder = inject(FormBuilder);
+  readonly actionSheetCtrl = inject(ActionSheetController);
   readonly friendsStore = inject(FriendsStore);
   readonly SplitOption = SplitOptions;
   readonly supportedCurrencies = ['PKR', 'USD', 'SGD'];
@@ -103,8 +107,40 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() {
       })
   }
 
-  closePopup() {
-    this.modalCtrl.dismiss();
+  async ngOnInit() {
+    if (!this.friend()) {
+      const role = await this.chooseFriend();
+      if (role !== 'confirm') {
+        setTimeout(() => {
+          this.closePopup();
+        }, 1000)
+      }
+    }
+  }
+
+  canDismiss = async () => {
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: 'Are you sure?',
+      buttons: [
+        {
+          text: 'Yes',
+          role: 'confirm',
+        },
+        {
+          text: 'No',
+          role: 'cancel',
+        },
+      ],
+    });
+    actionSheet.present();
+    const { role } = await actionSheet.onWillDismiss();
+    return role === 'confirm';
+  };
+
+  async closePopup() {
+    if (!this.defineExpenseForm.dirty || await this.canDismiss()) {
+      this.modalCtrl.dismiss();
+    }
   }
 
   async onSubmit() {
@@ -116,9 +152,18 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() {
       try {
         this.loading.set(true);
         await this.saveExpense(this.defineExpenseForm.getRawValue());
-        await this.friendsStore.loadFriends();
+        let postSaveActions = [this.friendsStore.loadFriends()];
+        console.log(this.friendsStore.selectedFriend());
+        if (
+          this.friendsStore.selectedFriend()
+          && this.friend()?.friendId === this.friendsStore.selectedFriend()?.friendId
+        ) {
+          postSaveActions.push(this.friendsStore.loadSelectedTransactions())
+        }
+        await Promise.all(postSaveActions);
         this.modalCtrl.dismiss(null, 'confirm');
       } catch (e) {
+        console.log(e);
         await this.helperService.showToast('Unable to add friend at the moment');
       } finally {
         this.loading.set(false);
@@ -130,6 +175,9 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() {
   }
 
   async chooseFriend() {
+    if (this.isUpdating()) {
+      return;
+    }
     const modal = await this.modalCtrl.create({
       component: SelectFriendComponent,
     })
@@ -139,6 +187,7 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() {
     if (role === 'confirm') {
       this.friend.set(data['friend']);
     }
+    return role;
   }
 
   async saveExpense(formValue: {
@@ -147,9 +196,17 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() {
     amount: number|null,
     type: SplitOptions
   }) {
-    return firstValueFrom(this.http.post(`${PRIVATE_API}/transactions/add`, {
-      ...formValue,
-      recipientId: this.friend()!.friendId
-    }));
+    if (this.isUpdating()) {
+      return firstValueFrom(
+        this.http.put(`${PRIVATE_API}/transactions/update/transactionId/${this.transaction()?.transactionId}`, {
+          ...formValue,
+        })
+      );
+    } else {
+      return firstValueFrom(this.http.post(`${PRIVATE_API}/transactions/add`, {
+        ...formValue,
+        recipientId: this.friend()!.friendId
+      }));
+    }
   }
 }

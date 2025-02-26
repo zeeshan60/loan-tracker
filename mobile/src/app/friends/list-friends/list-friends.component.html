@@ -17,17 +17,21 @@
       <ion-label>
           Overall balance:
       </ion-label>
-      @if (friendsStore['finalAmount']()) {
+      @if (friendsStore['overallBalance']()) {
         <p>
           <ion-label
-            [color]="friendsStore['finalAmount']() > 0 ? 'success' : 'danger'"
+            [color]="friendsStore['overallBalance']()?.main?.isOwed ? 'success' : 'danger'"
           >
-            {{friendsStore['finalAmount']() | currency}}
-            <ul class="other-balances-list">
-              <ion-label  [color]="true ? 'success': 'danger'">
-                {{'1234' | currency: 'PKR': 'symbol-narrow'}}
-              </ion-label>
-            </ul>
+            {{friendsStore['overallBalance']()?.main?.totalAmount | currency}}
+            @if (friendsStore['overallBalance']()?.other?.length) {
+              <ul class="other-balances-list">
+                @for (otherBalance of friendsStore['overallBalance']()?.other; track otherBalance.currency) {
+                  <ion-label  [color]="otherBalance.isOwed ? 'success': 'danger'">
+                    {{otherBalance.totalAmount | currency: otherBalance.currency: 'symbol'}}
+                  </ion-label>
+                }
+              </ul>
+            }
           </ion-label>
         </p>
       }
@@ -46,8 +50,8 @@
           @if(friend.otherBalances.length) {
             <ul class="other-balances-list">
             @for(balance of friend.otherBalances; track balance.currency) {
-              <ion-label color="medium">
-                - {{!balance.isOwed ? 'You' : friend.name | shortenName}} owe: {{balance.amount | currency: balance.currency: 'symbol-narrow'}}
+              <ion-label [color]="balance.isOwed ? 'success' : 'danger'">
+                - {{!balance.isOwed ? 'You' : friend.name | shortenName}} owe: {{balance.amount | currency: balance.currency: 'symbol'}}
               </ion-label>
             }
             </ul>
@@ -56,7 +60,7 @@
         @if (friend.mainBalance) {
           <p>
             <ion-label [color]="friend.mainBalance.isOwed ? 'success': 'danger'">
-              {{ friend.mainBalance.amount | currency: friend.mainBalance.currency: 'symbol-narrow' }}
+              {{ friend.mainBalance.amount | currency: friend.mainBalance.currency: 'symbol' }}
             </ion-label>
           </p>
         }

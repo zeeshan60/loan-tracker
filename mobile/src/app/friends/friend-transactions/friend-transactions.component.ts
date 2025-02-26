@@ -1,5 +1,5 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { CurrencyPipe } from '@angular/common';
+import { Component, inject, input, OnInit } from '@angular/core';
+import { CurrencyPipe, JsonPipe } from '@angular/common';
 import {
   IonAvatar, IonBackButton,
   IonButton,
@@ -8,7 +8,7 @@ import {
   IonHeader,
   IonIcon,
   IonItem,
-  IonLabel, IonList, IonNav, IonSpinner, IonTitle, IonToolbar,
+  IonLabel, IonList, IonNav, IonSpinner, IonTitle, IonToolbar, ModalController,
 } from '@ionic/angular/standalone';
 import { NavParams } from '@ionic/angular';
 import { Friend } from '../model';
@@ -18,6 +18,7 @@ import { HelperService } from '../../helper.service';
 import { shortName } from '../../utility-functions';
 import { ShortenNamePipe } from '../../pipes/shorten-name.pipe';
 import { DateFormatPipe } from '../../pipes/date-format.pipe';
+import { DefineExpenseComponent } from '../../define-expense/define-expense.component';
 
 @Component({
   selector: 'app-friend-transactions',
@@ -41,29 +42,41 @@ import { DateFormatPipe } from '../../pipes/date-format.pipe';
     IonSpinner,
     ShortenNamePipe,
     DateFormatPipe,
+    JsonPipe,
   ],
 })
 export class FriendTransactionsComponent  implements OnInit {
-  readonly friend: Friend = inject(NavParams).data?.['friend'];
+  // readonly friend: Friend = inject(NavParams).data?.['friend'];
+  readonly friend = input.required<Friend>();
   readonly nav = inject(IonNav);
   readonly friendsStore = inject(FriendsStore);
-  readonly transactionDetails = TransactionDetailsComponent;
   readonly transactions = this.friendsStore.selectedTransactions;
+  readonly modalCtrl = inject(ModalController);
   protected readonly shortName = shortName;
 
   constructor() {
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+  }
 
   openTransactionDetails(transaction: any) {
-    this.nav.push(this.transactionDetails, {
-      transaction
+    this.nav.push(TransactionDetailsComponent, {
+      transaction,
+      friend: this.friend
     });
   }
 
+  async addExpense() {
+    const modal = await this.modalCtrl.create({
+      component: DefineExpenseComponent,
+      componentProps: { friend: this.friend() }
+    })
+    modal.present();
+  }
+
   ionViewWillEnter() {
-    this.friendsStore.setSelectedFriend(this.friend || null);
+    this.friendsStore.setSelectedFriend(this.friend());
     this.friendsStore.loadSelectedTransactions();
   }
 

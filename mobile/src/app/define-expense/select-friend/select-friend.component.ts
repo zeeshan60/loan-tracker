@@ -41,6 +41,13 @@ export class SelectFriendComponent {
   constructor() {
   }
 
+  friendBalanceColor(friend: Friend) {
+    if (!friend.mainBalance) {
+      return 'light';
+    }
+    return friend.mainBalance.isOwed ? 'success' : 'danger';
+  }
+
   async chooseFriend(friend: Friend) {
     this.modalCtrl.dismiss({friend}, 'confirm');
   }
