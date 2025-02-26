@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class FriendsControllerAdapter {
-    fun FriendsDto.toResponse() = FriendsResponse(
+    fun FriendsWithAllTimeBalancesDto.toResponse() = FriendsResponse(
         friends = this.friends.map { it.toResponse() }
     )
 
@@ -41,10 +41,10 @@ class FriendsControllerAdapter {
         )
     }
 
-    fun fromDtoToPaginatedResponse(friendsDto: FriendsDto): Paginated<FriendsResponse> {
+    fun fromDtoToPaginatedResponse(friendsDto: FriendsWithAllTimeBalancesDto): Paginated<FriendsResponse> {
         return Paginated(
             data = friendsDto.toResponse(),
-            next = friendsDto.next
+            next = null
         )
     }
 }

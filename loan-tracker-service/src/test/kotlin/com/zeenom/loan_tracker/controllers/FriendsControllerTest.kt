@@ -38,7 +38,7 @@ class FriendsControllerTest(
     @Test
     fun `friends endpoint returns friends`(): Unit = runBlocking {
         val userid = "userid"
-        val friendsDto = FriendsDto(
+        val friendsDto = FriendsWithAllTimeBalancesDto(
             friends = listOf(
                 FriendDto(
                     name = "John Doe",
@@ -49,6 +49,10 @@ class FriendsControllerTest(
                     photoUrl = "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl2",
                     friendId = UUID.randomUUID()
                 )
+            ),
+            balance = AllTimeBalanceDto(
+                main = null,
+                other = emptyList()
             )
         )
         Mockito.doReturn(

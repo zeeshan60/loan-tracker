@@ -32,7 +32,15 @@ class FriendsControllerAdapterTest {
 
         // Act
         val adapter = FriendsControllerAdapter()
-        val result = adapter.fromDtoToPaginatedResponse(FriendsDto(listOf(friendDto))).data.friends[0]
+        val result = adapter.fromDtoToPaginatedResponse(
+            FriendsWithAllTimeBalancesDto(
+                listOf(friendDto),
+                balance = AllTimeBalanceDto(
+                    main = null,
+                    other = emptyList()
+                )
+            )
+        ).data.friends[0]
 
         // Assert
         assertThat(result.mainBalance?.amount).isEqualTo(100.0.toBigDecimal())
@@ -70,7 +78,15 @@ class FriendsControllerAdapterTest {
 
         // Act
         val adapter = FriendsControllerAdapter()
-        val result = adapter.fromDtoToPaginatedResponse(FriendsDto(listOf(friendDto))).data.friends[0]
+        val result = adapter.fromDtoToPaginatedResponse(
+            FriendsWithAllTimeBalancesDto(
+                listOf(friendDto),
+                balance = AllTimeBalanceDto(
+                    main = null,
+                    other = emptyList()
+                )
+            )
+        ).data.friends[0]
 
         // Assert
         assertThat(result.mainBalance?.amount).isEqualTo(200.0.toBigDecimal())
@@ -97,7 +113,15 @@ class FriendsControllerAdapterTest {
 
         // Act
         val adapter = FriendsControllerAdapter()
-        val result = adapter.fromDtoToPaginatedResponse(FriendsDto(listOf(friendDto))).data.friends[0]
+        val result = adapter.fromDtoToPaginatedResponse(
+            FriendsWithAllTimeBalancesDto(
+                listOf(friendDto),
+                balance = AllTimeBalanceDto(
+                    main = null,
+                    other = emptyList()
+                )
+            )
+        ).data.friends[0]
 
         // Assert
         assertThat(result.mainBalance).isNull()

@@ -5,8 +5,8 @@ import com.zeenom.loan_tracker.common.Query
 import org.springframework.stereotype.Service
 
 @Service
-class FriendsQuery(private val friendService: FriendService) : Query<PaginationDto<String>, FriendsDto> {
-    override suspend fun execute(input: PaginationDto<String>): FriendsDto {
+class FriendsQuery(private val friendService: FriendService) : Query<PaginationDto<String>, FriendsWithAllTimeBalancesDto> {
+    override suspend fun execute(input: PaginationDto<String>): FriendsWithAllTimeBalancesDto {
         return friendService.findAllByUserId(input.input)
     }
 }

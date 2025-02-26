@@ -5,7 +5,7 @@ import com.zeenom.loan_tracker.events.CommandPayloadDto
 import java.util.Currency
 import java.util.UUID
 
-data class FriendsDto(val friends: List<FriendDto>, val next: String? = null) : CommandPayloadDto
+data class FriendsDto(val friends: List<FriendDto>) : CommandPayloadDto
 data class FriendDto(
     val friendId: UUID,
     val email: String?,
@@ -15,3 +15,13 @@ data class FriendDto(
     val mainCurrency: Currency?,
     val balances: List<AmountDto>
 )
+
+data class FriendsWithAllTimeBalancesDto(
+    val friends: List<FriendDto>,
+    val balance: AllTimeBalanceDto
+) : CommandPayloadDto
+
+data class AllTimeBalanceDto(
+    val main: AmountDto?,
+    val other: List<AmountDto>
+) : CommandPayloadDto

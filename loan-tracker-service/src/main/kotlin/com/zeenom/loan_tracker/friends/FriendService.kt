@@ -1,5 +1,6 @@
 package com.zeenom.loan_tracker.friends
 
+import com.zeenom.loan_tracker.transactions.AmountDto
 import com.zeenom.loan_tracker.transactions.TransactionEventHandler
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventHandler
@@ -16,10 +17,10 @@ class FriendService(
     private val friendsEventHandler: FriendsEventHandler,
     private val userEventHandler: UserEventHandler,
     private val transactionEventHandler: TransactionEventHandler,
-    private val friendFinderStrategy: FriendFinderStrategy
+    private val friendFinderStrategy: FriendFinderStrategy,
 ) {
 
-    suspend fun findAllByUserId(userId: String): FriendsDto = withContext(Dispatchers.IO) {
+    suspend fun findAllByUserId(userId: String): FriendsWithAllTimeBalancesDto = withContext(Dispatchers.IO) {
         val events = friendFinderStrategy.findUserFriends(userId)
         val amountsPerFriend =
             async { transactionEventHandler.balancesOfFriendsByCurrency(userId, events.map { it.friendStreamId }) }
@@ -34,7 +35,26 @@ class FriendService(
                 balances = amountsPerFriend.await()[it.friendStreamId]?.values?.toList() ?: emptyList()
             )
         }
-        FriendsDto(friends)
+        val sortedByDescendingEntries =
+            amountsPerFriend.await().values.map { amountsPerCurrency -> amountsPerCurrency.values }.flatten()
+                .groupBy { it.currency }.entries.sortedByDescending { it.value.size }
+        val main =
+            sortedByDescendingEntries.firstOrNull()
+        val other = sortedByDescendingEntries.drop(1).associate { it.key to it.value }
+        val balance = AllTimeBalanceDto(
+            main = main?.value?.sumOf {
+                if (it.isOwed) it.amount else
+                    -it.amount
+            }?.let { AmountDto(it, main.key, it >= 0.toBigDecimal()) },
+            other = other.map {
+                val total = it.value.sumOf { amount -> amount.amount }
+                AmountDto(total, it.key, total >= 0.toBigDecimal())
+            }
+        )
+        FriendsWithAllTimeBalancesDto(
+            friends = friends,
+            balance = balance
+        )
     }
 
     suspend fun createFriend(userId: String, friendDto: CreateFriendDto) {
