@@ -1,4 +1,4 @@
-import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
+import { patchState, signalStore, withComputed, withMethods, withState, WritableStateSource } from '@ngrx/signals';
 import { computed, inject, Signal } from '@angular/core';
 import { FriendsService } from './friends.service';
 import { firstValueFrom, map, Observable } from 'rxjs';
@@ -48,6 +48,46 @@ interface Methods extends MethodsDictionary {
   deleteTransaction(transaction: Transaction): Promise<void>;
 }
 
+async function loadSelectedTransactions(
+  store: WritableStateSource<FriendsState>,
+  http: HttpClient,
+  helperService: HelperService,
+  selectedFriend: Friend|null,
+  ) {
+  if (!selectedFriend) {
+    throw new Error('No friend selected');
+  }
+  try {
+    patchState(store, { loading: true })
+    const transactions = await firstValueFrom(http.get<{ perMonth: TransactionsByMonth[]}>(
+      `${PRIVATE_API}/transactions/friend/byMonth`,
+      {
+        params: {
+          friendId: selectedFriend?.friendId!,
+          timeZone: helperService.getTimeZone()
+        }
+      }
+    )
+      .pipe(
+        map((response) => {
+          response.perMonth.forEach(tbm => {
+            tbm.transactions.forEach((transaction) => {
+              transaction.createdAt = '2025-02-01T03:00:00+08:00';
+              transaction.createdBy = { name: 'You', id: 'kdjfkjdf849384938' };
+              transaction.updatedAt = '2025-02-01T03:00:00+08:00';
+              transaction.updatedBy = { id: 'dkjfkdjfldkfjd', name: 'Zeeshi' }
+            });
+          })
+          return response;
+        })
+      ) as Observable<{ perMonth: TransactionsByMonth[] }>)
+    patchState(store, { selectedTransactions: transactions.perMonth, loading: false })
+  } catch (e: any) {
+    patchState(store, { loading: false })
+    helperService.showToast(e.toString())
+  }
+}
+
 export const FriendsStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
@@ -88,42 +128,13 @@ export const FriendsStore = signalStore(
     async setSelectedFriend(friend: Friend|null) {
       if (store.selectedFriend()?.friendId !== friend?.friendId) {
         patchState(store, { selectedFriend: friend })
-        await store.loadSelectedTransactions(); // todo: is ko karna hai abhi
+        if (friend) {
+          await loadSelectedTransactions(store, http, helperService, store.selectedFriend());
+        }
       }
     },
     async loadSelectedTransactions() {
-      if (!store.selectedFriend()) {
-       throw new Error('No friend selected');
-      }
-      try {
-        patchState(store, { loading: true })
-        const transactions = await firstValueFrom(http.get<{ perMonth: TransactionsByMonth[]}>(
-          `${PRIVATE_API}/transactions/friend/byMonth`,
-          {
-            params: {
-              friendId: store.selectedFriend()?.friendId!,
-              timeZone: helperService.getTimeZone()
-            }
-          }
-        )
-          .pipe(
-            map((response) => {
-              response.perMonth.forEach(tbm => {
-                tbm.transactions.forEach((transaction) => {
-                  transaction.createdAt = '2025-02-01T03:00:00+08:00';
-                  transaction.createdBy = { name: 'You', id: 'kdjfkjdf849384938' };
-                  transaction.updatedAt = '2025-02-01T03:00:00+08:00';
-                  transaction.updatedBy = { id: 'dkjfkdjfldkfjd', name: 'Zeeshi' }
-                });
-              })
-              return response;
-            })
-          ) as Observable<{ perMonth: TransactionsByMonth[] }>)
-        patchState(store, { selectedTransactions: transactions.perMonth, loading: false })
-      } catch (e: any) {
-        patchState(store, { loading: false })
-        helperService.showToast(e.toString())
-      }
+      await loadSelectedTransactions(store, http, helperService, store.selectedFriend())
     },
     async deleteTransaction(transaction: Transaction): Promise<void> {
       try {

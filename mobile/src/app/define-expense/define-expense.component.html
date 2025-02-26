@@ -5,9 +5,9 @@
     </ion-buttons>
     <ion-title>
       @if (isUpdating()) {
-        Update transaction
+        Edit expense
       } @else {
-        With you and {{(friend()?.['name'] || '') | shortenName}}
+        Create expense
       }
     </ion-title>
     <ion-buttons slot="end">
@@ -78,6 +78,17 @@
         <ion-select-option  class="red" [value]="SplitOption.TheyPaidSplitEqually">Paid by {{friend()?.['name']}} and split equally</ion-select-option>
         <ion-select-option  class="red" [value]="SplitOption.YouOweThemAll">You owe {{friend()?.['name']}} the full amount</ion-select-option>
       </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-label>
+        Expense date:
+      </ion-label>
+      <ion-datetime-button datetime="datetime"></ion-datetime-button>
+      <ion-modal [keepContentsMounted]="true">
+        <ng-template>
+          <ion-datetime formControlName="transactionDate" presentation="date" id="datetime"></ion-datetime>
+        </ng-template>
+      </ion-modal>
     </ion-item>
   </ion-list>
   </form>

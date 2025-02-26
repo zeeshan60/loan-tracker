@@ -14,9 +14,9 @@ import {
   IonBackButton,
   IonButton,
   IonButtons,
-  IonContent,
+  IonContent, IonDatetime, IonDatetimeButton,
   IonHeader,
-  IonInput, IonItem, IonLabel, IonList, IonSelect, IonSelectOption, IonSpinner,
+  IonInput, IonItem, IonLabel, IonList, IonModal, IonSelect, IonSelectOption, IonSpinner,
   IonTitle,
   IonToolbar, ModalController,
 } from '@ionic/angular/standalone';
@@ -27,7 +27,7 @@ import { HelperService } from '../helper.service';
 import { FriendsStore } from '../friends/friends.store';
 import { Friend, Transaction } from '../friends/model';
 import { SelectFriendComponent } from './select-friend/select-friend.component';
-import { JsonPipe } from '@angular/common';
+import { DatePipe, JsonPipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { PRIVATE_API } from '../constants';
 import { ShortenNamePipe } from '../pipes/shorten-name.pipe';
@@ -65,6 +65,10 @@ export enum SplitOptions {
     JsonPipe,
     IonLabel,
     ShortenNamePipe,
+    IonModal,
+    IonDatetimeButton,
+    IonDatetime,
+    DatePipe,
   ],
 })
 export class DefineExpenseComponent extends ComponentDestroyedMixin() implements OnInit {
@@ -84,8 +88,9 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
   defineExpenseForm = this.formBuilder.group({
     description: this.formBuilder.nonNullable.control('', [Validators.required, Validators.maxLength(1000)]),
     currency: this.formBuilder.nonNullable.control('PKR', [Validators.required]),
-    amount: this.formBuilder.nonNullable.control(null, [Validators.required, Validators.min(1)]),
+    amount: this.formBuilder.nonNullable.control<number|null>(null, [Validators.required, Validators.min(1)]),
     type: this.formBuilder.nonNullable.control({ value: SplitOptions.YouPaidSplitEqually, disabled: !this.friend() }, [Validators.required]),
+    transactionDate: this.formBuilder.nonNullable.control('2021-02-13T23:58:00', [Validators.required]),
   });
   isOwed = () => {
     return [SplitOptions.YouPaidSplitEqually, SplitOptions.TheyOweYouAll]
@@ -108,6 +113,18 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
   }
 
   async ngOnInit() {
+
+    if (this.isUpdating()) {
+      const formInitialValue = this.defineExpenseForm.getRawValue();
+      this.defineExpenseForm.patchValue({
+        description: this.transaction()?.description || formInitialValue.description,
+        amount: this.transaction()?.totalAmount || formInitialValue.amount,
+        currency: this.transaction()?.amountResponse.currency || formInitialValue.currency,
+        type: this.transaction()?.splitType || formInitialValue.type,
+        transactionDate: this.transaction()?.date || formInitialValue.transactionDate,
+      });
+    }
+
     if (!this.friend()) {
       const role = await this.chooseFriend();
       if (role !== 'confirm') {

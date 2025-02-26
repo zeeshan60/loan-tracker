@@ -77,7 +77,6 @@ export class FriendTransactionsComponent  implements OnInit {
 
   ionViewWillEnter() {
     this.friendsStore.setSelectedFriend(this.friend());
-    this.friendsStore.loadSelectedTransactions();
   }
 
   ionViewWillLeave() {
