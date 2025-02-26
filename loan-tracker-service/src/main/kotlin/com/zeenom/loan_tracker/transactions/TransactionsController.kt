@@ -124,7 +124,21 @@ class TransactionsController(
                                         )
                                     }
                                 )
-                            }
+                            },
+                            createdAt = transaction.createdAt ?: throw IllegalStateException("Transaction created at is required"),
+                            updatedAt = transaction.updatedAt,
+                            createdBy = transaction.createdBy?.let {
+                                TransactionUserResponse(
+                                    id = it,
+                                    name = transaction.createdByName ?: throw IllegalStateException("Created by name is required")
+                                )
+                            } ?: throw IllegalStateException("Created by is required"),
+                            updatedBy = transaction.updatedBy?.let {
+                                TransactionUserResponse(
+                                    id = it,
+                                    name = transaction.updatedByName ?: throw IllegalStateException("Updated by name is required")
+                                )
+                            },
                         )
                     }
                 )
@@ -211,6 +225,15 @@ data class TransactionResponse(
     val friendName: String,
     val amountResponse: AmountResponse,
     val history: List<ChangeSummaryResponse>,
+    val createdAt: Instant,
+    val updatedAt: Instant?,
+    val createdBy: TransactionUserResponse,
+    val updatedBy: TransactionUserResponse?,
+)
+
+data class TransactionUserResponse(
+    val id: String,
+    val name: String
 )
 
 data class ChangeSummaryResponse(

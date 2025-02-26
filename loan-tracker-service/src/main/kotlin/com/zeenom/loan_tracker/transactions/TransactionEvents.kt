@@ -68,20 +68,7 @@ data class TransactionCreated(
             currency = currency,
             isOwed = splitType.isOwed(),
             date = createdAt,
-            transactionModel = TransactionModel(
-                id = streamId,
-                userUid = userId,
-                description = description,
-                currency = currency,
-                splitType = splitType,
-                totalAmount = totalAmount,
-                recipientId = recipientId,
-                createdAt = createdAt,
-                createdBy = createdBy,
-                streamId = streamId,
-                version = version,
-                firstCreatedAt = createdAt
-            ),
+            transactionModel = current,
             activityByUid = createdBy,
             description = description
         )
@@ -106,8 +93,8 @@ data class DescriptionChanged(
         return existing.copy(
             description = description,
             version = version,
-            createdBy = createdBy,
-            createdAt = createdAt
+            updatedBy = userId,
+            updatedAt = createdAt
         )
     }
 
@@ -175,9 +162,9 @@ data class TransactionDeleted(
     override fun applyEvent(existing: TransactionModel): TransactionModel {
         return existing.copy(
             version = version,
-            createdBy = createdBy,
-            createdAt = createdAt,
-            deleted = true
+            deleted = true,
+            updatedBy = userId,
+            updatedAt = createdAt
         )
     }
 
@@ -247,8 +234,8 @@ data class TotalAmountChanged(
         return existing.copy(
             totalAmount = totalAmount,
             version = version,
-            createdBy = createdBy,
-            createdAt = createdAt
+            updatedBy = userId,
+            updatedAt = createdAt
         )
     }
 
@@ -318,8 +305,8 @@ data class CurrencyChanged(
         return existing.copy(
             currency = currency,
             version = version,
-            createdBy = createdBy,
-            createdAt = createdAt
+            updatedBy = userId,
+            updatedAt = createdAt
         )
     }
 
@@ -389,8 +376,8 @@ data class SplitTypeChanged(
         return existing.copy(
             splitType = splitType,
             version = version,
-            createdBy = createdBy,
-            createdAt = createdAt
+            updatedBy = userId,
+            updatedAt = createdAt
         )
     }
 

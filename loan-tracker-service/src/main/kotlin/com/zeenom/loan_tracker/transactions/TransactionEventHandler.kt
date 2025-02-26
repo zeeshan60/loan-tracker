@@ -73,7 +73,10 @@ class TransactionEventHandler(
                 createdBy = it.createdBy,
                 streamId = it.streamId,
                 version = it.version,
-                firstCreatedAt = it.createdAt
+                firstCreatedAt = it.createdAt,
+                updatedAt = null,
+                updatedBy = null,
+                deleted = false,
             )
         } else throw IllegalArgumentException("First event must be a transaction created event")
     }
