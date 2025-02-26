@@ -3,7 +3,10 @@ package com.zeenom.loan_tracker.friends
 import com.zeenom.loan_tracker.transactions.AmountResponse
 import java.util.*
 
-data class FriendsResponse(val friends: List<FriendResponse>)
+data class FriendsResponse(
+    val friends: List<FriendResponse>,
+    val balance: AllTimeBalanceDto
+)
 data class FriendResponse(
     val photoUrl: String?,
     val name: String,

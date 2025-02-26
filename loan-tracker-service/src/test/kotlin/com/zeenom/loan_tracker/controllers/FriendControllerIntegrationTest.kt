@@ -87,7 +87,8 @@ class FriendControllerIntegrationTest(@LocalServerPort val port: Int) : BaseInte
         assertThat(friendResponse.data.friends[0].mainBalance).isNull()
         assertThat(friendResponse.data.friends[0].otherBalances).isEmpty()
         assertThat(friendResponse.data.friends[0].friendId).isNotNull()
-
+        assertThat(friendResponse.data.balance.main).isNull()
+        assertThat(friendResponse.data.balance.other).isEmpty()
     }
 
     @Order(4)
@@ -107,6 +108,8 @@ class FriendControllerIntegrationTest(@LocalServerPort val port: Int) : BaseInte
         assertThat(response.data.friends[0].mainBalance).isNull()
         assertThat(response.data.friends[0].otherBalances).isEmpty()
         assertThat(response.data.friends[0].friendId).isNotNull()
+        assertThat(response.data.balance.main).isNull()
+        assertThat(response.data.balance.other).isEmpty()
     }
 
     @Order(6)
@@ -120,6 +123,8 @@ class FriendControllerIntegrationTest(@LocalServerPort val port: Int) : BaseInte
         assertThat(response.data.friends[0].mainBalance).isNull()
         assertThat(response.data.friends[0].otherBalances).isEmpty()
         assertThat(response.data.friends[0].friendId).isNotNull()
+        assertThat(response.data.balance.main).isNull()
+        assertThat(response.data.balance.other).isEmpty()
     }
 }
 
