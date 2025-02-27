@@ -32,6 +32,7 @@ class TransactionService(
 
         val streamId = UUID.randomUUID()
         val event = TransactionCreated(
+            id = null,
             userId = userUid,
             description = transactionDto.description,
             transactionDate = Instant.now(),
@@ -75,6 +76,7 @@ class TransactionService(
         val createdAt = Instant.now()
         if (existing.description != transactionDto.description) {
             val event = DescriptionChanged(
+                id = null,
                 userId = userUid,
                 description = transactionDto.description,
                 transactionDate = createdAt,
@@ -95,6 +97,7 @@ class TransactionService(
 
         if (existing.splitType != transactionDto.splitType) {
             val event = SplitTypeChanged(
+                id = null,
                 userId = userUid,
                 splitType = transactionDto.splitType,
                 transactionDate = createdAt,
@@ -115,6 +118,7 @@ class TransactionService(
 
         if (existing.totalAmount != transactionDto.originalAmount) {
             val event = TotalAmountChanged(
+                id = null,
                 userId = userUid,
                 totalAmount = transactionDto.originalAmount,
                 transactionDate = createdAt,
@@ -135,6 +139,7 @@ class TransactionService(
 
         if (existing.currency != transactionDto.currency.toString()) {
             val event = CurrencyChanged(
+                id = null,
                 userId = userUid,
                 currency = transactionDto.currency.toString(),
                 createdAt = createdAt,
@@ -189,6 +194,7 @@ class TransactionService(
             userUid = userUid, recipientId = recipientId
         )
         val event = TransactionDeleted(
+            id = null,
             userId = userUid,
             createdAt = Instant.now(),
             transactionDate = Instant.now(),
@@ -260,7 +266,7 @@ class TransactionService(
         return TransactionDto(
             currency = Currency.getInstance(currency),
             recipientId = recipientId,
-            transactionStreamId = id,
+            transactionStreamId = streamId,
             description = description,
             originalAmount = totalAmount,
             splitType = splitType,

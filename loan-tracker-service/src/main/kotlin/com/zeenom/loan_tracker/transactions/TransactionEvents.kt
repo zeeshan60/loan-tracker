@@ -9,12 +9,14 @@ import java.time.Instant
 import java.util.*
 
 interface ITransactionEvent : IEvent<TransactionModel>, TransactionChangeSummary, CrossTransactionable {
+    val id: UUID?
     val recipientId: UUID
     val transactionDate: Instant
     fun activityLog(current: TransactionModel): ActivityLog
 }
 
 data class TransactionCreated(
+    override val id: UUID?,
     override val userId: String,
     val description: String,
     val currency: String,
@@ -45,11 +47,13 @@ data class TransactionCreated(
     }
 
     override fun applyEvent(existing: TransactionModel): TransactionModel {
-        throw UnsupportedOperationException("Transaction created event cannot be applied to existing model")
+        throw UnsupportedOperationException("Transactio" +
+                " id = idn created event cannot be applied to existing model")
     }
 
     override fun crossTransaction(recipientUserId: String, userStreamId: UUID): IEvent<TransactionModel> {
         return TransactionCreated(
+            id = null,
             userId = recipientUserId,
             description = description,
             currency = currency,
@@ -66,6 +70,7 @@ data class TransactionCreated(
 
     override fun activityLog(current: TransactionModel): ActivityLog {
         return ActivityLog(
+            id = current.id,
             userUid = userId,
             activityType = ActivityType.CREATED,
             amount = splitType.apply(totalAmount),
@@ -84,6 +89,7 @@ data class TransactionCreated(
 }
 
 data class DescriptionChanged(
+    override val id: UUID?,
     val description: String,
     override val recipientId: UUID,
     override val userId: String,
@@ -96,6 +102,7 @@ data class DescriptionChanged(
 
     override fun applyEvent(existing: TransactionModel): TransactionModel {
         return existing.copy(
+            id = id,
             description = description,
             version = version,
             updatedBy = userId,
@@ -132,6 +139,7 @@ data class DescriptionChanged(
 
     override fun crossTransaction(recipientUserId: String, userStreamId: UUID): IEvent<TransactionModel> {
         return DescriptionChanged(
+            id = id,
             description = description,
             userId = recipientUserId,
             streamId = streamId,
@@ -145,6 +153,7 @@ data class DescriptionChanged(
 
     override fun activityLog(current: TransactionModel): ActivityLog {
         return ActivityLog(
+            id = current.id,
             userUid = userId,
             activityType = ActivityType.UPDATED,
             amount = current.splitType.apply(current.totalAmount),
@@ -159,6 +168,7 @@ data class DescriptionChanged(
 }
 
 data class TransactionDeleted(
+    override val id: UUID?,
     override val recipientId: UUID,
     override val userId: String,
     override val streamId: UUID,
@@ -169,6 +179,7 @@ data class TransactionDeleted(
 ) : ITransactionEvent {
     override fun applyEvent(existing: TransactionModel): TransactionModel {
         return existing.copy(
+            id = id,
             version = version,
             deleted = true,
             updatedBy = userId,
@@ -205,6 +216,7 @@ data class TransactionDeleted(
 
     override fun crossTransaction(recipientUserId: String, userStreamId: UUID): IEvent<TransactionModel> {
         return TransactionDeleted(
+            id = id,
             userId = recipientUserId,
             streamId = streamId,
             version = version,
@@ -217,6 +229,7 @@ data class TransactionDeleted(
 
     override fun activityLog(current: TransactionModel): ActivityLog {
         return ActivityLog(
+            id = current.id,
             userUid = userId,
             activityType = ActivityType.DELETED,
             amount = current.splitType.apply(current.totalAmount),
@@ -232,6 +245,7 @@ data class TransactionDeleted(
 
 
 data class TotalAmountChanged(
+    override val id: UUID?,
     val totalAmount: BigDecimal,
     override val recipientId: UUID,
     override val userId: String,
@@ -243,6 +257,7 @@ data class TotalAmountChanged(
 ) : ITransactionEvent {
     override fun applyEvent(existing: TransactionModel): TransactionModel {
         return existing.copy(
+            id = id,
             totalAmount = totalAmount,
             version = version,
             updatedBy = userId,
@@ -279,6 +294,7 @@ data class TotalAmountChanged(
 
     override fun crossTransaction(recipientUserId: String, userStreamId: UUID): IEvent<TransactionModel> {
         return TotalAmountChanged(
+            id = id,
             totalAmount = totalAmount,
             userId = recipientUserId,
             streamId = streamId,
@@ -292,6 +308,7 @@ data class TotalAmountChanged(
 
     override fun activityLog(current: TransactionModel): ActivityLog {
         return ActivityLog(
+            id = current.id,
             userUid = userId,
             activityType = ActivityType.UPDATED,
             currency = current.currency,
@@ -306,6 +323,7 @@ data class TotalAmountChanged(
 }
 
 data class CurrencyChanged(
+    override val id: UUID?,
     val currency: String,
     override val recipientId: UUID,
     override val userId: String,
@@ -317,6 +335,7 @@ data class CurrencyChanged(
 ) : ITransactionEvent {
     override fun applyEvent(existing: TransactionModel): TransactionModel {
         return existing.copy(
+            id = id,
             currency = currency,
             version = version,
             updatedBy = userId,
@@ -353,6 +372,7 @@ data class CurrencyChanged(
 
     override fun crossTransaction(recipientUserId: String, userStreamId: UUID): IEvent<TransactionModel> {
         return CurrencyChanged(
+            id  = id,
             currency = currency,
             userId = recipientUserId,
             streamId = streamId,
@@ -366,6 +386,7 @@ data class CurrencyChanged(
 
     override fun activityLog(current: TransactionModel): ActivityLog {
         return ActivityLog(
+            id = current.id,
             userUid = userId,
             activityType = ActivityType.UPDATED,
             currency = currency,
@@ -380,6 +401,7 @@ data class CurrencyChanged(
 }
 
 data class SplitTypeChanged(
+    override val id: UUID?,
     val splitType: SplitType,
     override val recipientId: UUID,
     override val userId: String,
@@ -391,6 +413,7 @@ data class SplitTypeChanged(
 ) : ITransactionEvent {
     override fun applyEvent(existing: TransactionModel): TransactionModel {
         return existing.copy(
+            id = id,
             splitType = splitType,
             version = version,
             updatedBy = userId,
@@ -427,6 +450,7 @@ data class SplitTypeChanged(
 
     override fun crossTransaction(recipientUserId: String, userStreamId: UUID): IEvent<TransactionModel> {
         return SplitTypeChanged(
+            id = id,
             splitType = splitType.reverse(),
             userId = recipientUserId,
             streamId = streamId,
@@ -440,6 +464,7 @@ data class SplitTypeChanged(
 
     override fun activityLog(current: TransactionModel): ActivityLog {
         return ActivityLog(
+            id = current.id,
             userUid = userId,
             activityType = ActivityType.UPDATED,
             currency = current.currency,

@@ -40,23 +40,25 @@ class TransactionEventHandler(
     }
 
     fun resolveStream(events: List<IEvent<TransactionModel>>): TransactionModel {
-        val firstEvent = events.first()
+        val sorted = events.sortedBy { it.version }
+        val firstEvent = sorted.first()
         var model: TransactionModel = baseModel(firstEvent)
-        events.drop(1).forEach {
+        sorted.drop(1).forEach {
             model = it.applyEvent(model)
         }
         return model
     }
 
     fun resolveStreamAndGenerateLogs(events: List<ITransactionEvent>): Pair<TransactionModel, List<ActivityLog>> {
-        val firstEvent = events.first()
+        val sorted = events.sortedBy { it.version }
+        val firstEvent = sorted.first()
         var model: TransactionModel = baseModel(firstEvent)
         val logs = mutableListOf(firstEvent.activityLog(model))
-        events.drop(1).forEach {
+        sorted.drop(1).forEach {
             model = it.applyEvent(model)
             logs.add(it.activityLog(model))
         }
-        return model to logs.reversed()
+        return model to logs.sortedWith(compareByDescending<ActivityLog> { it.date }.thenByDescending { it.id })
     }
 
     private fun baseModel(firstEvent: IEvent<TransactionModel>): TransactionModel {
@@ -134,6 +136,7 @@ class TransactionEventHandler(
                 changeSummary = historyByStream[it.streamId] ?: emptyList()
             )
         }
+            .sortedWith(compareByDescending<TransactionModelWithChangeSummary> { it.transactionModel.transactionDate }.thenByDescending { it.transactionModel.id })
     }
 
     private fun changeSummaryByTransactionId(transactionEvents: List<ITransactionEvent>): Map<UUID, List<ChangeSummary>> {
@@ -141,9 +144,10 @@ class TransactionEventHandler(
         val byStreamId = transactionEvents.groupBy { it.streamId }
         return byStreamId.map { (streamId, events) ->
 
-            val baseModel = baseModel(events.first())
+            val sortedEvents = events.sortedBy { it.version }
+            val baseModel = baseModel(sortedEvents.first())
             val history = mutableListOf<ChangeSummary>()
-            events.drop(1).forEach {
+            sortedEvents.drop(1).forEach {
                 history.add(it.changeSummary(baseModel))
             }
             streamId to history

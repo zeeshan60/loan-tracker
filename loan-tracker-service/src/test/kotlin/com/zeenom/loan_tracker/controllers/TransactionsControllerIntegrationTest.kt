@@ -410,6 +410,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
             }
 
         assertThat(result.perMonth).hasSize(1)
+        result.perMonth.prettyAndPrint(objectMapper)
         assertThat(result.perMonth[0].transactions[1].friendName).isEqualTo("john")
         assertThat(result.perMonth[0].transactions[1].amountResponse.amount).isEqualTo(300.0.toBigDecimal())
         assertThat(result.perMonth[0].transactions[1].amountResponse.currency).isEqualTo("SGD")
@@ -524,39 +525,35 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
 
         assertThat(result.data).hasSize(5)
 
-        // First Activity Log (DELETED)
-        assertThat(result.data[0].activityType).isEqualTo(ActivityType.DELETED)
-        assertThat(result.data[0].amount).isEqualTo(300.0.toBigDecimal())
-        assertThat(result.data[0].currency).isEqualTo("SGD")
-        assertThat(result.data[0].description).isEqualTo("Sample transaction edited by john")
+        assertThat(result.data[0].activityType).isEqualTo(ActivityType.CREATED)
+        assertThat(result.data[0].amount).isEqualTo(50.0.toBigDecimal())
+        assertThat(result.data[0].transactionResponse.totalAmount).isEqualTo(100.0.toBigDecimal())
+        assertThat(result.data[0].currency).isEqualTo("USD")
+        assertThat(result.data[0].description).isEqualTo("Sample transaction")
         assertThat(result.data[0].activityByName).isEqualTo(zeeDto.displayName)
         assertThat(result.data[0].activityByPhoto).isEqualTo(zeeDto.photoUrl)
 
-        // Second Activity Log (UPDATED)
-        assertThat(result.data[1].activityType).isEqualTo(ActivityType.UPDATED)
+        assertThat(result.data[1].activityType).isEqualTo(ActivityType.DELETED)
         assertThat(result.data[1].amount).isEqualTo(300.0.toBigDecimal())
         assertThat(result.data[1].currency).isEqualTo("SGD")
         assertThat(result.data[1].description).isEqualTo("Sample transaction edited by john")
-        assertThat(result.data[1].activityByName).isEqualTo("john")
-        assertThat(result.data[1].activityByPhoto).isEqualTo(johnDto.photoUrl)
+        assertThat(result.data[1].activityByName).isEqualTo(zeeDto.displayName)
+        assertThat(result.data[1].activityByPhoto).isEqualTo(zeeDto.photoUrl)
 
-        // Third Activity Log (UPDATED with USD currency)
         assertThat(result.data[2].activityType).isEqualTo(ActivityType.UPDATED)
-        assertThat(result.data[2].amount).isEqualTo(200.0.toBigDecimal())
+        assertThat(result.data[2].amount).isEqualTo(300.0.toBigDecimal())
         assertThat(result.data[2].currency).isEqualTo("SGD")
-        assertThat(result.data[2].description).isEqualTo("Sample transaction edited")
-        assertThat(result.data[2].activityByName).isEqualTo(zeeDto.displayName)
-        assertThat(result.data[2].activityByPhoto).isEqualTo(zeeDto.photoUrl)
+        assertThat(result.data[2].description).isEqualTo("Sample transaction edited by john")
+        assertThat(result.data[2].activityByName).isEqualTo("john")
+        assertThat(result.data[2].activityByPhoto).isEqualTo(johnDto.photoUrl)
 
-        // Fourth Activity Log (UPDATED with amount 100.0)
-        assertThat(result.data[3].activityType).isEqualTo(ActivityType.CREATED)
-        assertThat(result.data[3].amount).isEqualTo(50.0.toBigDecimal())
-        assertThat(result.data[3].currency).isEqualTo("USD")
-        assertThat(result.data[3].description).isEqualTo("Sample transaction")
+        assertThat(result.data[3].activityType).isEqualTo(ActivityType.UPDATED)
+        assertThat(result.data[3].amount).isEqualTo(200.0.toBigDecimal())
+        assertThat(result.data[3].currency).isEqualTo("SGD")
+        assertThat(result.data[3].description).isEqualTo("Sample transaction edited")
         assertThat(result.data[3].activityByName).isEqualTo(zeeDto.displayName)
         assertThat(result.data[3].activityByPhoto).isEqualTo(zeeDto.photoUrl)
 
-        // Fifth Activity Log (UPDATED with amount 50.0)
         assertThat(result.data[4].activityType).isEqualTo(ActivityType.CREATED)
         assertThat(result.data[4].amount).isEqualTo(50.0.toBigDecimal())
         assertThat(result.data[4].currency).isEqualTo("USD")
@@ -564,14 +561,12 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
         assertThat(result.data[4].activityByName).isEqualTo(zeeDto.displayName)
         assertThat(result.data[4].activityByPhoto).isEqualTo(zeeDto.photoUrl)
 
-        // Verify transaction response of the first activity log
-        val transactionResponse = result.data[0].transactionResponse
+        val transactionResponse = result.data[4].transactionResponse
         assertThat(transactionResponse.transactionId).isEqualTo(transactionId)
         assertThat(transactionResponse.totalAmount).isEqualTo(300.0.toBigDecimal())
         assertThat(transactionResponse.splitType.name).isEqualTo("YouOweThemAll")
         assertThat(transactionResponse.friendName).isEqualTo("john")
 
-        // Verify history changes of the first activity log
         val history = transactionResponse.history
         assertThat(history).isNotEmpty
     }

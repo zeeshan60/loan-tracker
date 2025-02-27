@@ -2,7 +2,9 @@ package com.zeenom.loan_tracker.transactions
 
 import com.zeenom.loan_tracker.common.events.IEvent
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import org.springframework.data.annotation.Id
+import org.springframework.data.r2dbc.repository.Query
 import org.springframework.data.relational.core.mapping.Table
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import org.springframework.stereotype.Repository
@@ -29,6 +31,7 @@ data class TransactionEvent(
     fun toEvent(): IEvent<TransactionModel> {
         return when (eventType) {
             TransactionEventType.TRANSACTION_CREATED -> TransactionCreated(
+                id = id,
                 userId = userUid,
                 description = description ?: throw IllegalStateException("Description is required"),
                 currency = currency ?: throw IllegalStateException("Currency is required"),
@@ -43,6 +46,7 @@ data class TransactionEvent(
             )
 
             TransactionEventType.DESCRIPTION_CHANGED -> DescriptionChanged(
+                id = id,
                 userId = userUid,
                 description = description ?: throw IllegalStateException("Description is required"),
                 createdAt = createdAt,
@@ -54,6 +58,7 @@ data class TransactionEvent(
             )
 
             TransactionEventType.SPLIT_TYPE_CHANGED -> SplitTypeChanged(
+                id = id,
                 userId = userUid,
                 splitType = splitType ?: throw IllegalStateException("Split type is required"),
                 createdAt = createdAt,
@@ -65,6 +70,7 @@ data class TransactionEvent(
             )
 
             TransactionEventType.TOTAL_AMOUNT_CHANGED -> TotalAmountChanged(
+                id = id,
                 userId = userUid,
                 totalAmount = totalAmount ?: throw IllegalStateException("Total amount is required"),
                 createdAt = createdAt,
@@ -76,6 +82,7 @@ data class TransactionEvent(
             )
 
             TransactionEventType.CURRENCY_CHANGED -> CurrencyChanged(
+                id = id,
                 userId = userUid,
                 currency = currency ?: throw IllegalStateException("Currency is required"),
                 createdAt = createdAt,
@@ -87,6 +94,7 @@ data class TransactionEvent(
             )
 
             TransactionEventType.TRANSACTION_DELETED -> TransactionDeleted(
+                id = id,
                 userId = userUid,
                 createdAt = createdAt,
                 createdBy = createdBy,
@@ -110,12 +118,26 @@ enum class TransactionEventType {
 
 @Repository
 interface TransactionEventRepository : CoroutineCrudRepository<TransactionEvent, UUID> {
+    @Query("SELECT * FROM transaction_events WHERE user_uid = :userId AND recipient_id = :recipientId order by stream_id desc, version")
     suspend fun findAllByUserUidAndRecipientId(userId: String, recipientId: UUID): Flow<TransactionEvent>
+    @Query("SELECT * FROM transaction_events WHERE user_uid = :userId order by stream_id desc, version desc")
     suspend fun findAllByUserUid(userId: String): Flow<TransactionEvent>
     suspend fun findAllByUserUidAndRecipientIdIn(
         userId: String,
         recipientIds: List<UUID>
+    ): Flow<TransactionEvent> {
+        if (recipientIds.isEmpty()) {
+            return emptyFlow()
+        }
+        return findAllByUserUidAndRecipientIdInInternal(userId, recipientIds)
+    }
+
+    @Query("SELECT * FROM transaction_events WHERE user_uid = :userId AND recipient_id IN (:recipientIds) order by stream_id desc, version")
+    suspend fun findAllByUserUidAndRecipientIdInInternal(
+        userId: String,
+        recipientIds: List<UUID>
     ): Flow<TransactionEvent>
 
+    @Query("SELECT * FROM transaction_events WHERE user_uid = :userId AND stream_id = :streamId order by version")
     suspend fun findAllByUserUidAndStreamId(userId: String, streamId: UUID): Flow<TransactionEvent>
 }

@@ -1,4 +1,4 @@
--- noinspection SqlResolveForFile @ routine/"gen_random_uuid"
+-- noinspection SqlResolveForFile @ routine/"uuid_generate_v1"
 
 ALTER TABLE transaction_events ADD COLUMN transaction_date TIMESTAMP;
 
