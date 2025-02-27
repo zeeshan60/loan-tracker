@@ -255,7 +255,8 @@ class TransactionService(
         val transactionsWithLogs = transactionEventHandler.transactionsWithActivityLogs(userId)
 
         return transactionsWithLogs.map { transactionWithLogs ->
-            transactionWithLogs.activityLogs.distinctBy { it.date }.map {
+            transactionWithLogs.activityLogs.groupBy { it.date }.map {logs ->
+                val it = logs.value.maxByOrNull { it.id }!!
                 ActivityLogWithFriendInfo(
                     id = it.id,
                     userUid = userId,

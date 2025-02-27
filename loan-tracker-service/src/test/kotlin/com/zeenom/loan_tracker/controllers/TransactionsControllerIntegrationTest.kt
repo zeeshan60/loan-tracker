@@ -351,7 +351,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
                     currency = "USD",
                     type = SplitType.YouPaidSplitEqually,
                     recipientId = johnFriendId,
-                    description = "Sample transaction",
+                    description = "Sample transaction 2",
                     transactionDate = Instant.parse("2025-02-27T00:00:00Z")
                 )
             )
@@ -383,7 +383,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
         assertThat(result.perMonth[0].transactions[0].totalAmount).isEqualTo(100.0.toBigDecimal())
         assertThat(result.perMonth[0].transactions[0].transactionId).isNotNull()
         assertThat(result.perMonth[0].transactions[0].splitType).isEqualTo(SplitType.YouPaidSplitEqually)
-        assertThat(result.perMonth[0].transactions[0].description).isEqualTo("Sample transaction")
+        assertThat(result.perMonth[0].transactions[0].description).isEqualTo("Sample transaction 2")
     }
 
     @Order(12)
@@ -519,7 +519,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
         assertThat(result.perMonth[0].transactions[0].totalAmount).isEqualTo(100.0.toBigDecimal())
         assertThat(result.perMonth[0].transactions[0].transactionId).isNotNull()
         assertThat(result.perMonth[0].transactions[0].splitType).isEqualTo(SplitType.YouPaidSplitEqually)
-        assertThat(result.perMonth[0].transactions[0].description).isEqualTo("Sample transaction")
+        assertThat(result.perMonth[0].transactions[0].description).isEqualTo("Sample transaction 2")
     }
 
 
@@ -552,7 +552,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
         assertTransactionDataCorrectness(result.data[0].transactionResponse)
 
         assertThat(result.data[1].activityType).isEqualTo(ActivityType.UPDATED)
-        assertThat(result.data[1].amount).isEqualTo(200.0.toBigDecimal())
+        assertThat(result.data[1].amount).isEqualTo(300.0.toBigDecimal())
         assertThat(result.data[1].currency).isEqualTo("SGD")
         assertThat(result.data[1].description).isEqualTo("Sample transaction edited by john")
         assertThat(result.data[1].transactionResponse.transactionId).isEqualTo(transaction.transactionId)
@@ -563,15 +563,15 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
         assertThat(result.data[2].activityType).isEqualTo(ActivityType.CREATED)
         assertThat(result.data[2].amount).isEqualTo(50.0.toBigDecimal())
         assertThat(result.data[2].currency).isEqualTo("USD")
-        assertThat(result.data[2].description).isEqualTo("Sample transaction")
+        assertThat(result.data[2].description).isEqualTo("Sample transaction 2")
         assertThat(result.data[2].transactionResponse.transactionId).isNotEqualTo(transaction.transactionId)
         assertThat(result.data[2].activityByName).isEqualTo(zeeDto.displayName)
         assertThat(result.data[2].activityByPhoto).isEqualTo(zeeDto.photoUrl)
         assertTransaction2DataCorrectness(result.data[2].transactionResponse)
 
         assertThat(result.data[3].activityType).isEqualTo(ActivityType.UPDATED)
-        assertThat(result.data[3].amount).isEqualTo(50.0.toBigDecimal())
-        assertThat(result.data[3].currency).isEqualTo("USD")
+        assertThat(result.data[3].amount).isEqualTo(200.0.toBigDecimal())
+        assertThat(result.data[3].currency).isEqualTo("SGD")
         assertThat(result.data[3].description).isEqualTo("Sample transaction edited")
         assertThat(result.data[3].activityByName).isEqualTo(zeeDto.displayName)
         assertThat(result.data[3].activityByPhoto).isEqualTo(zeeDto.photoUrl)
@@ -644,7 +644,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
     private fun assertTransaction2DataCorrectness(transactionResponse: TransactionResponse) {
         assertThat(transactionResponse.date).isEqualTo("2025-02-27T00:00:00Z")
         assertThat(transactionResponse.transactionId).isNotEqualTo(transaction2.transactionId)
-        assertThat(transactionResponse.description).isEqualTo("Sample transaction")
+        assertThat(transactionResponse.description).isEqualTo("Sample transaction 2")
         assertThat(transactionResponse.totalAmount).isEqualTo(100.0.toBigDecimal())
         assertThat(transactionResponse.splitType).isEqualTo(SplitType.YouPaidSplitEqually)
         assertThat(transactionResponse.friendName).isEqualTo("john")

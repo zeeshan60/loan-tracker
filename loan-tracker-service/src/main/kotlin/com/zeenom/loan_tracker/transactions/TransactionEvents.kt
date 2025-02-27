@@ -72,8 +72,7 @@ data class TransactionCreated(
 
     override fun activityLog(current: TransactionModel): ActivityLog {
         return ActivityLog(
-            id = current.id ?: throw IllegalStateException("Transaction event id is required for activity log")
-                ?: throw IllegalStateException("Transaction event id is required for activity log"),
+            id = current.id ?: throw IllegalStateException("Transaction event id is required for activity log"),
             userUid = userId,
             activityType = ActivityType.CREATED,
             amount = splitType.apply(totalAmount),
