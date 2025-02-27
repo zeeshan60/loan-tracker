@@ -22,12 +22,12 @@
           <ion-label
             [color]="friendsStore['overallBalance']()?.main?.isOwed ? 'success' : 'danger'"
           >
-            {{friendsStore['overallBalance']()?.main?.totalAmount | currency}}
+            {{friendsStore['overallBalance']()?.main?.amount | currency: friendsStore['overallBalance']()?.main?.currency: 'symbol'}}
             @if (friendsStore['overallBalance']()?.other?.length) {
               <ul class="other-balances-list">
                 @for (otherBalance of friendsStore['overallBalance']()?.other; track otherBalance.currency) {
                   <ion-label  [color]="otherBalance.isOwed ? 'success': 'danger'">
-                    {{otherBalance.totalAmount | currency: otherBalance.currency: 'symbol'}}
+                    {{otherBalance.amount | currency: otherBalance.currency: 'symbol'}}
                   </ion-label>
                 }
               </ul>

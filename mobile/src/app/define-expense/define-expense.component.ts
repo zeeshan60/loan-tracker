@@ -33,6 +33,7 @@ import { PRIVATE_API } from '../constants';
 import { ShortenNamePipe } from '../pipes/shorten-name.pipe';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { ComponentDestroyedMixin } from '../component-destroyed.mixin';
+import { DefineExpenseService } from './define-expense.service';
 
 export enum SplitOptions {
   YouPaidSplitEqually = 'YouPaidSplitEqually',
@@ -79,6 +80,7 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
   readonly http = inject(HttpClient);
   readonly modalCtrl = inject(ModalController);
   readonly helperService = inject<HelperService>(HelperService);
+  readonly defineExpenseService = inject(DefineExpenseService);
   readonly formBuilder = inject(FormBuilder);
   readonly actionSheetCtrl = inject(ActionSheetController);
   readonly friendsStore = inject(FriendsStore);
@@ -90,7 +92,7 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
     currency: this.formBuilder.nonNullable.control('PKR', [Validators.required]),
     amount: this.formBuilder.nonNullable.control<number|null>(null, [Validators.required, Validators.min(1)]),
     type: this.formBuilder.nonNullable.control({ value: SplitOptions.YouPaidSplitEqually, disabled: !this.friend() }, [Validators.required]),
-    transactionDate: this.formBuilder.nonNullable.control('2021-02-13T23:58:00', [Validators.required]),
+    transactionDate: this.formBuilder.nonNullable.control((new Date()).toISOString(), [Validators.required]),
   });
   isOwed = () => {
     return [SplitOptions.YouPaidSplitEqually, SplitOptions.TheyOweYouAll]
@@ -113,7 +115,6 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
   }
 
   async ngOnInit() {
-
     if (this.isUpdating()) {
       const formInitialValue = this.defineExpenseForm.getRawValue();
       this.defineExpenseForm.patchValue({
@@ -128,9 +129,7 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
     if (!this.friend()) {
       const role = await this.chooseFriend();
       if (role !== 'confirm') {
-        setTimeout(() => {
-          this.closePopup();
-        }, 1000)
+        this.defineExpenseService.defineExpenseModalInstance?.dismiss();
       }
     }
   }
@@ -166,6 +165,7 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
       return;
     }
     if (this.defineExpenseForm.valid) {
+      // todo: 'date-fns-tz' to manipulate date
       try {
         this.loading.set(true);
         await this.saveExpense(this.defineExpenseForm.getRawValue());
@@ -211,8 +211,10 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
     description: string,
     currency: string,
     amount: number|null,
-    type: SplitOptions
+    type: SplitOptions,
+    transactionDate: string,
   }) {
+    formValue.transactionDate = (new Date(formValue.transactionDate)).toISOString();
     if (this.isUpdating()) {
       return firstValueFrom(
         this.http.put(`${PRIVATE_API}/transactions/update/transactionId/${this.transaction()?.transactionId}`, {

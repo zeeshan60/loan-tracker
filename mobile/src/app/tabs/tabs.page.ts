@@ -3,6 +3,7 @@ import { IonTabs, IonTabBar, IonTabButton, IonIcon, ModalController } from '@ion
 import { Router } from '@angular/router';
 import { FriendsStore } from '../friends/friends.store';
 import { DefineExpenseComponent } from '../define-expense/define-expense.component';
+import { DefineExpenseService } from '../define-expense/define-expense.service';
 
 @Component({
   selector: 'app-tabs',
@@ -16,18 +17,11 @@ export class TabsPage {
   readonly modalCtrl = inject(ModalController);
   readonly router = inject(Router);
   readonly friendsStore = inject(FriendsStore);
+  readonly defineExpenseService = inject(DefineExpenseService);
   constructor() {
   }
 
   async addNewExpense() {
-    let selectedFriend = null;
-    if (this.router.url.endsWith('tabs/friends')) {
-      selectedFriend = this.friendsStore.selectedFriend();
-    }
-    const modal = await this.modalCtrl.create({
-      component: DefineExpenseComponent,
-      componentProps: { friend: selectedFriend }
-    })
-    modal.present();
+    this.defineExpenseService.openDefineExpenseModal();
   }
 }

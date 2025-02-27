@@ -17,7 +17,7 @@ export type AddFriend = {
 
 type Balance = {
   currency: string,
-  totalAmount: number,
+  amount: number,
   isOwed: boolean
 }
 
@@ -67,20 +67,7 @@ async function loadSelectedTransactions(
           timeZone: helperService.getTimeZone()
         }
       }
-    )
-      .pipe(
-        map((response) => {
-          response.perMonth.forEach(tbm => {
-            tbm.transactions.forEach((transaction) => {
-              transaction.createdAt = '2025-02-01T03:00:00+08:00';
-              transaction.createdBy = { name: 'You', id: 'kdjfkjdf849384938' };
-              transaction.updatedAt = '2025-02-01T03:00:00+08:00';
-              transaction.updatedBy = { id: 'dkjfkdjfldkfjd', name: 'Zeeshi' }
-            });
-          })
-          return response;
-        })
-      ) as Observable<{ perMonth: TransactionsByMonth[] }>)
+    ) as Observable<{ perMonth: TransactionsByMonth[] }>)
     patchState(store, { selectedTransactions: transactions.perMonth, loading: false })
   } catch (e: any) {
     patchState(store, { loading: false })

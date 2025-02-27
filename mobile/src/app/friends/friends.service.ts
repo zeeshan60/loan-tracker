@@ -7,7 +7,7 @@ import { PRIVATE_API } from '../constants';
 
 interface Balance {
   "currency": string;
-  "totalAmount": number;
+  "amount": number;
   "isOwed": boolean;
 }
 
@@ -39,13 +39,13 @@ export class FriendsService {
     }>(PRIVATE_API + '/friends')
       .pipe(
         map((response) => {
-          response.data.balance = {
-            main: { currency: 'USD', isOwed: true, totalAmount: 2323 },
-            other: [
-              { currency: 'PKR', isOwed: true, totalAmount: 2323 },
-              { currency: 'SGD', isOwed: false, totalAmount: 300 }
-            ]
-          };
+          // response.data.balance = {
+          //   main: { currency: 'USD', isOwed: true, totalAmount: 2323 },
+          //   other: [
+          //     { currency: 'PKR', isOwed: true, totalAmount: 2323 },
+          //     { currency: 'SGD', isOwed: false, totalAmount: 300 }
+          //   ]
+          // };
           return response;
         })
       );
