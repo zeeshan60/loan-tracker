@@ -27,8 +27,7 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
     private val friendEventHandler = mock<FriendsEventHandler>()
     private val friendEventRepository = mock<FriendEventRepository>()
     private val transactionEventHandler = TransactionEventHandler(
-        transactionEventRepository = transactionEventRepository,
-        friendEventRepository = friendEventRepository
+        transactionEventRepository = transactionEventRepository
     )
     private val transactionService = TransactionService(
         transactionEventHandler = transactionEventHandler,

@@ -70,7 +70,7 @@ data class TransactionCreated(
 
     override fun activityLog(current: TransactionModel): ActivityLog {
         return ActivityLog(
-            id = current.id,
+            id = current.id  ?: throw IllegalStateException("Transaction event id is required for activity log") ?: throw IllegalStateException("Transaction event id is required for activity log"),
             userUid = userId,
             activityType = ActivityType.CREATED,
             amount = splitType.apply(totalAmount),
@@ -153,7 +153,7 @@ data class DescriptionChanged(
 
     override fun activityLog(current: TransactionModel): ActivityLog {
         return ActivityLog(
-            id = current.id,
+            id = current.id  ?: throw IllegalStateException("Transaction event id is required for activity log"),
             userUid = userId,
             activityType = ActivityType.UPDATED,
             amount = current.splitType.apply(current.totalAmount),
@@ -229,7 +229,7 @@ data class TransactionDeleted(
 
     override fun activityLog(current: TransactionModel): ActivityLog {
         return ActivityLog(
-            id = current.id,
+            id = current.id  ?: throw IllegalStateException("Transaction event id is required for activity log"),
             userUid = userId,
             activityType = ActivityType.DELETED,
             amount = current.splitType.apply(current.totalAmount),
@@ -308,7 +308,7 @@ data class TotalAmountChanged(
 
     override fun activityLog(current: TransactionModel): ActivityLog {
         return ActivityLog(
-            id = current.id,
+            id = current.id  ?: throw IllegalStateException("Transaction event id is required for activity log"),
             userUid = userId,
             activityType = ActivityType.UPDATED,
             currency = current.currency,
@@ -386,7 +386,7 @@ data class CurrencyChanged(
 
     override fun activityLog(current: TransactionModel): ActivityLog {
         return ActivityLog(
-            id = current.id,
+            id = current.id  ?: throw IllegalStateException("Transaction event id is required for activity log"),
             userUid = userId,
             activityType = ActivityType.UPDATED,
             currency = currency,
@@ -464,7 +464,7 @@ data class SplitTypeChanged(
 
     override fun activityLog(current: TransactionModel): ActivityLog {
         return ActivityLog(
-            id = current.id,
+            id = current.id  ?: throw IllegalStateException("Transaction event id is required for activity log"),
             userUid = userId,
             activityType = ActivityType.UPDATED,
             currency = current.currency,

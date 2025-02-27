@@ -24,7 +24,7 @@ data class TransactionModel(
 )
 
 data class ActivityLog(
-    val id: UUID?,
+    val id: UUID,
     val userUid: String,
     val activityByUid: String,
     val description: String,

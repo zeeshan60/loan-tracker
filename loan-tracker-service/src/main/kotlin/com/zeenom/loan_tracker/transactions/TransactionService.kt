@@ -236,6 +236,7 @@ class TransactionService(
         return transactionsWithLogs.map { transactionWithLogs ->
             transactionWithLogs.activityLogs.distinctBy { it.date }.map {
                 ActivityLogWithFriendInfo(
+                    id = it.id,
                     userUid = userId,
                     activityByUid = it.activityByUid,
                     activityByName = if (it.activityByUid == userId) user.displayName else friendUsersByUid[it.activityByUid]?.name,
@@ -254,7 +255,7 @@ class TransactionService(
                     ),
                 )
             }
-        }.flatten()
+        }.flatten().sortedWith(compareByDescending<ActivityLogWithFriendInfo> { it.date }.thenByDescending { it.id })
     }
 
     fun TransactionModel.toTransactionDto(
@@ -285,6 +286,7 @@ class TransactionService(
 }
 
 data class ActivityLogWithFriendInfo(
+    val id: UUID,
     val userUid: String,
     val activityByUid: String,
     val activityByName: String?,

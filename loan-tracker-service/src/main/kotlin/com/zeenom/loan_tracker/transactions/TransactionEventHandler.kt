@@ -3,8 +3,6 @@ package com.zeenom.loan_tracker.transactions
 import com.zeenom.loan_tracker.common.apply
 import com.zeenom.loan_tracker.common.events.IEvent
 import com.zeenom.loan_tracker.common.isOwed
-import com.zeenom.loan_tracker.friends.FriendEventRepository
-import com.zeenom.loan_tracker.friends.FriendModel
 import io.swagger.v3.core.util.Json
 import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
@@ -14,7 +12,6 @@ import java.util.*
 @Service
 class TransactionEventHandler(
     private val transactionEventRepository: TransactionEventRepository,
-    private val friendEventRepository: FriendEventRepository,
 ) {
 
     suspend fun read(userId: String, streamId: UUID): TransactionModel? {
@@ -22,21 +19,6 @@ class TransactionEventHandler(
             .findAllByUserUidAndStreamId(userId, streamId).toList().map { it.toEvent() }.let {
                 resolveStream(it)
             }
-    }
-
-    suspend fun transactionsByFriendId(userId: String, friendId: UUID): List<TransactionDto> {
-        val friend = friendEventRepository.findByUserUidAndStreamId(userId, friendId) ?: throw IllegalArgumentException(
-            "Friend not found"
-        )
-        return transactionsByFriend(userId, friend.let {
-            FriendModel(
-                userId = it.userUid,
-                streamId = it.streamId,
-                friendEmail = it.friendEmail,
-                friendPhoneNumber = it.friendPhoneNumber,
-                friendDisplayName = it.friendDisplayName
-            )
-        })
     }
 
     fun resolveStream(events: List<IEvent<TransactionModel>>): TransactionModel {
@@ -58,7 +40,7 @@ class TransactionEventHandler(
             model = it.applyEvent(model)
             logs.add(it.activityLog(model))
         }
-        return model to logs.sortedWith(compareByDescending<ActivityLog> { it.date }.thenByDescending { it.id })
+        return model to logs
     }
 
     private fun baseModel(firstEvent: IEvent<TransactionModel>): TransactionModel {
@@ -82,39 +64,6 @@ class TransactionEventHandler(
                 transactionDate = it.transactionDate
             )
         } else throw IllegalArgumentException("First event must be a transaction created event")
-    }
-
-    suspend fun transactionsByFriend(userId: String, friend: FriendModel): List<TransactionDto> {
-
-        val transactions = findAllByUserIdFriendId(userId, friend.streamId)
-
-        val byStreamId = transactions.groupBy { it.streamId }
-        val models = byStreamId.map { (_, events) ->
-            resolveStream(events)
-        }
-
-        val historyByStream = changeSummaryByTransactionId(transactions)
-
-        return models.map {
-            TransactionDto(
-                currency = Currency.getInstance(it.currency),
-                recipientId = it.recipientId,
-                transactionStreamId = it.streamId,
-                description = it.description,
-                originalAmount = it.totalAmount,
-                splitType = it.splitType,
-                recipientName = friend.friendDisplayName,
-                updatedAt = it.createdAt,
-                deleted = it.deleted,
-                history = historyByStream[it.streamId] ?: emptyList(),
-                createdAt = it.firstCreatedAt,
-                createdBy = it.createdBy,
-                createdByName = null,
-                updatedBy = it.userUid,
-                updatedByName = null,
-                transactionDate = it.transactionDate
-            )
-        }
     }
 
     suspend fun transactionModelsByFriend(
