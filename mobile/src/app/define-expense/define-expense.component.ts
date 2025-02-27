@@ -165,12 +165,10 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
       return;
     }
     if (this.defineExpenseForm.valid) {
-      // todo: 'date-fns-tz' to manipulate date
       try {
         this.loading.set(true);
         await this.saveExpense(this.defineExpenseForm.getRawValue());
         let postSaveActions = [this.friendsStore.loadFriends()];
-        console.log(this.friendsStore.selectedFriend(), this.friend());
         if (
           this.friendsStore.selectedFriend()
           && this.friend()?.friendId === this.friendsStore.selectedFriend()?.friendId
@@ -180,7 +178,6 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
         await Promise.all(postSaveActions);
         this.modalCtrl.dismiss(null, 'confirm');
       } catch (e) {
-        console.log(e);
         await this.helperService.showToast('Unable to add friend at the moment');
       } finally {
         this.loading.set(false);

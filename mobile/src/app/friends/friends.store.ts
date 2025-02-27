@@ -138,7 +138,6 @@ export const FriendsStore = signalStore(
       }
     },
     setLoading(isLoading: boolean) {
-      console.log(isLoading);
       patchState(store, { loading: isLoading })
     }
   }))
