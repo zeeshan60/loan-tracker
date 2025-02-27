@@ -2,8 +2,10 @@ package com.zeenom.loan_tracker.transactions
 
 import java.math.BigDecimal
 import java.time.Instant
+import java.util.UUID
 
 data class ActivityLogResponse(
+    val id: UUID,
     val userUid: String,
     val activityByName: String?,
     val activityByPhoto: String?,

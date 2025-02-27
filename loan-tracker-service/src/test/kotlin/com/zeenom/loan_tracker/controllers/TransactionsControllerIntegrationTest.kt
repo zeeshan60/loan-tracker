@@ -524,7 +524,6 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
         assertThat(result.perMonth[0].transactions[0].description).isEqualTo("Sample transaction 2")
     }
 
-
     @Order(16)
     @Test
     fun `get activity logs for approval`() {
@@ -543,6 +542,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
 
         assertThat(result.data).hasSize(5)
 
+        assertThat(result.data[0].id).isNotNull()
         assertThat(result.data[0].activityType).isEqualTo(ActivityType.DELETED)
         assertThat(result.data[0].amount).isEqualTo(300.0.toBigDecimal())
         assertThat(result.data[0].currency).isEqualTo("SGD")

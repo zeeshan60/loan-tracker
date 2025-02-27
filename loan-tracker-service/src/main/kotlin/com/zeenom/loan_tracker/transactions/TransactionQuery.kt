@@ -24,6 +24,7 @@ class ActivityLogsQuery(
             requireNotNull(log.transactionDto.createdByName) { "Created by name is required" }
             requireNotNull(log.transactionDto.createdAt) { "Created at is required" }
             ActivityLogResponse(
+                id = log.id,
                 userUid = log.userUid,
                 activityByName = log.activityByName,
                 activityByPhoto = log.activityByPhoto,
