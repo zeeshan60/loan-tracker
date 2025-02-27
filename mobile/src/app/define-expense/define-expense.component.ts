@@ -170,7 +170,7 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
         this.loading.set(true);
         await this.saveExpense(this.defineExpenseForm.getRawValue());
         let postSaveActions = [this.friendsStore.loadFriends()];
-        console.log(this.friendsStore.selectedFriend());
+        console.log(this.friendsStore.selectedFriend(), this.friend());
         if (
           this.friendsStore.selectedFriend()
           && this.friend()?.friendId === this.friendsStore.selectedFriend()?.friendId

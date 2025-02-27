@@ -56,7 +56,7 @@ async function loadSelectedTransactions(
   selectedFriend: Friend|null,
   ) {
   if (!selectedFriend) {
-    throw new Error('No friend selected');
+    return;
   }
   try {
     patchState(store, { loading: true })
@@ -126,15 +126,13 @@ export const FriendsStore = signalStore(
     },
     async deleteTransaction(transaction: Transaction): Promise<void> {
       try {
-        const response = await helperService.showConfirmAlert()
-        if (response.role === 'confirm') {
-          patchState(store, { loading: true })
-          await firstValueFrom(http.delete(`${PRIVATE_API}/transactions/delete/transactionId/${transaction.transactionId}`))
-          // todo: load active transactions
-          helperService.showToast('Transaction deleted successfully');
-        }
+        patchState(store, { loading: true })
+        await firstValueFrom(http.delete(`${PRIVATE_API}/transactions/delete/transactionId/${transaction.transactionId}`))
+        loadSelectedTransactions(store, http, helperService, store.selectedFriend())
+        helperService.showToast('Transaction deleted successfully');
       } catch (e) {
         helperService.showToast('Unable to add friend at the moment');
+        throw new Error('Unable to add friend at the moment')
       } finally {
         patchState(store, { loading: false })
       }

@@ -1,5 +1,13 @@
 import { SplitOptions } from '../define-expense/define-expense.component';
 
+export enum HistoryChangeType {
+  DESCRIPTION = "DESCRIPTION",
+  TOTAL_AMOUNT = "TOTAL_AMOUNT",
+  CURRENCY = "CURRENCY",
+  SPLIT_TYPE = "SPLIT_TYPE",
+  DELETED = "DELETED",
+  TRANSACTION_DATE = "TRANSACTION_DATE"
+}
 export interface Friend {
   friendId: string;
   photoUrl: string|null;
@@ -30,10 +38,13 @@ export interface Transaction {
     currency: string,
     isOwed: true
   },
-  "history": {
-    amount: number,
-    currency: string,
-    isOwed: true
+  history: {
+    changedBy: string,
+    changes: {
+      oldValue: string,
+      newValue: string,
+      type: HistoryChangeType
+    }[]
   }[]
 }
 

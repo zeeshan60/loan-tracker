@@ -52,6 +52,10 @@ export class ListFriendsComponent  implements OnInit {
     this.nav.push(FriendTransactionsComponent, { friend });
   }
 
+  ionViewDidEnter() {
+    this.friendsStore.setSelectedFriend(null);
+  }
+
   async addFriend() {
     const modal = await this.modalCtrl.create({
       component: AddFriendComponent,

@@ -63,7 +63,7 @@ export class FriendTransactionsComponent  implements OnInit {
   openTransactionDetails(transaction: any) {
     this.nav.push(TransactionDetailsComponent, {
       transaction,
-      friend: this.friend
+      friend: this.friend()
     });
   }
 
@@ -79,7 +79,7 @@ export class FriendTransactionsComponent  implements OnInit {
     this.friendsStore.setSelectedFriend(this.friend());
   }
 
-  ionViewWillLeave() {
-    this.friendsStore.setSelectedFriend(null);
-  }
+  // ionViewWillLeave() {
+  //   this.friendsStore.setSelectedFriend(null);
+  // }
 }

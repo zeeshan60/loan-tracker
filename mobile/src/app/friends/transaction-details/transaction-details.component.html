@@ -59,4 +59,39 @@
       </ion-button>
     </ion-item>
   </ion-list>
+  @if (transaction().history.length) {
+    <ion-list lines="none">
+      <ion-item>
+        <ion-label>
+          <h1>History</h1>
+        </ion-label>
+      </ion-item>
+      @for (history of transaction().history; track history) {
+        <ion-item>
+          <ion-label>
+            {{history.changedBy|shortenName}} updated this transaction
+            @for (change of history.changes; track change.type) {
+              <p>
+                -{{historyChangeType[change.type]}} changed from
+                @switch (change.type) {
+                  @case (HistoryChangeType.TOTAL_AMOUNT) {
+                    {{change.oldValue|currency: transaction().amountResponse.currency: 'symbol-narrow'}} to {{change.newValue|currency: transaction().amountResponse.currency: 'symbol-narrow'}}
+                  }
+                  @case (HistoryChangeType.TRANSACTION_DATE) {
+                    {{change.oldValue|date}} to {{change.newValue|date}}
+                  }
+                  @case (HistoryChangeType.DESCRIPTION) {
+                    "{{change.oldValue}}" to "{{change.newValue}}"
+                  }
+                  @default {
+                    {{change.oldValue}} to {{change.newValue}}
+                  }
+                }
+              </p>
+            }
+          </ion-label>
+        </ion-item>
+      }
+    </ion-list>
+  }
 </ion-content>
