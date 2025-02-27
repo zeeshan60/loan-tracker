@@ -65,7 +65,8 @@ class ActivityLogsQuery(
                             name = log.transactionDto.updatedByName
                                 ?: throw IllegalStateException("Updated by name is required")
                         )
-                    }
+                    },
+                    deleted = log.transactionDto.deleted
                 )
             )
         }, null)

@@ -133,7 +133,8 @@ class TransactionsController(
                                         ?: throw IllegalStateException("Updated by name is required")
                                 )
                             },
-                            friend = transaction.friendSummaryDto
+                            friend = transaction.friendSummaryDto,
+                            deleted = transaction.deleted
                         )
                     }
                 )
@@ -233,6 +234,7 @@ data class TransactionResponse(
     val updatedAt: Instant?,
     val createdBy: TransactionUserResponse,
     val updatedBy: TransactionUserResponse?,
+    val deleted: Boolean,
 )
 
 data class TransactionUserResponse(

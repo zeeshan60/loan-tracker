@@ -30,12 +30,12 @@ class HelpersTest {
     @CsvSource(
         "5, 2.5",
         "10, 5",
+        "100.0, 50.0",
         "5.0, 2.5",
         "5.5, 2.75",
     )
     fun `test that split types splits amount with decimal`(value: BigDecimal, expected: BigDecimal) {
-        val amount = value
-        val result = SplitType.YouPaidSplitEqually.apply(amount)
+        val result = SplitType.YouPaidSplitEqually.apply(value)
         assertThat(result).isEqualTo(expected)
     }
 }
