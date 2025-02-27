@@ -68,6 +68,10 @@ class TransactionService(
                 "Transaction with id ${transactionDto.transactionStreamId} does not exist"
             )
 
+        if (existing.deleted) {
+            throw IllegalArgumentException("Transaction with id ${transactionDto.transactionStreamId} is deleted")
+        }
+
         val recipientId = existing.recipientId
         val (friendUser, userStreamId) = friendUserAndMyStreamId(
             userUid = userUid, recipientId = recipientId

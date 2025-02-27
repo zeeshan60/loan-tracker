@@ -76,7 +76,7 @@ class TransactionEventHandler(
         val byStreamId = transactions.groupBy { it.streamId }
         val models = byStreamId.map { (_, events) ->
             resolveStream(events)
-        }
+        }.filter { !it.deleted }
         val historyByStream = changeSummaryByTransactionId(transactions)
 
         return models.map {
@@ -139,7 +139,7 @@ class TransactionEventHandler(
         return transactions
             .groupBy { it.streamId }
             .values
-            .map { resolveStream(it) }
+            .map { resolveStream(it) }.filter { !it.deleted }
             .groupBy { it.recipientId }
             .mapValues { (_, transactionsByFriend) ->
                 transactionsByFriend

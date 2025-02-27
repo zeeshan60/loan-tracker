@@ -91,7 +91,7 @@ class TransactionsController(
                 friendId = friendId
             )
         ).let {
-            it.data.sortedByDescending { it.transactionDate }.filter { !it.deleted }.groupBy {
+            it.data.sortedByDescending { it.transactionDate }.groupBy {
                 it.transactionDate.startOfMonth(timeZone)
             }.map {
                 TransactionsPerMonth(
