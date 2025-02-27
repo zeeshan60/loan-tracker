@@ -1,24 +1,25 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import {
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonContent,
-  IonButton,
-  IonIcon,
-   IonButtons,
-} from '@ionic/angular/standalone';
-import { AuthStore } from '../login/auth.store';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { IonNav } from '@ionic/angular/standalone';
+import { ListActivitiesComponent } from './list-activities/list-activities.component';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-activity-log',
   templateUrl: 'activity-log.page.html',
   styleUrls: ['activity-log.page.scss'],
   standalone: true,
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonIcon, IonButtons],
+  imports: [
+    IonNav,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ActivityLogPage {
-  readonly authStore = inject(AuthStore);
+  readonly listActivitiesComponent = ListActivitiesComponent;
+  rootParams = {
+    refreshActivities$: new Subject()
+  }
   constructor() {}
+  ionViewWillEnter() {
+    this.rootParams.refreshActivities$.next(true);
+  }
 }

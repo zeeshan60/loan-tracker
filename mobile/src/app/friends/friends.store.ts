@@ -46,6 +46,7 @@ interface Methods extends MethodsDictionary {
   setSelectedFriend(friend: Friend|null): void;
   loadSelectedTransactions(): Promise<void>;
   deleteTransaction(transaction: Transaction): Promise<void>;
+  setLoading(isLoading: boolean): void;
 }
 
 async function loadSelectedTransactions(
@@ -138,5 +139,9 @@ export const FriendsStore = signalStore(
         patchState(store, { loading: false })
       }
     },
+    setLoading(isLoading: boolean) {
+      console.log(isLoading);
+      patchState(store, { loading: isLoading })
+    }
   }))
 );

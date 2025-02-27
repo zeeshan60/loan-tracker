@@ -87,7 +87,7 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
   readonly SplitOption = SplitOptions;
   readonly supportedCurrencies = ['PKR', 'USD', 'SGD'];
   readonly router = inject(Router);
-  defineExpenseForm = this.formBuilder.group({
+  readonly defineExpenseForm = this.formBuilder.group({
     description: this.formBuilder.nonNullable.control('', [Validators.required, Validators.maxLength(1000)]),
     currency: this.formBuilder.nonNullable.control('PKR', [Validators.required]),
     amount: this.formBuilder.nonNullable.control<number|null>(null, [Validators.required, Validators.min(1)]),
