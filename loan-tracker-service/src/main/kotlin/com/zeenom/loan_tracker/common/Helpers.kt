@@ -4,6 +4,7 @@ package com.zeenom.loan_tracker.common
 
 import com.zeenom.loan_tracker.transactions.SplitType
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.net.URI
 import java.time.Instant
 import java.time.LocalDate
@@ -148,8 +149,8 @@ fun SplitType.apply(amount: BigDecimal): BigDecimal {
     return when (this) {
         SplitType.TheyOweYouAll -> amount
         SplitType.YouOweThemAll -> amount
-        SplitType.YouPaidSplitEqually -> amount / 2.toBigDecimal()
-        SplitType.TheyPaidSplitEqually -> amount / 2.toBigDecimal()
+        SplitType.YouPaidSplitEqually -> amount.divide(2.0.toBigDecimal())
+        SplitType.TheyPaidSplitEqually -> amount.divide(2.0.toBigDecimal())
     }
 }
 
