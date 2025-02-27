@@ -74,6 +74,27 @@ class TransactionService(
         )
         var eventVersion = existing.version
         val createdAt = Instant.now()
+
+        if (existing.transactionDate != transactionDto.transactionDate) {
+            val event = TransactionDateChanged(
+                id = null,
+                userId = userUid,
+                transactionDate = transactionDto.transactionDate,
+                createdAt = createdAt,
+                createdBy = userUid,
+                streamId = existing.streamId,
+                version = ++eventVersion,
+                recipientId = recipientId
+            )
+            transactionEventHandler.addEvent(event)
+            if (friendUser != null && userStreamId != null) transactionEventHandler.addEvent(
+                event.crossTransaction(
+                    friendUser.uid,
+                    userStreamId
+                )
+            )
+        }
+
         if (existing.description != transactionDto.description) {
             val event = DescriptionChanged(
                 id = null,

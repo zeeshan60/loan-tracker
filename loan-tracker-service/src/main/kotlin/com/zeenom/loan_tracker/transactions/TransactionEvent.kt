@@ -103,6 +103,17 @@ data class TransactionEvent(
                 transactionDate = transactionDate,
                 recipientId = recipientId
             )
+
+            TransactionEventType.TRANSACTION_DATE_CHANGED -> TransactionDateChanged(
+                id = id,
+                userId = userUid,
+                createdAt = createdAt,
+                createdBy = createdBy,
+                streamId = streamId,
+                version = version,
+                transactionDate = transactionDate,
+                recipientId = recipientId
+            )
         }
     }
 }
@@ -113,7 +124,8 @@ enum class TransactionEventType {
     SPLIT_TYPE_CHANGED,
     TOTAL_AMOUNT_CHANGED,
     CURRENCY_CHANGED,
-    TRANSACTION_DELETED
+    TRANSACTION_DELETED,
+    TRANSACTION_DATE_CHANGED
 }
 
 @Repository
