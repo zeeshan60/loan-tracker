@@ -1,6 +1,7 @@
 package com.zeenom.loan_tracker.transactions
 
 import com.zeenom.loan_tracker.friends.FriendFinderStrategy
+import com.zeenom.loan_tracker.friends.FriendSummaryDto
 import com.zeenom.loan_tracker.friends.FriendUserDto
 import com.zeenom.loan_tracker.friends.FriendsEventHandler
 import com.zeenom.loan_tracker.users.UserDto
@@ -26,7 +27,7 @@ class TransactionService(
 
         val (friendUser, userStreamId) = friendUserAndMyStreamId(
             userUid = userUid,
-            recipientId = transactionDto.recipientId
+            recipientId = transactionDto.friendSummaryDto.friendId
                 ?: throw IllegalArgumentException("Recipient id is required to add new transaction")
         )
 
@@ -39,7 +40,7 @@ class TransactionService(
             currency = transactionDto.currency.toString(),
             splitType = transactionDto.splitType,
             totalAmount = transactionDto.originalAmount,
-            recipientId = transactionDto.recipientId,
+            recipientId = transactionDto.friendSummaryDto.friendId,
             createdAt = Instant.now(),
             createdBy = userUid,
             streamId = streamId,
@@ -292,12 +293,17 @@ class TransactionService(
     ): TransactionDto {
         return TransactionDto(
             currency = Currency.getInstance(currency),
-            recipientId = recipientId,
             transactionStreamId = streamId,
             description = description,
             originalAmount = totalAmount,
             splitType = splitType,
-            recipientName = friendUsersByStreamId[recipientId]?.name,
+            friendSummaryDto = FriendSummaryDto(
+                friendId = recipientId,
+                email = friendUsersByStreamId[recipientId]?.email,
+                phoneNumber = friendUsersByStreamId[recipientId]?.phoneNumber,
+                photoUrl = friendUsersByStreamId[recipientId]?.photoUrl,
+                name = friendUsersByStreamId[recipientId]?.name
+            ),
             deleted = deleted,
             history = history.map {
                 ChangeSummaryDto(

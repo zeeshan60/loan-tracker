@@ -107,7 +107,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
             }
 
         assertThat(result.perMonth).hasSize(1)
-        assertThat(result.perMonth[0].transactions[0].friendName).isEqualTo("john")
+        assertThat(result.perMonth[0].transactions[0].friend.name).isEqualTo("john")
         assertThat(result.perMonth[0].transactions[0].amountResponse.amount).isEqualTo(50.0.toBigDecimal())
         assertThat(result.perMonth[0].transactions[0].amountResponse.currency).isEqualTo("USD")
         assertThat(result.perMonth[0].transactions[0].amountResponse.isOwed).isTrue()
@@ -147,7 +147,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
             }
 
         assertThat(result.perMonth).hasSize(1)
-        assertThat(result.perMonth[0].transactions[0].friendName).isEqualTo("Zeeshan Tufail")
+        assertThat(result.perMonth[0].transactions[0].friend.name).isEqualTo("Zeeshan Tufail")
         assertThat(result.perMonth[0].transactions[0].amountResponse.amount).isEqualTo(50.0.toBigDecimal())
         assertThat(result.perMonth[0].transactions[0].amountResponse.currency).isEqualTo("USD")
         assertThat(result.perMonth[0].transactions[0].amountResponse.isOwed).isFalse()
@@ -195,7 +195,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
             }
 
         assertThat(result.perMonth).hasSize(1)
-        assertThat(result.perMonth[0].transactions[0].friendName).isEqualTo("john")
+        assertThat(result.perMonth[0].transactions[0].friend.name).isEqualTo("john")
         assertThat(result.perMonth[0].transactions[0].date).isEqualTo(Instant.parse("2025-02-25T00:00:00Z"))
         assertThat(result.perMonth[0].transactions[0].amountResponse.amount).isEqualTo(200.0.toBigDecimal())
         assertThat(result.perMonth[0].transactions[0].amountResponse.currency).isEqualTo("SGD")
@@ -252,7 +252,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
             }
 
         assertThat(result.perMonth).hasSize(1)
-        assertThat(result.perMonth[0].transactions[0].friendName).isEqualTo("Zeeshan Tufail")
+        assertThat(result.perMonth[0].transactions[0].friend.name).isEqualTo("Zeeshan Tufail")
         assertThat(result.perMonth[0].transactions[0].amountResponse.amount).isEqualTo(200.0.toBigDecimal())
         assertThat(result.perMonth[0].transactions[0].amountResponse.currency).isEqualTo("SGD")
         assertThat(result.perMonth[0].transactions[0].amountResponse.isOwed).isFalse()
@@ -376,7 +376,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
             }
 
         assertThat(result.perMonth[0].transactions).hasSize(2)
-        assertThat(result.perMonth[0].transactions[0].friendName).isEqualTo("john")
+        assertThat(result.perMonth[0].transactions[0].friend.name).isEqualTo("john")
         assertThat(result.perMonth[0].transactions[0].amountResponse.amount).isEqualTo(50.0.toBigDecimal())
         assertThat(result.perMonth[0].transactions[0].amountResponse.currency).isEqualTo("USD")
         assertThat(result.perMonth[0].transactions[0].amountResponse.isOwed).isTrue()
@@ -424,7 +424,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
 
         assertThat(result.perMonth).hasSize(1)
         transaction2 = result.perMonth[0].transactions[1]
-        assertThat(result.perMonth[0].transactions[1].friendName).isEqualTo("john")
+        assertThat(result.perMonth[0].transactions[1].friend.name).isEqualTo("john")
         assertThat(result.perMonth[0].transactions[1].amountResponse.amount).isEqualTo(300.0.toBigDecimal())
         assertThat(result.perMonth[0].transactions[1].amountResponse.currency).isEqualTo("SGD")
         assertThat(result.perMonth[0].transactions[1].amountResponse.isOwed).isFalse()
@@ -512,7 +512,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
             }
 
         assertThat(result.perMonth[0].transactions).hasSize(1)
-        assertThat(result.perMonth[0].transactions[0].friendName).isEqualTo("john")
+        assertThat(result.perMonth[0].transactions[0].friend.name).isEqualTo("john")
         assertThat(result.perMonth[0].transactions[0].amountResponse.amount).isEqualTo(50.0.toBigDecimal())
         assertThat(result.perMonth[0].transactions[0].amountResponse.currency).isEqualTo("USD")
         assertThat(result.perMonth[0].transactions[0].amountResponse.isOwed).isTrue()
@@ -592,7 +592,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
         assertThat(transactionResponse.description).isEqualTo("Sample transaction edited by john")
         assertThat(transactionResponse.totalAmount).isEqualTo(300.0.toBigDecimal())
         assertThat(transactionResponse.splitType).isEqualTo(SplitType.YouOweThemAll)
-        assertThat(transactionResponse.friendName).isEqualTo("john")
+        assertThat(transactionResponse.friend.name).isEqualTo("john")
         assertThat(transactionResponse.amountResponse.amount).isEqualTo(300.0.toBigDecimal())
         assertThat(transactionResponse.amountResponse.currency).isEqualTo("SGD")
         assertThat(transactionResponse.amountResponse.isOwed).isFalse()
@@ -647,7 +647,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
         assertThat(transactionResponse.description).isEqualTo("Sample transaction 2")
         assertThat(transactionResponse.totalAmount).isEqualTo(100.0.toBigDecimal())
         assertThat(transactionResponse.splitType).isEqualTo(SplitType.YouPaidSplitEqually)
-        assertThat(transactionResponse.friendName).isEqualTo("john")
+        assertThat(transactionResponse.friend.name).isEqualTo("john")
         assertThat(transactionResponse.amountResponse.amount).isEqualTo(50.0.toBigDecimal())
         assertThat(transactionResponse.amountResponse.currency).isEqualTo("USD")
         assertThat(transactionResponse.amountResponse.isOwed).isTrue()

@@ -2,6 +2,7 @@ package com.zeenom.loan_tracker.controllers
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.zeenom.loan_tracker.common.Paginated
+import com.zeenom.loan_tracker.friends.FriendSummaryDto
 import com.zeenom.loan_tracker.prettyAndPrint
 import com.zeenom.loan_tracker.security.AuthService
 import com.zeenom.loan_tracker.transactions.*
@@ -46,8 +47,13 @@ class TransactionsControllerTest(@LocalServerPort private val port: Int) : BaseI
                         description = "transaction 1",
                         originalAmount = 200.0.toBigDecimal(),
                         splitType = SplitType.YouPaidSplitEqually,
-                        recipientId = recipientId,
-                        recipientName = "John",
+                        friendSummaryDto = FriendSummaryDto(
+                            recipientId,
+                            "john@gmail.com",
+                            "+923001234567",
+                            "John",
+                            "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl2",
+                        ),
                         transactionStreamId = UUID.randomUUID(),
                         updatedAt = Instant.parse("2021-01-01T00:00:00Z"),
                         history = emptyList(),
@@ -64,8 +70,13 @@ class TransactionsControllerTest(@LocalServerPort private val port: Int) : BaseI
                         description = "transaction 2",
                         originalAmount = 100.0.toBigDecimal(),
                         splitType = SplitType.YouPaidSplitEqually,
-                        recipientId = recipientId,
-                        recipientName = "John",
+                        friendSummaryDto = FriendSummaryDto(
+                            recipientId,
+                            "john@gmail.com",
+                            "+923001234567",
+                            "John",
+                            "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl2",
+                        ),
                         transactionStreamId = UUID.randomUUID(),
                         updatedAt = Instant.parse("2021-01-02T00:00:00Z"),
                         history = emptyList(),
@@ -84,8 +95,13 @@ class TransactionsControllerTest(@LocalServerPort private val port: Int) : BaseI
                         description = "transaction 1",
                         originalAmount = 50.0.toBigDecimal(),
                         splitType = SplitType.TheyOweYouAll,
-                        recipientId = recipientId,
-                        recipientName = "John",
+                        friendSummaryDto = FriendSummaryDto(
+                            recipientId,
+                            "john@gmail.com",
+                            "+923001234567",
+                            "John",
+                            "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl2",
+                        ),
                         transactionStreamId = UUID.randomUUID(),
                         updatedAt = Instant.parse("2021-02-03T00:00:00Z"),
                         history = emptyList(),
@@ -103,8 +119,13 @@ class TransactionsControllerTest(@LocalServerPort private val port: Int) : BaseI
                         description = "transaction 2",
                         originalAmount = 300.0.toBigDecimal(),
                         splitType = SplitType.YouPaidSplitEqually,
-                        recipientId = recipientId,
-                        recipientName = "John",
+                        friendSummaryDto = FriendSummaryDto(
+                            recipientId,
+                            "john@gmail.com",
+                            "+923001234567",
+                            "John",
+                            "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl2",
+                        ),
                         transactionStreamId = UUID.randomUUID(),
                         updatedAt = Instant.parse("2021-02-01T00:00:00Z"),
                         history = emptyList(),

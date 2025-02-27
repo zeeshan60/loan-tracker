@@ -1,6 +1,7 @@
 package com.zeenom.loan_tracker.transactions
 
 import com.zeenom.loan_tracker.events.CommandPayloadDto
+import com.zeenom.loan_tracker.friends.FriendSummaryDto
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.*
@@ -10,8 +11,7 @@ data class TransactionDto(
     val description: String,
     val originalAmount: BigDecimal,
     val splitType: SplitType,
-    val recipientId: UUID?,
-    val recipientName: String?,
+    val friendSummaryDto: FriendSummaryDto,
     val transactionStreamId: UUID? = null,
     val transactionDate: Instant,
     val updatedAt: Instant?,

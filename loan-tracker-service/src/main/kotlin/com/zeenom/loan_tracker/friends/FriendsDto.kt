@@ -14,6 +14,14 @@ data class FriendDto(
     val balances: List<AmountDto>,
 )
 
+data class FriendSummaryDto(
+    val friendId: UUID?,
+    val email: String?,
+    val phoneNumber: String?,
+    val photoUrl: String?,
+    val name: String?,
+)
+
 data class FriendsWithAllTimeBalancesDto(
     val friends: List<FriendDto>,
     val balance: AllTimeBalanceDto,

@@ -19,7 +19,7 @@ class ActivityLogsQuery(
     override suspend fun execute(input: String): Paginated<List<ActivityLogResponse>> {
         return Paginated(transactionService.transactionActivityLogs(userId = input).map { log ->
             requireNotNull(log.transactionDto.transactionStreamId) { "Transaction stream id is required" }
-            requireNotNull(log.transactionDto.recipientName) { "Recipient name is required" }
+            requireNotNull(log.transactionDto.friendSummaryDto.friendId) { "Recipient name is required" }
             requireNotNull(log.transactionDto.createdBy) { "Created by is required" }
             requireNotNull(log.transactionDto.createdByName) { "Created by name is required" }
             requireNotNull(log.transactionDto.createdAt) { "Created at is required" }
@@ -36,7 +36,7 @@ class ActivityLogsQuery(
                 transactionResponse = TransactionResponse(
                     date = log.transactionDto.transactionDate,
                     transactionId = log.transactionDto.transactionStreamId,
-                    friendName = log.transactionDto.recipientName,
+                    friend = log.transactionDto.friendSummaryDto,
                     amountResponse = AmountResponse(
                         amount = log.transactionDto.splitType.apply(log.transactionDto.originalAmount),
                         currency = log.transactionDto.currency.currencyCode,
