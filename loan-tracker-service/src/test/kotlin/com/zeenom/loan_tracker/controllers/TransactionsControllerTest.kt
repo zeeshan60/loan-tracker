@@ -3,7 +3,6 @@ package com.zeenom.loan_tracker.controllers
 import com.fasterxml.jackson.core.type.TypeReference
 import com.zeenom.loan_tracker.common.Paginated
 import com.zeenom.loan_tracker.friends.FriendSummaryDto
-import com.zeenom.loan_tracker.prettyAndPrint
 import com.zeenom.loan_tracker.security.AuthService
 import com.zeenom.loan_tracker.transactions.*
 import kotlinx.coroutines.runBlocking
@@ -154,7 +153,6 @@ class TransactionsControllerTest(@LocalServerPort private val port: Int) : BaseI
                     object : TypeReference<TransactionsResponse>() {})
             }
 
-        result.prettyAndPrint(objectMapper)
         Assertions.assertThat(result.perMonth).hasSize(2)
         Assertions.assertThat(result.perMonth[0].transactions).hasSize(2)
         val month1Transaction1 = result.perMonth[0].transactions[0]
@@ -214,6 +212,7 @@ class TransactionsControllerTest(@LocalServerPort private val port: Int) : BaseI
             .header("Authorization", "Bearer ${authService.generateJwt("123")}")
             .exchange()
             .expectStatus().isBadRequest
-            .expectBody().jsonPath("$.error.message").isEqualTo("400 BAD_REQUEST \"Required query parameter 'friendId' is not present.\"")
+            .expectBody().jsonPath("$.error.message")
+            .isEqualTo("400 BAD_REQUEST \"Required query parameter 'friendId' is not present.\"")
     }
 }

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.zeenom.loan_tracker.common.Paginated
 import com.zeenom.loan_tracker.friends.FriendEventRepository
 import com.zeenom.loan_tracker.friends.FriendsResponse
-import com.zeenom.loan_tracker.prettyAndPrint
 import com.zeenom.loan_tracker.transactions.*
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventRepository
@@ -147,7 +146,11 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
             }
 
         assertThat(result.perMonth).hasSize(1)
-        assertThat(result.perMonth[0].transactions[0].friend.name).isEqualTo("Zeeshan Tufail")
+        assertThat(result.perMonth[0].transactions[0].friend.friendId).isEqualTo(zeeFriendId)
+        assertThat(result.perMonth[0].transactions[0].friend.name).isEqualTo(zeeDto.displayName)
+        assertThat(result.perMonth[0].transactions[0].friend.email).isEqualTo(zeeDto.email)
+        assertThat(result.perMonth[0].transactions[0].friend.phoneNumber).isEqualTo(zeeDto.phoneNumber)
+        assertThat(result.perMonth[0].transactions[0].friend.photoUrl).isEqualTo(zeeDto.photoUrl)
         assertThat(result.perMonth[0].transactions[0].amountResponse.amount).isEqualTo(50.0.toBigDecimal())
         assertThat(result.perMonth[0].transactions[0].amountResponse.currency).isEqualTo("USD")
         assertThat(result.perMonth[0].transactions[0].amountResponse.isOwed).isFalse()
@@ -439,7 +442,6 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
         assertThat(result.perMonth[0].transactions[1].createdAt).isNotNull()
         assertThat(result.perMonth[0].transactions[1].updatedAt).isNotNull()
         assertThat(result.perMonth[0].transactions[1].history).hasSize(2)
-        result.perMonth[0].transactions[1].history.prettyAndPrint(objectMapper)
         assertThat(result.perMonth[0].transactions[1].history[0].changes).hasSize(5)
         val history0Changes = result.perMonth[0].transactions[1].history[0].changes[0]
         assertThat(history0Changes.type).isEqualTo(TransactionChangeType.TRANSACTION_DATE)
@@ -538,8 +540,6 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
                     it,
                     object : TypeReference<Paginated<List<ActivityLogResponse>>>() {})
             }
-
-        result.prettyAndPrint(objectMapper)
 
         assertThat(result.data).hasSize(5)
 
