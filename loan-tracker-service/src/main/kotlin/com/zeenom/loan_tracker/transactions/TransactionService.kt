@@ -162,7 +162,6 @@ class TransactionService(
         val friendUser = userEventHandler.findUserByEmailOrPhoneNumber(friend.email, friend.phoneNumber)
         val userStreamId = friendUser?.let {
             friendsEventHandler.findFriendStreamIdByEmailOrPhoneNumber(friendUser.uid, me.email, me.phoneNumber)
-                ?: throw IllegalArgumentException("Friend with email ${friend.email} or phone number ${friend.phoneNumber} does not exist")
         }
         return Pair(friendUser, userStreamId)
     }
