@@ -46,13 +46,7 @@ class ActivityLogsQuery(
                         .map {
                             ChangeSummaryResponse(
                                 changedBy = it.key.second,
-                                changes = it.value.map {
-                                    ChangeSummaryByUserResponse(
-                                        oldValue = it.oldValue,
-                                        newValue = it.newValue,
-                                        type = it.type
-                                    )
-                                }
+                                changes = it.value
 
                             )
                         },

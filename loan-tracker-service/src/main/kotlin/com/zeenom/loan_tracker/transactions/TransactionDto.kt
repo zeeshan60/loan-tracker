@@ -21,11 +21,21 @@ data class TransactionDto(
     val updatedBy: String?,
     val updatedByName: String?,
     val deleted: Boolean = false,
-    val history: List<ChangeSummary> = emptyList()
+    val history: List<ChangeSummaryDto> = emptyList()
 ) : CommandPayloadDto
 
 data class AmountDto(
     val amount: BigDecimal,
     val currency: Currency,
     val isOwed: Boolean
+)
+
+data class ChangeSummaryDto(
+    val date: Instant,
+    val changedBy: String,
+    val changedByName: String,
+    val changedByPhoto: String?,
+    val oldValue: String,
+    val newValue: String,
+    val type: TransactionChangeType,
 )

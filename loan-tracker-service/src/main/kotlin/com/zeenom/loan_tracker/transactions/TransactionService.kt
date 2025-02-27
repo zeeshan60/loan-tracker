@@ -259,7 +259,7 @@ class TransactionService(
         val transactionsWithLogs = transactionEventHandler.transactionsWithActivityLogs(userId)
 
         return transactionsWithLogs.map { transactionWithLogs ->
-            transactionWithLogs.activityLogs.groupBy { it.date }.map {logs ->
+            transactionWithLogs.activityLogs.groupBy { it.date }.map { logs ->
                 val it = logs.value.maxByOrNull { it.id }!!
                 ActivityLogWithFriendInfo(
                     id = it.id,
@@ -299,7 +299,18 @@ class TransactionService(
             splitType = splitType,
             recipientName = friendUsersByStreamId[recipientId]?.name,
             deleted = deleted,
-            history = history,
+            history = history.map {
+                ChangeSummaryDto(
+                    date = it.date,
+                    changedBy = it.changedBy,
+                    changedByName = if (it.changedBy == userDto.uid) "You" else friendUsersByUserId[it.changedBy]?.name
+                        ?: throw IllegalStateException("Friend with id ${it.changedBy} not found"),
+                    changedByPhoto = if (it.changedBy == userDto.uid) userDto.photoUrl else friendUsersByUserId[it.changedBy]?.photoUrl,
+                    oldValue = it.oldValue,
+                    newValue = it.newValue,
+                    type = it.type
+                )
+            },
             createdAt = createdAt,
             createdBy = createdBy,
             createdByName = if (createdBy == userDto.uid) "You" else friendUsersByUserId[createdBy]?.name,

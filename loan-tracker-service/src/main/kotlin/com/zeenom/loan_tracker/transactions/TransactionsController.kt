@@ -114,13 +114,7 @@ class TransactionsController(
                             history = transaction.history.groupBy { Pair(it.date, it.changedBy) }.map {
                                 ChangeSummaryResponse(
                                     changedBy = it.key.second,
-                                    changes = it.value.map {
-                                        ChangeSummaryByUserResponse(
-                                            oldValue = it.oldValue,
-                                            newValue = it.newValue,
-                                            type = it.type
-                                        )
-                                    }
+                                    changes = it.value
                                 )
                             },
                             createdAt = transaction.createdAt ?: throw IllegalStateException("Created at is required"),
@@ -242,7 +236,7 @@ data class TransactionUserResponse(
 
 data class ChangeSummaryResponse(
     val changedBy: String,
-    val changes: List<ChangeSummaryByUserResponse>,
+    val changes: List<ChangeSummaryDto>,
 )
 
 data class ChangeSummaryByUserResponse(
