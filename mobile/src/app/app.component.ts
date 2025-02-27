@@ -11,7 +11,13 @@ import {
   addCircleOutline,
   logOutOutline,
   addOutline,
-  person
+  person,
+  mailOutline,
+  callOutline,
+  listOutline,
+  receiptOutline,
+  trashOutline,
+  createOutline,
 } from 'ionicons/icons';
 import { signalMethod } from '@ngrx/signals';
 import { FriendsStore } from './friends/friends.store';
@@ -63,7 +69,13 @@ export class AppComponent implements OnInit {
       addCircleOutline,
       logOutOutline,
       addOutline,
-      person
+      person,
+      mailOutline,
+      callOutline,
+      listOutline,
+      receiptOutline,
+      trashOutline,
+      createOutline,
     });
 
     this.activateLoaderWhen(this.friendsStore.loading);
@@ -75,6 +87,9 @@ export class AppComponent implements OnInit {
   async initApp() {
     this.storageService.storageReady$.subscribe(async () => {
       await this.authStore.setApiKey();
+
+      // load all friends
+      await this.friendsStore.loadFriends()
     });
   }
 }

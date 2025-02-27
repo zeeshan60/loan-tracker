@@ -1,0 +1,65 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>With you and {{friend()['name'] | shortenName}}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @for(transactionsByMonth of transactions(); track transactionsByMonth.date) {
+    <ion-list>
+      <ion-item class="group-label-item">
+        <ion-label color="medium">{{transactionsByMonth.date | dateFormat:'month': 'year'}}</ion-label>
+      </ion-item>
+      @for(transaction of transactionsByMonth.transactions; track transaction.transactionId) {
+        <ion-item (click)="openTransactionDetails(transaction)" button>
+          <p slot="start" class="date-wrapper">
+            {{transaction.date | dateFormat: 'day'}}<br>
+            {{transaction.date | dateFormat: 'month'}}
+          </p>
+          <ion-avatar>
+            <ion-icon color="medium" size="large" name="receipt-outline"></ion-icon>
+          </ion-avatar>
+          <ion-label class="description-wrapper">
+            <h2>{{ transaction.description }}</h2>
+            <p>
+              @if (transaction.amountResponse.isOwed) {
+                You paid:
+              } @else {
+                {{friend().name | shortenName}} paid:
+              }
+              {{ transaction.totalAmount | currency: transaction.amountResponse.currency: 'symbol' }}
+            </p>
+          </ion-label>
+          <p class="amount-wrapper">
+            <ion-label class="type" [color]="transaction.amountResponse.isOwed ? 'success': 'danger'">
+              @if (transaction.amountResponse.isOwed) {
+                You lent
+              } @else {
+                You borrowed
+              }
+            </ion-label>
+            <ion-label [color]="transaction.amountResponse.isOwed ? 'success': 'danger'">
+              {{ transaction.amountResponse.amount | currency: transaction.amountResponse.currency: 'symbol' }}
+            </ion-label>
+          </p>
+        </ion-item>
+      }
+    </ion-list>
+  } @empty {
+    @if (!friendsStore.loading) {
+      <ion-list lines="none">
+        <ion-item>
+          <ion-label>
+            <p>No transactions yet.</p>
+          </ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-button (click)="addExpense()">Add now</ion-button>
+        </ion-item>
+      </ion-list>
+    }
+  }
+</ion-content>

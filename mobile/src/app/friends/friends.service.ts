@@ -1,9 +1,15 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { AddFriend } from './friends.store';
 import { Friend } from './model';
 import { PRIVATE_API } from '../constants';
+
+interface Balance {
+  "currency": string;
+  "amount": number;
+  "isOwed": boolean;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -13,8 +19,36 @@ export class FriendsService {
 
   constructor() { }
 
-  loadAllFriends(): Observable<{ data: { friends: Friend[]}}> {
-    return this.http.get<{ data: { friends: Friend[]}}>(PRIVATE_API + '/friends');
+  loadAllFriends(): Observable<{
+    data: {
+      balance: {
+        "main": Balance,
+        "other": Balance[]
+      }
+      friends: Friend[]
+    },
+  }> {
+    return this.http.get<{
+      data: {
+        balance: {
+          "main": Balance,
+          "other": Balance[]
+        }
+        friends: Friend[]
+      }
+    }>(PRIVATE_API + '/friends')
+      .pipe(
+        map((response) => {
+          // response.data.balance = {
+          //   main: { currency: 'USD', isOwed: true, totalAmount: 2323 },
+          //   other: [
+          //     { currency: 'PKR', isOwed: true, totalAmount: 2323 },
+          //     { currency: 'SGD', isOwed: false, totalAmount: 300 }
+          //   ]
+          // };
+          return response;
+        })
+      );
   }
 
   addFriend(friend: AddFriend): Observable<any> {

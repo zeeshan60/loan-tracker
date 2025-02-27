@@ -12,14 +12,14 @@ export const routes: Routes = [
           import('../friends/friends.page').then((m) => m.FriendsPage),
       },
       {
-        path: 'add-new',
-        loadComponent: () =>
-          import('../add-new/add-new.page').then((m) => m.AddNewPage),
-      },
-      {
         path: 'account',
         loadComponent: () =>
           import('../account/account.page').then((m) => m.AccountPage),
+      },
+      {
+        path: 'activity-log',
+        loadComponent: () =>
+          import('../activity-log/activity-log.page').then((m) => m.ActivityLogPage),
       },
       {
         path: '',

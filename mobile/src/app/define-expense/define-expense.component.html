@@ -1,0 +1,95 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button color="medium" (click)="closePopup()">Cancel</ion-button>
+    </ion-buttons>
+    <ion-title>
+      @if (isUpdating()) {
+        Edit expense
+      } @else {
+        Create expense
+      }
+    </ion-title>
+    <ion-buttons slot="end">
+      @if (loading()) {
+        <ion-spinner></ion-spinner>
+      } @else {
+        <ion-button type="submit" form="define-expense-form" [strong]="true">Save</ion-button>
+      }
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <h1>Define expense details</h1>
+  <form [formGroup]="defineExpenseForm" (ngSubmit)="onSubmit()" id="define-expense-form">
+  <ion-list>
+    <ion-item class="choose-friend-item">
+      <ion-label>
+        <h1>
+          With you and&nbsp;
+          <ion-label
+            class="selected-friend-label"
+            color="primary"
+            (click)="chooseFriend()"
+          >
+            {{friend()?.['name'] || ''}}
+          </ion-label>
+        </h1>
+      </ion-label>
+      @if (!friend()) {
+        <ion-button (click)="chooseFriend()">Choose friend</ion-button>
+      }
+    </ion-item>
+    <ion-item>
+      <ion-input
+        type="text"
+        labelPlacement="stacked"
+        label="Description"
+        formControlName="description"
+        placeholder="Description"
+        errorText="Description is required"
+      ></ion-input>
+    </ion-item>
+    <ion-item class="currency-expense">
+      <ion-select
+        formControlName="currency"
+        class="currency"
+        placeholder="Select currency"
+        label="Currency"
+        label-placement="stacked"
+        interface="action-sheet"
+      >
+        @for (currency of supportedCurrencies; track currency) {
+          <ion-select-option value="{{currency}}">{{currency}}</ion-select-option>
+        }
+      </ion-select>
+      <ion-input
+        type="number"
+        labelPlacement="stacked"
+        label="Expense"
+        formControlName="amount"
+        errorText="Expense is required"
+      ></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-select formControlName="type" class="split-option-select" [class.is-owed]="isOwed()" color="green" placeholder="place holder .." label="Who owes who" label-placement="stacked" interface="action-sheet">
+        <ion-select-option class="green" [value]="SplitOption.YouPaidSplitEqually">Paid by you and split equally</ion-select-option>
+        <ion-select-option  class="green" [value]="SplitOption.TheyOweYouAll">{{friend()?.['name']}} owes you the full amount</ion-select-option>
+        <ion-select-option  class="red" [value]="SplitOption.TheyPaidSplitEqually">Paid by {{friend()?.['name']}} and split equally</ion-select-option>
+        <ion-select-option  class="red" [value]="SplitOption.YouOweThemAll">You owe {{friend()?.['name']}} the full amount</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-label>
+        Expense date:
+      </ion-label>
+      <ion-datetime-button datetime="datetime"></ion-datetime-button>
+      <ion-modal [keepContentsMounted]="true">
+        <ng-template>
+          <ion-datetime formControlName="transactionDate" presentation="date" id="datetime"></ion-datetime>
+        </ng-template>
+      </ion-modal>
+    </ion-item>
+  </ion-list>
+  </form>
+</ion-content>
