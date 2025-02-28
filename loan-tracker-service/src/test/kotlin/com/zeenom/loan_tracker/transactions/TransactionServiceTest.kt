@@ -22,7 +22,6 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
     TestPostgresConfig() {
     private val userEventHandler = mock<UserEventHandler>()
     private val friendEventHandler = mock<FriendsEventHandler>()
-    private val friendEventRepository = mock<FriendEventRepository>()
     private val transactionEventHandler = TransactionEventHandler(
         transactionEventRepository = transactionEventRepository
     )
@@ -60,6 +59,7 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
             )
         ).`when`(friendEventHandler).findFriendByUserIdAndFriendId("123", friendEventStreamId)
         val transactionDto = TransactionDto(
+            transactionStreamId = UUID.randomUUID(),
             currency = Currency.getInstance("USD"),
             friendSummaryDto = FriendSummaryDto(
                 friendEventStreamId,
@@ -123,7 +123,8 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
             updatedBy = null,
             updatedByName = null,
             deleted = false,
-            transactionDate = Instant.parse("2025-02-27T00:00:00Z")
+            transactionDate = Instant.parse("2025-02-27T00:00:00Z"),
+            transactionStreamId = UUID.randomUUID(),
         )
 
         transactionService.addTransaction(
@@ -183,7 +184,8 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
             updatedBy = null,
             updatedByName = null,
             deleted = false,
-            transactionDate = Instant.parse("2025-02-27T00:00:00Z")
+            transactionDate = Instant.parse("2025-02-27T00:00:00Z"),
+            transactionStreamId = UUID.randomUUID(),
         )
 
         assertThatThrownBy {
@@ -232,7 +234,8 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
             updatedBy = null,
             updatedByName = null,
             deleted = false,
-            transactionDate = Instant.parse("2025-02-27T00:00:00Z")
+            transactionDate = Instant.parse("2025-02-27T00:00:00Z"),
+            transactionStreamId = UUID.randomUUID(),
         )
 
         assertThatThrownBy { runBlocking { transactionService.addTransaction("123", transactionDto) } }
@@ -263,7 +266,8 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
             updatedBy = null,
             updatedByName = null,
             deleted = false,
-            transactionDate = Instant.parse("2025-02-27T00:00:00Z")
+            transactionDate = Instant.parse("2025-02-27T00:00:00Z"),
+            transactionStreamId = UUID.randomUUID(),
         )
 
         transactionService.addTransaction(
@@ -340,7 +344,8 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
             updatedBy = null,
             updatedByName = null,
             deleted = false,
-            transactionDate = Instant.parse("2025-02-27T00:00:00Z")
+            transactionDate = Instant.parse("2025-02-27T00:00:00Z"),
+            transactionStreamId = UUID.randomUUID(),
         )
 
         transactionService.addTransaction(

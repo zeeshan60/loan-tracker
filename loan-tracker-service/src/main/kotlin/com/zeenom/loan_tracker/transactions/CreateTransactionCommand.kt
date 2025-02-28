@@ -26,7 +26,12 @@ class CreateTransactionCommand(
     }
 }
 
-data class FriendTransactionQueryDto(
+data class FriendTransactionsQueryDto(
     val userId: String,
     val friendId: UUID,
+)
+
+data class FriendTransactionQueryDto(
+    val userId: String,
+    val transactionId: UUID,
 )

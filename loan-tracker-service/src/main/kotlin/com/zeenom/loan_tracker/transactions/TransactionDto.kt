@@ -12,7 +12,7 @@ data class TransactionDto(
     val originalAmount: BigDecimal,
     val splitType: SplitType,
     val friendSummaryDto: FriendSummaryDto,
-    val transactionStreamId: UUID? = null,
+    val transactionStreamId: UUID,
     val transactionDate: Instant,
     val updatedAt: Instant?,
     val createdAt: Instant?,
