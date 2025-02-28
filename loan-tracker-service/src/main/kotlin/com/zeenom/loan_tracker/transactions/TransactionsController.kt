@@ -3,7 +3,6 @@ package com.zeenom.loan_tracker.transactions
 import com.zeenom.loan_tracker.common.*
 import com.zeenom.loan_tracker.events.CommandDto
 import com.zeenom.loan_tracker.events.CommandType
-import com.zeenom.loan_tracker.friends.FriendDto
 import com.zeenom.loan_tracker.friends.FriendSummaryDto
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Schema
@@ -19,7 +18,7 @@ import java.util.*
 class TransactionsController(
     private val createTransactionCommand: CreateTransactionCommand,
     private val updateTransactionCommand: UpdateTransactionCommand,
-    private val transactionQuery: TransactionQuery,
+    private val transactionsQuery: TransactionsQuery,
     private val deleteTransactionCommand: DeleteTransactionCommand,
     private val activityLogsQuery: ActivityLogsQuery,
 ) {
@@ -87,7 +86,7 @@ class TransactionsController(
         if (timeZone !in ZoneId.getAvailableZoneIds()) {
             throw IllegalArgumentException("Invalid timezone")
         }
-        return transactionQuery.execute(
+        return transactionsQuery.execute(
             FriendTransactionQueryDto(
                 userId = userId,
                 friendId = friendId

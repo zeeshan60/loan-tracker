@@ -23,7 +23,7 @@ class TransactionsControllerTest(@LocalServerPort private val port: Int) : BaseI
     private lateinit var updateTransactionCommand: UpdateTransactionCommand
 
     @MockitoBean
-    private lateinit var transactionQuery: TransactionQuery
+    private lateinit var transactionsQuery: TransactionsQuery
 
     @Autowired
     private lateinit var authService: AuthService
@@ -32,7 +32,7 @@ class TransactionsControllerTest(@LocalServerPort private val port: Int) : BaseI
     fun `given transactions spanning over months return correct grouping`() {
         val recipientId = UUID.randomUUID()
         whenever(runBlocking {
-            transactionQuery.execute(
+            transactionsQuery.execute(
                 FriendTransactionQueryDto(
                     "123",
                     recipientId
