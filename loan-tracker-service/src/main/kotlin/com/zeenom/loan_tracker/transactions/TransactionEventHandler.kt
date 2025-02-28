@@ -88,6 +88,17 @@ class TransactionEventHandler(
             .sortedWith(compareByDescending<TransactionModelWithChangeSummary> { it.transactionModel.transactionDate }.thenByDescending { it.transactionModel.id })
     }
 
+    suspend fun transactionModelByTransactionId(
+        userId: String,
+        transactionId: UUID,
+    ): TransactionModelWithChangeSummary {
+        val transactions = transactionEventRepository.findAllByUserUidAndStreamId(userId, transactionId).toList()
+            .map { it.toEvent() as ITransactionEvent }
+        val model = resolveStream(transactions)
+        val history = changeSummaryByTransactionId(transactions)
+        return TransactionModelWithChangeSummary(model, history[model.streamId] ?: emptyList())
+    }
+
     private fun changeSummaryByTransactionId(transactionEvents: List<ITransactionEvent>): Map<UUID, List<ChangeSummary>> {
 
         val byStreamId = transactionEvents.groupBy { it.streamId }

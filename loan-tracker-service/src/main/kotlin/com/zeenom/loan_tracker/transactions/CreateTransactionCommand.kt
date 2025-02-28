@@ -7,6 +7,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.springframework.stereotype.Service
+import java.time.Instant
 import java.util.*
 
 @Service
@@ -26,7 +27,13 @@ class CreateTransactionCommand(
     }
 }
 
+data class FriendTransactionsQueryDto(
+    val userId: String,
+    val friendId: UUID,
+)
+
 data class FriendTransactionQueryDto(
     val userId: String,
     val friendId: UUID,
+    val transactionId: UUID,
 )

@@ -85,7 +85,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
             )
             .exchange()
             .expectStatus().isOk
-            .expectBody().jsonPath("$.message").isEqualTo("Transaction added successfully")
+            .expectBody().jsonPath("$.description").isEqualTo("Sample transaction")
     }
 
     private lateinit var transaction: TransactionResponse
@@ -360,7 +360,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
             )
             .exchange()
             .expectStatus().isOk
-            .expectBody().jsonPath("$.message").isEqualTo("Transaction added successfully")
+            .expectBody().jsonPath("$.description").isEqualTo("Sample transaction 2")
     }
 
     @Order(11)

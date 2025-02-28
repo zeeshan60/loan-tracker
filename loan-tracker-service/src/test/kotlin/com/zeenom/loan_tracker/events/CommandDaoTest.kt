@@ -57,7 +57,8 @@ class CommandDaoTest(
                 updatedBy = null,
                 updatedByName = null,
                 deleted = false,
-                transactionDate = Instant.parse("2025-02-27T00:00:00Z")
+                transactionDate = Instant.parse("2025-02-27T00:00:00Z"),
+                transactionStreamId = UUID.randomUUID(),
             ),
             userId = "123",
         )

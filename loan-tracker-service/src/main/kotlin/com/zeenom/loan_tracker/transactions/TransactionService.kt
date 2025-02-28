@@ -30,8 +30,6 @@ class TransactionService(
             recipientId = transactionDto.friendSummaryDto.friendId
                 ?: throw IllegalArgumentException("Recipient id is required to add new transaction")
         )
-
-        val streamId = UUID.randomUUID()
         val event = TransactionCreated(
             id = null,
             userId = userUid,
@@ -43,7 +41,7 @@ class TransactionService(
             recipientId = transactionDto.friendSummaryDto.friendId,
             createdAt = Instant.now(),
             createdBy = userUid,
-            streamId = streamId,
+            streamId = transactionDto.transactionStreamId,
             version = 1
         )
         transactionEventHandler.addEvent(event)
@@ -59,10 +57,6 @@ class TransactionService(
         userUid: String,
         transactionDto: TransactionDto,
     ): Unit = withContext(Dispatchers.IO) {
-
-        if (transactionDto.transactionStreamId == null) {
-            throw IllegalArgumentException("Transaction stream id is required")
-        }
 
         val existing =
             transactionEventHandler.read(userUid, transactionDto.transactionStreamId) ?: throw IllegalArgumentException(
@@ -324,6 +318,17 @@ class TransactionService(
             updatedBy = updatedBy,
             updatedByName = if (updatedBy == userDto.uid) "You" else friendUsersByUserId[updatedBy]?.name,
             transactionDate = transactionDate
+        )
+    }
+
+    suspend fun findByUserIdTransactionId(userId: String, friendId: UUID, transactionId: UUID): TransactionDto {
+        val (user, friendUsersByUid, friendUsersByStreamId) = userAndFriendInfo(userId)
+        val transactionModel = transactionEventHandler.transactionModelByTransactionId(userId, transactionId)
+        return transactionModel.transactionModel.toTransactionDto(
+            friendUsersByStreamId = friendUsersByStreamId,
+            friendUsersByUserId = friendUsersByUid,
+            userDto = user,
+            history = emptyList()
         )
     }
 }

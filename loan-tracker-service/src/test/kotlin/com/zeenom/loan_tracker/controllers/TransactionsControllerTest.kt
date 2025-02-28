@@ -33,7 +33,7 @@ class TransactionsControllerTest(@LocalServerPort private val port: Int) : BaseI
         val recipientId = UUID.randomUUID()
         whenever(runBlocking {
             transactionsQuery.execute(
-                FriendTransactionQueryDto(
+                FriendTransactionsQueryDto(
                     "123",
                     recipientId
                 )

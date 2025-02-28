@@ -21,6 +21,7 @@ class TransactionsController(
     private val transactionsQuery: TransactionsQuery,
     private val deleteTransactionCommand: DeleteTransactionCommand,
     private val activityLogsQuery: ActivityLogsQuery,
+    private val transactionQuery: TransactionQuery,
 ) {
 
     @Operation(summary = "Add a transaction")
@@ -28,15 +29,60 @@ class TransactionsController(
     suspend fun addTransaction(
         @RequestBody transactionRequest: TransactionCreateRequest,
         @AuthenticationPrincipal userId: String,
-    ): MessageResponse {
+    ): TransactionResponse {
+        val transactionId = UUID.randomUUID()
         createTransactionCommand.execute(
             CommandDto(
                 userId = userId,
-                payload = requestToDto(transactionRequest),
+                payload = requestToDto(transactionRequest, transactionId),
                 commandType = CommandType.CREATE_TRANSACTION
             )
         )
-        return MessageResponse("Transaction added successfully")
+        return transactionQuery.execute(
+            FriendTransactionQueryDto(
+                userId = userId,
+                friendId = transactionRequest.recipientId ?: throw IllegalArgumentException("Recipient id is required"),
+                transactionId = transactionId
+            )
+        ).let {
+            TransactionResponse(
+                date = it.transactionDate,
+                description = it.description,
+                transactionId = it.transactionStreamId
+                    ?: throw IllegalStateException("Transaction stream id is required in transactions response"),
+                totalAmount = it.originalAmount,
+                splitType = it.splitType,
+                amountResponse = AmountResponse(
+                    amount = it.splitType.apply(it.originalAmount),
+                    currency = it.currency.currencyCode,
+                    isOwed = it.splitType.isOwed()
+                ),
+                history = it.history.groupBy { Pair(it.date, it.changedBy) }.map {
+                    ChangeSummaryResponse(
+                        changedBy = it.value.first().changedBy,
+                        changedByName = it.value.first().changedByName,
+                        changedByPhoto = it.value.first().changedByPhoto,
+                        changes = it.value
+                    )
+                },
+                createdAt = it.createdAt ?: throw IllegalStateException("Created at is required"),
+                updatedAt = it.updatedAt,
+                createdBy = it.createdBy?.let {
+                    TransactionUserResponse(
+                        id = it,
+                        name = it
+                    )
+                } ?: throw IllegalStateException("Created by is required"),
+                updatedBy = it.updatedBy?.let {
+                    TransactionUserResponse(
+                        id = it,
+                        name = it
+                    )
+                },
+                friend = it.friendSummaryDto,
+                deleted = it.deleted
+            )
+        }
     }
 
     @Operation(summary = "Update a transaction")
@@ -49,7 +95,7 @@ class TransactionsController(
         updateTransactionCommand.execute(
             CommandDto(
                 userId = userId,
-                payload = requestToDto(transactionRequest).copy(transactionStreamId = transactionId),
+                payload = requestToDto(transactionRequest, transactionId),
                 commandType = CommandType.UPDATE_TRANSACTION
             )
         )
@@ -87,7 +133,7 @@ class TransactionsController(
             throw IllegalArgumentException("Invalid timezone")
         }
         return transactionsQuery.execute(
-            FriendTransactionQueryDto(
+            FriendTransactionsQueryDto(
                 userId = userId,
                 friendId = friendId
             )
@@ -150,7 +196,7 @@ class TransactionsController(
         return activityLogsQuery.execute(userId)
     }
 
-    private fun requestToDto(transactionRequest: TransactionBaseRequest) =
+    private fun requestToDto(transactionRequest: TransactionBaseRequest, transactionId: UUID) =
         TransactionDto(
             description = transactionRequest.description,
             splitType = transactionRequest.type,
@@ -161,7 +207,7 @@ class TransactionsController(
             createdBy = null,
             updatedBy = null,
             updatedByName = null,
-            transactionStreamId = null,
+            transactionStreamId = transactionId,
             createdByName = null,
             deleted = false,
             history = emptyList(),
