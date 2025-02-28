@@ -8,6 +8,20 @@
   <ion-toolbar>
     <ion-searchbar [(ngModel)]="filter"></ion-searchbar>
   </ion-toolbar>
+  @if (friend()) {
+    <ion-toolbar>
+      <ion-chip>
+        <ion-avatar>
+        @if (friend()?.photoUrl) {
+          <img alt="Silhouette of a person's head" [src]="friend()?.photoUrl" />
+        } @else {
+          <ion-icon size="medium" name="person" color="medium"></ion-icon>
+        }
+        </ion-avatar>
+        <ion-label>{{friend()?.name}}</ion-label>
+      </ion-chip>
+    </ion-toolbar>
+  }
 </ion-header>
 <ion-content>
   <ion-list>
@@ -31,10 +45,10 @@
         <ion-label>
           <h2>{{ friend.name }}</h2>
         </ion-label>
-        @if (friend.mainBalance) {
+        @if (friend.mainBalance?.amount) {
           <p>
-            <ion-label [color]="friend.mainBalance.isOwed ? 'success': 'danger'">
-              {{ friend.mainBalance.amount | currency }}
+            <ion-label [color]="friend.mainBalance?.isOwed ? 'success': 'danger'">
+              {{ friend.mainBalance?.amount | currency }}
             </ion-label>
           </p>
         }

@@ -21,30 +21,11 @@ const initialState: AuthState = {
   apiKey: '',
 }
 
-const login = async (
-  store: WritableStateSource<AuthState>,
-  idToken: string,
-  http: HttpClient,
-  storageService: StorageService,
-) => {
-  try {
-    const url = `${PUBLIC_API}/login`
-    const { token: apiKey } = await firstValueFrom(
-      http.post<{ token: string  }>(url, {
-        idToken: `Bearer ${idToken}`
-      })
-    );
-    await storageService.set('api_key', apiKey);
-    patchState(store, { apiKey: apiKey })
-  } catch (e) {
-    throw Error;
-  }
-}
-
 interface Methods extends MethodsDictionary {
   loginWithGoogle(): Promise<void>;
   setApiKey(): Promise<void>;
   signOut(): Promise<void>;
+  login(idToken: string): Promise<void>;
 }
 
 export const AuthStore = signalStore(
@@ -66,7 +47,7 @@ export const AuthStore = signalStore(
         .then(async () => {
           const loader = await loadingCtrl.create({ duration: 2000 });
           loader.present();
-          await login(store, (await helperService.getFirebaseAccessToken())!, http, storageService)
+          await this.login((await helperService.getFirebaseAccessToken())!)
           await friendsStore.loadFriends({ showLoader: false });
           await loader.dismiss();
         })
@@ -81,6 +62,20 @@ export const AuthStore = signalStore(
         });
     },
 
+    async login(idToken: string) {
+      try {
+        const url = `${PUBLIC_API}/login`
+        const { token: apiKey } = await firstValueFrom(
+          http.post<{ token: string  }>(url, {
+            idToken: `Bearer ${idToken}`
+          })
+        );
+        await storageService.set('api_key', apiKey);
+        patchState(store, { apiKey: apiKey })
+      } catch (e) {
+        throw e;
+      }
+    },
     async setApiKey() {
       patchState(store, { apiKey: await storageService.get('api_key') })
     },

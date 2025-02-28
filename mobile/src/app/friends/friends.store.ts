@@ -5,7 +5,7 @@ import { firstValueFrom, map, Observable } from 'rxjs';
 import { HelperService } from '../helper.service';
 import { MethodsDictionary } from '@ngrx/signals/src/signal-store-models';
 import { FriendWithBalance, Transaction, TransactionsByMonth } from './model'
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { PRIVATE_API } from '../constants';
 import { AlertController } from '@ionic/angular/standalone';
 
@@ -110,11 +110,13 @@ export const FriendsStore = signalStore(
     },
     async addFriend(friend: AddFriend): Promise<void> {
       try {
-        await firstValueFrom(friendsService.addFriend(friend));
+        const addedFriend = await firstValueFrom(friendsService.addFriend(friend));
         await this.loadFriends();
         helperService.showToast('Friend created successfully');
-      } catch (e) {
-        helperService.showToast('Unable to add friend at the moment');
+        return addedFriend;
+      } catch (e: any) {
+        helperService.showToast(e.error?.error?.message || 'Unable to add friend at the moment');
+        throw e;
       }
     },
     async setSelectedFriend(friend: FriendWithBalance|null) {

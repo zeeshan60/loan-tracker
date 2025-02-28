@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, model, OnInit, signal } from '@angular/core';
 import {
-  IonAvatar, IonButton, IonButtons, IonContent,
+  IonAvatar, IonButton, IonButtons, IonChip, IonContent,
   IonHeader,
   IonIcon,
   IonItem,
   IonLabel,
   IonList,
-   IonSearchbar, IonTitle, IonToolbar,
+  IonSearchbar, IonTitle, IonToolbar,
   ModalController,
 } from '@ionic/angular/standalone';
 import { AddFriendComponent } from '../../add-friend/add-friend.component';
@@ -14,6 +14,7 @@ import { FriendsStore } from '../../friends/friends.store';
 import { CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FriendWithBalance } from '../../friends/model';
+import { DefineExpenseService } from '../define-expense.service';
 
 @Component({
   selector: 'app-select-friend',
@@ -28,12 +29,14 @@ import { FriendWithBalance } from '../../friends/model';
     IonItem,
     IonLabel,
     IonList,
-    IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, FormsModule, IonList, IonItem, IonAvatar, IonLabel, CurrencyPipe, IonSearchbar, IonButton, IonButtons,
+    IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, FormsModule, IonList, IonItem, IonAvatar, IonLabel, CurrencyPipe, IonSearchbar, IonButton, IonButtons, IonChip,
   ],
 })
 export class SelectFriendComponent {
   modalCtrl = inject(ModalController);
   friendsStore = inject(FriendsStore);
+  defineExpenseService = inject(DefineExpenseService);
+  friend = input<FriendWithBalance>();
   filter = model<string>('');
   readonly friends = computed(() => this.friendsStore.friends().filter(friend =>
     friend.name.toLowerCase().includes(this.filter().toLowerCase())
@@ -49,11 +52,15 @@ export class SelectFriendComponent {
   }
 
   async chooseFriend(friend: FriendWithBalance) {
-    this.modalCtrl.dismiss({friend}, 'confirm');
+    this.defineExpenseService.selectFriendModalInstance ?
+      this.defineExpenseService.selectFriendModalInstance.dismiss({friend}, 'confirm') :
+      this.modalCtrl.dismiss({friend}, 'confirm');
   }
 
   closePopup() {
-    this.modalCtrl.dismiss();
+    this.defineExpenseService.selectFriendModalInstance ?
+      this.defineExpenseService.selectFriendModalInstance.dismiss() :
+      this.modalCtrl.dismiss();
   }
 
   async createNewFriend() {
@@ -62,9 +69,9 @@ export class SelectFriendComponent {
       componentProps: { name: this.filter()}
     })
     modal.present();
-    const { role } = await modal.onWillDismiss();
+    const { data: friend, role } = await modal.onWillDismiss();
     if (role === 'confirm') {
-      // this.friendsStore.loadFriends();
+      this.chooseFriend(friend);
     }
   }
 }

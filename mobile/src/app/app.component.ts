@@ -18,6 +18,7 @@ import {
   receiptOutline,
   trashOutline,
   createOutline,
+  closeCircle,
 } from 'ionicons/icons';
 import { signalMethod } from '@ngrx/signals';
 import { FriendsStore } from './friends/friends.store';
@@ -76,6 +77,7 @@ export class AppComponent implements OnInit {
       receiptOutline,
       trashOutline,
       createOutline,
+      closeCircle
     });
 
     this.activateLoaderWhen(this.friendsStore.loading);

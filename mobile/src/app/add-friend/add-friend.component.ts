@@ -73,7 +73,7 @@ export class AddFriendComponent implements OnInit {
         const friend = await this.friendsStore.addFriend(this.addFriendForm.getRawValue());
         await this.modalCtrl.dismiss(friend, 'confirm')
       } catch (e) {
-        await this.helperService.showToast('Unable to add friend at the moment');
+        console.log(e);
       } finally {
         this.loading.set(false);
       }

@@ -12,6 +12,7 @@ export class DefineExpenseService {
   readonly modalCtrl = inject(ModalController);
   readonly router = inject(Router);
   public defineExpenseModalInstance: HTMLIonModalElement|null = null;
+  public selectFriendModalInstance: HTMLIonModalElement|null = null;
 
   constructor() { }
 

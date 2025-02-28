@@ -85,7 +85,7 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
   readonly actionSheetCtrl = inject(ActionSheetController);
   readonly friendsStore = inject(FriendsStore);
   readonly SplitOption = SplitOptions;
-  readonly supportedCurrencies = ['PKR', 'USD', 'SGD'];
+  readonly supportedCurrencies = ['PKR', 'USD', 'SGD', 'THB'];
   readonly router = inject(Router);
   readonly defineExpenseForm = this.formBuilder.group({
     description: this.formBuilder.nonNullable.control('', [Validators.required, Validators.maxLength(1000)]),
@@ -192,12 +192,15 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
     if (this.isUpdating()) {
       return;
     }
-    const modal = await this.modalCtrl.create({
+    this.defineExpenseService.selectFriendModalInstance = await this.modalCtrl.create({
       component: SelectFriendComponent,
+      componentProps: {
+        friend: this.friend()
+      }
     })
-    modal.present();
+    this.defineExpenseService.selectFriendModalInstance.present();
 
-    const { data, role } = await modal.onWillDismiss();
+    const { data, role } = await this.defineExpenseService.selectFriendModalInstance.onWillDismiss();
     if (role === 'confirm') {
       this.friend.set(data['friend']);
     }
