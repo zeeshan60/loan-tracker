@@ -29,7 +29,7 @@ import { FriendWithBalance, Transaction } from '../friends/model';
 import { SelectFriendComponent } from './select-friend/select-friend.component';
 import { DatePipe, JsonPipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { PRIVATE_API } from '../constants';
+import { CURRENCIES, PRIVATE_API } from '../constants';
 import { ShortenNamePipe } from '../pipes/shorten-name.pipe';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { ComponentDestroyedMixin } from '../component-destroyed.mixin';
@@ -85,7 +85,7 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
   readonly actionSheetCtrl = inject(ActionSheetController);
   readonly friendsStore = inject(FriendsStore);
   readonly SplitOption = SplitOptions;
-  readonly supportedCurrencies = ['PKR', 'USD', 'SGD', 'THB'];
+  readonly supportedCurrencies = CURRENCIES;
   readonly router = inject(Router);
   readonly defineExpenseForm = this.formBuilder.group({
     description: this.formBuilder.nonNullable.control('', [Validators.required, Validators.maxLength(1000)]),
@@ -167,7 +167,7 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
     if (this.defineExpenseForm.valid) {
       try {
         this.loading.set(true);
-        await this.saveExpense(this.defineExpenseForm.getRawValue());
+        const updatedExpense = await this.saveExpense(this.defineExpenseForm.getRawValue());
         let postSaveActions = [this.friendsStore.loadFriends()];
         if (
           this.friendsStore.selectedFriend()
@@ -176,7 +176,7 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
           postSaveActions.push(this.friendsStore.loadSelectedTransactions())
         }
         await Promise.all(postSaveActions);
-        this.modalCtrl.dismiss(null, 'confirm');
+        this.modalCtrl.dismiss(updatedExpense, 'confirm');
       } catch (e) {
         await this.helperService.showToast('Unable to add friend at the moment');
       } finally {

@@ -12,7 +12,6 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-<!--  @if (user) {-->
     <ion-card>
       <ion-card-content class="ion-text-center">
         @if (user()?.photoURL) {
@@ -24,13 +23,30 @@
           <ion-card-title>{{user()?.displayName}}</ion-card-title>
         </ion-card-header>
         <ion-card-content>
-          <ion-icon name="mail-outline"></ion-icon>
-          <ion-label>{{user()?.email || 'N/A'}}</ion-label>
-          <br>
-          <ion-icon name="call-outline"></ion-icon>
-          <ion-label>{{user()?.phoneNumber || 'N/A'}}</ion-label>
+          <ion-list>
+            <ion-item>
+              <ion-icon name="mail-outline"></ion-icon>
+              <ion-label>{{user()?.email || 'N/A'}}</ion-label>
+            </ion-item>
+            <ion-item>
+              <ion-select
+                placeholder="Default currency"
+                label="Currency"
+                label-placement=""
+                interface="action-sheet"
+                [(ngModel)]="defaultCurrency"
+              >
+                @for (currency of currencies; track currency) {
+                  <ion-select-option value="{{currency}}">{{currency}}</ion-select-option>
+                }
+              </ion-select>
+            </ion-item>
+            <ion-item>
+              <ion-icon name="call-outline"></ion-icon>
+              <ion-label>{{user()?.phoneNumber || 'N/A'}}</ion-label>
+            </ion-item>
+          </ion-list>
         </ion-card-content>
       </ion-card-content>
     </ion-card>
-<!--  }-->
 </ion-content>

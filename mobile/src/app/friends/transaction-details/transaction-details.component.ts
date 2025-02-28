@@ -1,4 +1,4 @@
-import { Component, inject, input, OnInit } from '@angular/core';
+import { Component, inject, input, model, OnInit } from '@angular/core';
 import {
   AlertController,
   IonAvatar,
@@ -11,7 +11,6 @@ import {
   IonToolbar, ModalController,
 } from '@ionic/angular/standalone';
 import { FriendWithBalance, HistoryChangeType, Transaction } from '../model';
-import { NavParams } from '@ionic/angular';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { DateFormatPipe } from '../../pipes/date-format.pipe';
 import { ShortenNamePipe } from '../../pipes/shorten-name.pipe';
@@ -57,7 +56,7 @@ export class TransactionDetailsComponent  implements OnInit {
   readonly helperService = inject(HelperService);
   readonly modalCtrl = inject(ModalController);
   readonly nav = inject(IonNav);
-  readonly transaction = input.required<Transaction>();
+  readonly transaction = model.required<Transaction>();
   readonly friend = input.required<FriendWithBalance>();
   constructor() {
   }
@@ -84,6 +83,10 @@ export class TransactionDetailsComponent  implements OnInit {
       }
     })
     modal.present();
+    const { data: updatedTransaction, role } = await modal.onWillDismiss();
+    if (role === 'confirm') {
+      this.transaction.set(updatedTransaction);
+    }
   }
 
   protected readonly historyChangeType = historyChangeType;

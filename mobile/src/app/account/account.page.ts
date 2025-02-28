@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, model, signal } from '@angular/core';
 import {
   IonHeader,
   IonToolbar,
@@ -15,10 +15,12 @@ import {
   IonCardSubtitle,
   IonList,
   IonItem,
-  IonLabel,
+  IonLabel, IonModal, IonSelect, IonSelectOption,
 } from '@ionic/angular/standalone';
 import { AuthStore } from '../login/auth.store';
 import { HelperService } from '../helper.service';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CURRENCIES } from '../constants';
 
 type Profile = {
   displayName: string,
@@ -32,13 +34,15 @@ type Profile = {
   templateUrl: 'account.page.html',
   styleUrls: ['account.page.scss'],
   standalone: true,
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonIcon, IonButtons, IonCard, IonCardContent, IonAvatar, IonCardHeader, IonCardTitle, IonCardSubtitle, IonList, IonItem, IonLabel],
+  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonIcon, IonButtons, IonCard, IonCardContent, IonAvatar, IonCardHeader, IonCardTitle, IonCardSubtitle, IonList, IonItem, IonLabel, IonModal, IonSelect, IonSelectOption, ReactiveFormsModule, FormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccountPage {
+  defaultCurrency = model('');
   readonly helperService = inject(HelperService);
   readonly authStore = inject(AuthStore);
   readonly user = signal<Profile | null>(null)
+  readonly currencies = CURRENCIES;
   constructor() {
     this.helperService.getUser().then((user) => {
       this.user.set({
