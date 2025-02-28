@@ -51,7 +51,8 @@ sudo docker pull zeeshan60/loan-tracker-service:latest && sudo docker stop loant
 sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
 sudo yum install -y libxcrypt-compat
-
+sudo docker-compose rm -s -v ui
+sudo docker-compose up -d
 sudo docker rm -f $(sudo docker ps -a -q)
 sudo docker image rm -f $(sudo docker images -q)
 sudo netstat -tuln | grep 5000
