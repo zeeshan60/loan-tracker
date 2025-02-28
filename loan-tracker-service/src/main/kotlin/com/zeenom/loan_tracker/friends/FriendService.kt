@@ -60,8 +60,10 @@ class FriendService(
             )
         }
         val balance =
-            allTimeBalanceStrategy.calculateAllTimeBalance(amountsPerFriend.values.map(Map<String, AmountDto>::values)
-                .flatten())
+            allTimeBalanceStrategy.calculateAllTimeBalance(
+                amountsPerFriend.values.map(Map<String, AmountDto>::values)
+                    .flatten()
+            )
         FriendsWithAllTimeBalancesDto(
             friends = friends,
             balance = balance
@@ -119,8 +121,19 @@ class FriendService(
         return Pair(friendUser, userStreamId)
     }
 
-    fun findByUserIdFriendId(userId: String, friendId: UUID): FriendDto {
-TODO()
+    suspend fun findByUserIdFriendId(userId: String, friendEmail: String?, friendPhone: String?): FriendDto {
+        val friendDto = friendFinderStrategy.findUserFriend(userId, friendEmail, friendPhone)
+        val amountsPerFriend =
+            transactionEventHandler.balancesOfFriendsByCurrency(userId, listOf(friendDto.friendStreamId))
+        return FriendDto(
+            friendId = friendDto.friendStreamId,
+            email = friendDto.email,
+            phoneNumber = friendDto.phoneNumber,
+            photoUrl = friendDto.photoUrl,
+            name = friendDto.name,
+            mainCurrency = null,
+            balances = amountsPerFriend[friendDto.friendStreamId]?.values?.toList() ?: emptyList()
+        )
     }
 
 }

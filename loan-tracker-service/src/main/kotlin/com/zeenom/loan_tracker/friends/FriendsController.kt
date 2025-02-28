@@ -1,6 +1,5 @@
 package com.zeenom.loan_tracker.friends
 
-import com.zeenom.loan_tracker.common.MessageResponse
 import com.zeenom.loan_tracker.common.Paginated
 import com.zeenom.loan_tracker.common.PaginationDto
 import com.zeenom.loan_tracker.events.CommandDto
@@ -16,7 +15,8 @@ import org.springframework.web.bind.annotation.*
 class FriendsController(
     val friendsQuery: FriendsQuery,
     val friendsAdapter: FriendsControllerAdapter,
-    private val createFriendCommand: CreateFriendCommand
+    private val createFriendCommand: CreateFriendCommand,
+    private val friendQuery: FriendQuery,
 ) {
 
     val logger = LoggerFactory.getLogger(FriendsController::class.java)
@@ -26,7 +26,7 @@ class FriendsController(
     suspend fun getFriends(
         @Parameter(description = "Pagination token for the next set of results")
         @RequestParam next: String? = null,
-        @AuthenticationPrincipal userId: String
+        @AuthenticationPrincipal userId: String,
     ): Paginated<FriendsResponse> {
         logger.info("Getting friends for user $userId")
         return friendsQuery.execute(PaginationDto(input = userId, next = next)).let { result ->
@@ -38,8 +38,8 @@ class FriendsController(
     @PostMapping("/add")
     suspend fun addFriend(
         @RequestBody friendRequest: CreateFriendRequest,
-        @AuthenticationPrincipal userId: String
-    ): MessageResponse {
+        @AuthenticationPrincipal userId: String,
+    ): FriendResponse {
         logger.info("Adding friend for user $userId")
         createFriendCommand.execute(
             CommandDto(
@@ -48,6 +48,14 @@ class FriendsController(
                 userId = userId
             )
         )
-        return MessageResponse("Friend added successfully")
+        return friendQuery.execute(
+            FriendQueryDto(
+                userId = userId,
+                friendEmail = friendRequest.email,
+                friendPhoneNumber = friendRequest.phoneNumber,
+            )
+        ).let {
+            friendsAdapter.fromDtoToResponse(it)
+        }
     }
 }

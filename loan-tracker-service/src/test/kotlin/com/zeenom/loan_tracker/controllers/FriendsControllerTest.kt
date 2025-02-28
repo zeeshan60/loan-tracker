@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.whenever
 import org.skyscreamer.jsonassert.JSONAssert
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -81,6 +82,23 @@ class FriendsControllerTest(
     @Test
     fun `addFriend creates friend successfully`(): Unit = runBlocking {
         Mockito.doReturn(Unit).`when`(friendService).createFriend(any(), any())
+        whenever(
+            friendService.findByUserIdFriendId(
+                userId = "sample uid",
+                friendEmail = "john@gmail.com",
+                friendPhone = "+923001234567"
+            )
+        ).thenReturn(
+            FriendDto(
+                friendId = UUID.randomUUID(),
+                email = "john@gmail.com",
+                phoneNumber = "+923001234567",
+                photoUrl = "some photo",
+                name = "John Doe",
+                mainCurrency = null,
+                balances = emptyList()
+            )
+        )
         Mockito.doReturn(Unit).`when`(commandDao).addCommand<CommandPayloadDto>(any())
         webTestClient.post()
             .uri("/api/v1/friends/add")
@@ -95,7 +113,7 @@ class FriendsControllerTest(
             .exchange()
             .expectStatus().isOk
             .expectBody()
-            .jsonPath("$.message").isEqualTo("Friend added successfully")
+            .jsonPath("$.name").isEqualTo("John Doe")
 
         val captor = argumentCaptor<String, CreateFriendDto>()
         Mockito.verify(friendService).createFriend(captor.first.capture(), captor.second.capture())

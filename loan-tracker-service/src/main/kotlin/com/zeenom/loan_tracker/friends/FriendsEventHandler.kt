@@ -14,6 +14,10 @@ class FriendsEventHandler(
 
     suspend fun findAllEventsByUserId(userId: String) = eventRepository.findAllByUserUid(userId)
 
+    suspend fun findByUserUidAndFriendStreamId(userUid: String, friendId: UUID): FriendEvent? {
+        return eventRepository.findByUserUidAndStreamId(userUid, friendId)
+    }
+
     suspend fun findByUserUidAndFriendEmail(userUid: String, email: String): FriendEvent? {
         return eventRepository.findByUserUidAndFriendEmail(userUid, email)
     }

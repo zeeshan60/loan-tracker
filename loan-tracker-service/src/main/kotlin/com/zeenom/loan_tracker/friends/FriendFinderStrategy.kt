@@ -30,4 +30,20 @@ class FriendFinderStrategy(
             )
         }
     }
+
+    suspend fun findUserFriend(userId: String, friendEmail: String?, friendPhone: String?): FriendUserDto {
+        val friend = friendEmail?.let { friendsEventHandler.findByUserUidAndFriendEmail(userId, friendEmail) }
+            ?: friendPhone?.let { friendsEventHandler.findByUserUidAndFriendPhoneNumber(userId, friendPhone) }
+            ?: throw IllegalStateException("Friend not found with email or phone")
+        val user = friend.friendPhoneNumber?.let { userEventHandler.findUserByPhoneNumber(friend.friendPhoneNumber) }
+            ?: friend.friendEmail?.let { userEventHandler.findUserByEmail(friend.friendEmail) }
+        return FriendUserDto(
+            friendUid = user?.uid,
+            friendStreamId = friend.streamId,
+            email = friend.friendEmail,
+            phoneNumber = friend.friendPhoneNumber,
+            name = friend.friendDisplayName,
+            photoUrl = user?.photoUrl,
+        )
+    }
 }

@@ -2,13 +2,9 @@ package com.zeenom.loan_tracker.controllers
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.zeenom.loan_tracker.common.MessageResponse
 import com.zeenom.loan_tracker.common.Paginated
 import com.zeenom.loan_tracker.firebase.FirebaseService
-import com.zeenom.loan_tracker.friends.CreateFriendRequest
-import com.zeenom.loan_tracker.friends.FriendEventRepository
-import com.zeenom.loan_tracker.friends.FriendsResponse
-import com.zeenom.loan_tracker.friends.TestPostgresConfig
+import com.zeenom.loan_tracker.friends.*
 import com.zeenom.loan_tracker.security.JWTTokenResponse
 import com.zeenom.loan_tracker.security.LoginRequest
 import com.zeenom.loan_tracker.users.UserDto
@@ -66,12 +62,12 @@ class FriendControllerIntegrationTest(@LocalServerPort val port: Int) : BaseInte
     @Order(1)
     fun `user zee adds a friend john successfully`() {
 
-        val responseMessage = addFriend(token = zeeToken)
-        assertThat(responseMessage).isEqualTo(
-            MessageResponse(
-                message = "Friend added successfully"
-            )
-        )
+        val friendResponse = addFriend(token = zeeToken)
+        assertThat(friendResponse.friendId).isNotNull()
+        assertThat(friendResponse.name).isEqualTo("John Doe")
+        assertThat(friendResponse.photoUrl).isNull()
+        assertThat(friendResponse.mainBalance).isNull()
+        assertThat(friendResponse.otherBalances).isEmpty()
     }
 
     @Test
@@ -163,7 +159,7 @@ class BaseIntegration(port: Int) : TestPostgresConfig() {
         assertThat(responseToken).isNotNull
         return responseToken!!
     }
-    fun addFriend(token: String, name: String = "John Doe"): MessageResponse {
+    fun addFriend(token: String, name: String = "John Doe"): FriendResponse {
         return webTestClient.post()
             .uri("/api/v1/friends/add")
             .header("Authorization", "Bearer $token")
@@ -176,7 +172,7 @@ class BaseIntegration(port: Int) : TestPostgresConfig() {
             )
             .exchange()
             .expectStatus().isOk
-            .expectBody(MessageResponse::class.java).returnResult().responseBody!!
+            .expectBody(FriendResponse::class.java).returnResult().responseBody!!
     }
     fun queryFriend(token: String): Paginated<FriendsResponse> {
         return webTestClient.get()

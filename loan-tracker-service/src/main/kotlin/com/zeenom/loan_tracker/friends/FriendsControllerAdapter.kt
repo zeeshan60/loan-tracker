@@ -48,4 +48,6 @@ class FriendsControllerAdapter {
             next = null
         )
     }
+
+    fun fromDtoToResponse(friendDto: FriendDto): FriendResponse = friendDto.toResponse()
 }
