@@ -44,46 +44,45 @@ class TransactionsController(
                 friendId = transactionRequest.recipientId ?: throw IllegalArgumentException("Recipient id is required"),
                 transactionId = transactionId
             )
-        ).let {
-            TransactionResponse(
-                date = it.transactionDate,
-                description = it.description,
-                transactionId = it.transactionStreamId
-                    ?: throw IllegalStateException("Transaction stream id is required in transactions response"),
-                totalAmount = it.originalAmount,
-                splitType = it.splitType,
-                amountResponse = AmountResponse(
-                    amount = it.splitType.apply(it.originalAmount),
-                    currency = it.currency.currencyCode,
-                    isOwed = it.splitType.isOwed()
-                ),
-                history = it.history.groupBy { Pair(it.date, it.changedBy) }.map {
-                    ChangeSummaryResponse(
-                        changedBy = it.value.first().changedBy,
-                        changedByName = it.value.first().changedByName,
-                        changedByPhoto = it.value.first().changedByPhoto,
-                        changes = it.value
-                    )
-                },
-                createdAt = it.createdAt ?: throw IllegalStateException("Created at is required"),
-                updatedAt = it.updatedAt,
-                createdBy = it.createdBy?.let {
-                    TransactionUserResponse(
-                        id = it,
-                        name = it
-                    )
-                } ?: throw IllegalStateException("Created by is required"),
-                updatedBy = it.updatedBy?.let {
-                    TransactionUserResponse(
-                        id = it,
-                        name = it
-                    )
-                },
-                friend = it.friendSummaryDto,
-                deleted = it.deleted
-            )
-        }
+        ).toResponse()
     }
+
+    private fun TransactionDto.toResponse() = TransactionResponse(
+        date = transactionDate,
+        description = description,
+        transactionId = transactionStreamId,
+        totalAmount = originalAmount,
+        splitType = splitType,
+        amountResponse = AmountResponse(
+            amount = splitType.apply(originalAmount),
+            currency = currency.currencyCode,
+            isOwed = splitType.isOwed()
+        ),
+        history = history.groupBy { Pair(it.date, it.changedBy) }.map {
+            ChangeSummaryResponse(
+                changedBy = it.value.first().changedBy,
+                changedByName = it.value.first().changedByName,
+                changedByPhoto = it.value.first().changedByPhoto,
+                changes = it.value
+            )
+        },
+        createdAt = createdAt ?: throw IllegalStateException("Created at is required"),
+        updatedAt = updatedAt,
+        createdBy = createdBy?.let {
+            TransactionUserResponse(
+                id = it,
+                name = createdByName ?: throw IllegalStateException("Created by name is required")
+            )
+        } ?: throw IllegalStateException("Created by is required"),
+        updatedBy = updatedBy?.let {
+            TransactionUserResponse(
+                id = it,
+                name = updatedByName ?: throw IllegalStateException("Updated by name is required")
+            )
+        },
+        friend = friendSummaryDto,
+        deleted = deleted
+    )
 
     @Operation(summary = "Update a transaction")
     @PutMapping("/update/transactionId/{transactionId}")
@@ -143,47 +142,7 @@ class TransactionsController(
             }.map {
                 TransactionsPerMonth(
                     date = it.key,
-                    transactions = it.value.map { transaction ->
-                        TransactionResponse(
-                            date = transaction.transactionDate,
-                            description = transaction.description,
-                            transactionId = transaction.transactionStreamId
-                                ?: throw IllegalStateException("Transaction stream id is required in transactions response"),
-                            totalAmount = transaction.originalAmount,
-                            splitType = transaction.splitType,
-                            amountResponse = AmountResponse(
-                                amount = transaction.splitType.apply(transaction.originalAmount),
-                                currency = transaction.currency.currencyCode,
-                                isOwed = transaction.splitType.isOwed()
-                            ),
-                            history = transaction.history.groupBy { Pair(it.date, it.changedBy) }.map {
-                                ChangeSummaryResponse(
-                                    changedBy = it.value.first().changedBy,
-                                    changedByName = it.value.first().changedByName,
-                                    changedByPhoto = it.value.first().changedByPhoto,
-                                    changes = it.value
-                                )
-                            },
-                            createdAt = transaction.createdAt ?: throw IllegalStateException("Created at is required"),
-                            updatedAt = transaction.updatedAt,
-                            createdBy = transaction.createdBy?.let {
-                                TransactionUserResponse(
-                                    id = it,
-                                    name = transaction.createdByName
-                                        ?: throw IllegalStateException("Created by name is required")
-                                )
-                            } ?: throw IllegalStateException("Created by is required"),
-                            updatedBy = transaction.updatedBy?.let {
-                                TransactionUserResponse(
-                                    id = it,
-                                    name = transaction.updatedByName
-                                        ?: throw IllegalStateException("Updated by name is required")
-                                )
-                            },
-                            friend = transaction.friendSummaryDto,
-                            deleted = transaction.deleted
-                        )
-                    }
+                    transactions = it.value.map { it.toResponse() }
                 )
             }.let { TransactionsResponse(it) }
         }
