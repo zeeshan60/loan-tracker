@@ -119,4 +119,8 @@ class FriendService(
         return Pair(friendUser, userStreamId)
     }
 
+    fun findByUserIdFriendId(userId: String, friendId: UUID): FriendDto {
+TODO()
+    }
+
 }

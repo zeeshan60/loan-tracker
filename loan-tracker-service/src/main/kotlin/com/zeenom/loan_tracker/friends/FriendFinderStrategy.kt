@@ -1,14 +1,15 @@
 package com.zeenom.loan_tracker.friends
 
 import com.zeenom.loan_tracker.users.UserEventHandler
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
 
 @Service
-class FriendFinderStrategy(private val friendsEventHandler: FriendsEventHandler, private val userEventHandler: UserEventHandler) {
-    suspend fun findUserFriends(userId: String): List<FriendUserDto> = withContext(Dispatchers.IO) {
+class FriendFinderStrategy(
+    private val friendsEventHandler: FriendsEventHandler,
+    private val userEventHandler: UserEventHandler,
+) {
+    suspend fun findUserFriends(userId: String): List<FriendUserDto> {
         val friends = friendsEventHandler.findAllEventsByUserId(userId).toList()
         val usersByPhones =
             userEventHandler.findUsersByPhoneNumbers(friends.mapNotNull { it.friendPhoneNumber }).toList()
@@ -16,7 +17,7 @@ class FriendFinderStrategy(private val friendsEventHandler: FriendsEventHandler,
         val usersByEmails =
             userEventHandler.findUsersByEmails(friends.filter { it.friendPhoneNumber !in usersByPhones.keys }
                 .mapNotNull { it.friendEmail }).toList().associateBy { it.email }
-        friends.map {
+        return friends.map {
             val user =
                 it.friendPhoneNumber?.let { usersByPhones[it] } ?: it.friendEmail?.let { usersByEmails[it] }
             FriendUserDto(
