@@ -113,7 +113,9 @@ class TransactionsController(
                             ),
                             history = transaction.history.groupBy { Pair(it.date, it.changedBy) }.map {
                                 ChangeSummaryResponse(
-                                    changedBy = it.key.second,
+                                    changedBy = it.value.first().changedBy,
+                                    changedByName = it.value.first().changedByName,
+                                    changedByPhoto = it.value.first().changedByPhoto,
                                     changes = it.value
                                 )
                             },
@@ -244,6 +246,8 @@ data class TransactionUserResponse(
 
 data class ChangeSummaryResponse(
     val changedBy: String,
+    val changedByName: String,
+    val changedByPhoto: String?,
     val changes: List<ChangeSummaryDto>,
 )
 

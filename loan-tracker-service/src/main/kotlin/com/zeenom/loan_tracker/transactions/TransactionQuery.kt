@@ -47,8 +47,9 @@ class ActivityLogsQuery(
                         .map {
                             ChangeSummaryResponse(
                                 changedBy = it.key.second,
-                                changes = it.value
-
+                                changes = it.value,
+                                changedByName = it.value.first().changedByName,
+                                changedByPhoto = it.value.first().changedByPhoto
                             )
                         },
                     description = log.transactionDto.description,
