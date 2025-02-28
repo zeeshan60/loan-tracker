@@ -67,12 +67,15 @@
           </p>
         }
       </ion-item>
-    } @empty {
-        <ion-item>
-            <ion-label>
-                <p>Nothing here yet. Please add expense</p>
-            </ion-label>
-        </ion-item>
     }
   </ion-list>
+    @if(!friendsStore.unSettledFriends().length) {
+        <ion-list lines="none">
+            <ion-item>
+                <ion-label>
+                    <p>Nothing here yet. Please add expense</p>
+                </ion-label>
+            </ion-item>
+        </ion-list>
+    }
 </ion-content>
