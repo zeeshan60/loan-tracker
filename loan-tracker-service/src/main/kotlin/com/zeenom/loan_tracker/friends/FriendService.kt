@@ -13,17 +13,41 @@ import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
+class AllTimeBalanceStrategy {
+    fun calculateAllTimeBalance(amounts: List<AmountDto>): AllTimeBalanceDto {
+        val sortedByDescendingEntries =
+            amounts
+                .groupBy { it.currency }.entries.sortedByDescending { it.value.size }
+        val main =
+            sortedByDescendingEntries.firstOrNull()
+        val other = sortedByDescendingEntries.drop(1).associate { it.key to it.value }
+        return AllTimeBalanceDto(
+            main = main?.value?.sumOf {
+                if (it.isOwed) it.amount else
+                    -it.amount
+            }?.let { AmountDto(it.abs(), main.key, it >= 0.toBigDecimal()) },
+            other = other.map {
+                val total = it.value.sumOf { amount -> if (amount.isOwed) amount.amount else -amount.amount }
+                AmountDto(total.abs(), it.key, total >= 0.toBigDecimal())
+            }
+        )
+    }
+}
+
+@Service
 class FriendService(
     private val friendsEventHandler: FriendsEventHandler,
     private val userEventHandler: UserEventHandler,
     private val transactionEventHandler: TransactionEventHandler,
     private val friendFinderStrategy: FriendFinderStrategy,
+    private val allTimeBalanceStrategy: AllTimeBalanceStrategy,
 ) {
 
     suspend fun findAllByUserId(userId: String): FriendsWithAllTimeBalancesDto = withContext(Dispatchers.IO) {
         val events = friendFinderStrategy.findUserFriends(userId)
-        val amountsPerFriend =
+        val amountsPerFriendAsync =
             async { transactionEventHandler.balancesOfFriendsByCurrency(userId, events.map { it.friendStreamId }) }
+        val amountsPerFriend = amountsPerFriendAsync.await()
         val friends = events.map {
             FriendDto(
                 friendId = it.friendStreamId,
@@ -32,25 +56,12 @@ class FriendService(
                 name = it.name,
                 photoUrl = it.photoUrl,
                 mainCurrency = null, //TODO implement main currency
-                balances = amountsPerFriend.await()[it.friendStreamId]?.values?.toList() ?: emptyList()
+                balances = amountsPerFriend[it.friendStreamId]?.values?.toList() ?: emptyList()
             )
         }
-        val sortedByDescendingEntries =
-            amountsPerFriend.await().values.map { amountsPerCurrency -> amountsPerCurrency.values }.flatten()
-                .groupBy { it.currency }.entries.sortedByDescending { it.value.size }
-        val main =
-            sortedByDescendingEntries.firstOrNull()
-        val other = sortedByDescendingEntries.drop(1).associate { it.key to it.value }
-        val balance = AllTimeBalanceDto(
-            main = main?.value?.sumOf {
-                if (it.isOwed) it.amount else
-                    -it.amount
-            }?.let { AmountDto(it, main.key, it >= 0.toBigDecimal()) },
-            other = other.map {
-                val total = it.value.sumOf { amount -> amount.amount }
-                AmountDto(total, it.key, total >= 0.toBigDecimal())
-            }
-        )
+        val balance =
+            allTimeBalanceStrategy.calculateAllTimeBalance(amountsPerFriend.values.map(Map<String, AmountDto>::values)
+                .flatten())
         FriendsWithAllTimeBalancesDto(
             friends = friends,
             balance = balance
