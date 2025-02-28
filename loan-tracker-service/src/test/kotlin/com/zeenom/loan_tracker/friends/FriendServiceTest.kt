@@ -41,6 +41,7 @@ class FriendServiceTest(
         transactionEventHandler = transactionEventHandler,
         friendsEventHandler = friendsEventHandler,
         friendFinderStrategy = FriendFinderStrategy(friendsEventHandler, userEventHandler),
+        allTimeBalanceStrategy = AllTimeBalanceStrategy()
     )
 
 
@@ -441,6 +442,7 @@ class FriendServiceTest(
                 friendsEventHandler,
                 userEventHandler
             ),
+            allTimeBalanceStrategy = AllTimeBalanceStrategy()
         )
         val (user1, user2) = friendData
         userEventHandler.saveEvent(
