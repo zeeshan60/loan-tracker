@@ -1,7 +1,11 @@
 package com.zeenom.loan_tracker.common
 
+import com.zeenom.loan_tracker.transactions.SplitType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
+import java.math.BigDecimal
 import java.time.Instant
 
 class HelpersTest {
@@ -19,6 +23,19 @@ class HelpersTest {
         val result = instant.startOfMonth("UTC")
         result.toReadableDateFormat().also { println(it) }
         // Assert
+        assertThat(result).isEqualTo(expected)
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+        "5, 2.5",
+        "10, 5",
+        "100.0, 50.0",
+        "5.0, 2.5",
+        "5.5, 2.75",
+    )
+    fun `test that split types splits amount with decimal`(value: BigDecimal, expected: BigDecimal) {
+        val result = SplitType.YouPaidSplitEqually.apply(value)
         assertThat(result).isEqualTo(expected)
     }
 }

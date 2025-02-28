@@ -1,9 +1,6 @@
 package com.zeenom.loan_tracker.transactions
 
-import com.zeenom.loan_tracker.friends.FriendEventRepository
-import com.zeenom.loan_tracker.friends.FriendId
-import com.zeenom.loan_tracker.friends.FriendsEventHandler
-import com.zeenom.loan_tracker.friends.TestPostgresConfig
+import com.zeenom.loan_tracker.friends.*
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventHandler
 import kotlinx.coroutines.flow.toList
@@ -27,8 +24,7 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
     private val friendEventHandler = mock<FriendsEventHandler>()
     private val friendEventRepository = mock<FriendEventRepository>()
     private val transactionEventHandler = TransactionEventHandler(
-        transactionEventRepository = transactionEventRepository,
-        friendEventRepository = friendEventRepository
+        transactionEventRepository = transactionEventRepository
     )
     private val transactionService = TransactionService(
         transactionEventHandler = transactionEventHandler,
@@ -65,11 +61,16 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
         ).`when`(friendEventHandler).findFriendByUserIdAndFriendId("123", friendEventStreamId)
         val transactionDto = TransactionDto(
             currency = Currency.getInstance("USD"),
-            recipientId = friendEventStreamId,
+            friendSummaryDto = FriendSummaryDto(
+                friendEventStreamId,
+                "john@gmail.com",
+                "+923001234567",
+                "Friend",
+                "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl2",
+            ),
             description = "Test Transaction",
             splitType = SplitType.TheyOweYouAll,
             originalAmount = 100.0.toBigDecimal(),
-            recipientName = "Friend",
             updatedAt = null,
             createdAt = null,
             createdBy = null,
@@ -92,7 +93,7 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
         assertThat(transactionEvent[0].currency).isEqualTo(transactionDto.currency.toString())
         assertThat(transactionEvent[0].totalAmount).isEqualTo(transactionDto.originalAmount)
         assertThat(transactionEvent[0].splitType).isEqualTo(transactionDto.splitType)
-        assertThat(transactionEvent[0].recipientId).isEqualTo(transactionDto.recipientId)
+        assertThat(transactionEvent[0].recipientId).isEqualTo(transactionDto.friendSummaryDto.friendId)
         assertThat(transactionEvent[0].createdAt).isNotNull
         assertThat(transactionEvent[0].createdBy).isEqualTo("123")
         assertThat(transactionEvent[0].streamId).isNotNull()
@@ -105,11 +106,16 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
         val (friendEventStreamId, myStreamId) = setupFriends()
         val transactionDto = TransactionDto(
             currency = Currency.getInstance("USD"),
-            recipientId = friendEventStreamId,
+            friendSummaryDto = FriendSummaryDto(
+                friendEventStreamId,
+                "john@gmail.com",
+                "+923001234567",
+                "Friend",
+                "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl2",
+            ),
             description = "Test Transaction",
             splitType = SplitType.TheyOweYouAll,
             originalAmount = 100.0.toBigDecimal(),
-            recipientName = "Friend",
             updatedAt = null,
             createdAt = null,
             createdBy = null,
@@ -160,11 +166,16 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
         doReturn(true).`when`(friendEventHandler).friendExistsByUserIdAndFriendId("1234", friendEventStreamId)
         val transactionDto = TransactionDto(
             currency = Currency.getInstance("USD"),
-            recipientId = friendEventStreamId,
+            friendSummaryDto = FriendSummaryDto(
+                friendEventStreamId,
+                "john@gmail.com",
+                "+923001234567",
+                "Friend",
+                "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl2",
+            ),
             description = "Test Transaction",
             splitType = SplitType.TheyOweYouAll,
             originalAmount = 100.0.toBigDecimal(),
-            recipientName = "Friend",
             updatedAt = null,
             createdAt = null,
             createdBy = null,
@@ -203,11 +214,17 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
 
         val transactionDto = TransactionDto(
             currency = Currency.getInstance("USD"),
-            recipientId = friendEventStreamId,
+
+            friendSummaryDto = FriendSummaryDto(
+                friendEventStreamId,
+                "john@gmail.com",
+                "+923001234567",
+                "Friend",
+                "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl2",
+            ),
             description = "Test Transaction",
             splitType = SplitType.TheyOweYouAll,
             originalAmount = 100.0.toBigDecimal(),
-            recipientName = "Friend",
             updatedAt = null,
             createdAt = null,
             createdBy = null,
@@ -228,11 +245,17 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
         val (friendEventStreamId, myStreamId) = setupFriends()
         val transactionDto = TransactionDto(
             currency = Currency.getInstance("USD"),
-            recipientId = friendEventStreamId,
+
+            friendSummaryDto = FriendSummaryDto(
+                friendEventStreamId,
+                "john@gmail.com",
+                "+923001234567",
+                "Friend",
+                "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl2",
+            ),
             description = "Test Transaction",
             splitType = SplitType.TheyOweYouAll,
             originalAmount = 100.0.toBigDecimal(),
-            recipientName = "Friend",
             updatedAt = null,
             createdAt = null,
             createdBy = null,
@@ -299,11 +322,17 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
         val (friendEventStreamId, myStreamId) = setupFriends()
         val transactionDto = TransactionDto(
             currency = Currency.getInstance("USD"),
-            recipientId = friendEventStreamId,
+
+            friendSummaryDto = FriendSummaryDto(
+                friendEventStreamId,
+                "john@gmail.com",
+                "+923001234567",
+                "Friend",
+                "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl2",
+            ),
             description = "Test Transaction",
             splitType = SplitType.TheyOweYouAll,
             originalAmount = 100.0.toBigDecimal(),
-            recipientName = "Friend",
             updatedAt = null,
             createdAt = null,
             createdBy = null,

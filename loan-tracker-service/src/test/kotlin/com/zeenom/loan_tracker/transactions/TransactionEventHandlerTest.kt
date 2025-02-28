@@ -1,7 +1,5 @@
 package com.zeenom.loan_tracker.transactions
 
-import com.zeenom.loan_tracker.friends.FriendEvent
-import com.zeenom.loan_tracker.friends.FriendEventType
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
@@ -28,22 +26,6 @@ class TransactionEventHandlerTest {
                 } doReturn sampleTransactions(
                     friendStreamId
                 ).asFlow()
-            },
-            friendEventRepository = mock {
-                on {
-                    runBlocking {
-                        findByUserUidAndStreamId("123", friendStreamId)
-                    }
-                } doReturn FriendEvent(
-                    friendDisplayName = "John Doe",
-                    userUid = "124",
-                    friendEmail = "John@gmail.com",
-                    friendPhoneNumber = "+923001234567",
-                    createdAt = Instant.now(),
-                    streamId = friendStreamId,
-                    version = 1,
-                    eventType = FriendEventType.FRIEND_CREATED,
-                )
             }
         )
 
@@ -70,37 +52,8 @@ class TransactionEventHandlerTest {
                 } doReturn sampleTransactions(
                     friendStreamId1
                 ).plus(sampleTransactions(friendStreamId2)).asFlow()
-            },
-            friendEventRepository = mock {
-                on {
-                    runBlocking {
-                        findByUserUidAndStreamId("123", friendStreamId1)
-                    }
-                } doReturn FriendEvent(
-                    friendDisplayName = "John Doe",
-                    userUid = "123",
-                    friendEmail = "John@gmail.com",
-                    friendPhoneNumber = "+923001234567",
-                    createdAt = Instant.now(),
-                    streamId = friendStreamId1,
-                    version = 1,
-                    eventType = FriendEventType.FRIEND_CREATED,
-                )
-                on {
-                    runBlocking {
-                        findByUserUidAndStreamId("123", friendStreamId2)
-                    }
-                } doReturn FriendEvent(
-                    friendDisplayName = "John Doe 2",
-                    userUid = "123",
-                    friendEmail = "John2@gmail.com",
-                    friendPhoneNumber = "+923001234568",
-                    createdAt = Instant.now(),
-                    streamId = friendStreamId2,
-                    version = 1,
-                    eventType = FriendEventType.FRIEND_CREATED,
-                )
-            })
+            }
+        )
 
         val balances = transactionEventHandler.balancesOfFriendsByCurrency("123", listOf(friendStreamId1, friendStreamId2))
         assertThat(balances).hasSize(2)
@@ -170,22 +123,6 @@ class TransactionEventHandlerTest {
                         totalAmount = 100.0.toBigDecimal()
                     )
                 ).asFlow()
-            },
-            friendEventRepository = mock {
-                on {
-                    runBlocking {
-                        findByUserUidAndStreamId("123", friendStreamId)
-                    }
-                } doReturn FriendEvent(
-                    friendDisplayName = "John Doe",
-                    userUid = "124",
-                    friendEmail = "John@gmail.com",
-                    friendPhoneNumber = "+923001234567",
-                    createdAt = Instant.now(),
-                    streamId = friendStreamId,
-                    version = 1,
-                    eventType = FriendEventType.FRIEND_CREATED,
-                )
             }
         )
 

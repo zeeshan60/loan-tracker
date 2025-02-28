@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.zeenom.loan_tracker.common.JacksonConfig
 import com.zeenom.loan_tracker.common.SecondInstant
 import com.zeenom.loan_tracker.common.r2dbc.toClass
+import com.zeenom.loan_tracker.friends.FriendSummaryDto
 import com.zeenom.loan_tracker.friends.TestPostgresConfig
 import com.zeenom.loan_tracker.transactions.SplitType
 import com.zeenom.loan_tracker.transactions.TransactionDto
@@ -39,11 +40,16 @@ class CommandDaoTest(
             commandType = CommandType.CREATE_TRANSACTION,
             payload = TransactionDto(
                 currency = Currency.getInstance("USD"),
-                recipientId = UUID.randomUUID(),
+                friendSummaryDto = FriendSummaryDto(
+                    UUID.randomUUID(),
+                    "john@gmail.com",
+                    "+923001234567",
+                    "John Doe",
+                    "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl2",
+                ),
                 description = "test",
                 originalAmount = 100.0.toBigDecimal(),
                 splitType = SplitType.TheyOweYouAll,
-                recipientName = "John Doe",
                 updatedAt = null,
                 createdAt = null,
                 createdBy = null,

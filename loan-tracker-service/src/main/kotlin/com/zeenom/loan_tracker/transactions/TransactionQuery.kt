@@ -19,11 +19,12 @@ class ActivityLogsQuery(
     override suspend fun execute(input: String): Paginated<List<ActivityLogResponse>> {
         return Paginated(transactionService.transactionActivityLogs(userId = input).map { log ->
             requireNotNull(log.transactionDto.transactionStreamId) { "Transaction stream id is required" }
-            requireNotNull(log.transactionDto.recipientName) { "Recipient name is required" }
+            requireNotNull(log.transactionDto.friendSummaryDto.friendId) { "Recipient name is required" }
             requireNotNull(log.transactionDto.createdBy) { "Created by is required" }
             requireNotNull(log.transactionDto.createdByName) { "Created by name is required" }
             requireNotNull(log.transactionDto.createdAt) { "Created at is required" }
             ActivityLogResponse(
+                id = log.id,
                 userUid = log.userUid,
                 activityByName = log.activityByName,
                 activityByPhoto = log.activityByPhoto,
@@ -36,24 +37,19 @@ class ActivityLogsQuery(
                 transactionResponse = TransactionResponse(
                     date = log.transactionDto.transactionDate,
                     transactionId = log.transactionDto.transactionStreamId,
-                    friendName = log.transactionDto.recipientName,
+                    friend = log.transactionDto.friendSummaryDto,
                     amountResponse = AmountResponse(
                         amount = log.transactionDto.splitType.apply(log.transactionDto.originalAmount),
                         currency = log.transactionDto.currency.currencyCode,
                         isOwed = log.transactionDto.splitType.isOwed()
                     ),
-                    history = log.transactionDto.history.groupBy { Pair(it.date.looseNanonSeconds(), it.changedBy) }
+                    history = log.transactionDto.history.groupBy { Pair(it.date, it.changedBy) }
                         .map {
                             ChangeSummaryResponse(
                                 changedBy = it.key.second,
-                                changes = it.value.map {
-                                    ChangeSummaryByUserResponse(
-                                        oldValue = it.oldValue,
-                                        newValue = it.newValue,
-                                        type = it.type
-                                    )
-                                }
-
+                                changes = it.value,
+                                changedByName = it.value.first().changedByName,
+                                changedByPhoto = it.value.first().changedByPhoto
                             )
                         },
                     description = log.transactionDto.description,
@@ -71,7 +67,8 @@ class ActivityLogsQuery(
                             name = log.transactionDto.updatedByName
                                 ?: throw IllegalStateException("Updated by name is required")
                         )
-                    }
+                    },
+                    deleted = log.transactionDto.deleted
                 )
             )
         }, null)

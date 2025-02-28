@@ -3,6 +3,8 @@ package com.zeenom.loan_tracker.transactions
 import com.zeenom.loan_tracker.common.*
 import com.zeenom.loan_tracker.events.CommandDto
 import com.zeenom.loan_tracker.events.CommandType
+import com.zeenom.loan_tracker.friends.FriendDto
+import com.zeenom.loan_tracker.friends.FriendSummaryDto
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Schema
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -91,7 +93,7 @@ class TransactionsController(
                 friendId = friendId
             )
         ).let {
-            it.data.sortedByDescending { it.transactionDate }.filter { !it.deleted }.groupBy {
+            it.data.sortedByDescending { it.transactionDate }.groupBy {
                 it.transactionDate.startOfMonth(timeZone)
             }.map {
                 TransactionsPerMonth(
@@ -104,8 +106,6 @@ class TransactionsController(
                                 ?: throw IllegalStateException("Transaction stream id is required in transactions response"),
                             totalAmount = transaction.originalAmount,
                             splitType = transaction.splitType,
-                            friendName = transaction.recipientName
-                                ?: throw IllegalStateException("Friend name is required in transactions response"),
                             amountResponse = AmountResponse(
                                 amount = transaction.splitType.apply(transaction.originalAmount),
                                 currency = transaction.currency.currencyCode,
@@ -113,14 +113,10 @@ class TransactionsController(
                             ),
                             history = transaction.history.groupBy { Pair(it.date, it.changedBy) }.map {
                                 ChangeSummaryResponse(
-                                    changedBy = it.key.second,
-                                    changes = it.value.map {
-                                        ChangeSummaryByUserResponse(
-                                            oldValue = it.oldValue,
-                                            newValue = it.newValue,
-                                            type = it.type
-                                        )
-                                    }
+                                    changedBy = it.value.first().changedBy,
+                                    changedByName = it.value.first().changedByName,
+                                    changedByPhoto = it.value.first().changedByPhoto,
+                                    changes = it.value
                                 )
                             },
                             createdAt = transaction.createdAt ?: throw IllegalStateException("Created at is required"),
@@ -139,6 +135,8 @@ class TransactionsController(
                                         ?: throw IllegalStateException("Updated by name is required")
                                 )
                             },
+                            friend = transaction.friendSummaryDto,
+                            deleted = transaction.deleted
                         )
                     }
                 )
@@ -155,12 +153,10 @@ class TransactionsController(
 
     private fun requestToDto(transactionRequest: TransactionBaseRequest) =
         TransactionDto(
-            recipientId = if (transactionRequest is TransactionCreateRequest) transactionRequest.recipientId else null,
             description = transactionRequest.description,
             splitType = transactionRequest.type,
             originalAmount = transactionRequest.amount,
             currency = Currency.getInstance(transactionRequest.currency),
-            recipientName = null,
             updatedAt = null,
             createdAt = null,
             createdBy = null,
@@ -170,7 +166,14 @@ class TransactionsController(
             createdByName = null,
             deleted = false,
             history = emptyList(),
-            transactionDate = transactionRequest.transactionDate
+            transactionDate = transactionRequest.transactionDate,
+            friendSummaryDto = FriendSummaryDto(
+                friendId = if (transactionRequest is TransactionCreateRequest) transactionRequest.recipientId else null,
+                email = null,
+                phoneNumber = null,
+                photoUrl = null,
+                name = null
+            )
         )
 }
 
@@ -226,13 +229,14 @@ data class TransactionResponse(
     val transactionId: UUID,
     val totalAmount: BigDecimal,
     val splitType: SplitType,
-    val friendName: String,
+    val friend: FriendSummaryDto,
     val amountResponse: AmountResponse,
     val history: List<ChangeSummaryResponse>,
     val createdAt: Instant,
     val updatedAt: Instant?,
     val createdBy: TransactionUserResponse,
     val updatedBy: TransactionUserResponse?,
+    val deleted: Boolean,
 )
 
 data class TransactionUserResponse(
@@ -242,7 +246,9 @@ data class TransactionUserResponse(
 
 data class ChangeSummaryResponse(
     val changedBy: String,
-    val changes: List<ChangeSummaryByUserResponse>,
+    val changedByName: String,
+    val changedByPhoto: String?,
+    val changes: List<ChangeSummaryDto>,
 )
 
 data class ChangeSummaryByUserResponse(

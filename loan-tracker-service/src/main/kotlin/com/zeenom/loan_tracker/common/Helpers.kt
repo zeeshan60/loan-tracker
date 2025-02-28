@@ -148,10 +148,13 @@ fun SplitType.apply(amount: BigDecimal): BigDecimal {
     return when (this) {
         SplitType.TheyOweYouAll -> amount
         SplitType.YouOweThemAll -> amount
-        SplitType.YouPaidSplitEqually -> amount / 2.toBigDecimal()
-        SplitType.TheyPaidSplitEqually -> amount / 2.toBigDecimal()
+        SplitType.YouPaidSplitEqually -> splitWithScaleOf1(amount)
+        SplitType.TheyPaidSplitEqually -> splitWithScaleOf1(amount)
     }
 }
+
+private fun splitWithScaleOf1(amount: BigDecimal): BigDecimal =
+    amount.divide(2.toBigDecimal()).also { if (it.scale() == 0) it.setScale(1) }
 
 fun SplitType.isOwed(): Boolean {
     return when (this) {

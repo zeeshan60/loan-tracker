@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.zeenom.loan_tracker.common.Paginated
 import com.zeenom.loan_tracker.friends.FriendEventRepository
 import com.zeenom.loan_tracker.friends.FriendsResponse
-import com.zeenom.loan_tracker.prettyAndPrint
 import com.zeenom.loan_tracker.transactions.*
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventRepository
@@ -81,7 +80,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
                     type = SplitType.YouPaidSplitEqually,
                     recipientId = johnFriendId,
                     description = "Sample transaction",
-                    transactionDate = Instant.parse("2025-02-27T00:00:00Z")
+                    transactionDate = Instant.parse("2025-02-26T00:00:00Z")
                 )
             )
             .exchange()
@@ -89,7 +88,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
             .expectBody().jsonPath("$.message").isEqualTo("Transaction added successfully")
     }
 
-    private lateinit var transactionId: UUID
+    private lateinit var transaction: TransactionResponse
 
     @Order(2)
     @Test
@@ -107,7 +106,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
             }
 
         assertThat(result.perMonth).hasSize(1)
-        assertThat(result.perMonth[0].transactions[0].friendName).isEqualTo("john")
+        assertThat(result.perMonth[0].transactions[0].friend.name).isEqualTo("john")
         assertThat(result.perMonth[0].transactions[0].amountResponse.amount).isEqualTo(50.0.toBigDecimal())
         assertThat(result.perMonth[0].transactions[0].amountResponse.currency).isEqualTo("USD")
         assertThat(result.perMonth[0].transactions[0].amountResponse.isOwed).isTrue()
@@ -115,7 +114,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
         assertThat(result.perMonth[0].transactions[0].transactionId).isNotNull()
         assertThat(result.perMonth[0].transactions[0].splitType).isEqualTo(SplitType.YouPaidSplitEqually)
         assertThat(result.perMonth[0].transactions[0].description).isEqualTo("Sample transaction")
-        transactionId = result.perMonth[0].transactions[0].transactionId
+        transaction = result.perMonth[0].transactions[0]
     }
 
     @Order(3)
@@ -147,7 +146,11 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
             }
 
         assertThat(result.perMonth).hasSize(1)
-        assertThat(result.perMonth[0].transactions[0].friendName).isEqualTo("Zeeshan Tufail")
+        assertThat(result.perMonth[0].transactions[0].friend.friendId).isEqualTo(zeeFriendId)
+        assertThat(result.perMonth[0].transactions[0].friend.name).isEqualTo(zeeDto.displayName)
+        assertThat(result.perMonth[0].transactions[0].friend.email).isEqualTo(zeeDto.email)
+        assertThat(result.perMonth[0].transactions[0].friend.phoneNumber).isEqualTo(zeeDto.phoneNumber)
+        assertThat(result.perMonth[0].transactions[0].friend.photoUrl).isEqualTo(zeeDto.photoUrl)
         assertThat(result.perMonth[0].transactions[0].amountResponse.amount).isEqualTo(50.0.toBigDecimal())
         assertThat(result.perMonth[0].transactions[0].amountResponse.currency).isEqualTo("USD")
         assertThat(result.perMonth[0].transactions[0].amountResponse.isOwed).isFalse()
@@ -162,7 +165,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
     @Test
     fun `update transaction as zee`() {
         webTestClient.put()
-            .uri("/api/v1/transactions/update/transactionId/$transactionId")
+            .uri("/api/v1/transactions/update/transactionId/${transaction.transactionId}")
             .header("Authorization", "Bearer $zeeToken")
             .bodyValue(
                 TransactionUpdateRequest(
@@ -171,7 +174,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
                     type = SplitType.TheyOweYouAll,
 
                     description = "Sample transaction edited",
-                    transactionDate = Instant.parse("2025-02-27T00:00:00Z")
+                    transactionDate = Instant.parse("2025-02-25T00:00:00Z")
                 )
             )
             .exchange()
@@ -195,7 +198,8 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
             }
 
         assertThat(result.perMonth).hasSize(1)
-        assertThat(result.perMonth[0].transactions[0].friendName).isEqualTo("john")
+        assertThat(result.perMonth[0].transactions[0].friend.name).isEqualTo("john")
+        assertThat(result.perMonth[0].transactions[0].date).isEqualTo(Instant.parse("2025-02-25T00:00:00Z"))
         assertThat(result.perMonth[0].transactions[0].amountResponse.amount).isEqualTo(200.0.toBigDecimal())
         assertThat(result.perMonth[0].transactions[0].amountResponse.currency).isEqualTo("SGD")
         assertThat(result.perMonth[0].transactions[0].amountResponse.isOwed).isTrue()
@@ -203,27 +207,32 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
         assertThat(result.perMonth[0].transactions[0].transactionId).isNotNull()
         assertThat(result.perMonth[0].transactions[0].splitType).isEqualTo(SplitType.TheyOweYouAll)
         assertThat(result.perMonth[0].transactions[0].description).isEqualTo("Sample transaction edited")
-        assertThat(result.perMonth[0].transactions[0].history[0].changes).hasSize(4)
+        assertThat(result.perMonth[0].transactions[0].history[0].changes).hasSize(5)
         val history1 = result.perMonth[0].transactions[0].history[0]
-        val history1Changes = result.perMonth[0].transactions[0].history[0].changes[0]
+        val history0Changes = result.perMonth[0].transactions[0].history[0].changes[0]
+        assertThat(history0Changes.type).isEqualTo(TransactionChangeType.TRANSACTION_DATE)
+        assertThat(history1.changedBy).isEqualTo(zeeDto.uid)
+        assertThat(history0Changes.oldValue).isEqualTo("2025-02-26T00:00:00Z")
+        assertThat(history0Changes.newValue).isEqualTo("2025-02-25T00:00:00Z")
+        val history1Changes = result.perMonth[0].transactions[0].history[0].changes[1]
         assertThat(history1Changes.type).isEqualTo(TransactionChangeType.DESCRIPTION)
         assertThat(history1.changedBy).isEqualTo(zeeDto.uid)
         assertThat(history1Changes.oldValue).isEqualTo("Sample transaction")
         assertThat(history1Changes.newValue).isEqualTo("Sample transaction edited")
         val history2 = result.perMonth[0].transactions[0].history[0]
-        val history2Changes = result.perMonth[0].transactions[0].history[0].changes[1]
+        val history2Changes = result.perMonth[0].transactions[0].history[0].changes[2]
         assertThat(history2Changes.type).isEqualTo(TransactionChangeType.SPLIT_TYPE)
         assertThat(history2.changedBy).isEqualTo(zeeDto.uid)
         assertThat(history2Changes.oldValue).isEqualTo("YouPaidSplitEqually")
         assertThat(history2Changes.newValue).isEqualTo("TheyOweYouAll")
         val history3 = result.perMonth[0].transactions[0].history[0]
-        val history3Changes = result.perMonth[0].transactions[0].history[0].changes[2]
+        val history3Changes = result.perMonth[0].transactions[0].history[0].changes[3]
         assertThat(history3Changes.type).isEqualTo(TransactionChangeType.TOTAL_AMOUNT)
         assertThat(history3.changedBy).isEqualTo(zeeDto.uid)
         assertThat(history3Changes.oldValue).isEqualTo("100.0")
         assertThat(history3Changes.newValue).isEqualTo("200.0")
         val history4 = result.perMonth[0].transactions[0].history[0]
-        val history4Changes = result.perMonth[0].transactions[0].history[0].changes[3]
+        val history4Changes = result.perMonth[0].transactions[0].history[0].changes[4]
         assertThat(history4Changes.type).isEqualTo(TransactionChangeType.CURRENCY)
         assertThat(history4.changedBy).isEqualTo(zeeDto.uid)
         assertThat(history4Changes.oldValue).isEqualTo("USD")
@@ -246,7 +255,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
             }
 
         assertThat(result.perMonth).hasSize(1)
-        assertThat(result.perMonth[0].transactions[0].friendName).isEqualTo("Zeeshan Tufail")
+        assertThat(result.perMonth[0].transactions[0].friend.name).isEqualTo("Zeeshan Tufail")
         assertThat(result.perMonth[0].transactions[0].amountResponse.amount).isEqualTo(200.0.toBigDecimal())
         assertThat(result.perMonth[0].transactions[0].amountResponse.currency).isEqualTo("SGD")
         assertThat(result.perMonth[0].transactions[0].amountResponse.isOwed).isFalse()
@@ -254,27 +263,33 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
         assertThat(result.perMonth[0].transactions[0].transactionId).isNotNull()
         assertThat(result.perMonth[0].transactions[0].splitType).isEqualTo(SplitType.YouOweThemAll)
         assertThat(result.perMonth[0].transactions[0].description).isEqualTo("Sample transaction edited")
-        assertThat(result.perMonth[0].transactions[0].history[0].changes).hasSize(4)
+        assertThat(result.perMonth[0].transactions[0].history[0].changes).hasSize(5)
+        val history0 = result.perMonth[0].transactions[0].history[0]
+        val history0Changes = result.perMonth[0].transactions[0].history[0].changes[0]
+        assertThat(history0Changes.type).isEqualTo(TransactionChangeType.TRANSACTION_DATE)
+        assertThat(history0.changedBy).isEqualTo(zeeDto.uid)
+        assertThat(history0Changes.oldValue).isEqualTo("2025-02-26T00:00:00Z")
+        assertThat(history0Changes.newValue).isEqualTo("2025-02-25T00:00:00Z")
         val history1 = result.perMonth[0].transactions[0].history[0]
-        val history1Changes = result.perMonth[0].transactions[0].history[0].changes[0]
+        val history1Changes = result.perMonth[0].transactions[0].history[0].changes[1]
         assertThat(history1Changes.type).isEqualTo(TransactionChangeType.DESCRIPTION)
         assertThat(history1.changedBy).isEqualTo(zeeDto.uid)
         assertThat(history1Changes.oldValue).isEqualTo("Sample transaction")
         assertThat(history1Changes.newValue).isEqualTo("Sample transaction edited")
         val history2 = result.perMonth[0].transactions[0].history[0]
-        val history2Changes = result.perMonth[0].transactions[0].history[0].changes[1]
+        val history2Changes = result.perMonth[0].transactions[0].history[0].changes[2]
         assertThat(history2Changes.type).isEqualTo(TransactionChangeType.SPLIT_TYPE)
         assertThat(history2.changedBy).isEqualTo(zeeDto.uid)
         assertThat(history2Changes.oldValue).isEqualTo("TheyPaidSplitEqually")
         assertThat(history2Changes.newValue).isEqualTo("YouOweThemAll")
         val history3 = result.perMonth[0].transactions[0].history[0]
-        val history3Changes = result.perMonth[0].transactions[0].history[0].changes[2]
+        val history3Changes = result.perMonth[0].transactions[0].history[0].changes[3]
         assertThat(history3Changes.type).isEqualTo(TransactionChangeType.TOTAL_AMOUNT)
         assertThat(history3.changedBy).isEqualTo(zeeDto.uid)
         assertThat(history3Changes.oldValue).isEqualTo("100.0")
         assertThat(history3Changes.newValue).isEqualTo("200.0")
         val history4 = result.perMonth[0].transactions[0].history[0]
-        val history4Changes = result.perMonth[0].transactions[0].history[0].changes[3]
+        val history4Changes = result.perMonth[0].transactions[0].history[0].changes[4]
         assertThat(history4Changes.type).isEqualTo(TransactionChangeType.CURRENCY)
         assertThat(history4.changedBy).isEqualTo(zeeDto.uid)
         assertThat(history4Changes.oldValue).isEqualTo("USD")
@@ -339,7 +354,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
                     currency = "USD",
                     type = SplitType.YouPaidSplitEqually,
                     recipientId = johnFriendId,
-                    description = "Sample transaction",
+                    description = "Sample transaction 2",
                     transactionDate = Instant.parse("2025-02-27T00:00:00Z")
                 )
             )
@@ -364,21 +379,21 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
             }
 
         assertThat(result.perMonth[0].transactions).hasSize(2)
-        assertThat(result.perMonth[0].transactions[0].friendName).isEqualTo("john")
+        assertThat(result.perMonth[0].transactions[0].friend.name).isEqualTo("john")
         assertThat(result.perMonth[0].transactions[0].amountResponse.amount).isEqualTo(50.0.toBigDecimal())
         assertThat(result.perMonth[0].transactions[0].amountResponse.currency).isEqualTo("USD")
         assertThat(result.perMonth[0].transactions[0].amountResponse.isOwed).isTrue()
         assertThat(result.perMonth[0].transactions[0].totalAmount).isEqualTo(100.0.toBigDecimal())
         assertThat(result.perMonth[0].transactions[0].transactionId).isNotNull()
         assertThat(result.perMonth[0].transactions[0].splitType).isEqualTo(SplitType.YouPaidSplitEqually)
-        assertThat(result.perMonth[0].transactions[0].description).isEqualTo("Sample transaction")
+        assertThat(result.perMonth[0].transactions[0].description).isEqualTo("Sample transaction 2")
     }
 
     @Order(12)
     @Test
     fun `update transaction as john`() {
         webTestClient.put()
-            .uri("/api/v1/transactions/update/transactionId/$transactionId")
+            .uri("/api/v1/transactions/update/transactionId/${transaction.transactionId}")
             .header("Authorization", "Bearer $johnToken")
             .bodyValue(
                 TransactionUpdateRequest(
@@ -386,7 +401,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
                     currency = "SGD",
                     type = SplitType.TheyOweYouAll,
                     description = "Sample transaction edited by john",
-                    transactionDate = Instant.parse("2025-02-27T00:00:00Z")
+                    transactionDate = Instant.parse("2025-02-25T00:00:00Z")
                 )
             )
             .exchange()
@@ -394,6 +409,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
             .expectBody().jsonPath("$.message").isEqualTo("Transaction updated successfully")
     }
 
+    lateinit var transaction2: TransactionResponse
     @Order(13)
     @Test
     fun `get all transactions as zee has history for john as well`() {
@@ -410,12 +426,13 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
             }
 
         assertThat(result.perMonth).hasSize(1)
-        assertThat(result.perMonth[0].transactions[1].friendName).isEqualTo("john")
+        transaction2 = result.perMonth[0].transactions[1]
+        assertThat(result.perMonth[0].transactions[1].friend.name).isEqualTo("john")
         assertThat(result.perMonth[0].transactions[1].amountResponse.amount).isEqualTo(300.0.toBigDecimal())
         assertThat(result.perMonth[0].transactions[1].amountResponse.currency).isEqualTo("SGD")
         assertThat(result.perMonth[0].transactions[1].amountResponse.isOwed).isFalse()
         assertThat(result.perMonth[0].transactions[1].totalAmount).isEqualTo(300.0.toBigDecimal())
-        assertThat(result.perMonth[0].transactions[1].transactionId).isEqualTo(transactionId)
+        assertThat(result.perMonth[0].transactions[1].transactionId).isEqualTo(transaction.transactionId)
         assertThat(result.perMonth[0].transactions[1].splitType).isEqualTo(SplitType.YouOweThemAll)
         assertThat(result.perMonth[0].transactions[1].description).isEqualTo("Sample transaction edited by john")
         assertThat(result.perMonth[0].transactions[1].createdBy.name).isEqualTo("You")
@@ -425,24 +442,28 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
         assertThat(result.perMonth[0].transactions[1].createdAt).isNotNull()
         assertThat(result.perMonth[0].transactions[1].updatedAt).isNotNull()
         assertThat(result.perMonth[0].transactions[1].history).hasSize(2)
-        result.perMonth[0].transactions[1].history.prettyAndPrint(objectMapper)
-        assertThat(result.perMonth[0].transactions[1].history[0].changes).hasSize(4)
-        val history1Changes = result.perMonth[0].transactions[1].history[0].changes[0]
+        assertThat(result.perMonth[0].transactions[1].history[0].changes).hasSize(5)
+        val history0Changes = result.perMonth[0].transactions[1].history[0].changes[0]
+        assertThat(history0Changes.type).isEqualTo(TransactionChangeType.TRANSACTION_DATE)
+        assertThat(result.perMonth[0].transactions[1].history[0].changedBy).isEqualTo(zeeDto.uid)
+        assertThat(history0Changes.oldValue).isEqualTo("2025-02-26T00:00:00Z")
+        assertThat(history0Changes.newValue).isEqualTo("2025-02-25T00:00:00Z")
+        val history1Changes = result.perMonth[0].transactions[1].history[0].changes[1]
         assertThat(history1Changes.type).isEqualTo(TransactionChangeType.DESCRIPTION)
         assertThat(result.perMonth[0].transactions[1].history[0].changedBy).isEqualTo(zeeDto.uid)
         assertThat(history1Changes.oldValue).isEqualTo("Sample transaction")
         assertThat(history1Changes.newValue).isEqualTo("Sample transaction edited")
-        val history2Changes = result.perMonth[0].transactions[1].history[0].changes[1]
+        val history2Changes = result.perMonth[0].transactions[1].history[0].changes[2]
         assertThat(history2Changes.type).isEqualTo(TransactionChangeType.SPLIT_TYPE)
         assertThat(result.perMonth[0].transactions[1].history[0].changedBy).isEqualTo(zeeDto.uid)
         assertThat(history2Changes.oldValue).isEqualTo("YouPaidSplitEqually")
         assertThat(history2Changes.newValue).isEqualTo("TheyOweYouAll")
-        val history3Changes = result.perMonth[0].transactions[1].history[0].changes[2]
+        val history3Changes = result.perMonth[0].transactions[1].history[0].changes[3]
         assertThat(history3Changes.type).isEqualTo(TransactionChangeType.TOTAL_AMOUNT)
         assertThat(result.perMonth[0].transactions[1].history[0].changedBy).isEqualTo(zeeDto.uid)
         assertThat(history3Changes.oldValue).isEqualTo("100.0")
         assertThat(history3Changes.newValue).isEqualTo("200.0")
-        val history4Changes = result.perMonth[0].transactions[1].history[0].changes[3]
+        val history4Changes = result.perMonth[0].transactions[1].history[0].changes[4]
         assertThat(history4Changes.type).isEqualTo(TransactionChangeType.CURRENCY)
         assertThat(result.perMonth[0].transactions[1].history[0].changedBy).isEqualTo(zeeDto.uid)
         assertThat(history4Changes.oldValue).isEqualTo("USD")
@@ -470,7 +491,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
     @Test
     fun `delete transaction as zee`() {
         webTestClient.delete()
-            .uri("/api/v1/transactions/delete/transactionId/$transactionId")
+            .uri("/api/v1/transactions/delete/transactionId/${transaction.transactionId}")
             .header("Authorization", "Bearer $zeeToken")
             .exchange()
             .expectStatus().isOk
@@ -493,16 +514,15 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
             }
 
         assertThat(result.perMonth[0].transactions).hasSize(1)
-        assertThat(result.perMonth[0].transactions[0].friendName).isEqualTo("john")
+        assertThat(result.perMonth[0].transactions[0].friend.name).isEqualTo("john")
         assertThat(result.perMonth[0].transactions[0].amountResponse.amount).isEqualTo(50.0.toBigDecimal())
         assertThat(result.perMonth[0].transactions[0].amountResponse.currency).isEqualTo("USD")
         assertThat(result.perMonth[0].transactions[0].amountResponse.isOwed).isTrue()
         assertThat(result.perMonth[0].transactions[0].totalAmount).isEqualTo(100.0.toBigDecimal())
         assertThat(result.perMonth[0].transactions[0].transactionId).isNotNull()
         assertThat(result.perMonth[0].transactions[0].splitType).isEqualTo(SplitType.YouPaidSplitEqually)
-        assertThat(result.perMonth[0].transactions[0].description).isEqualTo("Sample transaction")
+        assertThat(result.perMonth[0].transactions[0].description).isEqualTo("Sample transaction 2")
     }
-
 
     @Order(16)
     @Test
@@ -520,59 +540,122 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
                     object : TypeReference<Paginated<List<ActivityLogResponse>>>() {})
             }
 
-        result.prettyAndPrint(objectMapper)
-
         assertThat(result.data).hasSize(5)
 
-        // First Activity Log (DELETED)
+        assertThat(result.data[0].id).isNotNull()
         assertThat(result.data[0].activityType).isEqualTo(ActivityType.DELETED)
         assertThat(result.data[0].amount).isEqualTo(300.0.toBigDecimal())
         assertThat(result.data[0].currency).isEqualTo("SGD")
         assertThat(result.data[0].description).isEqualTo("Sample transaction edited by john")
         assertThat(result.data[0].activityByName).isEqualTo(zeeDto.displayName)
         assertThat(result.data[0].activityByPhoto).isEqualTo(zeeDto.photoUrl)
+        assertTransactionDataCorrectness(result.data[0].transactionResponse)
 
-        // Second Activity Log (UPDATED)
         assertThat(result.data[1].activityType).isEqualTo(ActivityType.UPDATED)
         assertThat(result.data[1].amount).isEqualTo(300.0.toBigDecimal())
         assertThat(result.data[1].currency).isEqualTo("SGD")
         assertThat(result.data[1].description).isEqualTo("Sample transaction edited by john")
+        assertThat(result.data[1].transactionResponse.transactionId).isEqualTo(transaction.transactionId)
         assertThat(result.data[1].activityByName).isEqualTo("john")
         assertThat(result.data[1].activityByPhoto).isEqualTo(johnDto.photoUrl)
+        assertTransactionDataCorrectness(result.data[1].transactionResponse)
 
-        // Third Activity Log (UPDATED with USD currency)
-        assertThat(result.data[2].activityType).isEqualTo(ActivityType.UPDATED)
-        assertThat(result.data[2].amount).isEqualTo(200.0.toBigDecimal())
-        assertThat(result.data[2].currency).isEqualTo("SGD")
-        assertThat(result.data[2].description).isEqualTo("Sample transaction edited")
+        assertThat(result.data[2].activityType).isEqualTo(ActivityType.CREATED)
+        assertThat(result.data[2].amount).isEqualTo(50.0.toBigDecimal())
+        assertThat(result.data[2].currency).isEqualTo("USD")
+        assertThat(result.data[2].description).isEqualTo("Sample transaction 2")
+        assertThat(result.data[2].transactionResponse.transactionId).isNotEqualTo(transaction.transactionId)
         assertThat(result.data[2].activityByName).isEqualTo(zeeDto.displayName)
         assertThat(result.data[2].activityByPhoto).isEqualTo(zeeDto.photoUrl)
+        assertTransaction2DataCorrectness(result.data[2].transactionResponse)
 
-        // Fourth Activity Log (UPDATED with amount 100.0)
-        assertThat(result.data[3].activityType).isEqualTo(ActivityType.CREATED)
-        assertThat(result.data[3].amount).isEqualTo(50.0.toBigDecimal())
-        assertThat(result.data[3].currency).isEqualTo("USD")
-        assertThat(result.data[3].description).isEqualTo("Sample transaction")
+        assertThat(result.data[3].activityType).isEqualTo(ActivityType.UPDATED)
+        assertThat(result.data[3].amount).isEqualTo(200.0.toBigDecimal())
+        assertThat(result.data[3].currency).isEqualTo("SGD")
+        assertThat(result.data[3].description).isEqualTo("Sample transaction edited")
         assertThat(result.data[3].activityByName).isEqualTo(zeeDto.displayName)
         assertThat(result.data[3].activityByPhoto).isEqualTo(zeeDto.photoUrl)
+        assertTransactionDataCorrectness(result.data[3].transactionResponse)
 
-        // Fifth Activity Log (UPDATED with amount 50.0)
         assertThat(result.data[4].activityType).isEqualTo(ActivityType.CREATED)
         assertThat(result.data[4].amount).isEqualTo(50.0.toBigDecimal())
         assertThat(result.data[4].currency).isEqualTo("USD")
         assertThat(result.data[4].description).isEqualTo("Sample transaction")
         assertThat(result.data[4].activityByName).isEqualTo(zeeDto.displayName)
         assertThat(result.data[4].activityByPhoto).isEqualTo(zeeDto.photoUrl)
+        assertTransactionDataCorrectness(result.data[4].transactionResponse)
+    }
 
-        // Verify transaction response of the first activity log
-        val transactionResponse = result.data[0].transactionResponse
-        assertThat(transactionResponse.transactionId).isEqualTo(transactionId)
+    private fun assertTransactionDataCorrectness(transactionResponse: TransactionResponse) {
+        assertThat(transactionResponse.date).isEqualTo("2025-02-25T00:00:00Z")
+        assertThat(transactionResponse.transactionId).isEqualTo(transaction.transactionId)
+        assertThat(transactionResponse.description).isEqualTo("Sample transaction edited by john")
         assertThat(transactionResponse.totalAmount).isEqualTo(300.0.toBigDecimal())
-        assertThat(transactionResponse.splitType.name).isEqualTo("YouOweThemAll")
-        assertThat(transactionResponse.friendName).isEqualTo("john")
+        assertThat(transactionResponse.splitType).isEqualTo(SplitType.YouOweThemAll)
+        assertThat(transactionResponse.friend.name).isEqualTo("john")
+        assertThat(transactionResponse.amountResponse.amount).isEqualTo(300.0.toBigDecimal())
+        assertThat(transactionResponse.amountResponse.currency).isEqualTo("SGD")
+        assertThat(transactionResponse.amountResponse.isOwed).isFalse()
 
-        // Verify history changes of the first activity log
-        val history = transactionResponse.history
-        assertThat(history).isNotEmpty
+        assertThat(transactionResponse.history[0].changes).hasSize(5)
+        assertThat(transactionResponse.history[0].changedBy).isEqualTo(zeeDto.uid)
+        assertThat(transactionResponse.history[0].changes[0].oldValue).isEqualTo("2025-02-26T00:00:00Z")
+        assertThat(transactionResponse.history[0].changes[0].newValue).isEqualTo("2025-02-25T00:00:00Z")
+        assertThat(transactionResponse.history[0].changes[0].type).isEqualTo(TransactionChangeType.TRANSACTION_DATE)
+        assertThat(transactionResponse.history[0].changes[1].oldValue).isEqualTo("Sample transaction")
+        assertThat(transactionResponse.history[0].changes[1].newValue).isEqualTo("Sample transaction edited")
+        assertThat(transactionResponse.history[0].changes[1].type).isEqualTo(TransactionChangeType.DESCRIPTION)
+        assertThat(transactionResponse.history[0].changes[2].oldValue).isEqualTo("YouPaidSplitEqually")
+        assertThat(transactionResponse.history[0].changes[2].newValue).isEqualTo("TheyOweYouAll")
+        assertThat(transactionResponse.history[0].changes[2].type).isEqualTo(TransactionChangeType.SPLIT_TYPE)
+        assertThat(transactionResponse.history[0].changes[3].oldValue).isEqualTo("100.0")
+        assertThat(transactionResponse.history[0].changes[3].newValue).isEqualTo("200.0")
+        assertThat(transactionResponse.history[0].changes[3].type).isEqualTo(TransactionChangeType.TOTAL_AMOUNT)
+        assertThat(transactionResponse.history[0].changes[4].oldValue).isEqualTo("USD")
+        assertThat(transactionResponse.history[0].changes[4].newValue).isEqualTo("SGD")
+        assertThat(transactionResponse.history[0].changes[4].type).isEqualTo(TransactionChangeType.CURRENCY)
+
+        assertThat(transactionResponse.history[1].changes).hasSize(3)
+        assertThat(transactionResponse.history[1].changedBy).isEqualTo(johnDto.uid)
+        assertThat(transactionResponse.history[1].changes[0].oldValue).isEqualTo("Sample transaction")
+        assertThat(transactionResponse.history[1].changes[0].newValue).isEqualTo("Sample transaction edited by john")
+        assertThat(transactionResponse.history[1].changes[0].type).isEqualTo(TransactionChangeType.DESCRIPTION)
+        assertThat(transactionResponse.history[1].changes[1].oldValue).isEqualTo("YouPaidSplitEqually")
+        assertThat(transactionResponse.history[1].changes[1].newValue).isEqualTo("YouOweThemAll")
+        assertThat(transactionResponse.history[1].changes[1].type).isEqualTo(TransactionChangeType.SPLIT_TYPE)
+        assertThat(transactionResponse.history[1].changes[2].oldValue).isEqualTo("100.0")
+        assertThat(transactionResponse.history[1].changes[2].newValue).isEqualTo("300.0")
+        assertThat(transactionResponse.history[1].changes[2].type).isEqualTo(TransactionChangeType.TOTAL_AMOUNT)
+
+        assertThat(transactionResponse.history[2].changes).hasSize(1)
+        assertThat(transactionResponse.history[2].changedBy).isEqualTo(zeeDto.uid)
+        assertThat(transactionResponse.history[2].changes[0].oldValue).isEqualTo("Not Deleted")
+        assertThat(transactionResponse.history[2].changes[0].newValue).isEqualTo("Deleted")
+        assertThat(transactionResponse.history[2].changes[0].type).isEqualTo(TransactionChangeType.DELETED)
+
+        assertThat(transactionResponse.createdAt).isNotNull()
+        assertThat(transactionResponse.updatedAt).isNotNull()
+        assertThat(transactionResponse.createdBy.id).isEqualTo("123")
+        assertThat(transactionResponse.createdBy.name).isEqualTo("You")
+        assertThat(transactionResponse.updatedBy!!.id).isEqualTo("123")
+        assertThat(transactionResponse.updatedBy!!.name).isEqualTo("You")
+    }
+
+    private fun assertTransaction2DataCorrectness(transactionResponse: TransactionResponse) {
+        assertThat(transactionResponse.date).isEqualTo("2025-02-27T00:00:00Z")
+        assertThat(transactionResponse.transactionId).isNotEqualTo(transaction2.transactionId)
+        assertThat(transactionResponse.description).isEqualTo("Sample transaction 2")
+        assertThat(transactionResponse.totalAmount).isEqualTo(100.0.toBigDecimal())
+        assertThat(transactionResponse.splitType).isEqualTo(SplitType.YouPaidSplitEqually)
+        assertThat(transactionResponse.friend.name).isEqualTo("john")
+        assertThat(transactionResponse.amountResponse.amount).isEqualTo(50.0.toBigDecimal())
+        assertThat(transactionResponse.amountResponse.currency).isEqualTo("USD")
+        assertThat(transactionResponse.amountResponse.isOwed).isTrue()
+
+        assertThat(transactionResponse.createdAt).isNotNull()
+        assertThat(transactionResponse.updatedAt).isNull()
+        assertThat(transactionResponse.createdBy.id).isEqualTo("123")
+        assertThat(transactionResponse.createdBy.name).isEqualTo("You")
+        assertThat(transactionResponse.updatedBy).isNull()
     }
 }

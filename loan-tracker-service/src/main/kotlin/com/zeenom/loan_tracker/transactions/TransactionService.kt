@@ -1,6 +1,7 @@
 package com.zeenom.loan_tracker.transactions
 
 import com.zeenom.loan_tracker.friends.FriendFinderStrategy
+import com.zeenom.loan_tracker.friends.FriendSummaryDto
 import com.zeenom.loan_tracker.friends.FriendUserDto
 import com.zeenom.loan_tracker.friends.FriendsEventHandler
 import com.zeenom.loan_tracker.users.UserDto
@@ -26,19 +27,20 @@ class TransactionService(
 
         val (friendUser, userStreamId) = friendUserAndMyStreamId(
             userUid = userUid,
-            recipientId = transactionDto.recipientId
+            recipientId = transactionDto.friendSummaryDto.friendId
                 ?: throw IllegalArgumentException("Recipient id is required to add new transaction")
         )
 
         val streamId = UUID.randomUUID()
         val event = TransactionCreated(
+            id = null,
             userId = userUid,
             description = transactionDto.description,
-            transactionDate = Instant.now(),
+            transactionDate = transactionDto.transactionDate,
             currency = transactionDto.currency.toString(),
             splitType = transactionDto.splitType,
             totalAmount = transactionDto.originalAmount,
-            recipientId = transactionDto.recipientId,
+            recipientId = transactionDto.friendSummaryDto.friendId,
             createdAt = Instant.now(),
             createdBy = userUid,
             streamId = streamId,
@@ -67,17 +69,43 @@ class TransactionService(
                 "Transaction with id ${transactionDto.transactionStreamId} does not exist"
             )
 
+        if (existing.deleted) {
+            throw IllegalArgumentException("Transaction with id ${transactionDto.transactionStreamId} is deleted")
+        }
+
         val recipientId = existing.recipientId
         val (friendUser, userStreamId) = friendUserAndMyStreamId(
             userUid = userUid, recipientId = recipientId
         )
         var eventVersion = existing.version
         val createdAt = Instant.now()
+
+        if (existing.transactionDate != transactionDto.transactionDate) {
+            val event = TransactionDateChanged(
+                id = null,
+                userId = userUid,
+                transactionDate = transactionDto.transactionDate,
+                createdAt = createdAt,
+                createdBy = userUid,
+                streamId = existing.streamId,
+                version = ++eventVersion,
+                recipientId = recipientId
+            )
+            transactionEventHandler.addEvent(event)
+            if (friendUser != null && userStreamId != null) transactionEventHandler.addEvent(
+                event.crossTransaction(
+                    friendUser.uid,
+                    userStreamId
+                )
+            )
+        }
+
         if (existing.description != transactionDto.description) {
             val event = DescriptionChanged(
+                id = null,
                 userId = userUid,
                 description = transactionDto.description,
-                transactionDate = createdAt,
+                transactionDate = existing.transactionDate,
                 createdAt = createdAt,
                 createdBy = userUid,
                 streamId = existing.streamId,
@@ -95,9 +123,10 @@ class TransactionService(
 
         if (existing.splitType != transactionDto.splitType) {
             val event = SplitTypeChanged(
+                id = null,
                 userId = userUid,
                 splitType = transactionDto.splitType,
-                transactionDate = createdAt,
+                transactionDate = existing.transactionDate,
                 createdAt = createdAt,
                 createdBy = userUid,
                 streamId = existing.streamId,
@@ -115,9 +144,10 @@ class TransactionService(
 
         if (existing.totalAmount != transactionDto.originalAmount) {
             val event = TotalAmountChanged(
+                id = null,
                 userId = userUid,
                 totalAmount = transactionDto.originalAmount,
-                transactionDate = createdAt,
+                transactionDate = existing.transactionDate,
                 createdAt = createdAt,
                 createdBy = userUid,
                 streamId = existing.streamId,
@@ -135,10 +165,11 @@ class TransactionService(
 
         if (existing.currency != transactionDto.currency.toString()) {
             val event = CurrencyChanged(
+                id = null,
                 userId = userUid,
                 currency = transactionDto.currency.toString(),
                 createdAt = createdAt,
-                transactionDate = createdAt,
+                transactionDate = existing.transactionDate,
                 createdBy = userUid,
                 streamId = existing.streamId,
                 version = ++eventVersion,
@@ -162,7 +193,6 @@ class TransactionService(
         val friendUser = userEventHandler.findUserByEmailOrPhoneNumber(friend.email, friend.phoneNumber)
         val userStreamId = friendUser?.let {
             friendsEventHandler.findFriendStreamIdByEmailOrPhoneNumber(friendUser.uid, me.email, me.phoneNumber)
-                ?: throw IllegalArgumentException("Friend with email ${friend.email} or phone number ${friend.phoneNumber} does not exist")
         }
         return Pair(friendUser, userStreamId)
     }
@@ -190,9 +220,10 @@ class TransactionService(
             userUid = userUid, recipientId = recipientId
         )
         val event = TransactionDeleted(
+            id = null,
             userId = userUid,
             createdAt = Instant.now(),
-            transactionDate = Instant.now(),
+            transactionDate = existing.transactionDate,
             createdBy = userUid,
             streamId = transactionStreamId,
             version = existing.version + 1,
@@ -229,8 +260,10 @@ class TransactionService(
         val transactionsWithLogs = transactionEventHandler.transactionsWithActivityLogs(userId)
 
         return transactionsWithLogs.map { transactionWithLogs ->
-            transactionWithLogs.activityLogs.distinctBy { it.date }.map {
+            transactionWithLogs.activityLogs.groupBy { it.date }.map { logs ->
+                val it = logs.value.maxByOrNull { it.id }!!
                 ActivityLogWithFriendInfo(
+                    id = it.id,
                     userUid = userId,
                     activityByUid = it.activityByUid,
                     activityByName = if (it.activityByUid == userId) user.displayName else friendUsersByUid[it.activityByUid]?.name,
@@ -249,7 +282,7 @@ class TransactionService(
                     ),
                 )
             }
-        }.flatten()
+        }.flatten().sortedWith(compareByDescending<ActivityLogWithFriendInfo> { it.date }.thenByDescending { it.id })
     }
 
     fun TransactionModel.toTransactionDto(
@@ -260,14 +293,30 @@ class TransactionService(
     ): TransactionDto {
         return TransactionDto(
             currency = Currency.getInstance(currency),
-            recipientId = recipientId,
-            transactionStreamId = id,
+            transactionStreamId = streamId,
             description = description,
             originalAmount = totalAmount,
             splitType = splitType,
-            recipientName = friendUsersByStreamId[recipientId]?.name,
+            friendSummaryDto = FriendSummaryDto(
+                friendId = recipientId,
+                email = friendUsersByStreamId[recipientId]?.email,
+                phoneNumber = friendUsersByStreamId[recipientId]?.phoneNumber,
+                photoUrl = friendUsersByStreamId[recipientId]?.photoUrl,
+                name = friendUsersByStreamId[recipientId]?.name
+            ),
             deleted = deleted,
-            history = history,
+            history = history.map {
+                ChangeSummaryDto(
+                    date = it.date,
+                    changedBy = it.changedBy,
+                    changedByName = if (it.changedBy == userDto.uid) "You" else friendUsersByUserId[it.changedBy]?.name
+                        ?: throw IllegalStateException("Friend with id ${it.changedBy} not found"),
+                    changedByPhoto = if (it.changedBy == userDto.uid) userDto.photoUrl else friendUsersByUserId[it.changedBy]?.photoUrl,
+                    oldValue = it.oldValue,
+                    newValue = it.newValue,
+                    type = it.type
+                )
+            },
             createdAt = createdAt,
             createdBy = createdBy,
             createdByName = if (createdBy == userDto.uid) "You" else friendUsersByUserId[createdBy]?.name,
@@ -280,6 +329,7 @@ class TransactionService(
 }
 
 data class ActivityLogWithFriendInfo(
+    val id: UUID,
     val userUid: String,
     val activityByUid: String,
     val activityByName: String?,
