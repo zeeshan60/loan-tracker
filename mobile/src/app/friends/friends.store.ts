@@ -49,33 +49,6 @@ interface Methods extends MethodsDictionary {
   setLoading(isLoading: boolean): void;
 }
 
-async function loadSelectedTransactions(
-  store: WritableStateSource<FriendsState>,
-  http: HttpClient,
-  helperService: HelperService,
-  selectedFriend: FriendWithBalance|null,
-  ) {
-  if (!selectedFriend) {
-    return;
-  }
-  try {
-    patchState(store, { loading: true })
-    const transactions = await firstValueFrom(http.get<{ perMonth: TransactionsByMonth[]}>(
-      `${PRIVATE_API}/transactions/friend/byMonth`,
-      {
-        params: {
-          friendId: selectedFriend?.friendId!,
-          timeZone: helperService.getTimeZone()
-        }
-      }
-    ) as Observable<{ perMonth: TransactionsByMonth[] }>)
-    patchState(store, { selectedTransactions: transactions.perMonth, loading: false })
-  } catch (e: any) {
-    patchState(store, { loading: false })
-    helperService.showToast(e.toString())
-  }
-}
-
 export const FriendsStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
@@ -123,18 +96,36 @@ export const FriendsStore = signalStore(
       if (store.selectedFriend()?.friendId !== friend?.friendId) {
         patchState(store, { selectedFriend: friend })
         if (friend) {
-          await loadSelectedTransactions(store, http, helperService, store.selectedFriend());
+          this.loadSelectedTransactions()
         }
       }
     },
     async loadSelectedTransactions() {
-      await loadSelectedTransactions(store, http, helperService, store.selectedFriend())
+      if (!store.selectedFriend()) {
+        return;
+      }
+      try {
+        patchState(store, { loading: true })
+        const transactions = await firstValueFrom(http.get<{ perMonth: TransactionsByMonth[]}>(
+          `${PRIVATE_API}/transactions/friend/byMonth`,
+          {
+            params: {
+              friendId: store.selectedFriend()?.friendId!,
+              timeZone: helperService.getTimeZone()
+            }
+          }
+        ) as Observable<{ perMonth: TransactionsByMonth[] }>)
+        patchState(store, { selectedTransactions: transactions.perMonth, loading: false })
+      } catch (e: any) {
+        patchState(store, { loading: false })
+        helperService.showToast(e.toString())
+      }
     },
     async deleteTransaction(transaction: Transaction): Promise<void> {
       try {
         patchState(store, { loading: true })
         await firstValueFrom(http.delete(`${PRIVATE_API}/transactions/delete/transactionId/${transaction.transactionId}`))
-        loadSelectedTransactions(store, http, helperService, store.selectedFriend())
+        this.loadSelectedTransactions()
         helperService.showToast('Transaction deleted successfully');
       } catch (e) {
         helperService.showToast('Unable to add friend at the moment');
