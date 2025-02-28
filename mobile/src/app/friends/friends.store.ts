@@ -4,7 +4,7 @@ import { FriendsService } from './friends.service';
 import { firstValueFrom, map, Observable } from 'rxjs';
 import { HelperService } from '../helper.service';
 import { MethodsDictionary } from '@ngrx/signals/src/signal-store-models';
-import { Friend, Transaction, TransactionsByMonth } from './model'
+import { FriendWithBalance, Transaction, TransactionsByMonth } from './model'
 import { HttpClient } from '@angular/common/http';
 import { PRIVATE_API } from '../constants';
 import { AlertController } from '@ionic/angular/standalone';
@@ -22,12 +22,12 @@ type Balance = {
 }
 
 type FriendsState = {
-  friends: Friend[],
+  friends: FriendWithBalance[],
   overallBalance: {
     main: Balance,
     other: Balance[]
   } | null,
-  selectedFriend: Friend | null,
+  selectedFriend: FriendWithBalance | null,
   selectedTransactions: TransactionsByMonth[],
   loading: boolean,
 }
@@ -41,9 +41,9 @@ const initialState: FriendsState = {
 }
 
 interface Methods extends MethodsDictionary {
-  loadFriends(): Promise<void>;
+  loadFriends(config?: { showLoader: boolean }): Promise<void>;
   addFriend(friend: AddFriend): Promise<void>;
-  setSelectedFriend(friend: Friend|null): void;
+  setSelectedFriend(friend: FriendWithBalance|null): void;
   loadSelectedTransactions(): Promise<void>;
   deleteTransaction(transaction: Transaction): Promise<void>;
   setLoading(isLoading: boolean): void;
@@ -53,7 +53,7 @@ async function loadSelectedTransactions(
   store: WritableStateSource<FriendsState>,
   http: HttpClient,
   helperService: HelperService,
-  selectedFriend: Friend|null,
+  selectedFriend: FriendWithBalance|null,
   ) {
   if (!selectedFriend) {
     return;
@@ -92,28 +92,32 @@ export const FriendsStore = signalStore(
     friendsService = inject(FriendsService),
     helperService = inject(HelperService),
     http = inject(HttpClient),
-    alertCtrl = inject(AlertController),
   ): Methods => ({
-    async loadFriends(): Promise<void> {
-      patchState(store, { loading: true });
+    async loadFriends(config = { showLoader: true }): Promise<void> {
+      if (config.showLoader) {
+        patchState(store, { loading: true });
+      }
       try {
         const {data} = await firstValueFrom(friendsService.loadAllFriends());
         patchState(store, { friends: data.friends, overallBalance: data.balance })
       } catch (e) {
         await helperService.showToast('Unable to load friends at the moment');
       } finally {
-        patchState(store, { loading: false })
+        if (config.showLoader) {
+          patchState(store, { loading: false })
+        }
       }
     },
     async addFriend(friend: AddFriend): Promise<void> {
       try {
         await firstValueFrom(friendsService.addFriend(friend));
+        await this.loadFriends();
         helperService.showToast('Friend created successfully');
       } catch (e) {
         helperService.showToast('Unable to add friend at the moment');
       }
     },
-    async setSelectedFriend(friend: Friend|null) {
+    async setSelectedFriend(friend: FriendWithBalance|null) {
       if (store.selectedFriend()?.friendId !== friend?.friendId) {
         patchState(store, { selectedFriend: friend })
         if (friend) {

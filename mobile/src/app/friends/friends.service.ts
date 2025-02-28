@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { AddFriend } from './friends.store';
-import { Friend } from './model';
+import { FriendWithBalance } from './model';
 import { PRIVATE_API } from '../constants';
 
 interface Balance {
@@ -25,7 +25,7 @@ export class FriendsService {
         "main": Balance,
         "other": Balance[]
       }
-      friends: Friend[]
+      friends: FriendWithBalance[]
     },
   }> {
     return this.http.get<{
@@ -34,7 +34,7 @@ export class FriendsService {
           "main": Balance,
           "other": Balance[]
         }
-        friends: Friend[]
+        friends: FriendWithBalance[]
       }
     }>(PRIVATE_API + '/friends')
       .pipe(

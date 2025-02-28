@@ -13,7 +13,7 @@ import {
 import { AddFriendComponent } from '../../add-friend/add-friend.component';
 import { FriendsStore } from '../friends.store';
 import { FormsModule } from '@angular/forms';
-import { Friend } from '../model';
+import { FriendWithBalance } from '../model';
 import { FriendTransactionsComponent } from '../friend-transactions/friend-transactions.component';
 import { ShortenNamePipe } from '../../pipes/shorten-name.pipe';
 
@@ -48,7 +48,7 @@ export class ListFriendsComponent  implements OnInit {
 
   ngOnInit() {}
 
-  async chooseFriend(friend: Friend) {
+  async chooseFriend(friend: FriendWithBalance) {
     this.nav.push(FriendTransactionsComponent, { friend });
   }
 
@@ -61,9 +61,5 @@ export class ListFriendsComponent  implements OnInit {
       component: AddFriendComponent,
     })
     modal.present();
-    const { role } = await modal.onWillDismiss();
-    if (role === 'confirm') {
-      this.friendsStore.loadFriends();
-    }
   }
 }

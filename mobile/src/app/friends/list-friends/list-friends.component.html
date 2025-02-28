@@ -13,29 +13,31 @@
 
 <ion-content [fullscreen]="true">
   <ion-list>
-    <ion-item class="overall-balance-wrapper">
-      <ion-label>
-          Overall balance:
-      </ion-label>
-      @if (friendsStore['overallBalance']()) {
-        <p>
-          <ion-label
-            [color]="friendsStore['overallBalance']()?.main?.isOwed ? 'success' : 'danger'"
-          >
-            {{friendsStore['overallBalance']()?.main?.amount | currency: friendsStore['overallBalance']()?.main?.currency: 'symbol'}}
-            @if (friendsStore['overallBalance']()?.other?.length) {
-              <ul class="other-balances-list">
-                @for (otherBalance of friendsStore['overallBalance']()?.other; track otherBalance.currency) {
-                  <ion-label  [color]="otherBalance.isOwed ? 'success': 'danger'">
-                    {{otherBalance.amount | currency: otherBalance.currency: 'symbol'}}
-                  </ion-label>
-                }
-              </ul>
-            }
-          </ion-label>
-        </p>
+      @if (friendsStore['overallBalance']()?.main) {
+          <ion-item class="overall-balance-wrapper">
+              <ion-label>
+                  Overall balance:
+              </ion-label>
+              @if (friendsStore['overallBalance']()) {
+                  <p>
+                      <ion-label
+                              [color]="friendsStore['overallBalance']()?.main?.isOwed ? 'success' : 'danger'"
+                      >
+                          {{friendsStore['overallBalance']()?.main?.amount | currency: friendsStore['overallBalance']()?.main?.currency: 'symbol'}}
+                          @if (friendsStore['overallBalance']()?.other?.length) {
+                              <ul class="other-balances-list">
+                                  @for (otherBalance of friendsStore['overallBalance']()?.other; track otherBalance.currency) {
+                                      <ion-label  [color]="otherBalance.isOwed ? 'success': 'danger'">
+                                          {{otherBalance.amount | currency: otherBalance.currency: 'symbol'}}
+                                      </ion-label>
+                                  }
+                              </ul>
+                          }
+                      </ion-label>
+                  </p>
+              }
+          </ion-item>
       }
-    </ion-item>
     @for( friend of friendsStore.unSettledFriends(); track friend.name) {
       <ion-item (click)="chooseFriend(friend)" button>
         <ion-avatar slot="start">
@@ -65,6 +67,12 @@
           </p>
         }
       </ion-item>
+    } @empty {
+        <ion-item>
+            <ion-label>
+                <p>Nothing here yet. Please add expense</p>
+            </ion-label>
+        </ion-item>
     }
   </ion-list>
 </ion-content>

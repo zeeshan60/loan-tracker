@@ -12,6 +12,11 @@ export interface Friend {
   friendId: string;
   photoUrl: string|null;
   name: string;
+  phoneNumber?: string;
+  email: string
+}
+
+export interface FriendWithBalance extends Friend {
   mainBalance: { amount: number, currency: string, isOwed: boolean } | null;
   otherBalances: { amount: number, currency: string, isOwed: boolean }[]
 }
@@ -32,7 +37,7 @@ export interface Transaction {
   transactionId: string,
   totalAmount: number,
   splitType: SplitOptions,
-  friendName: string,
+  friend: Friend,
   amountResponse: {
     amount: number,
     currency: string,
@@ -40,12 +45,15 @@ export interface Transaction {
   },
   history: {
     changedBy: string,
+    changedByName: string,
+    changedByPhoto: string,
     changes: {
       oldValue: string,
       newValue: string,
       type: HistoryChangeType
     }[]
-  }[]
+  }[],
+  deleted: boolean,
 }
 
 export interface TransactionsByMonth {

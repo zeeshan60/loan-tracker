@@ -10,7 +10,7 @@ import {
   IonTitle,
   IonToolbar, ModalController,
 } from '@ionic/angular/standalone';
-import { Friend, HistoryChangeType, Transaction } from '../model';
+import { FriendWithBalance, HistoryChangeType, Transaction } from '../model';
 import { NavParams } from '@ionic/angular';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { DateFormatPipe } from '../../pipes/date-format.pipe';
@@ -58,7 +58,7 @@ export class TransactionDetailsComponent  implements OnInit {
   readonly modalCtrl = inject(ModalController);
   readonly nav = inject(IonNav);
   readonly transaction = input.required<Transaction>();
-  readonly friend = input.required<Friend>();
+  readonly friend = input.required<FriendWithBalance>();
   constructor() {
   }
 

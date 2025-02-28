@@ -87,7 +87,7 @@ export class ListActivitiesComponent implements OnInit {
   openTransaction(activity: any) {
     this.nav.push(TransactionDetailsComponent, {
       transaction: activity.transactionResponse,
-      friend: { name: activity.transactionResponse.friendName}
+      friend: activity.transactionResponse.friend
     })
   }
 

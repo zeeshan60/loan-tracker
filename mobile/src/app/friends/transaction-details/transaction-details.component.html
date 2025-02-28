@@ -4,11 +4,13 @@
       <ion-back-button></ion-back-button>
     </ion-buttons>
     <ion-title>Details</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="updateTransaction()">
-        <ion-icon name="create-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
+    @if (!transaction().deleted) {
+      <ion-buttons slot="end">
+        <ion-button (click)="updateTransaction()">
+          <ion-icon name="create-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    }
   </ion-toolbar>
 </ion-header>
 
@@ -34,30 +36,32 @@
       <ion-label>
         @switch (transaction().splitType) {
           @case (SplitOptions.YouOweThemAll) {
-            {{transaction().friendName|shortenName}} paid {{transaction().totalAmount|currency: transaction().amountResponse.currency: 'symbol'}}.
-            <p>You owe {{transaction().friendName|shortenName}} the full amount.</p>
+            {{transaction().friend.name|shortenName}} paid {{transaction().totalAmount|currency: transaction().amountResponse.currency: 'symbol'}}.
+            <p>You owe {{transaction().friend.name|shortenName}} the full amount.</p>
           }
           @case (SplitOptions.TheyOweYouAll) {
             You paid {{transaction().totalAmount|currency: transaction().amountResponse.currency: 'symbol'}}.
-            <p>{{transaction().friendName|shortenName}} owe you the full amount.</p>
+            <p>{{transaction().friend.name|shortenName}} owe you the full amount.</p>
           }
           @case (SplitOptions.TheyPaidSplitEqually) {
-            {{transaction().friendName|shortenName}} paid {{transaction().totalAmount|currency: transaction().amountResponse.currency: 'symbol'}}.
-              <p>You owe {{transaction().friendName|shortenName}} {{transaction().amountResponse.amount|currency: transaction().amountResponse.currency: 'symbol'}}.</p>
+            {{transaction().friend.name|shortenName}} paid {{transaction().totalAmount|currency: transaction().amountResponse.currency: 'symbol'}}.
+              <p>You owe {{transaction().friend.name|shortenName}} {{transaction().amountResponse.amount|currency: transaction().amountResponse.currency: 'symbol'}}.</p>
           }
           @case (SplitOptions.YouPaidSplitEqually) {
             You paid {{transaction().totalAmount|currency: transaction().amountResponse.currency: 'symbol'}}.
-              <p>{{transaction().friendName|shortenName}} owe you {{transaction().amountResponse.amount|currency: transaction().amountResponse.currency: 'symbol'}}.</p>
+              <p>{{transaction().friend.name|shortenName}} owe you {{transaction().amountResponse.amount|currency: transaction().amountResponse.currency: 'symbol'}}.</p>
           }
         }
       </ion-label>
     </ion-item>
-    <ion-item>
-      <ion-button fill="solid" color="danger" size="small" (click)="deleteTransaction()">
-        <ion-icon slot="start" name="trash-outline"></ion-icon>
-        Delete
-      </ion-button>
-    </ion-item>
+    @if (!transaction().deleted) {
+      <ion-item>
+        <ion-button fill="solid" color="danger" size="small" (click)="deleteTransaction()">
+          <ion-icon slot="start" name="trash-outline"></ion-icon>
+          Delete
+        </ion-button>
+      </ion-item>
+    }
   </ion-list>
   @if (transaction().history.length) {
     <ion-list lines="none">
@@ -68,26 +72,41 @@
       </ion-item>
       @for (history of transaction().history; track history) {
         <ion-item>
+          <ion-avatar slot="start">
+            @if (history.changedByPhoto) {
+              <img [src]="history.changedByPhoto" alt="Friend's photo" />
+            } @else {
+              <ion-icon size="large" color="medium" name="person"></ion-icon>
+            }
+          </ion-avatar>
           <ion-label>
-            {{history.changedBy|shortenName}} updated this transaction
-            @for (change of history.changes; track change.type) {
-              <p>
-                -{{historyChangeType[change.type]}} changed from
-                @switch (change.type) {
-                  @case (HistoryChangeType.TOTAL_AMOUNT) {
-                    {{change.oldValue|currency: transaction().amountResponse.currency: 'symbol-narrow'}} to {{change.newValue|currency: transaction().amountResponse.currency: 'symbol-narrow'}}
+            {{history.changedByName|shortenName}}
+            @if (history.changes[0].type === HistoryChangeType.DELETED) {
+              deleted this transaction
+            } @else {
+              updated this transaction
+              @for (change of history.changes; track change.type) {
+                <p>
+                  -{{historyChangeType[change.type]}} changed from
+                  @switch (change.type) {
+                    @case (HistoryChangeType.TOTAL_AMOUNT) {
+                      {{change.oldValue|currency: transaction().amountResponse.currency: 'symbol-narrow'}} to {{change.newValue|currency: transaction().amountResponse.currency: 'symbol-narrow'}}
+                    }
+                    @case (HistoryChangeType.TRANSACTION_DATE) {
+                      {{change.oldValue|date}} to {{change.newValue|date}}
+                    }
+                    @case (HistoryChangeType.DESCRIPTION) {
+                      "{{change.oldValue}}" to "{{change.newValue}}"
+                    }
+                    @case (HistoryChangeType.DELETED) {
+                      "{{change.oldValue}}" to "{{change.newValue}}"
+                    }
+                    @default {
+                      {{change.oldValue}} to {{change.newValue}}
+                    }
                   }
-                  @case (HistoryChangeType.TRANSACTION_DATE) {
-                    {{change.oldValue|date}} to {{change.newValue|date}}
-                  }
-                  @case (HistoryChangeType.DESCRIPTION) {
-                    "{{change.oldValue}}" to "{{change.newValue}}"
-                  }
-                  @default {
-                    {{change.oldValue}} to {{change.newValue}}
-                  }
-                }
-              </p>
+                </p>
+              }
             }
           </ion-label>
         </ion-item>

@@ -11,7 +11,7 @@ import {
   IonLabel, IonList, IonNav, IonSpinner, IonTitle, IonToolbar, ModalController,
 } from '@ionic/angular/standalone';
 import { NavParams } from '@ionic/angular';
-import { Friend } from '../model';
+import { FriendWithBalance } from '../model';
 import { TransactionDetailsComponent } from '../transaction-details/transaction-details.component';
 import { FriendsStore } from '../friends.store';
 import { HelperService } from '../../helper.service';
@@ -47,7 +47,7 @@ import { DefineExpenseComponent } from '../../define-expense/define-expense.comp
 })
 export class FriendTransactionsComponent  implements OnInit {
   // readonly friend: Friend = inject(NavParams).data?.['friend'];
-  readonly friend = input.required<Friend>();
+  readonly friend = input.required<FriendWithBalance>();
   readonly nav = inject(IonNav);
   readonly friendsStore = inject(FriendsStore);
   readonly transactions = this.friendsStore.selectedTransactions;

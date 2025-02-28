@@ -25,7 +25,7 @@ import { firstValueFrom, takeUntil, timer } from 'rxjs';
 import { Router } from '@angular/router';
 import { HelperService } from '../helper.service';
 import { FriendsStore } from '../friends/friends.store';
-import { Friend, Transaction } from '../friends/model';
+import { FriendWithBalance, Transaction } from '../friends/model';
 import { SelectFriendComponent } from './select-friend/select-friend.component';
 import { DatePipe, JsonPipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
@@ -73,7 +73,7 @@ export enum SplitOptions {
   ],
 })
 export class DefineExpenseComponent extends ComponentDestroyedMixin() implements OnInit {
-  readonly friend = model<Friend|null>(null);
+  readonly friend = model<FriendWithBalance|null>(null);
   readonly loading = signal(false);
   readonly isUpdating = input(false);
   readonly transaction = input<Transaction>();

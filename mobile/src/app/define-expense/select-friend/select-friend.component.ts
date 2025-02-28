@@ -13,7 +13,7 @@ import { AddFriendComponent } from '../../add-friend/add-friend.component';
 import { FriendsStore } from '../../friends/friends.store';
 import { CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Friend } from '../../friends/model';
+import { FriendWithBalance } from '../../friends/model';
 
 @Component({
   selector: 'app-select-friend',
@@ -41,14 +41,14 @@ export class SelectFriendComponent {
   constructor() {
   }
 
-  friendBalanceColor(friend: Friend) {
+  friendBalanceColor(friend: FriendWithBalance) {
     if (!friend.mainBalance) {
       return 'light';
     }
     return friend.mainBalance.isOwed ? 'success' : 'danger';
   }
 
-  async chooseFriend(friend: Friend) {
+  async chooseFriend(friend: FriendWithBalance) {
     this.modalCtrl.dismiss({friend}, 'confirm');
   }
 
@@ -64,7 +64,7 @@ export class SelectFriendComponent {
     modal.present();
     const { role } = await modal.onWillDismiss();
     if (role === 'confirm') {
-      this.friendsStore.loadFriends();
+      // this.friendsStore.loadFriends();
     }
   }
 }

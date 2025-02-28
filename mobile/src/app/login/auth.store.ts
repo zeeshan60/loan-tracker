@@ -10,6 +10,8 @@ import { ToastController } from '@ionic/angular';
 import { StorageService } from '../services/storage.service';
 import { MethodsDictionary } from '@ngrx/signals/src/signal-store-models';
 import { PUBLIC_API } from '../constants';
+import { LoadingController } from '@ionic/angular/standalone';
+import { FriendsStore } from '../friends/friends.store';
 
 type AuthState = {
   apiKey: string,
@@ -56,10 +58,18 @@ export const AuthStore = signalStore(
     router = inject(Router),
     toastCtrl = inject(ToastController),
     storageService = inject(StorageService),
+    loadingCtrl = inject(LoadingController),
+    friendsStore = inject(FriendsStore),
   ): Methods => ({
     async loginWithGoogle(): Promise<void> {
       signInWithPopup(auth, new GoogleAuthProvider())
-        .then(async () => login(store, (await helperService.getFirebaseAccessToken())!, http, storageService))
+        .then(async () => {
+          const loader = await loadingCtrl.create({ duration: 2000 });
+          loader.present();
+          await login(store, (await helperService.getFirebaseAccessToken())!, http, storageService)
+          await friendsStore.loadFriends({ showLoader: false });
+          await loader.dismiss();
+        })
         .then(() => router.navigate(['/']))
         .catch(async (err: Error) => {
           await signOut(auth)
