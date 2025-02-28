@@ -1,6 +1,9 @@
 package com.zeenom.loan_tracker.transactions
 
-import com.zeenom.loan_tracker.common.*
+import com.zeenom.loan_tracker.common.Paginated
+import com.zeenom.loan_tracker.common.apply
+import com.zeenom.loan_tracker.common.isOwed
+import com.zeenom.loan_tracker.common.startOfMonth
 import com.zeenom.loan_tracker.events.CommandDto
 import com.zeenom.loan_tracker.events.CommandType
 import com.zeenom.loan_tracker.friends.FriendSummaryDto
@@ -41,7 +44,6 @@ class TransactionsController(
         return transactionQuery.execute(
             FriendTransactionQueryDto(
                 userId = userId,
-                friendId = transactionRequest.recipientId ?: throw IllegalArgumentException("Recipient id is required"),
                 transactionId = transactionId
             )
         ).toResponse()
@@ -90,7 +92,7 @@ class TransactionsController(
         @PathVariable transactionId: UUID,
         @RequestBody transactionRequest: TransactionUpdateRequest,
         @AuthenticationPrincipal userId: String,
-    ): MessageResponse {
+    ): TransactionResponse {
         updateTransactionCommand.execute(
             CommandDto(
                 userId = userId,
@@ -98,7 +100,13 @@ class TransactionsController(
                 commandType = CommandType.UPDATE_TRANSACTION
             )
         )
-        return MessageResponse("Transaction updated successfully")
+
+        return transactionQuery.execute(
+            FriendTransactionQueryDto(
+                userId = userId,
+                transactionId = transactionId
+            )
+        ).toResponse()
     }
 
     @Operation(summary = "Delete a transaction")
@@ -106,7 +114,7 @@ class TransactionsController(
     suspend fun deleteTransaction(
         @PathVariable transactionId: UUID,
         @AuthenticationPrincipal userId: String,
-    ): MessageResponse {
+    ): TransactionResponse {
         deleteTransactionCommand.execute(
             CommandDto(
                 userId = userId,
@@ -114,7 +122,12 @@ class TransactionsController(
                 commandType = CommandType.DELETE_TRANSACTION
             )
         )
-        return MessageResponse("Transaction deleted successfully")
+        return transactionQuery.execute(
+            FriendTransactionQueryDto(
+                userId = userId,
+                transactionId = transactionId
+            )
+        ).toResponse()
     }
 
     @Operation(

@@ -15,7 +15,7 @@ class TransactionsQuery(
 @Service
 class TransactionQuery(private val transactionService: TransactionService) : Query<FriendTransactionQueryDto, TransactionDto> {
     override suspend fun execute(input: FriendTransactionQueryDto): TransactionDto {
-        return transactionService.findByUserIdTransactionId(input.userId, input.friendId, input.transactionId)
+        return transactionService.findByUserIdTransactionId(input.userId, input.transactionId)
     }
 }
 

@@ -179,7 +179,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
             )
             .exchange()
             .expectStatus().isOk
-            .expectBody().jsonPath("$.message").isEqualTo("Transaction updated successfully")
+            .expectBody().jsonPath("$.description").isEqualTo("Sample transaction edited")
     }
 
     @Order(6)
@@ -406,7 +406,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
             )
             .exchange()
             .expectStatus().isOk
-            .expectBody().jsonPath("$.message").isEqualTo("Transaction updated successfully")
+            .expectBody().jsonPath("$.description").isEqualTo("Sample transaction edited by john")
     }
 
     lateinit var transaction2: TransactionResponse
@@ -495,7 +495,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
             .header("Authorization", "Bearer $zeeToken")
             .exchange()
             .expectStatus().isOk
-            .expectBody().jsonPath("$.message").isEqualTo("Transaction deleted successfully")
+            .expectBody().jsonPath("$.deleted").isEqualTo(true)
     }
 
     @Order(15)

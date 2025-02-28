@@ -279,6 +279,17 @@ class TransactionService(
         }.flatten().sortedWith(compareByDescending<ActivityLogWithFriendInfo> { it.date }.thenByDescending { it.id })
     }
 
+    suspend fun findByUserIdTransactionId(userId: String, transactionId: UUID): TransactionDto {
+        val (user, friendUsersByUid, friendUsersByStreamId) = userAndFriendInfo(userId)
+        val transactionModel = transactionEventHandler.transactionModelByTransactionId(userId, transactionId)
+        return transactionModel.transactionModel.toTransactionDto(
+            friendUsersByStreamId = friendUsersByStreamId,
+            friendUsersByUserId = friendUsersByUid,
+            userDto = user,
+            history = emptyList()
+        )
+    }
+
     fun TransactionModel.toTransactionDto(
         friendUsersByStreamId: Map<UUID, FriendUserDto>,
         friendUsersByUserId: Map<String, FriendUserDto>,
@@ -318,17 +329,6 @@ class TransactionService(
             updatedBy = updatedBy,
             updatedByName = if (updatedBy == userDto.uid) "You" else friendUsersByUserId[updatedBy]?.name,
             transactionDate = transactionDate
-        )
-    }
-
-    suspend fun findByUserIdTransactionId(userId: String, friendId: UUID, transactionId: UUID): TransactionDto {
-        val (user, friendUsersByUid, friendUsersByStreamId) = userAndFriendInfo(userId)
-        val transactionModel = transactionEventHandler.transactionModelByTransactionId(userId, transactionId)
-        return transactionModel.transactionModel.toTransactionDto(
-            friendUsersByStreamId = friendUsersByStreamId,
-            friendUsersByUserId = friendUsersByUid,
-            userDto = user,
-            history = emptyList()
         )
     }
 }
