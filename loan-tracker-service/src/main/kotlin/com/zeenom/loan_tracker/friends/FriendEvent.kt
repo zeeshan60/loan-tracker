@@ -1,5 +1,7 @@
 package com.zeenom.loan_tracker.friends
 
+import com.zeenom.loan_tracker.common.events.IEvent
+import com.zeenom.loan_tracker.transactions.IEventAble
 import kotlinx.coroutines.flow.Flow
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
@@ -19,7 +21,62 @@ data class FriendEvent(
     val streamId: UUID,
     val version: Int,
     val eventType: FriendEventType,
+): IEventAble<FriendModel> {
+    override fun toEvent(): IEvent<FriendModel> {
+        return FriendCreated(
+            id = id,
+            friendEmail = friendEmail,
+            friendPhoneNumber = friendPhoneNumber,
+            friendDisplayName = friendDisplayName,
+            userId = userUid,
+            createdAt = createdAt,
+            streamId = streamId,
+            version = version,
+            createdBy = userUid
+        )
+    }
+}
+
+data class FriendModel(
+    val id: UUID?,
+    val userUid: String,
+    val friendEmail: String?,
+    val friendPhoneNumber: String?,
+    val friendDisplayName: String,
+    val createdAt: Instant,
+    val streamId: UUID,
+    val version: Int,
+    val eventType: FriendEventType,
 )
+
+data class FriendCreated(
+    val id: UUID?,
+    val friendEmail: String?,
+    val friendPhoneNumber: String?,
+    val friendDisplayName: String,
+    override val userId: String,
+    override val createdAt: Instant,
+    override val streamId: UUID,
+    override val version: Int,
+    override val createdBy: String
+): IEvent<FriendModel> {
+    override fun toEntity(): Any {
+        return FriendEvent(
+            userUid = userId,
+            friendEmail = friendEmail,
+            friendPhoneNumber = friendPhoneNumber,
+            friendDisplayName = friendDisplayName,
+            createdAt = createdAt,
+            streamId = streamId,
+            version = version,
+            eventType = FriendEventType.FRIEND_CREATED
+        )
+    }
+
+    override fun applyEvent(existing: FriendModel): FriendModel {
+        throw IllegalStateException("FriendCreated event should not be applied to existing entity")
+    }
+}
 
 enum class FriendEventType {
     FRIEND_CREATED

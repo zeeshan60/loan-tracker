@@ -12,6 +12,10 @@ import java.math.BigDecimal
 import java.time.Instant
 import java.util.*
 
+interface IEventAble<T> {
+    fun toEvent(): IEvent<T>
+}
+
 @Table("transaction_events")
 data class TransactionEvent(
     @Id private val id: UUID? = null,
@@ -27,8 +31,8 @@ data class TransactionEvent(
     val streamId: UUID,
     val version: Int,
     val eventType: TransactionEventType,
-) {
-    fun toEvent(): IEvent<TransactionModel> {
+): IEventAble<TransactionModel> {
+    override fun toEvent(): IEvent<TransactionModel> {
         return when (eventType) {
             TransactionEventType.TRANSACTION_CREATED -> TransactionCreated(
                 id = id,

@@ -1,5 +1,6 @@
 package com.zeenom.loan_tracker.friends
 
+import com.zeenom.loan_tracker.common.events.IEvent
 import com.zeenom.loan_tracker.users.UserDto
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.toList
@@ -23,19 +24,12 @@ class FriendsEventHandler(
     }
 
 
-    suspend fun saveFriend(uid: String, friendDto: CreateFriendDto) {
-        eventRepository.save(
-            FriendEvent(
-                userUid = uid,
-                friendEmail = friendDto.email,
-                friendPhoneNumber = friendDto.phoneNumber,
-                friendDisplayName = friendDto.name,
-                createdAt = Instant.now(),
-                streamId = UUID.randomUUID(),
-                version = 1,
-                eventType = FriendEventType.FRIEND_CREATED
-            )
-        )
+    suspend fun addEvent(event: IEvent<FriendModel>) {
+        val entity = event.toEntity()
+        if (entity is FriendEvent) {
+            eventRepository.save(entity)
+        } else
+            throw IllegalStateException("Invalid event type ${entity.javaClass.simpleName}")
     }
 
     suspend fun saveAllUsersAsFriends(userId: String, userDtos: List<UserDto>) {

@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
+import java.time.Instant
 import java.util.*
 
 @Service
@@ -79,7 +80,17 @@ class FriendService(
             friendsEventHandler.findByUserUidAndFriendPhoneNumber(userId, friendDto.phoneNumber)
                 ?.let { throw IllegalArgumentException("Friend with phone number ${friendDto.phoneNumber} already exist") }
 
-        friendsEventHandler.saveFriend(userId, friendDto)
+        friendsEventHandler.addEvent(FriendCreated(
+            userId = userId,
+            friendEmail = friendDto.email,
+            friendPhoneNumber = friendDto.phoneNumber,
+            friendDisplayName = friendDto.name,
+            createdAt = Instant.now(),
+            streamId = UUID.randomUUID(),
+            version = 1,
+            id = null,
+            createdBy = userId,
+        ))
         makeMeThisUsersFriendAsWell(friendDto.email, friendDto.phoneNumber, user)
     }
 
@@ -102,11 +113,17 @@ class FriendService(
                     )
                 }).let {
                 if (it == null) {
-
-                    friendsEventHandler.saveFriend(
-                        usersFriend.uid,
-                        CreateFriendDto(me.email, me.phoneNumber, me.displayName)
-                    )
+                    friendsEventHandler.addEvent(FriendCreated(
+                        userId = usersFriend.uid,
+                        friendEmail = me.email,
+                        friendPhoneNumber = me.phoneNumber,
+                        friendDisplayName = me.displayName,
+                        createdAt = Instant.now(),
+                        streamId = UUID.randomUUID(),
+                        version = 1,
+                        id = null,
+                        createdBy = me.uid,
+                    ))
                 }
             }
         }
