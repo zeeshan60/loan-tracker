@@ -1,6 +1,6 @@
 # loan-tracker
 
-## Some handy commands to setup docker and run service on ec2
+## Some handy commands to set up docker and run service on ec2
 
 quick ec2 setup:
 
@@ -132,7 +132,7 @@ hooks:
 
 # Installing gradle on windows
 
-- in power shell
+- in PowerShell
 - Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 - iwr -useb get.scoop.sh | iex
 - scoop install gradle

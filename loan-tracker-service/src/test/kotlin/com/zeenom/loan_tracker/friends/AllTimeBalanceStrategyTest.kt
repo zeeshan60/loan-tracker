@@ -2,7 +2,6 @@ package com.zeenom.loan_tracker.friends
 
 import com.zeenom.loan_tracker.currencyRateMap
 import com.zeenom.loan_tracker.transactions.AmountDto
-import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.util.*
@@ -110,7 +109,7 @@ class AllTimeBalanceStrategyTest {
     }
 
     @Test
-    fun `with negative balance reverts isowed`() {
+    fun `with negative balance reverts isOwed`() {
         val amountDto1 = AmountDto(
             amount = 100.0.toBigDecimal(),
             currency = Currency.getInstance("USD"),

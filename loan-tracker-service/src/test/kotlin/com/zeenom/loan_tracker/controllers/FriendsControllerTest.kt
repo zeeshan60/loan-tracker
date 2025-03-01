@@ -138,7 +138,7 @@ class FriendsControllerTest(
         val response = webTestClient.options()
             .uri("/api/v1/friends")
             .header("Authorization", "Bearer ${authService.generateJwt("verified-id-token")}")
-            .header("Origin", "http://any-origin.com")
+            .header("Origin", "https://any-origin.com")
             .header("Access-Control-Request-Method", "GET")
             .exchange()
 
@@ -151,7 +151,7 @@ class FriendsControllerTest(
     fun `test CORS preflight request is allowed`() {
         val response = webTestClient.options()
             .uri("/api/v1/friends") // Change this to a real endpoint
-            .header("Origin", "http://example.com") // Simulate a request from a frontend
+            .header("Origin", "https://example.com") // Simulate a request from a frontend
             .header("Access-Control-Request-Method", "POST") // Simulate preflight for POST
             .exchange()
 

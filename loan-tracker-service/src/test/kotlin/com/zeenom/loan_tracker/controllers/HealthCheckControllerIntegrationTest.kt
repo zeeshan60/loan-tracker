@@ -25,7 +25,7 @@ class HealthCheckControllerIntegrationTest(@LocalServerPort private val port: In
     fun `test cors configuration`() {
         val response = webTestClient.options()
             .uri("/health")
-            .header("Origin", "http://any-origin.com")
+            .header("Origin", "https://any-origin.com")
             .header("Access-Control-Request-Method", "GET")
             .exchange()
 

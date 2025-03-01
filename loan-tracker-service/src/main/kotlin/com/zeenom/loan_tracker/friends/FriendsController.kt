@@ -6,6 +6,7 @@ import com.zeenom.loan_tracker.events.CommandDto
 import com.zeenom.loan_tracker.events.CommandType
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
@@ -19,7 +20,7 @@ class FriendsController(
     private val friendQuery: FriendQuery,
 ) {
 
-    val logger = LoggerFactory.getLogger(FriendsController::class.java)
+    val logger: Logger = LoggerFactory.getLogger(FriendsController::class.java)
 
     @Operation(summary = "Get friends", description = "Retrieve a list of friends with pagination")
     @GetMapping
