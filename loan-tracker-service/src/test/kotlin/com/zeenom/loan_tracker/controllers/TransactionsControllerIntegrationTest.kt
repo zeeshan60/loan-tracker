@@ -2,22 +2,19 @@ package com.zeenom.loan_tracker.controllers
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.zeenom.loan_tracker.common.Paginated
-import com.zeenom.loan_tracker.currencyRateMap
 import com.zeenom.loan_tracker.friends.FriendEventRepository
 import com.zeenom.loan_tracker.friends.FriendsResponse
+import com.zeenom.loan_tracker.prettyAndPrint
 import com.zeenom.loan_tracker.transactions.*
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventRepository
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.web.server.LocalServerPort
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import java.time.Instant
 import java.util.*
 
@@ -35,6 +32,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
 
     private lateinit var zeeToken: String
     private lateinit var johnToken: String
+    private lateinit var jasonToken: String
     private var zeeDto = UserDto(
         uid = "123",
         email = "zee@gmail.com",
@@ -49,6 +47,14 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
         phoneNumber = "+923001234568",
         displayName = "John Doe",
         photoUrl = "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl3",
+        emailVerified = true
+    )
+    private var jasonDto = UserDto(
+        uid = "125",
+        email = "jason@gmail.com",
+        phoneNumber = "+923001234569",
+        displayName = "Jason Doe",
+        photoUrl = "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl4",
         emailVerified = true
     )
     private lateinit var johnFriendId: UUID
@@ -588,6 +594,20 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
         assertThat(result.data[4].activityByName).isEqualTo(zeeDto.displayName)
         assertThat(result.data[4].activityByPhoto).isEqualTo(zeeDto.photoUrl)
         assertTransactionDataCorrectness(result.data[4].transactionResponse)
+    }
+
+    @Order(17)
+    @Test
+    fun `login as jason add john as friend and see if john also has jason as friend and jason has john as friend`() {
+        jasonToken = loginUser(jasonDto).token
+        addFriend(jasonToken, "johni")
+        val johnFriends = queryFriend(johnToken).data.friends
+        assertThat(johnFriends).hasSize(2)
+        assertThat(johnFriends[1].name).isEqualTo("Jason Doe")
+
+        val jasonFriends = queryFriend(jasonToken).data.friends
+        assertThat(jasonFriends).hasSize(1)
+        assertThat(jasonFriends[0].name).isEqualTo("johni")
     }
 
     private fun assertTransactionDataCorrectness(transactionResponse: TransactionResponse) {
