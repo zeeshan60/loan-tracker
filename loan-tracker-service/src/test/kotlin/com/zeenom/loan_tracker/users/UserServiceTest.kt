@@ -1,6 +1,7 @@
 package com.zeenom.loan_tracker.users
 
 import com.zeenom.loan_tracker.friends.TestPostgresConfig
+import com.zeenom.loan_tracker.friends.UserUpdateDto
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
@@ -143,8 +144,11 @@ class UserServiceTest(
         saveEvent(userDto = userDto)
 
         userService.updateUser(
-            userDto.copy(
-                currency = "PKR"
+            UserUpdateDto(
+                uid = userDto.uid,
+                currency = "PKR",
+                displayName = userDto.displayName,
+                phoneNumber = userDto.phoneNumber,
             )
         )
 

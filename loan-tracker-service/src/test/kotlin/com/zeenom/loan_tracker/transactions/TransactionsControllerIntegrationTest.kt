@@ -1,10 +1,10 @@
-package com.zeenom.loan_tracker.controllers
+package com.zeenom.loan_tracker.transactions
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.zeenom.loan_tracker.common.Paginated
+import com.zeenom.loan_tracker.controllers.BaseIntegration
 import com.zeenom.loan_tracker.friends.FriendEventRepository
 import com.zeenom.loan_tracker.friends.FriendsResponse
-import com.zeenom.loan_tracker.transactions.*
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventRepository
 import kotlinx.coroutines.runBlocking
