@@ -11,7 +11,7 @@ data class FriendDto(
     val photoUrl: String?,
     val name: String,
     val mainCurrency: Currency?,
-    val balances: List<AmountDto>,
+    val balances: AllTimeBalanceDto,
 )
 
 data class FriendSummaryDto(

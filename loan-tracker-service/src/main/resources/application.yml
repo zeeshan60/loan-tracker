@@ -1,8 +1,4 @@
 spring:
-  cache:
-    type: caffeine
-    caffeine:
-      spec: maximumSize=100,expireAfterWrite=4h
   r2dbc:
     url: r2dbc:${DATABASE_URL}
     username: ${DATABASE_USER}

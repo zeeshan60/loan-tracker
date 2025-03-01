@@ -12,25 +12,12 @@ class FriendsControllerAdapter {
     )
 
     fun FriendDto.toResponse(): FriendResponse {
-        val mainBalance = this.balances.firstOrNull { it.currency == this.mainCurrency } ?: this.balances.firstOrNull()
         return FriendResponse(
             photoUrl = this.photoUrl,
             name = this.name,
             friendId = this.friendId,
-            mainBalance = mainBalance?.let {
-                AmountResponse(
-                    amount = it.amount,
-                    currency = it.currency.currencyCode,
-                    isOwed = it.isOwed
-                )
-            },
-            otherBalances = this.balances.filter { it.currency != mainBalance?.currency }.map {
-                AmountResponse(
-                    amount = it.amount,
-                    currency = it.currency.currencyCode,
-                    isOwed = it.isOwed
-                )
-            }
+            mainBalance = this.balances.main?.let { AmountResponse(it.amount, it.currency.currencyCode, it.isOwed) },
+            otherBalances = this.balances.other.map { AmountResponse(it.amount, it.currency.currencyCode, it.isOwed) }
         )
     }
 

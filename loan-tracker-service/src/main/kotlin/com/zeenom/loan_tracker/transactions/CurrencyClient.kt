@@ -8,9 +8,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.reactor.awaitSingle
 import org.slf4j.LoggerFactory
-import org.springframework.boot.autoconfigure.cache.CacheProperties
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.cache.annotation.Cacheable
+import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
@@ -27,14 +26,20 @@ class CurrencyClientProperties {
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class CurrencyResponse(val rates: Map<String, BigDecimal>)
 
+interface ICurrencyClient {
+    suspend fun fetchCurrencies(): CurrencyResponse
+}
+
 @Service
-class CurrencyClient(private val webClient: WebClient, private val currencyClientProperties: CurrencyClientProperties) {
+@Profile("!test")
+class CurrencyClient(private val webClient: WebClient, private val currencyClientProperties: CurrencyClientProperties) :
+    ICurrencyClient {
     private val logger = LoggerFactory.getLogger(CurrencyClient::class.java)
     private val cache = Caffeine.newBuilder()
-        .expireAfterWrite(10, TimeUnit.MINUTES) // Adjust as needed
+        .expireAfterWrite(10, TimeUnit.HOURS)
         .build<String, Deferred<CurrencyResponse>>()
 
-    suspend fun fetchCurrencies(): CurrencyResponse {
+    override suspend fun fetchCurrencies(): CurrencyResponse {
         return cache.get("currencies") {
             CoroutineScope(Dispatchers.IO).async {
                 logger.info("Fetching currencies")
@@ -44,5 +49,19 @@ class CurrencyClient(private val webClient: WebClient, private val currencyClien
                     .awaitSingle()
             }
         }!!.await()
+    }
+}
+
+@Service
+@Profile("test")
+class TestCurrencyClient : ICurrencyClient {
+    override suspend fun fetchCurrencies(): CurrencyResponse {
+        return CurrencyResponse(
+            mapOf(
+                "USD" to 1.0.toBigDecimal(),
+                "PKR" to 260.0.toBigDecimal(),
+                "SGD" to 1.3.toBigDecimal()
+            )
+        )
     }
 }

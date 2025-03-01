@@ -5,8 +5,9 @@ import java.util.*
 
 data class FriendsResponse(
     val friends: List<FriendResponse>,
-    val balance: AllTimeBalanceDto
+    val balance: AllTimeBalanceDto,
 )
+
 data class FriendResponse(
     val photoUrl: String?,
     val name: String,

@@ -45,7 +45,10 @@ class FriendsControllerTest(
                     name = "John Doe",
                     email = "sample@gmail.com",
                     phoneNumber = "+923001234567",
-                    balances = listOf(AmountDto(1000.0.toBigDecimal(), Currency.getInstance("USD"), true)),
+                    balances = AllTimeBalanceDto(
+                        AmountDto(1000.0.toBigDecimal(), Currency.getInstance("USD"), true),
+                        listOf(AmountDto(1000.0.toBigDecimal(), Currency.getInstance("USD"), true))
+                    ),
                     mainCurrency = Currency.getInstance("USD"),
                     photoUrl = "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl2",
                     friendId = UUID.randomUUID()
@@ -96,7 +99,10 @@ class FriendsControllerTest(
                 photoUrl = "some photo",
                 name = "John Doe",
                 mainCurrency = null,
-                balances = emptyList()
+                balances = AllTimeBalanceDto(
+                    main = null,
+                    other = emptyList()
+                )
             )
         )
         Mockito.doReturn(Unit).`when`(commandDao).addCommand<CommandPayloadDto>(any())

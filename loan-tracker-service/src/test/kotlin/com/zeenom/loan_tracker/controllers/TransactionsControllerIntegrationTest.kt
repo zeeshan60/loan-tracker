@@ -2,6 +2,7 @@ package com.zeenom.loan_tracker.controllers
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.zeenom.loan_tracker.common.Paginated
+import com.zeenom.loan_tracker.currencyRateMap
 import com.zeenom.loan_tracker.friends.FriendEventRepository
 import com.zeenom.loan_tracker.friends.FriendsResponse
 import com.zeenom.loan_tracker.transactions.*
@@ -10,10 +11,13 @@ import com.zeenom.loan_tracker.users.UserEventRepository
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.web.server.LocalServerPort
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import java.time.Instant
 import java.util.*
 
@@ -53,7 +57,6 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
 
     @BeforeAll
     fun setupBeforeAll(): Unit = runBlocking {
-
         userEventRepository.deleteAll()
         friendEventRepository.deleteAll()
         transactionEventRepository.deleteAll()
@@ -314,7 +317,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
         assertThat(result.data.friends).hasSize(1)
         assertThat(result.data.friends[0].name).isEqualTo("john")
         assertThat(result.data.friends[0].mainBalance).isNotNull
-        assertThat(result.data.friends[0].mainBalance!!.amount).isEqualTo(200.0.toBigDecimal())
+        assertThat(result.data.friends[0].mainBalance!!.amount).isEqualTo(153.85.toBigDecimal())
         assertThat(result.data.friends[0].mainBalance!!.isOwed).isTrue()
         assertThat(result.data.friends[0].photoUrl).isEqualTo(johnDto.photoUrl)
     }
@@ -337,7 +340,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
         assertThat(result.data.friends).hasSize(1)
         assertThat(result.data.friends[0].name).isEqualTo("Zeeshan Tufail")
         assertThat(result.data.friends[0].mainBalance).isNotNull
-        assertThat(result.data.friends[0].mainBalance!!.amount).isEqualTo(200.0.toBigDecimal())
+        assertThat(result.data.friends[0].mainBalance!!.amount).isEqualTo(153.85.toBigDecimal())
         assertThat(result.data.friends[0].mainBalance!!.isOwed).isFalse()
         assertThat(result.data.friends[0].photoUrl).isEqualTo(zeeDto.photoUrl)
     }
@@ -410,6 +413,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
     }
 
     lateinit var transaction2: TransactionResponse
+
     @Order(13)
     @Test
     fun `get all transactions as zee has history for john as well`() {

@@ -16,16 +16,18 @@ class FriendsControllerAdapterTest {
             photoUrl = null,
             name = "John",
             mainCurrency = null,
-            balances = listOf(
-                AmountDto(
-                    amount = 100.0.toBigDecimal(),
-                    currency = Currency.getInstance("SGD"),
-                    isOwed = true
-                ),
-                AmountDto(
-                    amount = 200.0.toBigDecimal(),
-                    currency = Currency.getInstance("USD"),
-                    isOwed = false
+            balances = AllTimeBalanceDto(
+                null, listOf(
+                    AmountDto(
+                        amount = 100.0.toBigDecimal(),
+                        currency = Currency.getInstance("SGD"),
+                        isOwed = true
+                    ),
+                    AmountDto(
+                        amount = 200.0.toBigDecimal(),
+                        currency = Currency.getInstance("USD"),
+                        isOwed = false
+                    )
                 )
             )
         )
@@ -62,7 +64,7 @@ class FriendsControllerAdapterTest {
             photoUrl = null,
             name = "John",
             mainCurrency = Currency.getInstance("USD"),
-            balances = listOf(
+            balances = AllTimeBalanceDto(null, listOf(
                 AmountDto(
                     amount = 100.0.toBigDecimal(),
                     currency = Currency.getInstance("SGD"),
@@ -73,7 +75,7 @@ class FriendsControllerAdapterTest {
                     currency = Currency.getInstance("USD"),
                     isOwed = false
                 )
-            )
+            ))
         )
 
         // Act
@@ -108,7 +110,7 @@ class FriendsControllerAdapterTest {
             photoUrl = null,
             name = "John",
             mainCurrency = Currency.getInstance("USD"),
-            balances = emptyList()
+            balances = AllTimeBalanceDto(null, emptyList())
         )
 
         // Act
