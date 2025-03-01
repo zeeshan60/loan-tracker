@@ -5,6 +5,8 @@ import com.zeenom.loan_tracker.common.Paginated
 import com.zeenom.loan_tracker.controllers.BaseIntegration
 import com.zeenom.loan_tracker.friends.FriendEventRepository
 import com.zeenom.loan_tracker.friends.FriendsResponse
+import com.zeenom.loan_tracker.friends.UpdateUserRequest
+import com.zeenom.loan_tracker.friends.UserResponse
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventRepository
 import kotlinx.coroutines.runBlocking
@@ -610,6 +612,35 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
         val jasonFriends = queryFriend(jasonToken).data.friends
         assertThat(jasonFriends).hasSize(1)
         assertThat(jasonFriends[0].name).isEqualTo("johni")
+    }
+
+    @Order(18)
+    @Test
+    fun `update zee main currency and get friends returns main balance in updated currency`() {
+        val userRequest = UpdateUserRequest(
+            displayName = zeeDto.displayName,
+            phoneNumber = zeeDto.phoneNumber,
+            currency = "PKR"
+        )
+        webTestClient.put()
+            .uri("/api/v1/users")
+            .header("Authorization", "Bearer $zeeToken")
+            .bodyValue(userRequest)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody(UserResponse::class.java)
+            .returnResult().responseBody!!
+
+        val friends = queryFriend(zeeToken).data.friends
+
+        assertThat(friends).hasSize(1)
+        assertThat(friends[0].mainBalance!!.amount).isEqualTo(13000.toBigDecimal())
+        assertThat(friends[0].mainBalance!!.isOwed).isTrue()
+        assertThat(friends[0].mainBalance!!.currency).isEqualTo("PKR")
+        assertThat(friends[0].otherBalances).hasSize(1)
+        assertThat(friends[0].otherBalances[0].amount).isEqualTo(50.0.toBigDecimal())
+        assertThat(friends[0].otherBalances[0].isOwed).isTrue()
+        assertThat(friends[0].otherBalances[0].currency).isEqualTo("USD")
     }
 
     private fun assertTransactionDataCorrectness(transactionResponse: TransactionResponse) {
