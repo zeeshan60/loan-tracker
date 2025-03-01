@@ -10,6 +10,10 @@ import org.springframework.stereotype.Repository
 import java.time.Instant
 import java.util.*
 
+interface IFriendEvent : IEvent<FriendModel> {
+    override fun toEntity(): FriendEvent
+}
+
 @Table("friend_events")
 data class FriendEvent(
     @Id val id: UUID? = null,
@@ -22,7 +26,7 @@ data class FriendEvent(
     val version: Int,
     val eventType: FriendEventType,
 ) : IEventAble<FriendModel> {
-    override fun toEvent(): IEvent<FriendModel> {
+    override fun toEvent(): IFriendEvent {
         return when (eventType) {
             FriendEventType.FRIEND_CREATED -> FriendCreated(
                 id = id,
@@ -60,8 +64,8 @@ data class FriendCreated(
     override val streamId: UUID,
     override val version: Int,
     override val createdBy: String,
-) : IEvent<FriendModel> {
-    override fun toEntity(): Any {
+) : IFriendEvent {
+    override fun toEntity(): FriendEvent {
         return FriendEvent(
             userUid = userId,
             friendEmail = friendEmail,

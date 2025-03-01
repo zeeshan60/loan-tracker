@@ -144,11 +144,8 @@ class TransactionEventHandler(
     }
 
 
-    suspend fun addEvent(event: IEvent<TransactionModel>) {
-        val entity = event.toEntity()
-        if (entity is TransactionEvent)
-            transactionEventRepository.save(entity)
-        else throw IllegalArgumentException("Invalid event type ${entity.javaClass}")
+    suspend fun addEvent(event: ITransactionEvent) {
+        transactionEventRepository.save(event.toEntity())
     }
 
     private fun TransactionEvent.reverse(

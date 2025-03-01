@@ -7,6 +7,10 @@ import org.springframework.data.relational.core.mapping.Table
 import java.time.Instant
 import java.util.*
 
+interface IUserEvent: IEvent<UserModel> {
+    override fun toEntity(): UserEvent
+}
+
 @Table("user_events")
 data class UserEvent(
     @Id val id: UUID? = null,
@@ -75,8 +79,8 @@ data class UserCreated(
     override val version: Int,
     override val streamId: UUID,
     override val createdBy: String,
-) : IEvent<UserModel> {
-    override fun toEntity(): Any {
+) : IUserEvent {
+    override fun toEntity(): UserEvent {
         return UserEvent(
             uid = userId,
             streamId = streamId,
@@ -117,7 +121,7 @@ data class UserCurrencyChanged(
     override val streamId: UUID,
     override val createdBy: String,
 ) : IEvent<UserModel> {
-    override fun toEntity(): Any {
+    override fun toEntity(): IEventAble<UserModel> {
         return UserEvent(
             uid = userId,
             streamId = streamId,

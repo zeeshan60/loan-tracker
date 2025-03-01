@@ -12,6 +12,7 @@ interface ITransactionEvent : IEvent<TransactionModel>, TransactionChangeSummary
     val id: UUID?
     val recipientId: UUID
     val transactionDate: Instant
+    override fun toEntity(): TransactionEvent
     fun activityLog(current: TransactionModel): ActivityLog
 }
 
@@ -68,7 +69,7 @@ data class TransactionCreated(
 
     }
 
-    override fun crossTransaction(recipientUserId: String, userStreamId: UUID): IEvent<TransactionModel> {
+    override fun crossTransaction(recipientUserId: String, userStreamId: UUID): ITransactionEvent {
         return TransactionCreated(
             id = null,
             userId = recipientUserId,
@@ -153,7 +154,7 @@ data class TransactionDateChanged(
         )
     }
 
-    override fun crossTransaction(recipientUserId: String, userStreamId: UUID): IEvent<TransactionModel> {
+    override fun crossTransaction(recipientUserId: String, userStreamId: UUID): ITransactionEvent {
         return TransactionDateChanged(
             id = id,
             transactionDate = transactionDate,
@@ -232,7 +233,7 @@ data class DescriptionChanged(
         )
     }
 
-    override fun crossTransaction(recipientUserId: String, userStreamId: UUID): IEvent<TransactionModel> {
+    override fun crossTransaction(recipientUserId: String, userStreamId: UUID): ITransactionEvent {
         return DescriptionChanged(
             id = id,
             description = description,
@@ -310,7 +311,7 @@ data class TransactionDeleted(
         )
     }
 
-    override fun crossTransaction(recipientUserId: String, userStreamId: UUID): IEvent<TransactionModel> {
+    override fun crossTransaction(recipientUserId: String, userStreamId: UUID): ITransactionEvent {
         return TransactionDeleted(
             id = id,
             userId = recipientUserId,
@@ -389,7 +390,7 @@ data class TotalAmountChanged(
         )
     }
 
-    override fun crossTransaction(recipientUserId: String, userStreamId: UUID): IEvent<TransactionModel> {
+    override fun crossTransaction(recipientUserId: String, userStreamId: UUID): ITransactionEvent {
         return TotalAmountChanged(
             id = id,
             totalAmount = totalAmount,
@@ -468,7 +469,7 @@ data class CurrencyChanged(
         )
     }
 
-    override fun crossTransaction(recipientUserId: String, userStreamId: UUID): IEvent<TransactionModel> {
+    override fun crossTransaction(recipientUserId: String, userStreamId: UUID): ITransactionEvent {
         return CurrencyChanged(
             id = id,
             currency = currency,
@@ -547,7 +548,7 @@ data class SplitTypeChanged(
         )
     }
 
-    override fun crossTransaction(recipientUserId: String, userStreamId: UUID): IEvent<TransactionModel> {
+    override fun crossTransaction(recipientUserId: String, userStreamId: UUID): ITransactionEvent {
         return SplitTypeChanged(
             id = id,
             splitType = splitType.reverse(),
@@ -578,7 +579,7 @@ data class SplitTypeChanged(
 }
 
 interface CrossTransactionable {
-    fun crossTransaction(recipientUserId: String, userStreamId: UUID): IEvent<TransactionModel>
+    fun crossTransaction(recipientUserId: String, userStreamId: UUID): ITransactionEvent
 }
 
 interface TransactionChangeSummary {
