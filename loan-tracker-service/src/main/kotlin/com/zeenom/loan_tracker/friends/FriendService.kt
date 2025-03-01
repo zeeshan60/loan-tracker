@@ -80,6 +80,36 @@ class FriendService(
                 ?.let { throw IllegalArgumentException("Friend with phone number ${friendDto.phoneNumber} already exist") }
 
         friendsEventHandler.saveFriend(userId, friendDto)
+        makeMeThisUsersFriendAsWell(friendDto.email, friendDto.phoneNumber, user)
+    }
+
+    private suspend fun makeMeThisUsersFriendAsWell(friendEmail: String?, phoneNumber: String?, me: UserDto) {
+        val friendsExistingUser =
+            friendEmail?.let { userEventHandler.findUserByEmail(friendEmail) } ?: phoneNumber?.let {
+                userEventHandler.findUserByPhoneNumber(phoneNumber)
+            }
+        friendsExistingUser?.let { usersFriend ->
+            (me.email?.let {
+                friendsEventHandler.findByUserUidAndFriendEmail(
+                    usersFriend.uid,
+                    me.email
+                )
+            }
+                ?: me.phoneNumber?.let {
+                    friendsEventHandler.findByUserUidAndFriendPhoneNumber(
+                        usersFriend.uid,
+                        me.phoneNumber
+                    )
+                }).let {
+                if (it == null) {
+
+                    friendsEventHandler.saveFriend(
+                        usersFriend.uid,
+                        CreateFriendDto(me.email, me.phoneNumber, me.displayName)
+                    )
+                }
+            }
+        }
     }
 
     suspend fun searchUsersImFriendOfAndAddThemAsMyFriends(uid: String) {
