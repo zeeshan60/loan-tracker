@@ -73,8 +73,8 @@ data class FriendCreated(
         )
     }
 
-    override fun applyEvent(existing: FriendModel): FriendModel {
-        throw IllegalStateException("FriendCreated event should not be applied to existing entity")
+    override fun applyEvent(existing: FriendModel?): FriendModel {
+        TODO()
     }
 }
 

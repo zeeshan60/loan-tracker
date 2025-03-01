@@ -11,5 +11,5 @@ interface IEvent<MODEL> {
     val version: Int
 
     fun toEntity(): Any
-    fun applyEvent(existing: MODEL): MODEL
+    fun applyEvent(existing: MODEL?): MODEL
 }

@@ -46,8 +46,26 @@ data class TransactionCreated(
         )
     }
 
-    override fun applyEvent(existing: TransactionModel): TransactionModel {
-        throw UnsupportedOperationException("Transaction created event cannot be applied to existing model")
+    override fun applyEvent(existing: TransactionModel?): TransactionModel {
+        return TransactionModel(
+            id = streamId,
+            userUid = userId,
+            description = description,
+            currency = currency,
+            splitType = splitType,
+            totalAmount = totalAmount,
+            recipientId = recipientId,
+            createdAt = createdAt,
+            createdBy = createdBy,
+            streamId = streamId,
+            version = version,
+            firstCreatedAt = createdAt,
+            updatedAt = null,
+            updatedBy = null,
+            deleted = false,
+            transactionDate = transactionDate
+        )
+
     }
 
     override fun crossTransaction(recipientUserId: String, userStreamId: UUID): IEvent<TransactionModel> {
@@ -97,7 +115,8 @@ data class TransactionDateChanged(
     override val createdAt: Instant,
     override val createdBy: String,
 ) : ITransactionEvent {
-    override fun applyEvent(existing: TransactionModel): TransactionModel {
+    override fun applyEvent(existing: TransactionModel?): TransactionModel {
+        requireNotNull(existing) {"TransactionModel cannot be null"}
         return existing.copy(
             id = id,
             transactionDate = transactionDate,
@@ -175,7 +194,8 @@ data class DescriptionChanged(
     override val transactionDate: Instant,
 ) : ITransactionEvent {
 
-    override fun applyEvent(existing: TransactionModel): TransactionModel {
+    override fun applyEvent(existing: TransactionModel?): TransactionModel {
+        requireNotNull(existing) {"TransactionModel cannot be null"}
         return existing.copy(
             id = id,
             description = description,
@@ -252,7 +272,8 @@ data class TransactionDeleted(
     override val createdBy: String,
     override val transactionDate: Instant,
 ) : ITransactionEvent {
-    override fun applyEvent(existing: TransactionModel): TransactionModel {
+    override fun applyEvent(existing: TransactionModel?): TransactionModel {
+        requireNotNull(existing) {"TransactionModel cannot be null"}
         return existing.copy(
             id = id,
             version = version,
@@ -330,7 +351,8 @@ data class TotalAmountChanged(
     override val createdBy: String,
     override val transactionDate: Instant,
 ) : ITransactionEvent {
-    override fun applyEvent(existing: TransactionModel): TransactionModel {
+    override fun applyEvent(existing: TransactionModel?): TransactionModel {
+        requireNotNull(existing) {"TransactionModel cannot be null"}
         return existing.copy(
             id = id,
             totalAmount = totalAmount,
@@ -408,7 +430,8 @@ data class CurrencyChanged(
     override val createdBy: String,
     override val transactionDate: Instant,
 ) : ITransactionEvent {
-    override fun applyEvent(existing: TransactionModel): TransactionModel {
+    override fun applyEvent(existing: TransactionModel?): TransactionModel {
+        requireNotNull(existing) {"TransactionModel cannot be null"}
         return existing.copy(
             id = id,
             currency = currency,
@@ -486,7 +509,8 @@ data class SplitTypeChanged(
     override val createdBy: String,
     override val transactionDate: Instant,
 ) : ITransactionEvent {
-    override fun applyEvent(existing: TransactionModel): TransactionModel {
+    override fun applyEvent(existing: TransactionModel?): TransactionModel {
+        requireNotNull(existing) {"TransactionModel cannot be null"}
         return existing.copy(
             id = id,
             splitType = splitType,

@@ -482,17 +482,17 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
         val history1Changes2 = result.perMonth[0].transactions[1].history[1].changes[0]
         assertThat(history1Changes2.type).isEqualTo(TransactionChangeType.DESCRIPTION)
         assertThat(result.perMonth[0].transactions[1].history[1].changedBy).isEqualTo(johnDto.uid)
-        assertThat(history1Changes2.oldValue).isEqualTo("Sample transaction")
+        assertThat(history1Changes2.oldValue).isEqualTo("Sample transaction edited")
         assertThat(history1Changes2.newValue).isEqualTo("Sample transaction edited by john")
         val history2Changes2 = result.perMonth[0].transactions[1].history[1].changes[1]
         assertThat(history2Changes2.type).isEqualTo(TransactionChangeType.SPLIT_TYPE)
         assertThat(result.perMonth[0].transactions[1].history[1].changedBy).isEqualTo(johnDto.uid)
-        assertThat(history2Changes2.oldValue).isEqualTo("YouPaidSplitEqually")
+        assertThat(history2Changes2.oldValue).isEqualTo("TheyOweYouAll")
         assertThat(history2Changes2.newValue).isEqualTo("YouOweThemAll")
         val history3Changes2 = result.perMonth[0].transactions[1].history[1].changes[2]
         assertThat(history3Changes2.type).isEqualTo(TransactionChangeType.TOTAL_AMOUNT)
         assertThat(result.perMonth[0].transactions[1].history[1].changedBy).isEqualTo(johnDto.uid)
-        assertThat(history3Changes2.oldValue).isEqualTo("100.0")
+        assertThat(history3Changes2.oldValue).isEqualTo("200.0")
         assertThat(history3Changes2.newValue).isEqualTo("300.0")
     }
 
@@ -640,13 +640,13 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
 
         assertThat(transactionResponse.history[1].changes).hasSize(3)
         assertThat(transactionResponse.history[1].changedBy).isEqualTo(johnDto.uid)
-        assertThat(transactionResponse.history[1].changes[0].oldValue).isEqualTo("Sample transaction")
+        assertThat(transactionResponse.history[1].changes[0].oldValue).isEqualTo("Sample transaction edited")
         assertThat(transactionResponse.history[1].changes[0].newValue).isEqualTo("Sample transaction edited by john")
         assertThat(transactionResponse.history[1].changes[0].type).isEqualTo(TransactionChangeType.DESCRIPTION)
-        assertThat(transactionResponse.history[1].changes[1].oldValue).isEqualTo("YouPaidSplitEqually")
+        assertThat(transactionResponse.history[1].changes[1].oldValue).isEqualTo("TheyOweYouAll")
         assertThat(transactionResponse.history[1].changes[1].newValue).isEqualTo("YouOweThemAll")
         assertThat(transactionResponse.history[1].changes[1].type).isEqualTo(TransactionChangeType.SPLIT_TYPE)
-        assertThat(transactionResponse.history[1].changes[2].oldValue).isEqualTo("100.0")
+        assertThat(transactionResponse.history[1].changes[2].oldValue).isEqualTo("200.0")
         assertThat(transactionResponse.history[1].changes[2].newValue).isEqualTo("300.0")
         assertThat(transactionResponse.history[1].changes[2].type).isEqualTo(TransactionChangeType.TOTAL_AMOUNT)
 
