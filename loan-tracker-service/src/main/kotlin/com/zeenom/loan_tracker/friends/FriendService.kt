@@ -1,6 +1,7 @@
 package com.zeenom.loan_tracker.friends
 
 import com.zeenom.loan_tracker.transactions.AmountDto
+import com.zeenom.loan_tracker.transactions.CurrencyClient
 import com.zeenom.loan_tracker.transactions.TransactionEventHandler
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventHandler
@@ -10,27 +11,53 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
+import java.math.BigDecimal
+import java.math.RoundingMode
 import java.util.*
 
 @Service
 class AllTimeBalanceStrategy {
-    fun calculateAllTimeBalance(amounts: List<AmountDto>): AllTimeBalanceDto {
+    fun calculateAllTimeBalance(
+        amounts: List<AmountDto>,
+        currencyRateMap: Map<String, BigDecimal>,
+        baseCurrency: String,
+    ): AllTimeBalanceDto {
         val sortedByDescendingEntries =
             amounts
                 .groupBy { it.currency }.entries.sortedByDescending { it.value.size }
-        val main =
-            sortedByDescendingEntries.firstOrNull()
-        val other = sortedByDescendingEntries.drop(1).associate { it.key to it.value }
-        return AllTimeBalanceDto(
-            main = main?.value?.sumOf {
-                if (it.isOwed) it.amount else
-                    -it.amount
-            }?.let { AmountDto(it.abs(), main.key, it >= 0.toBigDecimal()) },
-            other = other.map {
-                val total = it.value.sumOf { amount -> if (amount.isOwed) amount.amount else -amount.amount }
-                AmountDto(total.abs(), it.key, total >= 0.toBigDecimal())
+        val other = sortedByDescendingEntries.associate { it.key to it.value }
+
+        val otherBalances = other.map {
+            val total = it.value.sumOf { amount -> if (amount.isOwed) amount.amount else -amount.amount }
+            AmountDto(total.abs(), it.key, total >= 0.toBigDecimal())
+        }
+
+        val main = if (otherBalances.isEmpty()) null else otherBalances.map {
+            if (it.currency.currencyCode != baseCurrency) {
+                val total = convertCurrency(it.amount, it.currency.currencyCode, baseCurrency, currencyRateMap)
+                AmountDto(total, Currency.getInstance(baseCurrency), it.isOwed)
+            } else {
+                it
             }
+        }.sumOf { amount -> if (amount.isOwed) amount.amount else -amount.amount }
+            .let { AmountDto(it.abs(), Currency.getInstance(baseCurrency), it >= 0.toBigDecimal()) }
+        return AllTimeBalanceDto(
+            main = main,
+            other = otherBalances
         )
+    }
+
+    fun convertCurrency(
+        amount: BigDecimal,
+        currentCurrency: String,
+        targetCurrency: String,
+        currencyRateMap: Map<String, BigDecimal>,
+    ): BigDecimal {
+        val rate = currencyRateMap[targetCurrency]
+            ?: throw IllegalArgumentException("Currency rate for $targetCurrency not found")
+        val currentRate = currencyRateMap[currentCurrency]
+            ?: throw IllegalArgumentException("Currency rate for $currentCurrency not found")
+        return amount.multiply(rate).divide(currentRate, 10, RoundingMode.HALF_UP).setScale(2, RoundingMode.HALF_UP).stripTrailingZeros()
     }
 }
 
@@ -41,6 +68,7 @@ class FriendService(
     private val transactionEventHandler: TransactionEventHandler,
     private val friendFinderStrategy: FriendFinderStrategy,
     private val allTimeBalanceStrategy: AllTimeBalanceStrategy,
+    private val currencyClient: CurrencyClient,
 ) {
 
     suspend fun findAllByUserId(userId: String): FriendsWithAllTimeBalancesDto = withContext(Dispatchers.IO) {
@@ -62,7 +90,9 @@ class FriendService(
         val balance =
             allTimeBalanceStrategy.calculateAllTimeBalance(
                 amountsPerFriend.values.map(Map<String, AmountDto>::values)
-                    .flatten()
+                    .flatten(),
+                currencyRateMap = currencyClient.fetchCurrencies().rates,
+                "USD"
             )
         FriendsWithAllTimeBalancesDto(
             friends = friends,

@@ -1,6 +1,9 @@
 package com.zeenom.loan_tracker.friends
 
+import com.zeenom.loan_tracker.currencyRateMap
 import com.zeenom.loan_tracker.transactions.AmountDto
+import com.zeenom.loan_tracker.transactions.CurrencyClient
+import com.zeenom.loan_tracker.transactions.CurrencyResponse
 import com.zeenom.loan_tracker.transactions.TransactionEventHandler
 import com.zeenom.loan_tracker.users.*
 import kotlinx.coroutines.flow.asFlow
@@ -36,12 +39,18 @@ class FriendServiceTest(
         FriendsEventHandler(
             eventRepository = eventRepository
         )
+    private val currencyClient: CurrencyClient = mock {
+        onBlocking { fetchCurrencies() } doReturn CurrencyResponse(
+            rates = currencyRateMap
+        )
+    }
     private val friendService = FriendService(
         userEventHandler = userEventHandler,
         transactionEventHandler = transactionEventHandler,
         friendsEventHandler = friendsEventHandler,
         friendFinderStrategy = FriendFinderStrategy(friendsEventHandler, userEventHandler),
-        allTimeBalanceStrategy = AllTimeBalanceStrategy()
+        allTimeBalanceStrategy = AllTimeBalanceStrategy(),
+        currencyClient = currencyClient
     )
 
 
@@ -442,7 +451,8 @@ class FriendServiceTest(
                 friendsEventHandler,
                 userEventHandler
             ),
-            allTimeBalanceStrategy = AllTimeBalanceStrategy()
+            allTimeBalanceStrategy = AllTimeBalanceStrategy(),
+            currencyClient = currencyClient
         )
         val (user1, user2) = friendData
         userEventHandler.saveEvent(

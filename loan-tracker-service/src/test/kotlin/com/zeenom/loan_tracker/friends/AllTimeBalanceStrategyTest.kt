@@ -1,7 +1,9 @@
 package com.zeenom.loan_tracker.friends
 
+import com.zeenom.loan_tracker.currencyRateMap
 import com.zeenom.loan_tracker.transactions.AmountDto
 import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.util.*
 
@@ -18,14 +20,16 @@ class AllTimeBalanceStrategyTest {
             )
         )
 
-        val balance = allTimeBalanceStrategy.calculateAllTimeBalance(amounts)
+        val balance = allTimeBalanceStrategy.calculateAllTimeBalance(amounts, currencyRateMap, "USD")
 
-        Assertions.assertThat(balance.main).isNotNull
-        Assertions.assertThat(balance.main!!.amount).isEqualTo(100.0.toBigDecimal())
-        Assertions.assertThat(balance.main!!.currency).isEqualTo(Currency.getInstance("USD"))
-        Assertions.assertThat(balance.main!!.isOwed).isTrue()
+        assertThat(balance.main).isNotNull
+        assertThat(balance.main!!.amount).isEqualTo(100.0.toBigDecimal())
+        assertThat(balance.main!!.currency).isEqualTo(Currency.getInstance("USD"))
+        assertThat(balance.main!!.isOwed).isTrue()
 
-        Assertions.assertThat(balance.other).isEmpty()
+        assertThat(balance.other[0].amount).isEqualTo(100.0.toBigDecimal())
+        assertThat(balance.other[0].currency).isEqualTo(Currency.getInstance("USD"))
+        assertThat(balance.other[0].isOwed).isTrue()
     }
 
     @Test
@@ -46,17 +50,21 @@ class AllTimeBalanceStrategyTest {
 
         val amounts = listOf(amountDto1, amountDto2)
 
-        val balance = allTimeBalanceStrategy.calculateAllTimeBalance(amounts)
+        val balance = allTimeBalanceStrategy.calculateAllTimeBalance(amounts, currencyRateMap, "USD")
 
-        Assertions.assertThat(balance.main).isNotNull
-        Assertions.assertThat(balance.main!!.amount).isEqualTo(100.0.toBigDecimal())
-        Assertions.assertThat(balance.main!!.currency).isEqualTo(Currency.getInstance("USD"))
-        Assertions.assertThat(balance.main!!.isOwed).isTrue()
+        assertThat(balance.main).isNotNull
+        assertThat(balance.main!!.amount).isEqualTo(100.38.toBigDecimal())
+        assertThat(balance.main!!.currency).isEqualTo(Currency.getInstance("USD"))
+        assertThat(balance.main!!.isOwed).isTrue()
 
-        Assertions.assertThat(balance.other).hasSize(1)
-        Assertions.assertThat(balance.other.first().amount).isEqualTo(100.0.toBigDecimal())
-        Assertions.assertThat(balance.other.first().currency).isEqualTo(Currency.getInstance("PKR"))
-        Assertions.assertThat(balance.other.first().isOwed).isTrue()
+        assertThat(balance.other).hasSize(2)
+
+        assertThat(balance.other[0].amount).isEqualTo(100.0.toBigDecimal())
+        assertThat(balance.other[0].currency).isEqualTo(Currency.getInstance("USD"))
+        assertThat(balance.other[0].isOwed).isTrue()
+        assertThat(balance.other[1].amount).isEqualTo(100.0.toBigDecimal())
+        assertThat(balance.other[1].currency).isEqualTo(Currency.getInstance("PKR"))
+        assertThat(balance.other[1].isOwed).isTrue()
     }
 
     @Test
@@ -83,17 +91,22 @@ class AllTimeBalanceStrategyTest {
 
         val amounts = listOf(amountDto1, amountDto2, amountDto3)
 
-        val balance = allTimeBalanceStrategy.calculateAllTimeBalance(amounts)
+        val balance = allTimeBalanceStrategy.calculateAllTimeBalance(amounts, currencyRateMap, "PKR")
 
-        Assertions.assertThat(balance.main).isNotNull
-        Assertions.assertThat(balance.main!!.amount).isEqualTo(300.0.toBigDecimal())
-        Assertions.assertThat(balance.main!!.currency).isEqualTo(Currency.getInstance("PKR"))
-        Assertions.assertThat(balance.main!!.isOwed).isTrue()
+        assertThat(balance.main).isNotNull
+        assertThat(balance.main!!.amount).isEqualTo(26300.0.toBigDecimal())
+        assertThat(balance.main!!.currency).isEqualTo(Currency.getInstance("PKR"))
+        assertThat(balance.main!!.isOwed).isTrue()
 
-        Assertions.assertThat(balance.other).isNotEmpty
-        Assertions.assertThat(balance.other.first().amount).isEqualTo(100.0.toBigDecimal())
-        Assertions.assertThat(balance.other.first().currency).isEqualTo(Currency.getInstance("USD"))
-        Assertions.assertThat(balance.other.first().isOwed).isTrue()
+        assertThat(balance.other).hasSize(2)
+
+        assertThat(balance.other[0].amount).isEqualTo(300.0.toBigDecimal())
+        assertThat(balance.other[0].currency).isEqualTo(Currency.getInstance("PKR"))
+        assertThat(balance.other[0].isOwed).isTrue()
+
+        assertThat(balance.other[1].amount).isEqualTo(100.0.toBigDecimal())
+        assertThat(balance.other[1].currency).isEqualTo(Currency.getInstance("USD"))
+        assertThat(balance.other[1].isOwed).isTrue()
     }
 
     @Test
@@ -120,16 +133,19 @@ class AllTimeBalanceStrategyTest {
 
         val amounts = listOf(amountDto1, amountDto2, amountDto3)
 
-        val balance = allTimeBalanceStrategy.calculateAllTimeBalance(amounts)
+        val balance = allTimeBalanceStrategy.calculateAllTimeBalance(amounts, currencyRateMap, "USD")
 
-        Assertions.assertThat(balance.main).isNotNull
-        Assertions.assertThat(balance.main!!.amount).isEqualTo(200.0.toBigDecimal())
-        Assertions.assertThat(balance.main!!.currency).isEqualTo(Currency.getInstance("USD"))
-        Assertions.assertThat(balance.main!!.isOwed).isFalse()
+        assertThat(balance.main).isNotNull
+        assertThat(balance.main!!.amount).isEqualTo(199.23.toBigDecimal())
+        assertThat(balance.main!!.currency).isEqualTo(Currency.getInstance("USD"))
+        assertThat(balance.main!!.isOwed).isFalse()
 
-        Assertions.assertThat(balance.other).isNotEmpty
-        Assertions.assertThat(balance.other.first().amount).isEqualTo(200.0.toBigDecimal())
-        Assertions.assertThat(balance.other.first().currency).isEqualTo(Currency.getInstance("PKR"))
-        Assertions.assertThat(balance.other.first().isOwed).isTrue()
+        assertThat(balance.other).hasSize(2)
+        assertThat(balance.other[0].amount).isEqualTo(200.0.toBigDecimal())
+        assertThat(balance.other[0].currency).isEqualTo(Currency.getInstance("USD"))
+        assertThat(balance.other[0].isOwed).isFalse()
+        assertThat(balance.other[1].amount).isEqualTo(200.0.toBigDecimal())
+        assertThat(balance.other[1].currency).isEqualTo(Currency.getInstance("PKR"))
+        assertThat(balance.other[1].isOwed).isTrue()
     }
 }

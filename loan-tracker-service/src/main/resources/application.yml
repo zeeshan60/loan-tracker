@@ -1,4 +1,8 @@
 spring:
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=100,expireAfterWrite=4h
   r2dbc:
     url: r2dbc:${DATABASE_URL}
     username: ${DATABASE_USER}
@@ -42,7 +46,12 @@ auth:
   secret-key: ${SECRET_KEY}
   jwt-expiry-days: 30
 
+
 logging:
   level:
     org.springframework.security: DEBUG
     org.flywaydb: DEBUG
+currency:
+  client:
+    url: https://api.exchangerate-api.com/v4/latest
+    base: USD

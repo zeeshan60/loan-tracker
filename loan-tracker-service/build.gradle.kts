@@ -36,6 +36,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
 
     // R2DBC reactive database setup
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
