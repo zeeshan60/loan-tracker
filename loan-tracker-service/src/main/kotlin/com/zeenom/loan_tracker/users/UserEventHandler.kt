@@ -4,7 +4,6 @@ import com.zeenom.loan_tracker.common.events.IEvent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
-import org.springframework.dao.DuplicateKeyException
 import org.springframework.stereotype.Service
 
 @Service
@@ -31,8 +30,8 @@ class UserEventHandler(private val userRepository: UserEventRepository) {
         }
     }
 
-    suspend fun findUsersByUids(uids: List<String>): Flow<UserDto> {
-        if (uids.isEmpty()) return emptyFlow()
+    suspend fun findUsersByUids(uids: List<String>): List<UserDto> {
+        if (uids.isEmpty()) return emptyList()
         return userRepository.findAllByUidIn(uids).map {
             UserDto(
                 uid = it.uid,
@@ -45,8 +44,8 @@ class UserEventHandler(private val userRepository: UserEventRepository) {
         }
     }
 
-    suspend fun findUsersByEmails(emails: List<String>): Flow<UserDto> {
-        if (emails.isEmpty()) return emptyFlow()
+    suspend fun findUsersByEmails(emails: List<String>): List<UserDto> {
+        if (emails.isEmpty()) return emptyList()
         return userRepository.findAllByEmailIn(emails).map {
             UserDto(
                 uid = it.uid,
@@ -59,8 +58,8 @@ class UserEventHandler(private val userRepository: UserEventRepository) {
         }
     }
 
-    suspend fun findUsersByPhoneNumbers(phoneNumbers: List<String>): Flow<UserDto> {
-        if (phoneNumbers.isEmpty()) return emptyFlow()
+    suspend fun findUsersByPhoneNumbers(phoneNumbers: List<String>): List<UserDto> {
+        if (phoneNumbers.isEmpty()) return emptyList()
         return userRepository.findAllByPhoneNumberIn(phoneNumbers).map {
             UserDto(
                 uid = it.uid,

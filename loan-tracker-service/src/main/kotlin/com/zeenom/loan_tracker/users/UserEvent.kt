@@ -12,11 +12,12 @@ data class UserEvent(
     @Id val id: UUID? = null,
     val uid: String,
     val streamId: UUID,
-    val displayName: String,
+    val displayName: String?,
     val phoneNumber: String?,
     val email: String?,
     val photoUrl: String?,
     val emailVerified: Boolean?,
+    val currency: String?,
     val createdAt: Instant,
     val version: Int,
     val eventType: UserEventType,
@@ -26,11 +27,20 @@ data class UserEvent(
             UserEventType.USER_CREATED -> UserCreated(
                 id = id,
                 userId = uid,
-                displayName = displayName,
+                displayName = displayName ?: throw IllegalStateException("Display name is required"),
                 phoneNumber = phoneNumber,
                 email = email,
                 photoUrl = photoUrl,
                 emailVerified = emailVerified,
+                createdAt = createdAt,
+                version = version,
+                streamId = streamId,
+                createdBy = uid
+            )
+            UserEventType.CURRENCY_CHANGED -> UserCurrencyChanged(
+                id = id,
+                userId = uid,
+                currency = currency ?: throw IllegalStateException("Currency is required"),
                 createdAt = createdAt,
                 version = version,
                 streamId = streamId,
@@ -75,6 +85,7 @@ data class UserCreated(
             email = email,
             photoUrl = photoUrl,
             emailVerified = emailVerified,
+            currency = null,
             createdAt = createdAt,
             version = version,
             eventType = UserEventType.USER_CREATED
@@ -97,6 +108,37 @@ data class UserCreated(
     }
 }
 
+data class UserCurrencyChanged(
+    val id: UUID?,
+    val currency: String,
+    override val userId: String,
+    override val createdAt: Instant,
+    override val version: Int,
+    override val streamId: UUID,
+    override val createdBy: String,
+) : IEvent<UserModel> {
+    override fun toEntity(): Any {
+        return UserEvent(
+            uid = userId,
+            streamId = streamId,
+            displayName = null,
+            phoneNumber = null,
+            email = null,
+            photoUrl = null,
+            emailVerified = null,
+            currency = currency,
+            createdAt = createdAt,
+            version = version,
+            eventType = UserEventType.CURRENCY_CHANGED
+        )
+    }
+
+    override fun applyEvent(existing: UserModel?): UserModel {
+        return existing?.copy() ?: throw IllegalStateException("User not found")
+    }
+}
+
 enum class UserEventType {
-    USER_CREATED
+    USER_CREATED,
+    CURRENCY_CHANGED,
 }
