@@ -1,6 +1,7 @@
 package com.zeenom.loan_tracker.users
 
 import com.zeenom.loan_tracker.controllers.BaseIntegration
+import com.zeenom.loan_tracker.friends.FriendEventRepository
 import com.zeenom.loan_tracker.friends.UpdateUserRequest
 import com.zeenom.loan_tracker.friends.UserResponse
 import kotlinx.coroutines.runBlocking
@@ -9,12 +10,18 @@ import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.web.server.LocalServerPort
-import org.springframework.test.web.reactive.server.body
 
-class UsersControllerIntegrationTest(@LocalServerPort private val port: Int):BaseIntegration(port) {
+class UsersControllerIntegrationTest(@LocalServerPort private val port: Int) : BaseIntegration(port) {
 
     @Autowired
     private lateinit var userEventRepository: UserEventRepository
+
+    @Autowired
+    private lateinit var friendEventRepository: FriendEventRepository
+
+    @Autowired
+    private lateinit var transactionEventRepository: FriendEventRepository
+
     private var zeeDto = UserDto(
         uid = "123",
         email = "zee@gmail.com",
@@ -29,6 +36,8 @@ class UsersControllerIntegrationTest(@LocalServerPort private val port: Int):Bas
     @BeforeAll
     fun setupBeforeAll(): Unit = runBlocking {
         userEventRepository.deleteAll()
+        friendEventRepository.deleteAll()
+        transactionEventRepository.deleteAll()
         zeeToken = loginUser(
             userDto = zeeDto
         ).token

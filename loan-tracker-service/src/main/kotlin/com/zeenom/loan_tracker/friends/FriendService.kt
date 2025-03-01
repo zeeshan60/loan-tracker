@@ -5,11 +5,8 @@ import com.zeenom.loan_tracker.transactions.ICurrencyClient
 import com.zeenom.loan_tracker.transactions.TransactionEventHandler
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventHandler
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.util.*
@@ -24,11 +21,12 @@ class FriendService(
     private val currencyClient: ICurrencyClient,
 ) {
 
-    suspend fun findAllByUserId(userId: String): FriendsWithAllTimeBalancesDto = withContext(Dispatchers.IO) {
+    suspend fun findAllByUserId(userId: String): FriendsWithAllTimeBalancesDto {
+        val user = userEventHandler.findUserById(userId) ?: throw IllegalArgumentException("User $userId not found")
         val events = friendFinderStrategy.findUserFriends(userId)
-        val amountsPerFriendAsync =
-            async { transactionEventHandler.balancesOfFriendsByCurrency(userId, events.map { it.friendStreamId }) }
-        val amountsPerFriend = amountsPerFriendAsync.await()
+        val amountsPerFriend =
+            transactionEventHandler.balancesOfFriendsByCurrency(userId, events.map { it.friendStreamId })
+        val mainCurrency = user.currency?.let { Currency.getInstance(user.currency) } ?: Currency.getInstance("USD")
         val friends = events.map {
             FriendDto(
                 friendId = it.friendStreamId,
@@ -36,12 +34,12 @@ class FriendService(
                 phoneNumber = it.phoneNumber,
                 name = it.name,
                 photoUrl = it.photoUrl,
-                mainCurrency = Currency.getInstance("USD"),
+                mainCurrency = mainCurrency,
                 balances = amountsPerFriend[it.friendStreamId]?.values?.toList()?.let {
                     allTimeBalanceStrategy.calculateAllTimeBalance(
                         it,
                         currencyClient.fetchCurrencies().rates,
-                        "USD"
+                        mainCurrency.currencyCode
                     )
                 } ?: AllTimeBalanceDto(
                     main = null,
@@ -54,9 +52,9 @@ class FriendService(
                 amountsPerFriend.values.map(Map<String, AmountDto>::values)
                     .flatten(),
                 currencyRateMap = currencyClient.fetchCurrencies().rates,
-                "USD"
+                mainCurrency.currencyCode
             )
-        FriendsWithAllTimeBalancesDto(
+        return FriendsWithAllTimeBalancesDto(
             friends = friends,
             balance = balance
         )
@@ -80,17 +78,19 @@ class FriendService(
             friendsEventHandler.findByUserUidAndFriendPhoneNumber(userId, friendDto.phoneNumber)
                 ?.let { throw IllegalArgumentException("Friend with phone number ${friendDto.phoneNumber} already exist") }
 
-        friendsEventHandler.addEvent(FriendCreated(
-            userId = userId,
-            friendEmail = friendDto.email,
-            friendPhoneNumber = friendDto.phoneNumber,
-            friendDisplayName = friendDto.name,
-            createdAt = Instant.now(),
-            streamId = UUID.randomUUID(),
-            version = 1,
-            id = null,
-            createdBy = userId,
-        ))
+        friendsEventHandler.addEvent(
+            FriendCreated(
+                userId = userId,
+                friendEmail = friendDto.email,
+                friendPhoneNumber = friendDto.phoneNumber,
+                friendDisplayName = friendDto.name,
+                createdAt = Instant.now(),
+                streamId = UUID.randomUUID(),
+                version = 1,
+                id = null,
+                createdBy = userId,
+            )
+        )
         makeMeThisUsersFriendAsWell(friendDto.email, friendDto.phoneNumber, user)
     }
 
@@ -113,17 +113,19 @@ class FriendService(
                     )
                 }).let {
                 if (it == null) {
-                    friendsEventHandler.addEvent(FriendCreated(
-                        userId = usersFriend.uid,
-                        friendEmail = me.email,
-                        friendPhoneNumber = me.phoneNumber,
-                        friendDisplayName = me.displayName,
-                        createdAt = Instant.now(),
-                        streamId = UUID.randomUUID(),
-                        version = 1,
-                        id = null,
-                        createdBy = me.uid,
-                    ))
+                    friendsEventHandler.addEvent(
+                        FriendCreated(
+                            userId = usersFriend.uid,
+                            friendEmail = me.email,
+                            friendPhoneNumber = me.phoneNumber,
+                            friendDisplayName = me.displayName,
+                            createdAt = Instant.now(),
+                            streamId = UUID.randomUUID(),
+                            version = 1,
+                            id = null,
+                            createdBy = me.uid,
+                        )
+                    )
                 }
             }
         }
@@ -160,6 +162,7 @@ class FriendService(
     }
 
     suspend fun findByUserIdFriendId(userId: String, friendEmail: String?, friendPhone: String?): FriendDto {
+        val user = userEventHandler.findUserById(userId) ?: throw IllegalArgumentException("User $userId not found")
         val friendDto = friendFinderStrategy.findUserFriend(userId, friendEmail, friendPhone)
         val amountsPerFriend =
             transactionEventHandler.balancesOfFriendsByCurrency(userId, listOf(friendDto.friendStreamId))
@@ -175,7 +178,7 @@ class FriendService(
                     allTimeBalanceStrategy.calculateAllTimeBalance(
                         it,
                         currencyClient.fetchCurrencies().rates,
-                        "USD"
+                        user.currency?.let { Currency.getInstance(it).currencyCode } ?: "USD"
                     )
                 }
                 ?: AllTimeBalanceDto(
