@@ -1,4 +1,3 @@
--- noinspection SqlResolveForFile
 -- noinspection SqlResolveForFile @ routine/"uuid_generate_v1"
 
 ALTER TABLE transaction_events DROP COLUMN amount;
