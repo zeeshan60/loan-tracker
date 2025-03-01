@@ -16,13 +16,14 @@ class AuthManager : ReactiveAuthenticationManager {
 
     suspend fun doAuthenticate(authentication: Authentication): Authentication {
         if (authentication is InternalAuthToken) {
-            val result = authorizeUser(authentication.action, authentication.principal)
+            val result = authorizeUser()
             return authentication.copy(authenticated = result)
         }
         return authentication
     }
 
-    suspend fun authorizeUser(action: Action, userId: String): Boolean {
+    @Suppress("SameReturnValue")
+    suspend fun authorizeUser(): Boolean {
         return true
     }
 }

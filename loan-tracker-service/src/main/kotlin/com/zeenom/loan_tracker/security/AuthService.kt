@@ -6,6 +6,7 @@ import com.zeenom.loan_tracker.events.CommandType
 import com.zeenom.loan_tracker.firebase.FirebaseService
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.util.*
@@ -17,7 +18,7 @@ class AuthService(
     private val authProperties: AuthProperties,
     private val loginUserCommand: LoginUserCommand
 ) {
-    val logger = LoggerFactory.getLogger(AuthService::class.java)
+    val logger: Logger = LoggerFactory.getLogger(AuthService::class.java)
     suspend fun generateJwtUsingIdToken(idToken: String): String {
         return generateJwt(uidByVerifyingIdToken(idToken))
     }

@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package com.zeenom.loan_tracker.common.r2dbc
 
 import com.fasterxml.jackson.databind.ObjectMapper

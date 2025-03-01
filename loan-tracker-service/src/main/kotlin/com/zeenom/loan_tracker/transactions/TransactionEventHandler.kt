@@ -191,11 +191,11 @@ class TransactionEventHandler(
         myUid: String,
         myStreamId: UUID,
         friendUid: String,
-        friendStreamid: UUID,
+        friendStreamId: UUID,
     ) {
 
         findAllEventsByUserIdFriendId(friendUid, myStreamId)
-            .map { it.reverse(myUid, friendStreamid) }.let {
+            .map { it.reverse(myUid, friendStreamId) }.let {
                 Json.prettyPrint(it)
                 transactionEventRepository.saveAll(it).toList()
             }

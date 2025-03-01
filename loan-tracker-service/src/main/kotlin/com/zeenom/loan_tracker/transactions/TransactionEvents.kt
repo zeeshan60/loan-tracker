@@ -47,10 +47,7 @@ data class TransactionCreated(
     }
 
     override fun applyEvent(existing: TransactionModel): TransactionModel {
-        throw UnsupportedOperationException(
-            "Transactio" +
-                    " id = idn created event cannot be applied to existing model"
-        )
+        throw UnsupportedOperationException("Transaction created event cannot be applied to existing model")
     }
 
     override fun crossTransaction(recipientUserId: String, userStreamId: UUID): IEvent<TransactionModel> {
