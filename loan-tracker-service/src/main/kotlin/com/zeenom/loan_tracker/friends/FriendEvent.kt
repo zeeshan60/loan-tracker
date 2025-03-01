@@ -21,19 +21,21 @@ data class FriendEvent(
     val streamId: UUID,
     val version: Int,
     val eventType: FriendEventType,
-): IEventAble<FriendModel> {
+) : IEventAble<FriendModel> {
     override fun toEvent(): IEvent<FriendModel> {
-        return FriendCreated(
-            id = id,
-            friendEmail = friendEmail,
-            friendPhoneNumber = friendPhoneNumber,
-            friendDisplayName = friendDisplayName,
-            userId = userUid,
-            createdAt = createdAt,
-            streamId = streamId,
-            version = version,
-            createdBy = userUid
-        )
+        return when (eventType) {
+            FriendEventType.FRIEND_CREATED -> FriendCreated(
+                id = id,
+                friendEmail = friendEmail,
+                friendPhoneNumber = friendPhoneNumber,
+                friendDisplayName = friendDisplayName,
+                userId = userUid,
+                createdAt = createdAt,
+                streamId = streamId,
+                version = version,
+                createdBy = userUid
+            )
+        }
     }
 }
 
@@ -46,7 +48,6 @@ data class FriendModel(
     val createdAt: Instant,
     val streamId: UUID,
     val version: Int,
-    val eventType: FriendEventType,
 )
 
 data class FriendCreated(
@@ -58,8 +59,8 @@ data class FriendCreated(
     override val createdAt: Instant,
     override val streamId: UUID,
     override val version: Int,
-    override val createdBy: String
-): IEvent<FriendModel> {
+    override val createdBy: String,
+) : IEvent<FriendModel> {
     override fun toEntity(): Any {
         return FriendEvent(
             userUid = userId,
@@ -74,7 +75,16 @@ data class FriendCreated(
     }
 
     override fun applyEvent(existing: FriendModel?): FriendModel {
-        TODO()
+        return FriendModel(
+            id = id,
+            userUid = userId,
+            friendEmail = friendEmail,
+            friendPhoneNumber = friendPhoneNumber,
+            friendDisplayName = friendDisplayName,
+            createdAt = createdAt,
+            streamId = streamId,
+            version = version
+        )
     }
 }
 

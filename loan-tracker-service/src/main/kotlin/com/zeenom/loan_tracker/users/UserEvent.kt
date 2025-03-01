@@ -21,7 +21,7 @@ data class UserEvent(
     val version: Int,
     val eventType: UserEventType,
 ) : IEventAble<UserModel> {
-    override fun toEvent(): UserCreated {
+    override fun toEvent(): IEvent<UserModel> {
         return when (eventType) {
             UserEventType.USER_CREATED -> UserCreated(
                 id = id,
