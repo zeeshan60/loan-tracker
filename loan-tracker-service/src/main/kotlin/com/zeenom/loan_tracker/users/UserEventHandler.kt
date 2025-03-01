@@ -1,5 +1,6 @@
 package com.zeenom.loan_tracker.users
 
+import com.zeenom.loan_tracker.common.events.IEvent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
@@ -9,12 +10,12 @@ import org.springframework.stereotype.Service
 @Service
 class UserEventHandler(private val userRepository: UserEventRepository) {
 
-    suspend fun saveEvent(userEvent: UserEvent) {
-        try {
-            userRepository.save(userEvent)
-        } catch (e: DuplicateKeyException) {
-            throw IllegalStateException("User with this unique identifier already exist")
-        }
+    suspend fun addEvent(event: IEvent<UserModel>) {
+        val entity = event.toEntity()
+        if (entity is UserEvent) {
+            userRepository.save(entity)
+        } else
+            throw IllegalStateException("Invalid event type ${entity.javaClass}")
     }
 
     suspend fun findUserById(uid: String): UserDto? {

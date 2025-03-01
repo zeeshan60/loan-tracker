@@ -1,5 +1,7 @@
 package com.zeenom.loan_tracker.users
 
+import com.zeenom.loan_tracker.common.events.IEvent
+import com.zeenom.loan_tracker.transactions.IEventAble
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import java.time.Instant
@@ -9,6 +11,7 @@ import java.util.*
 data class UserEvent(
     @Id val id: UUID? = null,
     val uid: String,
+    val streamId: UUID,
     val displayName: String,
     val phoneNumber: String?,
     val email: String?,
@@ -17,8 +20,83 @@ data class UserEvent(
     val createdAt: Instant,
     val version: Int,
     val eventType: UserEventType,
+) : IEventAble<UserModel> {
+    override fun toEvent(): UserCreated {
+        return when (eventType) {
+            UserEventType.USER_CREATED -> UserCreated(
+                id = id,
+                userId = uid,
+                displayName = displayName,
+                phoneNumber = phoneNumber,
+                email = email,
+                photoUrl = photoUrl,
+                emailVerified = emailVerified,
+                createdAt = createdAt,
+                version = version,
+                streamId = streamId,
+                createdBy = uid
+            )
+        }
+    }
+}
+
+data class UserModel(
+    val id: UUID?,
+    val streamId: UUID,
+    val uid: String,
+    val displayName: String,
+    val phoneNumber: String?,
+    val email: String?,
+    val photoUrl: String?,
+    val emailVerified: Boolean?,
+    val createdAt: Instant,
+    val version: Int,
 )
 
+data class UserCreated(
+    val id: UUID?,
+    val displayName: String,
+    val phoneNumber: String?,
+    val email: String?,
+    val photoUrl: String?,
+    val emailVerified: Boolean?,
+    override val userId: String,
+    override val createdAt: Instant,
+    override val version: Int,
+    override val streamId: UUID,
+    override val createdBy: String,
+) : IEvent<UserModel> {
+    override fun toEntity(): Any {
+        return UserEvent(
+            uid = userId,
+            streamId = streamId,
+            displayName = displayName,
+            phoneNumber = phoneNumber,
+            email = email,
+            photoUrl = photoUrl,
+            emailVerified = emailVerified,
+            createdAt = createdAt,
+            version = version,
+            eventType = UserEventType.USER_CREATED
+        )
+    }
+
+    override fun applyEvent(existing: UserModel?): UserModel {
+        return UserModel(
+            id = id,
+            uid = userId,
+            streamId = streamId,
+            displayName = displayName,
+            phoneNumber = phoneNumber,
+            email = email,
+            photoUrl = photoUrl,
+            emailVerified = emailVerified,
+            createdAt = createdAt,
+            version = version
+        )
+    }
+}
+
 enum class UserEventType {
-    CREATE_USER
+    USER_CREATED
 }

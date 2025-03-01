@@ -3,6 +3,7 @@ package com.zeenom.loan_tracker.users
 import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
 import java.time.Instant
+import java.util.*
 
 @Service
 class UserService(
@@ -19,17 +20,23 @@ class UserService(
             throw IllegalArgumentException("User with email ${userDto.email} or phone number ${userDto.phoneNumber} already exist")
         }
 
-        userEventHandler.saveEvent(
-            UserEvent(
-                uid = userDto.uid,
+        userEventHandler.findUserById(userDto.uid)?.let {
+            throw IllegalStateException("User with this unique identifier already exist")
+        }
+
+        userEventHandler.addEvent(
+            UserCreated(
+                id = null,
                 displayName = userDto.displayName,
                 phoneNumber = userDto.phoneNumber,
                 email = userDto.email,
-                emailVerified = userDto.emailVerified,
                 photoUrl = userDto.photoUrl,
+                emailVerified = userDto.emailVerified,
+                userId = userDto.uid,
                 createdAt = Instant.now(),
+                streamId = UUID.randomUUID(),
                 version = 1,
-                eventType = UserEventType.CREATE_USER
+                createdBy = userDto.uid
             )
         )
     }
