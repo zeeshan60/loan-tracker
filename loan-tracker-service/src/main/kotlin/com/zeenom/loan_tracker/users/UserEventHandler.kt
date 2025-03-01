@@ -9,12 +9,17 @@ class UserEventHandler(private val userRepository: UserEventRepository) {
         userRepository.save(event.toEntity())
     }
 
+    suspend fun findUserModelByUid(uid: String): UserModel? {
+        return userRepository.findByUid(uid)
+    }
+
     suspend fun findUserById(uid: String): UserDto? {
         return userRepository.findByUid(uid)?.let {
             UserDto(
                 uid = it.uid,
                 displayName = it.displayName,
                 phoneNumber = it.phoneNumber,
+                currency = it.currency,
                 email = it.email,
                 emailVerified = it.emailVerified ?: false,
                 photoUrl = it.photoUrl
@@ -29,6 +34,7 @@ class UserEventHandler(private val userRepository: UserEventRepository) {
                 uid = it.uid,
                 displayName = it.displayName,
                 phoneNumber = it.phoneNumber,
+                currency = it.currency,
                 email = it.email,
                 emailVerified = it.emailVerified ?: false,
                 photoUrl = it.photoUrl
@@ -43,6 +49,7 @@ class UserEventHandler(private val userRepository: UserEventRepository) {
                 uid = it.uid,
                 displayName = it.displayName,
                 phoneNumber = it.phoneNumber,
+                currency = it.currency,
                 email = it.email,
                 emailVerified = it.emailVerified ?: false,
                 photoUrl = it.photoUrl
@@ -57,6 +64,7 @@ class UserEventHandler(private val userRepository: UserEventRepository) {
                 uid = it.uid,
                 displayName = it.displayName,
                 phoneNumber = it.phoneNumber,
+                currency = it.currency,
                 email = it.email,
                 emailVerified = it.emailVerified ?: false,
                 photoUrl = it.photoUrl
@@ -70,6 +78,7 @@ class UserEventHandler(private val userRepository: UserEventRepository) {
                 uid = it.uid,
                 displayName = it.displayName,
                 phoneNumber = it.phoneNumber,
+                currency = it.currency,
                 email = it.email,
                 emailVerified = it.emailVerified ?: false,
                 photoUrl = it.photoUrl
@@ -83,6 +92,7 @@ class UserEventHandler(private val userRepository: UserEventRepository) {
                 uid = it.uid,
                 displayName = it.displayName,
                 phoneNumber = it.phoneNumber,
+                currency = it.currency,
                 email = it.email,
                 emailVerified = it.emailVerified ?: false,
                 photoUrl = it.photoUrl

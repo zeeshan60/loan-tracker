@@ -38,6 +38,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
         phoneNumber = "+923001234567",
         displayName = "Zeeshan Tufail",
         photoUrl = "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl2",
+        currency = null,
         emailVerified = true
     )
     private var johnDto = UserDto(
@@ -46,6 +47,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
         phoneNumber = "+923001234568",
         displayName = "John Doe",
         photoUrl = "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl3",
+        currency = null,
         emailVerified = true
     )
     private var jasonDto = UserDto(
@@ -54,6 +56,7 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
         phoneNumber = "+923001234569",
         displayName = "Jason Doe",
         photoUrl = "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl4",
+        currency = null,
         emailVerified = true
     )
     private lateinit var johnFriendId: UUID

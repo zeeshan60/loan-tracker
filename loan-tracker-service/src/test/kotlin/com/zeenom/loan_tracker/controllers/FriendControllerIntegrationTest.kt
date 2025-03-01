@@ -36,6 +36,7 @@ class FriendControllerIntegrationTest(@LocalServerPort val port: Int) : BaseInte
         phoneNumber = "+923001234567",
         displayName = "Zeeshan Tufail",
         photoUrl = "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl2",
+        currency = null,
         emailVerified = true
     )
 
@@ -46,6 +47,7 @@ class FriendControllerIntegrationTest(@LocalServerPort val port: Int) : BaseInte
         phoneNumber = "+923001234568",
         displayName = "John Doe",
         photoUrl = "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl3",
+        currency = null,
         emailVerified = true
     )
 

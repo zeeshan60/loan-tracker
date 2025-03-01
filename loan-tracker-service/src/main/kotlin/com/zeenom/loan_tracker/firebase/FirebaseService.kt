@@ -70,6 +70,7 @@ class FirebaseAdapter {
             displayName = token.name,
             photoUrl = token.picture,
             emailVerified = token.isEmailVerified,
+            currency = null,
             phoneNumber = null
         )
     }

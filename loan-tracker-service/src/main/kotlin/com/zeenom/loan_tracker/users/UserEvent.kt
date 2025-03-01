@@ -7,7 +7,7 @@ import org.springframework.data.relational.core.mapping.Table
 import java.time.Instant
 import java.util.*
 
-interface IUserEvent: IEvent<UserModel> {
+interface IUserEvent : IEvent<UserModel> {
     override fun toEntity(): UserEvent
 }
 
@@ -29,20 +29,19 @@ data class UserEvent(
     override fun toEvent(): IEvent<UserModel> {
         return when (eventType) {
             UserEventType.USER_CREATED -> UserCreated(
-                id = id,
                 userId = uid,
                 displayName = displayName ?: throw IllegalStateException("Display name is required"),
                 phoneNumber = phoneNumber,
                 email = email,
                 photoUrl = photoUrl,
-                emailVerified = emailVerified,
+                emailVerified = emailVerified ?: throw IllegalStateException("Email verified is required"),
                 createdAt = createdAt,
                 version = version,
                 streamId = streamId,
                 createdBy = uid
             )
+
             UserEventType.CURRENCY_CHANGED -> UserCurrencyChanged(
-                id = id,
                 userId = uid,
                 currency = currency ?: throw IllegalStateException("Currency is required"),
                 createdAt = createdAt,
@@ -55,11 +54,11 @@ data class UserEvent(
 }
 
 data class UserModel(
-    val id: UUID?,
     val streamId: UUID,
     val uid: String,
     val displayName: String,
     val phoneNumber: String?,
+    val currency: String?,
     val email: String?,
     val photoUrl: String?,
     val emailVerified: Boolean?,
@@ -68,12 +67,11 @@ data class UserModel(
 )
 
 data class UserCreated(
-    val id: UUID?,
     val displayName: String,
     val phoneNumber: String?,
     val email: String?,
     val photoUrl: String?,
-    val emailVerified: Boolean?,
+    val emailVerified: Boolean,
     override val userId: String,
     override val createdAt: Instant,
     override val version: Int,
@@ -98,13 +96,13 @@ data class UserCreated(
 
     override fun applyEvent(existing: UserModel?): UserModel {
         return UserModel(
-            id = id,
             uid = userId,
             streamId = streamId,
             displayName = displayName,
             phoneNumber = phoneNumber,
             email = email,
             photoUrl = photoUrl,
+            currency = null,
             emailVerified = emailVerified,
             createdAt = createdAt,
             version = version
@@ -113,15 +111,14 @@ data class UserCreated(
 }
 
 data class UserCurrencyChanged(
-    val id: UUID?,
-    val currency: String,
+    val currency: String?,
     override val userId: String,
     override val createdAt: Instant,
     override val version: Int,
     override val streamId: UUID,
     override val createdBy: String,
-) : IEvent<UserModel> {
-    override fun toEntity(): IEventAble<UserModel> {
+) : IUserEvent {
+    override fun toEntity(): UserEvent {
         return UserEvent(
             uid = userId,
             streamId = streamId,
@@ -138,7 +135,19 @@ data class UserCurrencyChanged(
     }
 
     override fun applyEvent(existing: UserModel?): UserModel {
-        return existing?.copy() ?: throw IllegalStateException("User not found")
+        requireNotNull(existing) { "User must exist" }
+        return UserModel(
+            uid = existing.uid,
+            streamId = existing.streamId,
+            displayName = existing.displayName,
+            phoneNumber = existing.phoneNumber,
+            email = existing.email,
+            photoUrl = existing.photoUrl,
+            currency = currency,
+            emailVerified = existing.emailVerified,
+            createdAt = createdAt,
+            version = version
+        )
     }
 }
 

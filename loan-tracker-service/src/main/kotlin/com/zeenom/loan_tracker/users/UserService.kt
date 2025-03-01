@@ -1,6 +1,5 @@
 package com.zeenom.loan_tracker.users
 
-import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.util.*
@@ -26,7 +25,6 @@ class UserService(
 
         userEventHandler.addEvent(
             UserCreated(
-                id = null,
                 displayName = userDto.displayName,
                 phoneNumber = userDto.phoneNumber,
                 email = userDto.email,
@@ -36,6 +34,30 @@ class UserService(
                 createdAt = Instant.now(),
                 streamId = UUID.randomUUID(),
                 version = 1,
+                createdBy = userDto.uid
+            )
+        )
+    }
+
+    suspend fun updateUser(userDto: UserDto) {
+
+        val existing = userEventHandler.findUserModelByUid(userDto.uid)
+            ?: throw IllegalArgumentException("User with this unique identifier does not exist")
+
+        if (existing.email != userDto.email) {
+            throw IllegalArgumentException("User email cannot be changed")
+        }
+
+        if (existing.currency == userDto.currency) {
+            return
+        }
+        userEventHandler.addEvent(
+            UserCurrencyChanged(
+                userId = userDto.uid,
+                currency = userDto.currency,
+                createdAt = Instant.now(),
+                streamId = UUID.randomUUID(),
+                version = existing.version + 1,
                 createdBy = userDto.uid
             )
         )

@@ -1,6 +1,9 @@
 package com.zeenom.loan_tracker.transactions
 
-import com.zeenom.loan_tracker.friends.*
+import com.zeenom.loan_tracker.friends.FriendId
+import com.zeenom.loan_tracker.friends.FriendSummaryDto
+import com.zeenom.loan_tracker.friends.FriendsEventHandler
+import com.zeenom.loan_tracker.friends.TestPostgresConfig
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventHandler
 import kotlinx.coroutines.flow.toList
@@ -46,6 +49,7 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
                 phoneNumber = "+923001234567",
                 displayName = "Test User",
                 photoUrl = "https://test.com",
+                currency = null,
                 emailVerified = true
             )
         ).`when`(userEventHandler).findUserById("123")
@@ -208,6 +212,7 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
                 phoneNumber = "+923001234567",
                 displayName = "Test User",
                 photoUrl = "https://test.com",
+                currency = null,
                 emailVerified = true
             )
         ).`when`(userEventHandler).findUserById("123")
@@ -412,6 +417,7 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
                 phoneNumber = "+923001234567",
                 displayName = "Test User",
                 photoUrl = "https://test.com",
+                currency = null,
                 emailVerified = true
             )
         ).`when`(userEventHandler).findUserById("123")
@@ -437,6 +443,7 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
                 phoneNumber = "+923001234568",
                 displayName = "Friend",
                 photoUrl = "https://test.com",
+                currency = null,
                 emailVerified = true
             )
         ).`when`(userEventHandler).findUserByEmailOrPhoneNumber("friend@gmail.com", "+923001234568")

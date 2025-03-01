@@ -53,6 +53,7 @@ class UserServiceTest(
                 phoneNumber = "+923001234567",
                 displayName = "Test User",
                 photoUrl = "https://test.com",
+                currency = null,
                 emailVerified = true
             )
             return userDto
@@ -77,6 +78,7 @@ class UserServiceTest(
                         phoneNumber = "+923001234568",
                         displayName = "Test User",
                         photoUrl = "https://test.com",
+                        currency = null,
                         emailVerified = true
                     )
                 )
@@ -134,5 +136,20 @@ class UserServiceTest(
         assertThat(user2.displayName).isEqualTo(userDto2.displayName)
         assertThat(user2.photoUrl).isEqualTo(userDto2.photoUrl)
         assertThat(user2.emailVerified).isEqualTo(userDto2.emailVerified)
+    }
+
+    @Test
+    fun `update user with currency successfully`(): Unit = runBlocking {
+        saveEvent(userDto = userDto)
+
+        userService.updateUser(
+            userDto.copy(
+                currency = "PKR"
+            )
+        )
+
+        userService.findUserById(userDto.uid)!!.let {
+            assertThat(it.currency).isEqualTo("PKR")
+        }
     }
 }

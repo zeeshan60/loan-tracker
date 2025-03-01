@@ -7,6 +7,7 @@ data class UserDto(
     val email: String?,
     val phoneNumber: String?,
     val displayName: String,
+    val currency: String?,
     val photoUrl: String?,
     val emailVerified: Boolean
 ) : CommandPayloadDto

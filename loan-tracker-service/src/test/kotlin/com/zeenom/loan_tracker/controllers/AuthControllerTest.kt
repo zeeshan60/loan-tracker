@@ -48,6 +48,7 @@ class AuthControllerTest(
             phoneNumber = "+923001234567",
             displayName = "Zeeshan Tufail",
             photoUrl = "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl2",
+            currency = null,
             emailVerified = true
         )
         Mockito.doReturn(
