@@ -1,5 +1,6 @@
 package com.zeenom.loan_tracker.users
 
+import com.zeenom.loan_tracker.friends.UserUpdateDto
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.util.*
@@ -39,14 +40,10 @@ class UserService(
         )
     }
 
-    suspend fun updateUser(userDto: UserDto) {
+    suspend fun updateUser(userDto: UserUpdateDto) {
 
         val existing = userEventHandler.findUserModelByUid(userDto.uid)
             ?: throw IllegalArgumentException("User with this unique identifier does not exist")
-
-        if (existing.email != userDto.email) {
-            throw IllegalArgumentException("User email cannot be changed")
-        }
 
         if (existing.currency == userDto.currency) {
             return
