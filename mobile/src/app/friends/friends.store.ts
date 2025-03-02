@@ -123,16 +123,19 @@ export const FriendsStore = signalStore(
       }
     },
     async deleteTransaction(transaction: Transaction): Promise<void> {
+      let transactionAdded;
       try {
         patchState(store, { loading: true })
-        await firstValueFrom(http.delete(`${PRIVATE_API}/transactions/delete/transactionId/${transaction.transactionId}`))
-        this.loadSelectedTransactions()
+        transactionAdded = await firstValueFrom(http.delete(`${PRIVATE_API}/transactions/delete/transactionId/${transaction.transactionId}`))
         helperService.showToast('Transaction deleted successfully');
       } catch (e) {
         helperService.showToast('Unable to add friend at the moment');
         throw new Error('Unable to add friend at the moment')
       } finally {
         patchState(store, { loading: false })
+      }
+      if (transactionAdded) {
+        this.loadSelectedTransactions()
       }
     },
     setLoading(isLoading: boolean) {
