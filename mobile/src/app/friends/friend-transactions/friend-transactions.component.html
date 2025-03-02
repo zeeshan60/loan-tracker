@@ -4,6 +4,12 @@
       <ion-back-button></ion-back-button>
     </ion-buttons>
     <ion-title>With you and {{friend()['name'] | shortenName}}</ion-title>
+    <ion-buttons slot="primary">
+      <ion-button fill="solid" (click)="settleUp()">
+        <ion-icon name="checkmark-outline" slot="start"></ion-icon>
+        Settle Up
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 

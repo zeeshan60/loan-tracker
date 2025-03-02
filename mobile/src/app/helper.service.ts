@@ -33,8 +33,9 @@ export class HelperService {
     return Intl.DateTimeFormat().resolvedOptions().timeZone
   }
 
-  async showConfirmAlert() {
+  async showConfirmAlert(customMessage = '', okButtonText = 'Yes') {
     const alert = await this.alertCtrl.create({
+      message: customMessage,
       header: 'Are you sure?',
       buttons: [
         {
@@ -42,7 +43,7 @@ export class HelperService {
           role: 'cancel',
         },
         {
-          text: 'OK',
+          text: okButtonText,
           role: 'confirm',
         },
       ]

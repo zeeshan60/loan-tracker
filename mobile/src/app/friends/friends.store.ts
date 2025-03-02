@@ -47,6 +47,7 @@ interface Methods extends MethodsDictionary {
   loadSelectedTransactions(): Promise<void>;
   deleteTransaction(transaction: Transaction): Promise<void>;
   setLoading(isLoading: boolean): void;
+  settleUp(friend: FriendWithBalance): Promise<void>;
 }
 
 export const FriendsStore = signalStore(
@@ -136,6 +137,22 @@ export const FriendsStore = signalStore(
     },
     setLoading(isLoading: boolean) {
       patchState(store, { loading: isLoading })
+    },
+    async settleUp(friend: FriendWithBalance) {
+      const confirmation = await helperService.showConfirmAlert(
+        `You are going to settle up everything with ${friend.name}.`, 'Let\'s do it'
+      )
+      if (confirmation.role !== 'confirm') return;
+
+      try {
+        patchState(store, {loading: true});
+        await firstValueFrom(http.put(`${PRIVATE_API}/friends/settle/${friend.friendId}`, {}));
+      } catch (e) {
+        helperService.showToast('Unable to settle up at the moment. Please try later');
+      } finally {
+        patchState(store, { loading: false })
+      }
+      await this.loadSelectedTransactions();
     }
   }))
 );

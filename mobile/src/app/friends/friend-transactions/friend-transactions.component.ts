@@ -79,7 +79,7 @@ export class FriendTransactionsComponent  implements OnInit {
     this.friendsStore.setSelectedFriend(this.friend());
   }
 
-  // ionViewWillLeave() {
-  //   this.friendsStore.setSelectedFriend(null);
-  // }
+  settleUp() {
+    this.friendsStore.settleUp(this.friend())
+  }
 }
