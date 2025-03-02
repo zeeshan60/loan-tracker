@@ -6,9 +6,11 @@
 
 .overall-balance-wrapper {
   font-size: 1.3rem;
+  > p {
+    text-align: right;
+  }
   ul.other-balances-list {
     font-weight: bold;
     font-size: 14px;
-    text-align: right;
   }
 }
