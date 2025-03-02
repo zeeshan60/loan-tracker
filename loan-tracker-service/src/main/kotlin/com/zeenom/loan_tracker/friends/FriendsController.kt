@@ -62,7 +62,7 @@ class FriendsController(
     }
 
     @Operation(summary = "Settle up", description = "Settle up with a friend")
-    @PostMapping("/settle-up/{friendId}")
+    @PostMapping("/settleUp/{friendId}")
     suspend fun settleUp(
         @PathVariable friendId: UUID,
         @AuthenticationPrincipal userId: String,
