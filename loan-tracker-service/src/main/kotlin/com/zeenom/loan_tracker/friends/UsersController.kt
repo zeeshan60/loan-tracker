@@ -6,10 +6,7 @@ import io.swagger.v3.oas.annotations.Operation
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.security.core.annotation.AuthenticationPrincipal
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -17,6 +14,22 @@ class UsersController(
     private val updateUserCommand: UpdateUserCommand,
     private val userQuery: UserQuery,
 ) {
+
+    @Operation(summary = "Get user", description = "Get user details")
+    @GetMapping
+    suspend fun getUser(@AuthenticationPrincipal userId: String): UserResponse {
+        return userQuery.execute(userId).let {
+            UserResponse(
+                uid = it.uid,
+                email = it.email,
+                phoneNumber = it.phoneNumber,
+                displayName = it.displayName,
+                currency = it.currency,
+                photoUrl = it.photoUrl,
+                emailVerified = it.emailVerified
+            )
+        }
+    }
 
     @Operation(summary = "Update user", description = "Update user details")
     @PutMapping
