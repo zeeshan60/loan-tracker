@@ -232,7 +232,7 @@ enum class SplitType {
 }
 
 data class TransactionsResponse(
-    val settleUp: Boolean = false,
+    val settled: Boolean = false,
     val perMonth: List<TransactionsPerMonth>,
 )
 

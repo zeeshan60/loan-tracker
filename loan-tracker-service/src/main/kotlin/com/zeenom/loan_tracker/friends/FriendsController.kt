@@ -1,6 +1,5 @@
 package com.zeenom.loan_tracker.friends
 
-import com.zeenom.loan_tracker.common.MessageResponse
 import com.zeenom.loan_tracker.common.Paginated
 import com.zeenom.loan_tracker.common.PaginationDto
 import com.zeenom.loan_tracker.events.CommandDto
@@ -72,7 +71,7 @@ class FriendsController(
             photoUrl = "dummy photo url.com",
             name = "dummy name",
             friendId = friendId,
-            settledUp = false,
+            settled = false,
             mainBalance = null,
             otherBalances = emptyList()
         )
