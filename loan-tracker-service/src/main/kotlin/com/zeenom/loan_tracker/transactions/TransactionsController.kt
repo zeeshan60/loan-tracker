@@ -157,7 +157,11 @@ class TransactionsController(
                     date = it.key,
                     transactions = it.value.map { it.toResponse() }
                 )
-            }.let { TransactionsResponse(it) }
+            }.let {
+                TransactionsResponse(
+                    perMonth = it
+                )
+            }
         }
     }
 
@@ -228,6 +232,7 @@ enum class SplitType {
 }
 
 data class TransactionsResponse(
+    val settleUp: Boolean = false,
     val perMonth: List<TransactionsPerMonth>,
 )
 
