@@ -162,7 +162,7 @@ class TransactionsController(
             }.let {
                 TransactionsResponse(
                     perMonth = it,
-                    balanceDto = transactionsDtoPaginated.data.balance.toResponse()
+                    balance = transactionsDtoPaginated.data.balance.toResponse()
                 )
             }
         }
@@ -237,7 +237,7 @@ enum class SplitType {
 }
 
 data class TransactionsResponse(
-    val balanceDto: BalanceResponse,
+    val balance: BalanceResponse,
     val perMonth: List<TransactionsPerMonth>,
 )
 

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service
 class FriendsControllerAdapter {
     fun FriendsWithAllTimeBalancesDto.toResponse() = FriendsResponse(
         friends = this.friends.map { it.toResponse() },
-        balance = this.balance
+        balance = this.balance.toResponse()
     )
 
     fun FriendDto.toResponse(): FriendResponse {
