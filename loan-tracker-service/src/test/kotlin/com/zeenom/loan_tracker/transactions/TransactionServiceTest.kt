@@ -1,9 +1,6 @@
 package com.zeenom.loan_tracker.transactions
 
-import com.zeenom.loan_tracker.friends.FriendId
-import com.zeenom.loan_tracker.friends.FriendSummaryDto
-import com.zeenom.loan_tracker.friends.FriendsEventHandler
-import com.zeenom.loan_tracker.friends.TestPostgresConfig
+import com.zeenom.loan_tracker.friends.*
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventHandler
 import kotlinx.coroutines.flow.toList
@@ -19,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest
 import java.time.Instant
 import java.util.*
+import kotlin.reflect.jvm.internal.impl.descriptors.deserialization.PlatformDependentDeclarationFilter.All
 
 @DataR2dbcTest
 class TransactionServiceTest(@Autowired private val transactionEventRepository: TransactionEventRepository) :
@@ -32,7 +30,9 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
         transactionEventHandler = transactionEventHandler,
         userEventHandler = userEventHandler,
         friendsEventHandler = friendEventHandler,
-        friendFinderStrategy = mock()
+        friendFinderStrategy = mock(),
+        allTimeBalanceStrategy = AllTimeBalanceStrategy(),
+        currencyClient = TestCurrencyClient(),
     )
 
     @BeforeEach

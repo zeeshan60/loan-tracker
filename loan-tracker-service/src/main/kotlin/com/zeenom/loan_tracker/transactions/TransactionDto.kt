@@ -1,10 +1,16 @@
 package com.zeenom.loan_tracker.transactions
 
 import com.zeenom.loan_tracker.events.CommandPayloadDto
+import com.zeenom.loan_tracker.friends.AllTimeBalanceDto
 import com.zeenom.loan_tracker.friends.FriendSummaryDto
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.*
+
+data class TransactionsDto(
+    val transactions: List<TransactionDto>,
+    val balance: AllTimeBalanceDto
+)
 
 data class TransactionDto(
     val currency: Currency,

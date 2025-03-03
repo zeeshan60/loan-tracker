@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service
 @Service
 class TransactionsQuery(
     private val transactionService: TransactionService,
-) : Query<FriendTransactionsQueryDto, Paginated<List<TransactionDto>>> {
-    override suspend fun execute(input: FriendTransactionsQueryDto): Paginated<List<TransactionDto>> {
+) : Query<FriendTransactionsQueryDto, Paginated<TransactionsDto>> {
+    override suspend fun execute(input: FriendTransactionsQueryDto): Paginated<TransactionsDto> {
         return Paginated(transactionService.transactionsByFriendId(input.userId, input.friendId), null)
     }
 }
