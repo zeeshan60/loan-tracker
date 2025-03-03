@@ -228,7 +228,9 @@ enum class SplitType {
     YouPaidSplitEqually,
     TheyPaidSplitEqually,
     TheyOweYouAll,
-    YouOweThemAll
+    YouOweThemAll,
+    TheyPaidToSettle,
+    YouPaidToSettle
 }
 
 data class TransactionsResponse(

@@ -141,6 +141,8 @@ fun SplitType.reverse(): SplitType {
         SplitType.YouOweThemAll -> SplitType.TheyOweYouAll
         SplitType.YouPaidSplitEqually -> SplitType.TheyPaidSplitEqually
         SplitType.TheyPaidSplitEqually -> SplitType.YouPaidSplitEqually
+        SplitType.TheyPaidToSettle -> SplitType.YouPaidToSettle
+        SplitType.YouPaidToSettle -> SplitType.TheyPaidToSettle
     }
 }
 
@@ -150,6 +152,8 @@ fun SplitType.apply(amount: BigDecimal): BigDecimal {
         SplitType.YouOweThemAll -> amount
         SplitType.YouPaidSplitEqually -> splitWithScaleOf1(amount)
         SplitType.TheyPaidSplitEqually -> splitWithScaleOf1(amount)
+        SplitType.TheyPaidToSettle -> amount
+        SplitType.YouPaidToSettle -> amount
     }
 }
 
@@ -162,14 +166,7 @@ fun SplitType.isOwed(): Boolean {
         SplitType.YouOweThemAll -> false
         SplitType.YouPaidSplitEqually -> true
         SplitType.TheyPaidSplitEqually -> false
-    }
-}
-
-fun SplitType.amountForYou(amount: BigDecimal): BigDecimal {
-    return when (this) {
-        SplitType.TheyOweYouAll -> amount
-        SplitType.YouOweThemAll -> amount
-        SplitType.YouPaidSplitEqually -> amount / 2.toBigDecimal()
-        SplitType.TheyPaidSplitEqually -> amount / 2.toBigDecimal()
+        SplitType.TheyPaidToSettle -> false
+        SplitType.YouPaidToSettle -> true
     }
 }
