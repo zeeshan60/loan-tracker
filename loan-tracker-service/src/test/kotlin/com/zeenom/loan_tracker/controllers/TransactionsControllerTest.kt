@@ -16,7 +16,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean
 import java.time.Instant
 import java.util.*
 
-class TransactionsControllerTest(@LocalServerPort private val port: Int) : BaseIntegration(port) {
+class TransactionsControllerTest(@LocalServerPort private val port: Int) : BaseIntegration() {
     @MockitoBean
     private lateinit var createTransactionCommand: CreateTransactionCommand
 

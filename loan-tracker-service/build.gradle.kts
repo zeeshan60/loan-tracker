@@ -3,8 +3,6 @@ plugins {
     kotlin("plugin.spring") version "1.9.25"
     id("org.springframework.boot") version "3.4.2"
     id("io.spring.dependency-management") version "1.1.7"
-    kotlin("plugin.serialization") version "1.9.22" // Use the latest version
-    groovy
 }
 
 group = "com.zeenom"
@@ -32,7 +30,6 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-api:0.11.5")
     implementation("io.jsonwebtoken:jjwt-impl:0.11.5")
     implementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
-    implementation("org.aspectj:aspectjweaver:1.9.7")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.springframework.boot:spring-boot-starter-security")
@@ -66,9 +63,6 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
-    testImplementation("org.spockframework:spock-core:2.3-groovy-3.0")
-    testImplementation("org.spockframework:spock-spring:2.3-groovy-3.0")
-    testImplementation("org.codehaus.groovy:groovy-all:3.0.9")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.1")
     val containerVersion = "1.20.4"
     testImplementation("org.testcontainers:testcontainers:$containerVersion")

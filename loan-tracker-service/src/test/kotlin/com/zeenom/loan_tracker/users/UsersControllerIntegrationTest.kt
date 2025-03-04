@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.web.server.LocalServerPort
 
-class UsersControllerIntegrationTest(@LocalServerPort private val port: Int) : BaseIntegration(port) {
+class UsersControllerIntegrationTest(@LocalServerPort private val port: Int) : BaseIntegration() {
 
     @Autowired
     private lateinit var userEventRepository: UserEventRepository
