@@ -1,9 +1,11 @@
-package com.zeenom.loan_tracker.users
+package com.zeenom.loan_tracker.integration
 
 import com.zeenom.loan_tracker.controllers.BaseIntegration
 import com.zeenom.loan_tracker.friends.FriendEventRepository
 import com.zeenom.loan_tracker.friends.UpdateUserRequest
 import com.zeenom.loan_tracker.friends.UserResponse
+import com.zeenom.loan_tracker.users.UserDto
+import com.zeenom.loan_tracker.users.UserEventRepository
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Order

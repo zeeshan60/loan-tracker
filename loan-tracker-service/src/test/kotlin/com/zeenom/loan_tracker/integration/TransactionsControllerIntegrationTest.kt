@@ -1,9 +1,10 @@
-package com.zeenom.loan_tracker.transactions
+package com.zeenom.loan_tracker.integration
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.zeenom.loan_tracker.common.Paginated
 import com.zeenom.loan_tracker.controllers.BaseIntegration
 import com.zeenom.loan_tracker.friends.*
+import com.zeenom.loan_tracker.transactions.*
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventRepository
 import kotlinx.coroutines.runBlocking
@@ -13,27 +14,8 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.web.reactive.server.WebTestClient
 import java.time.Instant
 import java.util.*
-
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
-class SampleIntegrationTest: TestPostgresConfig() {
-    @Autowired
-    private lateinit var webTestClient: WebTestClient
-    @Test
-    fun `health check endpoint returns alive message`() {
-        webTestClient.get()
-            .uri("/health")
-            .exchange()
-            .expectStatus().isOk
-            .expectBody()
-    }
-
-}
 
 class TransactionsControllerIntegrationTest:
     BaseIntegration() {
