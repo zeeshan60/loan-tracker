@@ -1,6 +1,5 @@
 package com.zeenom.loan_tracker.integration
 
-import com.zeenom.loan_tracker.controllers.BaseIntegration
 import com.zeenom.loan_tracker.friends.FriendEventRepository
 import com.zeenom.loan_tracker.friends.UpdateUserRequest
 import com.zeenom.loan_tracker.friends.UserResponse

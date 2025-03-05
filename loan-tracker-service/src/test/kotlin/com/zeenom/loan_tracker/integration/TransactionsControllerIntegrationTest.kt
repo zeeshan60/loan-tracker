@@ -2,7 +2,6 @@ package com.zeenom.loan_tracker.integration
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.zeenom.loan_tracker.common.Paginated
-import com.zeenom.loan_tracker.controllers.BaseIntegration
 import com.zeenom.loan_tracker.friends.*
 import com.zeenom.loan_tracker.transactions.*
 import com.zeenom.loan_tracker.users.UserDto

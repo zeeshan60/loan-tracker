@@ -1,4 +1,4 @@
-package com.zeenom.loan_tracker.controllers
+package com.zeenom.loan_tracker.integration
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
