@@ -1,11 +1,11 @@
-package com.zeenom.loan_tracker.controllers
+package com.zeenom.loan_tracker.transactions
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.zeenom.loan_tracker.common.Paginated
+import com.zeenom.loan_tracker.controllers.BaseIntegration
 import com.zeenom.loan_tracker.friends.AllTimeBalanceDto
 import com.zeenom.loan_tracker.friends.FriendSummaryDto
 import com.zeenom.loan_tracker.security.AuthService
-import com.zeenom.loan_tracker.transactions.*
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test

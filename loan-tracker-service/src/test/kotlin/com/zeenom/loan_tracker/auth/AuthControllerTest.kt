@@ -1,4 +1,4 @@
-package com.zeenom.loan_tracker.controllers
+package com.zeenom.loan_tracker.auth
 
 import com.zeenom.loan_tracker.events.CommandDao
 import com.zeenom.loan_tracker.events.CommandDto

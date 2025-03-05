@@ -1,4 +1,4 @@
-package com.zeenom.loan_tracker.controllers
+package com.zeenom.loan_tracker.friends
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -6,7 +6,6 @@ import com.zeenom.loan_tracker.common.Paginated
 import com.zeenom.loan_tracker.common.exceptions.NotFoundException
 import com.zeenom.loan_tracker.events.CommandDao
 import com.zeenom.loan_tracker.events.CommandPayloadDto
-import com.zeenom.loan_tracker.friends.*
 import com.zeenom.loan_tracker.security.AuthService
 import com.zeenom.loan_tracker.transactions.AmountDto
 import kotlinx.coroutines.runBlocking

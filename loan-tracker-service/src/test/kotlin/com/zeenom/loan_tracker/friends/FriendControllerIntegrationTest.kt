@@ -1,6 +1,6 @@
-package com.zeenom.loan_tracker.controllers
+package com.zeenom.loan_tracker.friends
 
-import com.zeenom.loan_tracker.friends.*
+import com.zeenom.loan_tracker.controllers.BaseIntegration
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventRepository
 import kotlinx.coroutines.runBlocking

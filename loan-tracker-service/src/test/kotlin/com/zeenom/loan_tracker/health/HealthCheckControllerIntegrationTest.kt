@@ -1,4 +1,4 @@
-package com.zeenom.loan_tracker.controllers
+package com.zeenom.loan_tracker.health
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
