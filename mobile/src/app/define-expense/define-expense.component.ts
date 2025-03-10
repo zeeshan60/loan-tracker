@@ -39,7 +39,9 @@ export enum SplitOptions {
   YouPaidSplitEqually = 'YouPaidSplitEqually',
   TheyPaidSplitEqually = 'TheyPaidSplitEqually',
   TheyOweYouAll = 'TheyOweYouAll',
-  YouOweThemAll = 'YouOweThemAll'
+  YouOweThemAll = 'YouOweThemAll',
+  TheyPaidToSettle = 'TheyPaidToSettle',
+  YouPaidToSettle = 'YouPaidToSettle',
 }
 
 @Component({
@@ -167,19 +169,13 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
     if (this.defineExpenseForm.valid) {
       try {
         this.loading.set(true);
-        const updatedExpense = await this.saveExpense(this.defineExpenseForm.getRawValue());
-        let postSaveActions = [this.friendsStore.loadFriends()];
-        if (
-          this.friendsStore.selectedFriend()
-          && this.friend()?.friendId === this.friendsStore.selectedFriend()?.friendId
-        ) {
-          postSaveActions.push(this.friendsStore.loadSelectedTransactions())
-        }
-        await Promise.all(postSaveActions);
+        const updatedExpense = await this.friendsStore.addUpdateExpense(
+          this.friend()!,
+          this.defineExpenseForm.getRawValue(),
+          this.isUpdating() ? this.transaction() : undefined
+        );
         this.modalCtrl.dismiss(updatedExpense, 'confirm');
-      } catch (e) {
-        await this.helperService.showToast('Unable to add friend at the moment');
-      } finally {
+      } catch (e) {} finally {
         this.loading.set(false);
       }
     } else {

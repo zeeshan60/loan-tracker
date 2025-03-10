@@ -8,6 +8,7 @@ import { FriendWithBalance, Transaction, TransactionsByMonth } from './model'
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { PRIVATE_API } from '../constants';
 import { AlertController } from '@ionic/angular/standalone';
+import { SplitOptions } from '../define-expense/define-expense.component';
 
 export type AddFriend = {
   name: string,
@@ -32,6 +33,14 @@ type FriendsState = {
   loading: boolean,
 }
 
+type AddUpdateExpenseFormValue = {
+  description: string,
+  currency: string,
+  amount: number|null,
+  type: SplitOptions,
+  transactionDate: string,
+}
+
 const initialState: FriendsState = {
   friends: [],
   overallBalance: null,
@@ -47,7 +56,8 @@ interface Methods extends MethodsDictionary {
   loadSelectedTransactions(): Promise<void>;
   deleteTransaction(transaction: Transaction): Promise<void>;
   setLoading(isLoading: boolean): void;
-  settleUp(friend: FriendWithBalance): Promise<void>;
+  settleUp(friend: FriendWithBalance, formValue: AddUpdateExpenseFormValue): Promise<void>;
+  addUpdateExpense(friend: FriendWithBalance, formValue: AddUpdateExpenseFormValue, updatingTransaction?: Transaction): Promise<Transaction>;
 }
 
 export const FriendsStore = signalStore(
@@ -141,21 +151,59 @@ export const FriendsStore = signalStore(
     setLoading(isLoading: boolean) {
       patchState(store, { loading: isLoading })
     },
-    async settleUp(friend: FriendWithBalance) {
+    async settleUp(friend: FriendWithBalance, formValue: AddUpdateExpenseFormValue) {
       const confirmation = await helperService.showConfirmAlert(
         `You are going to settle up everything with ${friend.name}.`, 'Let\'s do it'
       )
       if (confirmation.role !== 'confirm') return;
 
+      console.log(friend.mainBalance?.isOwed)
       try {
         patchState(store, {loading: true});
-        await firstValueFrom(http.put(`${PRIVATE_API}/friends/settle/${friend.friendId}`, {}));
+        await this.addUpdateExpense(friend, formValue)
       } catch (e) {
         helperService.showToast('Unable to settle up at the moment. Please try later');
       } finally {
         patchState(store, { loading: false })
       }
       await this.loadSelectedTransactions();
+    },
+    async addUpdateExpense(
+      friend: FriendWithBalance,
+      formValue: AddUpdateExpenseFormValue,
+      updatingTransaction?: Transaction,
+    ) {
+      formValue.transactionDate = (new Date(formValue.transactionDate)).toISOString();
+
+      let transactionAddUpdateResponse;
+      try {
+        if (updatingTransaction) {
+          transactionAddUpdateResponse = await firstValueFrom(
+            http.put<Transaction>(`${PRIVATE_API}/transactions/update/transactionId/${updatingTransaction.transactionId}`, {
+              ...formValue,
+            })
+          );
+        } else {
+          transactionAddUpdateResponse = await firstValueFrom(http.post<Transaction>(`${PRIVATE_API}/transactions/add`, {
+            ...formValue,
+            recipientId: friend.friendId
+          }));
+        }
+      } catch (e) {
+        await helperService.showToast('Unable to add/update expense at the moment');
+        throw e;
+      }
+
+      let postSaveActions = [this.loadFriends()];
+      if (
+        store.selectedFriend()
+        && friend.friendId === store.selectedFriend()?.friendId
+      ) {
+        postSaveActions.push(this.loadSelectedTransactions())
+      }
+      await Promise.all(postSaveActions);
+
+      return transactionAddUpdateResponse;
     }
   }))
 );

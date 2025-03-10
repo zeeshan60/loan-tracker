@@ -1,24 +1,29 @@
 import { Component, inject, input, OnInit } from '@angular/core';
 import { CurrencyPipe, JsonPipe } from '@angular/common';
 import {
-  IonAvatar, IonBackButton,
+  IonAvatar,
+  IonBackButton,
   IonButton,
   IonButtons,
   IonContent,
   IonHeader,
   IonIcon,
   IonItem,
-  IonLabel, IonList, IonNav, IonSpinner, IonTitle, IonToolbar, ModalController,
+  IonLabel,
+  IonList,
+  IonNav,
+  IonSpinner,
+  IonTitle,
+  IonToolbar,
+  ModalController,
 } from '@ionic/angular/standalone';
-import { NavParams } from '@ionic/angular';
 import { FriendWithBalance } from '../model';
 import { TransactionDetailsComponent } from '../transaction-details/transaction-details.component';
 import { FriendsStore } from '../friends.store';
-import { HelperService } from '../../helper.service';
 import { shortName } from '../../utility-functions';
 import { ShortenNamePipe } from '../../pipes/shorten-name.pipe';
 import { DateFormatPipe } from '../../pipes/date-format.pipe';
-import { DefineExpenseComponent } from '../../define-expense/define-expense.component';
+import { DefineExpenseComponent, SplitOptions } from '../../define-expense/define-expense.component';
 
 @Component({
   selector: 'app-friend-transactions',
@@ -80,6 +85,12 @@ export class FriendTransactionsComponent  implements OnInit {
   }
 
   settleUp() {
-    this.friendsStore.settleUp(this.friend())
+    this.friendsStore.settleUp(this.friend(), {
+      amount: this.friend().mainBalance?.amount,
+      currency: this.friend().mainBalance.currency,
+      type: this.friend().mainBalance.isOwed ? SplitOptions.TheyPaidToSettle : SplitOptions.YouPaidToSettle,
+      transactionDate: (new Date()).toISOString(),
+      description: 'settlement'
+    })
   }
 }
