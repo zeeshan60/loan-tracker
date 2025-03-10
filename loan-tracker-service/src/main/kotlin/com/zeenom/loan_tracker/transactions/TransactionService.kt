@@ -1,9 +1,6 @@
 package com.zeenom.loan_tracker.transactions
 
-import com.zeenom.loan_tracker.friends.FriendFinderStrategy
-import com.zeenom.loan_tracker.friends.FriendSummaryDto
-import com.zeenom.loan_tracker.friends.FriendUserDto
-import com.zeenom.loan_tracker.friends.FriendsEventHandler
+import com.zeenom.loan_tracker.friends.*
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventHandler
 import kotlinx.coroutines.Dispatchers
@@ -19,6 +16,8 @@ class TransactionService(
     private val userEventHandler: UserEventHandler,
     private val friendsEventHandler: FriendsEventHandler,
     private val friendFinderStrategy: FriendFinderStrategy,
+    private val allTimeBalanceStrategy: AllTimeBalanceStrategy,
+    private val currencyClient: ICurrencyClient,
 ) {
     suspend fun addTransaction(
         userUid: String,
@@ -191,16 +190,31 @@ class TransactionService(
         return Pair(friendUser, userStreamId)
     }
 
-    suspend fun transactionsByFriendId(userId: String, friendId: UUID): List<TransactionDto> {
+    suspend fun transactionsByFriendId(userId: String, friendId: UUID): TransactionsDto {
         val (user, friendUsersByUid, friendUsersByStreamId) = userAndFriendInfo(userId)
         val models = transactionEventHandler.transactionModelsByFriend(userId, friendId)
 
+        val amounts = transactionEventHandler.balancesOfFriendsByCurrency(
+            userId = userId,
+            friendIds = listOf(friendId)
+        )[friendId]?.values?.toList()
+            ?: throw IllegalArgumentException("Friend with id $friendId does not exist")
+        val balance = allTimeBalanceStrategy.calculateAllTimeBalance(
+            amounts = amounts,
+            currencyRateMap = currencyClient.fetchCurrencies().rates,
+            baseCurrency = user.currency?.let { Currency.getInstance(it).currencyCode } ?: "USD"
+        )
         return models.map {
             it.transactionModel.toTransactionDto(
                 friendUsersByStreamId = friendUsersByStreamId,
                 friendUsersByUserId = friendUsersByUid,
                 userDto = user,
                 history = it.changeSummary
+            )
+        }.let {
+            TransactionsDto(
+                transactions = it,
+                balance = balance
             )
         }
     }

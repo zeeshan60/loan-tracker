@@ -6,7 +6,9 @@ import com.zeenom.loan_tracker.common.isOwed
 import com.zeenom.loan_tracker.common.startOfMonth
 import com.zeenom.loan_tracker.events.CommandDto
 import com.zeenom.loan_tracker.events.CommandType
+import com.zeenom.loan_tracker.friends.BalanceResponse
 import com.zeenom.loan_tracker.friends.FriendSummaryDto
+import com.zeenom.loan_tracker.friends.toResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Schema
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -149,8 +151,8 @@ class TransactionsController(
                 userId = userId,
                 friendId = friendId
             )
-        ).let {
-            it.data.sortedByDescending { it.transactionDate }.groupBy {
+        ).let { transactionsDtoPaginated ->
+            transactionsDtoPaginated.data.transactions.sortedByDescending { it.transactionDate }.groupBy {
                 it.transactionDate.startOfMonth(timeZone)
             }.map {
                 TransactionsPerMonth(
@@ -159,7 +161,8 @@ class TransactionsController(
                 )
             }.let {
                 TransactionsResponse(
-                    perMonth = it
+                    perMonth = it,
+                    balance = transactionsDtoPaginated.data.balance.toResponse()
                 )
             }
         }
@@ -228,11 +231,13 @@ enum class SplitType {
     YouPaidSplitEqually,
     TheyPaidSplitEqually,
     TheyOweYouAll,
-    YouOweThemAll
+    YouOweThemAll,
+    TheyPaidToSettle,
+    YouPaidToSettle
 }
 
 data class TransactionsResponse(
-    val settled: Boolean = false,
+    val balance: BalanceResponse,
     val perMonth: List<TransactionsPerMonth>,
 )
 

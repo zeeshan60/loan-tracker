@@ -1,14 +1,13 @@
 package com.zeenom.loan_tracker.friends
 
 import com.zeenom.loan_tracker.common.Paginated
-import com.zeenom.loan_tracker.transactions.AmountResponse
 import org.springframework.stereotype.Service
 
 @Service
 class FriendsControllerAdapter {
     fun FriendsWithAllTimeBalancesDto.toResponse() = FriendsResponse(
         friends = this.friends.map { it.toResponse() },
-        balance = this.balance
+        balance = this.balance.toResponse()
     )
 
     fun FriendDto.toResponse(): FriendResponse {
@@ -16,8 +15,8 @@ class FriendsControllerAdapter {
             photoUrl = this.photoUrl,
             name = this.name,
             friendId = this.friendId,
-            mainBalance = this.balances.main?.let { AmountResponse(it.amount, it.currency.currencyCode, it.isOwed) },
-            otherBalances = this.balances.other.map { AmountResponse(it.amount, it.currency.currencyCode, it.isOwed) }
+            mainBalance = this.balances.main?.toResponse(),
+            otherBalances = this.balances.other.map { it.toResponse() }
         )
     }
 

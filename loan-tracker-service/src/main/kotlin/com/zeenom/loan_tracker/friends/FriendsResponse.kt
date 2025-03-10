@@ -5,7 +5,7 @@ import java.util.*
 
 data class FriendsResponse(
     val friends: List<FriendResponse>,
-    val balance: AllTimeBalanceDto,
+    val balance: BalanceResponse,
 )
 
 data class FriendResponse(

@@ -536,6 +536,13 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
         assertThat(result.perMonth[0].transactions[0].transactionId).isNotNull()
         assertThat(result.perMonth[0].transactions[0].splitType).isEqualTo(SplitType.YouPaidSplitEqually)
         assertThat(result.perMonth[0].transactions[0].description).isEqualTo("Sample transaction 2")
+        assertThat(result.balance.main!!.amount).isEqualTo(50.0.toBigDecimal())
+        assertThat(result.balance.main!!.isOwed).isTrue()
+        assertThat(result.balance.main!!.currency).isEqualTo("USD")
+        assertThat(result.balance.other).hasSize(1)
+        assertThat(result.balance.other[0].amount).isEqualTo(50.0.toBigDecimal())
+        assertThat(result.balance.other[0].isOwed).isTrue()
+        assertThat(result.balance.other[0].currency).isEqualTo("USD")
     }
 
     @Order(16)
