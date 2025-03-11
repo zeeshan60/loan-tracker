@@ -29,7 +29,7 @@ export interface Transaction {
     name: string,
     id: string,
   },
-  updatedBy: {
+  updatedBy?: {
     name: string,
     id: string,
   },

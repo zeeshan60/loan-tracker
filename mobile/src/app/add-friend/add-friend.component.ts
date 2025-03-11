@@ -8,9 +8,11 @@ import {
 } from '@angular/core';
 import {
   IonButton,
-  IonButtons, IonContent,
+  IonButtons,
+  IonContent,
   IonHeader,
-  IonInput, IonLabel, IonSpinner,
+  IonInput,
+  IonSpinner,
   IonTitle,
   IonToolbar,
   ModalController,
@@ -36,7 +38,6 @@ import { FriendsStore } from '../friends/friends.store';
     IonContent,
     IonSpinner,
     ReactiveFormsModule,
-    IonLabel,
   ],
 })
 export class AddFriendComponent implements OnInit {

@@ -1,17 +1,14 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  computed,
   inject,
   input,
-  Input,
   model,
   OnInit,
   signal,
 } from '@angular/core';
 import {
   ActionSheetController,
-  IonBackButton,
   IonButton,
   IonButtons,
   IonContent, IonDatetime, IonDatetimeButton,
@@ -21,13 +18,12 @@ import {
   IonToolbar, ModalController,
 } from '@ionic/angular/standalone';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { firstValueFrom, takeUntil, timer } from 'rxjs';
+import { firstValueFrom, takeUntil } from 'rxjs';
 import { Router } from '@angular/router';
 import { HelperService } from '../helper.service';
 import { FriendsStore } from '../friends/friends.store';
 import { FriendWithBalance, Transaction } from '../friends/model';
 import { SelectFriendComponent } from './select-friend/select-friend.component';
-import { DatePipe, JsonPipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { CURRENCIES, PRIVATE_API } from '../constants';
 import { ShortenNamePipe } from '../pipes/shorten-name.pipe';
@@ -64,14 +60,11 @@ export enum SplitOptions {
     IonSelectOption,
     IonList,
     IonItem,
-    IonBackButton,
-    JsonPipe,
     IonLabel,
     ShortenNamePipe,
     IonModal,
     IonDatetimeButton,
     IonDatetime,
-    DatePipe,
   ],
 })
 export class DefineExpenseComponent extends ComponentDestroyedMixin() implements OnInit {

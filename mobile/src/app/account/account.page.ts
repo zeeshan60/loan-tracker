@@ -9,13 +9,11 @@ import {
   IonButtons,
   IonCard,
   IonCardContent,
-  IonAvatar,
   IonCardHeader,
   IonCardTitle,
-  IonCardSubtitle,
   IonList,
   IonItem,
-  IonLabel, IonModal, IonSelect, IonSelectOption,
+  IonLabel, IonSelect, IonSelectOption,
 } from '@ionic/angular/standalone';
 import { AuthStore } from '../login/auth.store';
 import { HelperService } from '../helper.service';
@@ -34,7 +32,7 @@ type Profile = {
   templateUrl: 'account.page.html',
   styleUrls: ['account.page.scss'],
   standalone: true,
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonIcon, IonButtons, IonCard, IonCardContent, IonAvatar, IonCardHeader, IonCardTitle, IonCardSubtitle, IonList, IonItem, IonLabel, IonModal, IonSelect, IonSelectOption, ReactiveFormsModule, FormsModule],
+  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonIcon, IonButtons, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonList, IonItem, IonLabel, IonSelect, IonSelectOption, ReactiveFormsModule, FormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccountPage {

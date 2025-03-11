@@ -1,6 +1,5 @@
 import { Component, inject, input, model, OnInit } from '@angular/core';
 import {
-  AlertController,
   IonAvatar,
   IonBackButton, IonButton,
   IonButtons,
@@ -12,7 +11,6 @@ import {
 } from '@ionic/angular/standalone';
 import { FriendWithBalance, HistoryChangeType, Transaction } from '../model';
 import { CurrencyPipe, DatePipe } from '@angular/common';
-import { DateFormatPipe } from '../../pipes/date-format.pipe';
 import { ShortenNamePipe } from '../../pipes/shorten-name.pipe';
 import { DefineExpenseComponent, SplitOptions } from '../../define-expense/define-expense.component';
 import { FriendsStore } from '../friends.store';
@@ -41,7 +39,6 @@ const historyChangeType = {
     IonToolbar,
     IonLabel,
     CurrencyPipe,
-    DateFormatPipe,
     IonAvatar,
     IonIcon,
     IonItem,

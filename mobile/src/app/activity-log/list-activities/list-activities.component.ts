@@ -2,7 +2,6 @@ import { Transaction } from '../../friends/model';
 import { ChangeDetectionStrategy, Component, inject, input, OnInit, signal } from '@angular/core';
 import {
   IonAvatar, IonBackButton,
-  IonButton,
   IonButtons,
   IonContent,
   IonHeader,
@@ -47,7 +46,7 @@ const ActivityTypeLabel = {
   templateUrl: './list-activities.component.html',
   styleUrls: ['./list-activities.component.scss'],
   standalone: true,
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonIcon, IonButtons, CurrencyPipe, IonAvatar, IonItem, IonLabel, IonList, AsyncPipe, ShortenNamePipe, DatePipe, IonNav, IonBackButton],
+  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonButtons, CurrencyPipe, IonAvatar, IonItem, IonLabel, IonList, AsyncPipe, ShortenNamePipe, DatePipe, IonNav, IonBackButton],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListActivitiesComponent implements OnInit {

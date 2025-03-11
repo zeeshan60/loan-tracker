@@ -1,5 +1,5 @@
 import { Component, inject, input, OnInit } from '@angular/core';
-import { CurrencyPipe, JsonPipe } from '@angular/common';
+import { CurrencyPipe } from '@angular/common';
 import {
   IonAvatar,
   IonBackButton,
@@ -12,7 +12,6 @@ import {
   IonLabel,
   IonList,
   IonNav,
-  IonSpinner,
   IonTitle,
   IonToolbar,
   ModalController,
@@ -44,14 +43,11 @@ import { DefineExpenseComponent, SplitOptions } from '../../define-expense/defin
     IonTitle,
     IonToolbar,
     IonBackButton,
-    IonSpinner,
     ShortenNamePipe,
     DateFormatPipe,
-    JsonPipe,
   ],
 })
-export class FriendTransactionsComponent  implements OnInit {
-  // readonly friend: Friend = inject(NavParams).data?.['friend'];
+export class FriendTransactionsComponent {
   readonly friend = input.required<FriendWithBalance>();
   readonly nav = inject(IonNav);
   readonly friendsStore = inject(FriendsStore);
@@ -59,11 +55,7 @@ export class FriendTransactionsComponent  implements OnInit {
   readonly modalCtrl = inject(ModalController);
   protected readonly shortName = shortName;
 
-  constructor() {
-  }
-
-  ngOnInit() {
-  }
+  constructor() {}
 
   openTransactionDetails(transaction: any) {
     this.nav.push(TransactionDetailsComponent, {

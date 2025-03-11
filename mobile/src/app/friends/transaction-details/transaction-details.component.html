@@ -28,7 +28,7 @@
         </h1>
         <p>Added by {{transaction().createdBy.name}} on {{transaction().createdAt|date}}</p>
         @if (transaction().updatedBy?.name) {
-          <p>Updated by {{transaction().updatedBy.name}} on {{transaction().updatedAt|date}}</p>
+          <p>Updated by {{transaction().updatedBy?.name}} on {{transaction().updatedAt|date}}</p>
         }
       </ion-label>
     </ion-item>
