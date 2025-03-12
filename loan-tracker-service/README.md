@@ -11,7 +11,7 @@ yum install docker -y
 systemctl start docker
 systemctl enable docker
 usermod -aG docker ec2-user
-docker build . -t zeeshan60/loan-tracker-service
+docker buildx build --platform linux/amd64 -t zeeshan60/loan-tracker-service --push .
 docker save -o image.tar zeeshan60/loan-tracker-service:latest
 docker push zeeshan60/loan-tracker-service:latest
 docker build . -t zeeshan60/loan-tracker-service && docker push zeeshan60/loan-tracker-service:latest

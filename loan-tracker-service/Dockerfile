@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 gradle:7-jdk17-alpine AS builder
+FROM gradle:7-jdk17-alpine AS builder
 WORKDIR /home/gradle/src
 COPY . .
 RUN gradle build -x test
