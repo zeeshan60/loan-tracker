@@ -29,6 +29,7 @@ docker save -o image.tar loantracker:latest
 scp -i "zee.pem" image.tar ec2-user@ec2-52-74-229-194.ap-southeast-1.compute.amazonaws.com:/home/ec2-user
 scp -i "zee.pem" ../deploy/manual/start_script.sh ec2-user@18.141.11.231:/home/ec2-user
 ssh -i "zee.pem" ec2-user@ec2-52-74-229-194.ap-southeast-1.compute.amazonaws.com
+ssh -i "zee.pem" ec2-user@ec2-13-228-157-84.ap-southeast-1.compute.amazonaws.com #prod
 ssh -i "zee.pem" ec2-user@46.137.192.133
 ssh -i "zee.pem" ec2-user@13.228.157.84
 sudo docker load -i image.tar

@@ -1,2 +1,4 @@
 self:
   api-url: "https://loanapi-prod.codewithzeeshan.com"
+auth:
+  secret-key: ${SECRET_KEY}
