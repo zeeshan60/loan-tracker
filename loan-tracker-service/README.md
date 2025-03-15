@@ -56,6 +56,7 @@ sudo docker-compose up -d
 sudo docker rm -f $(sudo docker ps -a -q)
 sudo docker image rm -f $(sudo docker images -q)
 sudo netstat -tuln | grep 5000
+free -h
 ```
 
 ### (Below commands run container on host network)
