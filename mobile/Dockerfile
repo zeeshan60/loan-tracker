@@ -22,8 +22,11 @@ RUN npm install @angular/material@latest
 # Copy the rest of the application source code
 COPY . .
 
+# Define a build argument for the build configuration
+ARG BUILD_CONFIG=--prod
+
 # Build the Ionic app for production.  Use the appropriate command for your project.
-RUN npm run build --prod
+RUN npm run build $BUILD_CONFIG
 
 # --- Production Stage ---
 # Use a smaller image for the final deployment.  Nginx is a common choice for serving static files.
