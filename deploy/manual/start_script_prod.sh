@@ -7,6 +7,7 @@ POSTGRES_DB=
 DEPLOY_WEBHOOK_PORT=5000
 POSTGRES_URL="postgresql://loantracker.cfk6kwwo8e2a.ap-southeast-1.rds.amazonaws.com:5432/postgres"
 SPRING_PROFILES_ACTIVE="prod"
+UI_TAG="prod"
 
 # Update the instance and install necessary packages
 sudo yum update -y
@@ -57,14 +58,14 @@ services:
       DATABASE_URL: ${POSTGRES_URL}
       DATABASE_USER: ${POSTGRES_USER}
       DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
-      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      SPRING_PROFILES_ACTIVE: ${ENVIRONMENT}
     ports:
       - "8080:8080"
     networks:
       - loan-tracker-net
 
   ui:
-    image: zeeshan60/loan-tracker-ui-repo:latest
+    image: zeeshan60/loan-tracker-ui-repo:${UI_TAG}
     container_name: loan_tracker_ui
     restart: unless-stopped
     depends_on:
