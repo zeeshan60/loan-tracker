@@ -37,6 +37,7 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
+          pwd
           docker buildx build --platform linux/amd64 -t zeeshan60/loan-tracker-service:prod --push .
 
       # 🔥 Deploy using Flask REST API instead of CodeDeploy
