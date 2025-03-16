@@ -8,5 +8,5 @@ export const environment = {
     messagingSenderId: "336545645239",
     appId: "1:336545645239:web:42d70da2cdcc91d1220332"
   },
-  apiBaseUrl: "https://loanapi.codewithzeeshan.com/api/v1",
+  apiBaseUrl: "https://loanapi-prod.codewithzeeshan.com/api/v1",
 };
