@@ -2,17 +2,17 @@
 # Redirect all HTTP traffic to HTTPS for main domain
 server {
     listen 80;
-    server_name loanapp-prod.codewithzeeshan.com loanapi-prod.codewithzeeshan.com;
+    server_name loanapp.codewithzeeshan.com loanapi.codewithzeeshan.com;
     return 301 https://$host$request_uri;
 }
 
 # Frontend (Main Domain)
 server {
     listen 443 ssl;
-    server_name loanapp-prod.codewithzeeshan.com;
+    server_name loanapp.codewithzeeshan.com;
 
-    ssl_certificate /etc/letsencrypt/live/loanapp-prod.codewithzeeshan.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/loanapp-prod.codewithzeeshan.com/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/loanapp.codewithzeeshan.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/loanapp.codewithzeeshan.com/privkey.pem;
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers HIGH:!aNULL:!MD5;
 
@@ -28,10 +28,10 @@ server {
 # Deploy webhook
 server {
     listen 443 ssl;
-    server_name loandeploy-prod.codewithzeeshan.com;
+    server_name loandeploy.codewithzeeshan.com;
 
-    ssl_certificate /etc/letsencrypt/live/loandeploy-prod.codewithzeeshan.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/loandeploy-prod.codewithzeeshan.com/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/loandeploy.codewithzeeshan.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/loandeploy.codewithzeeshan.com/privkey.pem;
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers HIGH:!aNULL:!MD5;
 
@@ -47,10 +47,10 @@ server {
 # Backend API (Subdomain)
 server {
     listen 443 ssl;
-    server_name loanapi-prod.codewithzeeshan.com;
+    server_name loanapi.codewithzeeshan.com;
 
-    ssl_certificate /etc/letsencrypt/live/loanapi-prod.codewithzeeshan.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/loanapi-prod.codewithzeeshan.com/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/loanapi.codewithzeeshan.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/loanapi.codewithzeeshan.com/privkey.pem;
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers HIGH:!aNULL:!MD5;
 
