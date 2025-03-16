@@ -45,10 +45,10 @@
         <ion-label>
           <h2>{{ friend.name }}</h2>
         </ion-label>
-        @if (friend.mainBalance.amount) {
+        @if (friend.mainBalance?.amount) {
           <p>
-            <ion-label [color]="friend.mainBalance.isOwed ? 'success': 'danger'">
-              {{ friend.mainBalance.amount | currency }}
+            <ion-label [color]="friend.mainBalance?.isOwed ? 'success': 'danger'">
+              {{ friend.mainBalance?.amount | currency }}
             </ion-label>
           </p>
         }
