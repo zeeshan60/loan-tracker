@@ -78,9 +78,9 @@ export class FriendTransactionsComponent {
 
   settleUp() {
     this.friendsStore.settleUp(this.friend(), {
-      amount: this.friend().mainBalance?.amount,
-      currency: this.friend().mainBalance.currency,
-      type: this.friend().mainBalance.isOwed ? SplitOptions.TheyPaidToSettle : SplitOptions.YouPaidToSettle,
+      amount: this.friend().mainBalance!.amount,
+      currency: this.friend().mainBalance!.currency,
+      type: this.friend().mainBalance!.isOwed ? SplitOptions.TheyPaidToSettle : SplitOptions.YouPaidToSettle,
       transactionDate: (new Date()).toISOString(),
       description: 'settlement'
     })

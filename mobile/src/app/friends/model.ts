@@ -17,8 +17,8 @@ export interface Friend {
 }
 
 export interface FriendWithBalance extends Friend {
-  mainBalance: { amount: number, currency: string, isOwed: boolean };
-  otherBalances: { amount: number, currency: string, isOwed: boolean }[]
+  mainBalance?: { amount: number, currency: string, isOwed: boolean };
+  otherBalances?: { amount: number, currency: string, isOwed: boolean }[]
 }
 
 export interface Transaction {
