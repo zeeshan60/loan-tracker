@@ -53,7 +53,7 @@ class UserService(
                 userId = userDto.uid,
                 currency = userDto.currency,
                 createdAt = Instant.now(),
-                streamId = UUID.randomUUID(),
+                streamId = existing.streamId,
                 version = existing.version + 1,
                 createdBy = userDto.uid
             )

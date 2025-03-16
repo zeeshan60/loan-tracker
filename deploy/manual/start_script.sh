@@ -1,11 +1,13 @@
 #!/bin/bash
 
-# ======== CONFIGURABLE SECRET VARIABLES ========
-# Set the authorization token for the webhook, db user, db password, and db name
-# ======== CONFIGURABLE NON SECRET VARIABLES ========
+AUTH_TOKEN="49cf14928048efa5569abb0b6330251d"
+POSTGRES_USER="postgres"
+POSTGRES_PASSWORD="postgres"
+POSTGRES_DB="postgres"
 DEPLOY_WEBHOOK_PORT=5000
 POSTGRES_URL="postgresql://postgres:5432/postgres"
 SPRING_PROFILES_ACTIVE="dev"
+IMAGE_TAG="latest"
 
 # Update the instance and install necessary packages
 sudo yum update -y
@@ -47,7 +49,7 @@ services:
       - loan-tracker-net
 
   service:
-    image: zeeshan60/loan-tracker-service:latest
+    image: zeeshan60/loan-tracker-service:${IMAGE_TAG}
     container_name: loan_tracker_service
     restart: unless-stopped
     depends_on:
@@ -56,14 +58,14 @@ services:
       DATABASE_URL: ${POSTGRES_URL}
       DATABASE_USER: ${POSTGRES_USER}
       DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
-      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      SPRING_PROFILES_ACTIVE: ${ENVIRONMENT}
     ports:
       - "8080:8080"
     networks:
       - loan-tracker-net
 
   ui:
-    image: zeeshan60/loan-tracker-ui-repo:latest
+    image: zeeshan60/loan-tracker-ui-repo:${IMAGE_TAG}
     container_name: loan_tracker_ui
     restart: unless-stopped
     depends_on:
