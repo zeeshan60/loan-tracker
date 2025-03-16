@@ -1,9 +1,10 @@
-package com.zeenom.loan_tracker.users
+package com.zeenom.loan_tracker.integration
 
-import com.zeenom.loan_tracker.controllers.BaseIntegration
 import com.zeenom.loan_tracker.friends.FriendEventRepository
 import com.zeenom.loan_tracker.friends.UpdateUserRequest
 import com.zeenom.loan_tracker.friends.UserResponse
+import com.zeenom.loan_tracker.users.UserDto
+import com.zeenom.loan_tracker.users.UserEventRepository
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Order
@@ -11,7 +12,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.web.server.LocalServerPort
 
-class UsersControllerIntegrationTest(@LocalServerPort private val port: Int) : BaseIntegration(port) {
+class UsersControllerIntegrationTest(@LocalServerPort private val port: Int) : BaseIntegration() {
 
     @Autowired
     private lateinit var userEventRepository: UserEventRepository

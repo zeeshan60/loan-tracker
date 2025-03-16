@@ -2,6 +2,7 @@ package com.zeenom.loan_tracker.common
 
 import com.zeenom.loan_tracker.common.exceptions.NotFoundException
 import com.zeenom.loan_tracker.common.exceptions.UnauthorizedException
+import io.swagger.v3.oas.models.servers.Server
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -31,6 +32,7 @@ class GlobalExceptionAdvice {
 
     @ExceptionHandler(IllegalStateException::class)
     suspend fun handleIllegalState(ex: IllegalStateException): ResponseEntity<ErrorResponse> {
+
         logger.info("Error occurred", ex)
         val errorResponse = ErrorResponse(ErrorMessage(ex.message ?: "Something went wrong"))
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse)
@@ -44,7 +46,7 @@ class GlobalExceptionAdvice {
     }
 
     @ExceptionHandler(ServerWebInputException::class)
-    suspend fun handleMissingRequestValue(ex: MissingRequestValueException): ResponseEntity<ErrorResponse> {
+    suspend fun handleMissingRequestValue(ex: ServerWebInputException): ResponseEntity<ErrorResponse> {
         logger.info("Error occurred", ex)
         val errorResponse = ErrorResponse(ErrorMessage(ex.message))
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse)

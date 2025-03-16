@@ -20,9 +20,9 @@ class FriendsControllerAdapter {
         )
     }
 
-    fun fromRequestToDto(createFriendRequest: CreateFriendRequest): CreateFriendDto {
-        return CreateFriendDto(
-            email = createFriendRequest.email,
+            fun fromRequestToDto(createFriendRequest: CreateFriendRequest): CreateFriendDto {
+                return CreateFriendDto(
+                    email = createFriendRequest.email,
             phoneNumber = createFriendRequest.phoneNumber,
             name = createFriendRequest.name
         )

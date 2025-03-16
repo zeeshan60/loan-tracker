@@ -1,26 +1,23 @@
-package com.zeenom.loan_tracker.transactions
+package com.zeenom.loan_tracker.integration
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.zeenom.loan_tracker.common.Paginated
-import com.zeenom.loan_tracker.controllers.BaseIntegration
-import com.zeenom.loan_tracker.friends.FriendEventRepository
-import com.zeenom.loan_tracker.friends.FriendsResponse
-import com.zeenom.loan_tracker.friends.UpdateUserRequest
-import com.zeenom.loan_tracker.friends.UserResponse
+import com.zeenom.loan_tracker.friends.*
+import com.zeenom.loan_tracker.transactions.*
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventRepository
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.AutoCloseableSoftAssertions
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.web.server.LocalServerPort
 import java.time.Instant
 import java.util.*
 
-class TransactionsControllerIntegrationTest(@LocalServerPort private val port: Int) :
-    BaseIntegration(port) {
+class TransactionsControllerIntegrationTest:
+    BaseIntegration() {
 
     @Autowired
     private lateinit var friendEventRepository: FriendEventRepository
@@ -641,13 +638,15 @@ class TransactionsControllerIntegrationTest(@LocalServerPort private val port: I
         val friends = queryFriend(zeeToken).data.friends
 
         assertThat(friends).hasSize(1)
-        assertThat(friends[0].mainBalance!!.amount).isEqualTo(13000.toBigDecimal())
-        assertThat(friends[0].mainBalance!!.isOwed).isTrue()
-        assertThat(friends[0].mainBalance!!.currency).isEqualTo("PKR")
-        assertThat(friends[0].otherBalances).hasSize(1)
-        assertThat(friends[0].otherBalances[0].amount).isEqualTo(50.0.toBigDecimal())
-        assertThat(friends[0].otherBalances[0].isOwed).isTrue()
-        assertThat(friends[0].otherBalances[0].currency).isEqualTo("USD")
+        AutoCloseableSoftAssertions().use { soft ->
+            soft.assertThat(friends[0].mainBalance!!.amount).isEqualTo(13000.toBigDecimal())
+            soft.assertThat(friends[0].mainBalance!!.isOwed).isTrue()
+            soft.assertThat(friends[0].mainBalance!!.currency).isEqualTo("PKR")
+            soft.assertThat(friends[0].otherBalances).hasSize(1)
+            soft.assertThat(friends[0].otherBalances[0].amount).isEqualTo(50.0.toBigDecimal())
+            soft.assertThat(friends[0].otherBalances[0].isOwed).isTrue()
+            soft.assertThat(friends[0].otherBalances[0].currency).isEqualTo("USD")
+        }
     }
 
     private fun assertTransactionDataCorrectness(transactionResponse: TransactionResponse) {
