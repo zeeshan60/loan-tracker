@@ -1,2 +1,5 @@
+# This file is used to configure the application for production environment
 self:
   api-url: "https://loanapi-prod.codewithzeeshan.com"
+auth:
+  secret-key: ${SECRET_KEY}

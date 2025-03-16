@@ -1,11 +1,11 @@
-name: Deploying Backend to dev
+name: Deploying Backend to production
 
 on:
   push:
     branches:
-      - main
+      - prod
     paths:
-      - '.github/workflows/deploy-service.yml'
+      - '.github/workflows/deploy-service-prod.yml'
       - 'loan-tracker-service/**'
 
 jobs:
@@ -37,11 +37,12 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          docker buildx build --platform linux/amd64 -t zeeshan60/loan-tracker-service:latest --push .
+          cd loan-tracker-service
+          docker buildx build --platform linux/amd64 -t zeeshan60/loan-tracker-service:prod --push .
 
       # 🔥 Deploy using Flask REST API instead of CodeDeploy
       - name: Deploy via Flask API
         run: |
-          curl -X POST "https://loandeploy.codewithzeeshan.com/deploy" \
+          curl -X POST "https://loandeploy-prod.codewithzeeshan.com/deploy" \
             -H "Authorization: Bearer ${{ secrets.FLASK_DEPLOY_TOKEN }}" \
             -H "Content-Type: application/json"
