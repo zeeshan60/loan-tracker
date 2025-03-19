@@ -39,6 +39,13 @@
 .strike {
   text-decoration: line-through;
 }
-//.red {
-//  color: red;
-//}
+
+.overall-balance-wrapper {
+  font-size: 1.3rem;
+  .other-balance-amount {
+    font-weight: bold;
+    font-size: 14px;
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+}

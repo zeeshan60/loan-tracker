@@ -1,6 +1,7 @@
-import { Component, inject, input, OnInit } from '@angular/core';
+import { Component, computed, inject, input, OnInit } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import {
+  IonAccordion, IonAccordionGroup,
   IonAvatar,
   IonBackButton,
   IonButton,
@@ -45,6 +46,8 @@ import { DefineExpenseComponent, SplitOptions } from '../../define-expense/defin
     IonBackButton,
     ShortenNamePipe,
     DateFormatPipe,
+    IonAccordion,
+    IonAccordionGroup,
   ],
 })
 export class FriendTransactionsComponent {
@@ -54,6 +57,8 @@ export class FriendTransactionsComponent {
   readonly transactions = this.friendsStore.selectedTransactions;
   readonly modalCtrl = inject(ModalController);
   protected readonly shortName = shortName;
+  readonly sortedOtherBalance = computed(() => this.friendsStore.selectedFriendBalance()?.other
+    .sort((a, b) => b.amount - a.amount));
 
   constructor() {}
 
