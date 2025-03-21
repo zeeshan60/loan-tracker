@@ -14,6 +14,35 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
+  <ion-list>
+    @if (friendsStore['selectedFriendBalance']()?.main) {
+      <ion-item class="overall-balance-wrapper">
+        <ion-label>
+          Balance with {{friend()['name'] | shortenName}}
+        </ion-label>
+        @if (friendsStore['selectedFriendBalance']()) {
+          <p>
+            <ion-accordion-group>
+              <ion-accordion value="first">
+                <ion-item slot="header" color="light">
+                  <ion-label
+                    [color]="friendsStore['selectedFriendBalance']()?.main?.isOwed ? 'success' : 'danger'"
+                  >
+                    <strong>{{friendsStore['selectedFriendBalance']()?.main?.amount | currency: friendsStore['selectedFriendBalance']()?.main?.currency: 'symbol'}}</strong>
+                  </ion-label>
+                </ion-item>
+                @for (otherBalance of sortedOtherBalance(); track otherBalance.currency) {
+                  <ion-label class="other-balance-amount" slot="content" [color]="otherBalance.isOwed ? 'success': 'danger'">
+                    {{otherBalance.amount | currency: otherBalance.currency: 'symbol'}}
+                  </ion-label>
+                }
+              </ion-accordion>
+            </ion-accordion-group>
+          </p>
+        }
+      </ion-item>
+    }
+  </ion-list>
   @for(transactionsByMonth of transactions(); track transactionsByMonth.date) {
     <ion-list>
       <ion-item class="group-label-item">

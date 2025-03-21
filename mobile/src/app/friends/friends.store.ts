@@ -28,6 +28,10 @@ type FriendsState = {
     main: Balance,
     other: Balance[]
   } | null,
+  selectedFriendBalance: {
+    main: Balance,
+    other: Balance[]
+  } | null,
   selectedFriend: FriendWithBalance | null,
   selectedTransactions: TransactionsByMonth[],
   loading: boolean,
@@ -46,7 +50,8 @@ const initialState: FriendsState = {
   overallBalance: null,
   loading: false,
   selectedFriend: null,
-  selectedTransactions: []
+  selectedTransactions: [],
+  selectedFriendBalance: null,
 }
 
 interface Methods extends MethodsDictionary {
@@ -117,7 +122,13 @@ export const FriendsStore = signalStore(
       }
       try {
         patchState(store, { loading: true })
-        const transactions = await firstValueFrom(http.get<{ perMonth: TransactionsByMonth[]}>(
+        const transactions = await firstValueFrom(http.get<{
+          perMonth: TransactionsByMonth[],
+          balance: {
+            "main": Balance,
+            "other": Balance[]
+          }
+        }>(
           `${PRIVATE_API}/transactions/friend/byMonth`,
           {
             params: {
@@ -125,8 +136,12 @@ export const FriendsStore = signalStore(
               timeZone: helperService.getTimeZone()
             }
           }
-        ) as Observable<{ perMonth: TransactionsByMonth[] }>)
-        patchState(store, { selectedTransactions: transactions.perMonth, loading: false })
+        ))
+        patchState(store, {
+          selectedTransactions: transactions.perMonth,
+          selectedFriendBalance: transactions.balance,
+          loading: false
+        })
       } catch (e: any) {
         patchState(store, { loading: false })
         helperService.showToast(e.toString())
