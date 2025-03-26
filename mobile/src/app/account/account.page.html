@@ -11,11 +11,13 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+@if (user()) {
+  <ion-content
+    class="ion-padding">
     <ion-card>
       <ion-card-content class="ion-text-center">
-        @if (user()?.photoURL) {
-          <img [alt]="user()?.displayName + ' picture'" [src]="user()?.photoURL" />
+        @if (user()?.photoUrl) {
+          <img [alt]="user()?.displayName + ' picture'" [src]="user()?.photoUrl" />
         } @else {
           <img alt="Silhouette of a person's head" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
         }
@@ -34,7 +36,8 @@
                 label="Currency"
                 label-placement=""
                 interface="action-sheet"
-                [(ngModel)]="defaultCurrency"
+                [ngModel]="user()!.currency"
+                (ngModelChange)="updateDefaultCurrency($event)"
               >
                 @for (currency of currencies; track currency) {
                   <ion-select-option value="{{currency}}">{{currency}}</ion-select-option>
@@ -49,4 +52,5 @@
         </ion-card-content>
       </ion-card-content>
     </ion-card>
-</ion-content>
+  </ion-content>
+}

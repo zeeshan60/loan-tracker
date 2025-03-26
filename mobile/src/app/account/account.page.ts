@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, model, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, model, signal } from '@angular/core';
 import {
   IonHeader,
   IonToolbar,
@@ -16,16 +16,8 @@ import {
   IonLabel, IonSelect, IonSelectOption,
 } from '@ionic/angular/standalone';
 import { AuthStore } from '../login/auth.store';
-import { HelperService } from '../helper.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CURRENCIES } from '../constants';
-
-type Profile = {
-  displayName: string,
-  email: string,
-  photoURL: string,
-  phoneNumber: string|null,
-}
 
 @Component({
   selector: 'app-account',
@@ -37,18 +29,18 @@ type Profile = {
 })
 export class AccountPage {
   defaultCurrency = model('');
-  readonly helperService = inject(HelperService);
   readonly authStore = inject(AuthStore);
-  readonly user = signal<Profile | null>(null)
+  readonly user = computed(() => this.authStore.user())
   readonly currencies = CURRENCIES;
   constructor() {
-    this.helperService.getUser().then((user) => {
-      this.user.set({
-        displayName: user?.displayName!,
-        email: user?.email!,
-        photoURL: user?.photoURL!,
-        phoneNumber: user?.phoneNumber || null,
-      });
-    })
+    this.authStore.loadUserData();
+  }
+
+  async updateDefaultCurrency(value: string) {
+    await this.authStore.updateUserData({
+      currency: value,
+      phoneNumber: this.user()!.phoneNumber || null,
+      displayName: this.user()!.displayName,
+    });
   }
 }

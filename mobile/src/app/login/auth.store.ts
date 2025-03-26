@@ -9,16 +9,28 @@ import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 import { StorageService } from '../services/storage.service';
 import { MethodsDictionary } from '@ngrx/signals/src/signal-store-models';
-import { PUBLIC_API } from '../constants';
+import { PRIVATE_API, PUBLIC_API } from '../constants';
 import { LoadingController } from '@ionic/angular/standalone';
 import { FriendsStore } from '../friends/friends.store';
 
+export interface User {
+  uid: string,
+  email: string,
+  phoneNumber: number|null,
+  displayName: string,
+  currency: string|null,
+  photoUrl: string,
+  emailVerified: boolean
+}
+
 type AuthState = {
   apiKey: string,
+  user: User|null,
 }
 
 const initialState: AuthState = {
   apiKey: '',
+  user: null
 }
 
 interface Methods extends MethodsDictionary {
@@ -26,6 +38,9 @@ interface Methods extends MethodsDictionary {
   setApiKey(): Promise<void>;
   signOut(): Promise<void>;
   login(idToken: string): Promise<void>;
+  loadUserData(userData?: User): Promise<void>;
+  fetchAndSaveUserData(): Promise<void>;
+  updateUserData(data: Partial<User>): Promise<void>;
 }
 
 export const AuthStore = signalStore(
@@ -42,13 +57,42 @@ export const AuthStore = signalStore(
     loadingCtrl = inject(LoadingController),
     friendsStore = inject(FriendsStore),
   ): Methods => ({
+    async loadUserData(userData?: User): Promise<void> {
+      patchState(store, { user: userData || await storageService.get('user_data') })
+    },
+    async fetchAndSaveUserData(): Promise<void> {
+      const userData = await firstValueFrom(http.get<User>(`${PRIVATE_API}/users`));
+      await storageService.set('user_data', userData);
+      await this.loadUserData(userData);
+      await toastCtrl.create({
+        message: 'User updated successfully.',
+        duration: 1500
+      });
+    },
+    async updateUserData(data: Partial<User>): Promise<void> {
+      const loader = await loadingCtrl.create();
+      try {
+        await firstValueFrom(http.put<User>(`${PRIVATE_API}/users`, data));
+        await this.fetchAndSaveUserData();
+      } catch (e) {
+        await toastCtrl.create({
+          message: 'Unable to save data.',
+          duration: 1500
+        });
+      } finally {
+        await loader.dismiss();
+      }
+    },
     async loginWithGoogle(): Promise<void> {
       signInWithPopup(auth, new GoogleAuthProvider())
         .then(async () => {
           const loader = await loadingCtrl.create({ duration: 2000 });
           loader.present();
           await this.login((await helperService.getFirebaseAccessToken())!)
-          await friendsStore.loadFriends({ showLoader: false });
+          await Promise.all([
+            this.fetchAndSaveUserData(),
+            friendsStore.loadFriends({ showLoader: false })
+          ]);
           await loader.dismiss();
         })
         .then(() => router.navigate(['/']))
