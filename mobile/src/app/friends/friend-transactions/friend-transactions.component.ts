@@ -24,6 +24,7 @@ import { shortName } from '../../utility-functions';
 import { ShortenNamePipe } from '../../pipes/shorten-name.pipe';
 import { DateFormatPipe } from '../../pipes/date-format.pipe';
 import { DefineExpenseComponent, SplitOptions } from '../../define-expense/define-expense.component';
+import { SettleUpComponent } from './settle-up/settle-up.component';
 
 @Component({
   selector: 'app-friend-transactions',
@@ -81,13 +82,17 @@ export class FriendTransactionsComponent {
     this.friendsStore.setSelectedFriend(this.friend());
   }
 
-  settleUp() {
-    this.friendsStore.settleUp(this.friend(), {
-      amount: this.friend().mainBalance!.amount,
-      currency: this.friend().mainBalance!.currency,
-      type: this.friend().mainBalance!.isOwed ? SplitOptions.TheyPaidToSettle : SplitOptions.YouPaidToSettle,
-      transactionDate: (new Date()).toISOString(),
-      description: 'settlement'
+  async settleUp() {
+    const modalInstance = await this.modalCtrl.create({
+      component: SettleUpComponent,
+      componentProps: {
+        friend: this.friend()
+      }
     })
+    modalInstance.present();
+    const { data, role } = await modalInstance.onWillDismiss();
+    if (role === 'confirm') {
+      // todo
+    }
   }
 }

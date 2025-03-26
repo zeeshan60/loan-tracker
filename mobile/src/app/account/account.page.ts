@@ -18,6 +18,7 @@ import {
 import { AuthStore } from '../login/auth.store';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CURRENCIES } from '../constants';
+import { FriendsStore } from '../friends/friends.store';
 
 @Component({
   selector: 'app-account',
@@ -30,6 +31,7 @@ import { CURRENCIES } from '../constants';
 export class AccountPage {
   defaultCurrency = model('');
   readonly authStore = inject(AuthStore);
+  readonly friendsStore = inject(FriendsStore);
   readonly user = computed(() => this.authStore.user())
   readonly currencies = CURRENCIES;
   constructor() {
@@ -42,5 +44,6 @@ export class AccountPage {
       phoneNumber: this.user()!.phoneNumber || null,
       displayName: this.user()!.displayName,
     });
+    this.friendsStore.loadFriends();
   }
 }
