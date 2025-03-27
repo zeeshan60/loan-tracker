@@ -49,3 +49,15 @@
     padding-right: 15px;
   }
 }
+.action-sheet-button {
+  &.red, &.green {
+    font-size: 1.2rem;
+  }
+  &.red {
+    color: red;
+  }
+  &.green {
+    color: green;
+  }
+}
+

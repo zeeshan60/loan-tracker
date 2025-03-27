@@ -13,3 +13,12 @@ ion-item {
     margin-top: 10px
   }
 }
+
+ion-select.balance-select {
+  &::part(text) {
+    color: red;
+  }
+  &.is-owed::part(text) {
+    color: green;
+  }
+}

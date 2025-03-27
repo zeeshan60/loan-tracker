@@ -1,17 +1,3 @@
-::ng-deep {
-  .action-sheet-button {
-    &.red, &.green {
-      font-size: 1.2rem;
-    }
-    &.red {
-      color: red;
-    }
-    &.green {
-      color: green;
-    }
-  }
-}
-
 .choose-friend-item {
   ion-label.selected-friend-label {
     display: inline;

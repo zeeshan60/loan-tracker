@@ -16,7 +16,7 @@
   </ion-toolbar>
 </ion-header>
 <ion-content class="ion-padding">
-  @if (settleUpForm.get('currency')?.value?.isOwed) {
+  @if (settleUpForm.get('balance')?.value?.isOwed) {
     <h1>{{this.friend().name | shortenName}} paid you.</h1>
   } @else {
     <h1>You paid to {{this.friend().name | shortenName}}</h1>
@@ -25,15 +25,16 @@
     <ion-list>
       <ion-item class="currency-expense">
         <ion-select
-          formControlName="currency"
-          class="currency"
+          formControlName="balance"
+          class="balance-select"
+          [class.is-owed]="settleUpForm.get('balance')!.value.isOwed"
           placeholder="Select currency"
           label="Choose a balance"
           label-placement="stacked"
           interface="action-sheet"
         >
           @for (balance of friend().otherBalances; track balance) {
-            <ion-select-option [ngClass]="{'is-owed': balance.isOwed}" [value]="balance">{{balance.currency}} | {{balance.amount}}</ion-select-option>
+            <ion-select-option [ngClass]="{'green': balance.isOwed, 'red': !balance.isOwed}" [value]="balance">{{balance.currency}} | {{balance.amount}}</ion-select-option>
           }
         </ion-select>
       </ion-item>

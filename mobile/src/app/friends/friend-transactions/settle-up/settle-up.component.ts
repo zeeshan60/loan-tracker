@@ -60,7 +60,7 @@ export class SettleUpComponent extends ComponentDestroyedMixin() implements OnIn
   })
   readonly router = inject(Router);
   readonly settleUpForm = this.formBuilder.group({
-    currency: this.formBuilder.nonNullable.control({ currency: 'PKR', isOwed: true, amount: 0}, [Validators.required]),
+    balance: this.formBuilder.nonNullable.control({ currency: 'PKR', isOwed: true, amount: 0}, [Validators.required]),
     amount: this.formBuilder.nonNullable.control<number|null>(null, [Validators.required, Validators.min(1), Validators.max(100000000)]),
   });
 
@@ -69,14 +69,14 @@ export class SettleUpComponent extends ComponentDestroyedMixin() implements OnIn
   }
 
   ngOnInit() {
-    this.settleUpForm.get('currency')?.valueChanges
+    this.settleUpForm.get('balance')?.valueChanges
       .pipe(
         takeUntil(this.componentDestroyed)
       )
       .subscribe((currency) => {
         this.settleUpForm.get('amount')?.setValue(this.otherBalances()[currency.currency].amount)
       });
-    this.settleUpForm.get('currency')?.setValue(this.friend().otherBalances?.[0] || { currency: 'PKR', isOwed: true, amount: 0})
+    this.settleUpForm.get('balance')?.setValue(this.friend().otherBalances?.[0] || { currency: 'PKR', isOwed: true, amount: 0})
   }
 
   async closePopup() {
@@ -88,9 +88,9 @@ export class SettleUpComponent extends ComponentDestroyedMixin() implements OnIn
       try {
         this.loading.set(true);
         const transaction = {
-          currency: this.settleUpForm.get('currency')!.value.currency,
+          currency: this.settleUpForm.get('balance')!.value.currency,
           amount: this.settleUpForm.get('amount')!.value,
-          type: this.settleUpForm.get('currency')!.value.isOwed ? SplitOptions.TheyPaidToSettle : SplitOptions.YouPaidToSettle,
+          type: this.settleUpForm.get('balance')!.value.isOwed ? SplitOptions.TheyPaidToSettle : SplitOptions.YouPaidToSettle,
           transactionDate: (new Date()).toISOString(),
           description: 'settlement'
         }
