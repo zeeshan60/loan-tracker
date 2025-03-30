@@ -6,7 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { Auth, signInWithPopup, signOut } from '@angular/fire/auth';
 import { GoogleAuthProvider } from 'firebase/auth';
 import { Router } from '@angular/router';
-import { ToastController } from '@ionic/angular';
+import { ToastController } from '@ionic/angular/standalone';
 import { StorageService } from '../services/storage.service';
 import { MethodsDictionary } from '@ngrx/signals/src/signal-store-models';
 import { PRIVATE_API, PUBLIC_API } from '../constants';
@@ -64,10 +64,6 @@ export const AuthStore = signalStore(
       const userData = await firstValueFrom(http.get<User>(`${PRIVATE_API}/users`));
       await storageService.set('user_data', userData);
       await this.loadUserData(userData);
-      await toastCtrl.create({
-        message: 'User updated successfully.',
-        duration: 1500
-      });
     },
     async updateUserData(data: Partial<User>): Promise<void> {
       const loader = await loadingCtrl.create();

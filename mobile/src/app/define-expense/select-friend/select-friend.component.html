@@ -24,15 +24,22 @@
   }
 </ion-header>
 <ion-content>
-  <ion-list>
+  <ion-list lines="none">
     <ion-item (click)="createNewFriend()">
       <ion-avatar slot="start">
-          <ion-icon size="large" name="add-outline"></ion-icon>
+        <ion-icon size="large" name="add-outline"></ion-icon>
       </ion-avatar>
       <ion-label>
         <h2>Add <span style="color: green">{{filter()}}</span></h2>
       </ion-label>
     </ion-item>
+  </ion-list>
+  <ion-list>
+    @if (isMobile) {
+      <ion-list-header>
+        <ion-label>Friends</ion-label>
+      </ion-list-header>
+    }
     @for( friend of friends(); track friend.name) {
       <ion-item (click)="chooseFriend(friend)">
         <ion-avatar slot="start">
@@ -61,4 +68,32 @@
       </ion-item>
     }
   </ion-list>
+  @if (isMobile) {
+    <ion-list>
+      <ion-list-header>
+        <ion-label>Contacts</ion-label>
+      </ion-list-header>
+      @for( contact of filteredContacts(); track contact.name) {
+        <ion-item (click)="chooseContact(contact)">
+          <ion-avatar slot="start">
+            <ion-icon size="large" name="person" color="medium"></ion-icon>
+          </ion-avatar>
+          <ion-label>
+            <h2>{{ contact.name }}</h2>
+          </ion-label>
+            <p>
+              <ion-label>
+                {{ contact.phoneNumber }}
+              </ion-label>
+            </p>
+        </ion-item>
+      } @empty {
+        <ion-item disabled="true">
+          <ion-label>
+            <h2>No friends in you contact list.</h2>
+          </ion-label>
+        </ion-item>
+      }
+    </ion-list>
+  }
 </ion-content>
