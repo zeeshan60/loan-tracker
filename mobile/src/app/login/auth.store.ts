@@ -61,11 +61,6 @@ export const AuthStore = signalStore(
       const userData = await firstValueFrom(http.get<User>(`${PRIVATE_API}/users`));
       await storageService.set('user_data', userData);
       await this.loadUserData(userData);
-      const toast = await toastCtrl.create({
-        message: 'User updated successfully.',
-        duration: 1500
-      });
-      await toast.present();
     },
     async updateUserData(data: Partial<User>): Promise<void> {
       const loader = await loadingCtrl.create();
