@@ -33,4 +33,8 @@ export class LoginComponent {
   loginWithGoogle() {
     this.authStore.loginWithGoogle();
   }
+
+  nativeLogin() {
+    // todo: trigger native plugin here...
+  }
 }

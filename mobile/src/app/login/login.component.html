@@ -6,8 +6,10 @@
 
 <ion-content class="ion-padding">
   <div class="login-container">
-    <div class="app-name">Loan Tracker v0.1</div>
-
+    <ion-button expand="full" (click)="nativeLogin()">
+      <ion-icon name="logo-google" slot="start"></ion-icon>
+      Native Login
+    </ion-button>
     <ion-button expand="full" (click)="loginWithGoogle()">
       <ion-icon name="logo-google" slot="start"></ion-icon>
       Login with Google
