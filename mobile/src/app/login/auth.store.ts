@@ -3,8 +3,6 @@ import { inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { HelperService } from '../helper.service';
 import { HttpClient } from '@angular/common/http';
-import { Auth, signInWithPopup, signOut } from '@angular/fire/auth';
-import { GoogleAuthProvider } from 'firebase/auth';
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular/standalone';
 import { StorageService } from '../services/storage.service';
@@ -37,7 +35,7 @@ interface Methods extends MethodsDictionary {
   loginWithGoogle(): Promise<void>;
   setApiKey(): Promise<void>;
   signOut(): Promise<void>;
-  login(idToken: string): Promise<void>;
+  login(idToken?: string): Promise<void>;
   loadUserData(userData?: User): Promise<void>;
   fetchAndSaveUserData(): Promise<void>;
   updateUserData(data: Partial<User>): Promise<void>;
@@ -50,7 +48,6 @@ export const AuthStore = signalStore(
     store,
     helperService = inject(HelperService),
     http = inject(HttpClient),
-    auth = inject(Auth),
     router = inject(Router),
     toastCtrl = inject(ToastController),
     storageService = inject(StorageService),
@@ -64,6 +61,11 @@ export const AuthStore = signalStore(
       const userData = await firstValueFrom(http.get<User>(`${PRIVATE_API}/users`));
       await storageService.set('user_data', userData);
       await this.loadUserData(userData);
+      const toast = await toastCtrl.create({
+        message: 'User updated successfully.',
+        duration: 1500
+      });
+      await toast.present();
     },
     async updateUserData(data: Partial<User>): Promise<void> {
       const loader = await loadingCtrl.create();
@@ -80,20 +82,31 @@ export const AuthStore = signalStore(
       }
     },
     async loginWithGoogle(): Promise<void> {
-      signInWithPopup(auth, new GoogleAuthProvider())
+      // signInWithPopup(auth, new GoogleAuthProvider())
+      //   .then(async () => {
+      //     const loader = await loadingCtrl.create({ duration: 2000 });
+      //     loader.present();
+      //     await this.login((await helperService.getFirebaseAccessToken())!)
+      //     await Promise.all([
+      //       this.fetchAndSaveUserData(),
+      //       friendsStore.loadFriends({ showLoader: false })
+      //     ]);
+      //     await loader.dismiss();
+      //   })
+      Promise.resolve(true)
         .then(async () => {
-          const loader = await loadingCtrl.create({ duration: 2000 });
-          loader.present();
-          await this.login((await helperService.getFirebaseAccessToken())!)
-          await Promise.all([
-            this.fetchAndSaveUserData(),
-            friendsStore.loadFriends({ showLoader: false })
-          ]);
-          await loader.dismiss();
+              const loader = await loadingCtrl.create({ duration: 2000 });
+              await loader.present();
+              await this.login()
+              await Promise.all([
+                this.fetchAndSaveUserData(),
+                friendsStore.loadFriends({ showLoader: false })
+              ]);
+              await loader.dismiss();
         })
         .then(() => router.navigate(['/']))
         .catch(async (err: Error) => {
-          await signOut(auth)
+          this.signOut();
           const toast = await toastCtrl.create({
             message: 'Unable to login at the moment',
             duration: 1500
@@ -105,11 +118,12 @@ export const AuthStore = signalStore(
     async login(idToken: string) {
       try {
         const url = `${PUBLIC_API}/login`
-        const { token: apiKey } = await firstValueFrom(
-          http.post<{ token: string  }>(url, {
-            idToken: `Bearer ${idToken}`
-          })
-        );
+        // const { token: apiKey } = await firstValueFrom(
+        //   http.post<{ token: string  }>(url, {
+        //     idToken: `Bearer ${idToken}`
+        //   })
+        // );
+        const apiKey = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzMmVVWHN5Z3JqaFVNVmhsdEhSVHF0YzBXUGoxIiwiaWF0IjoxNzQzMzI3MjgwLCJleHAiOjE3NDU5MTkyODB9.gZc14CPwG_TYmHM8VMjEK9MBwYNAb0RXsTHLUXI8CCs';
         await storageService.set('api_key', apiKey);
         patchState(store, { apiKey: apiKey })
       } catch (e) {
@@ -121,7 +135,7 @@ export const AuthStore = signalStore(
     },
 
     async signOut(): Promise<void> {
-      await signOut(auth)
+      // await signOut(auth)
       storageService.remove('api_key');
       router.navigate(['login']);
     }
