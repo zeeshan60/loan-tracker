@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { ToastController } from '@ionic/angular';
+import { ToastController } from '@ionic/angular/standalone';
 import { DEFAULT_TOAST_DURATION } from './constants';
 import { getAuth } from '@angular/fire/auth';
 import { AlertController } from '@ionic/angular/standalone';
