@@ -16,7 +16,9 @@ class FriendsControllerAdapter {
             name = this.name,
             friendId = this.friendId,
             mainBalance = this.balances.main?.toResponse(),
-            otherBalances = this.balances.other.map { it.toResponse() }
+            otherBalances = this.balances.other.map { it.toResponse() },
+            email = this.email,
+            phone = this.phoneNumber,
         )
     }
 

@@ -13,6 +13,8 @@ data class FriendResponse(
     val name: String,
     val friendId: UUID,
     val settled: Boolean = false,
+    val email: String?,
+    val phone: String?,
     val mainBalance: AmountResponse?,
     val otherBalances: List<AmountResponse>,
 )
