@@ -32,3 +32,14 @@ Follow these steps to set up the Loan Tracker application on your local machine:
 
    ```bash
    npm serve
+   
+to import plugin run following command in ios plugin branch
+```bash
+git submodule update --init
+
+#than in mobile directory
+npm run build
+npx cap sync
+
+#than open ios folder and run the app
+```
