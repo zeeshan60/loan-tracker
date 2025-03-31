@@ -1,0 +1,3 @@
+[submodule "mobile/zeenom"]
+	path = mobile/zeenom
+	url = git@github.com:zeeshan60/login_plugin.git
