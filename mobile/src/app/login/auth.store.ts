@@ -1,6 +1,5 @@
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { inject } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
 import { HelperService } from '../helper.service';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -10,6 +9,11 @@ import { MethodsDictionary } from '@ngrx/signals/src/signal-store-models';
 import { PRIVATE_API, PUBLIC_API } from '../constants';
 import { LoadingController } from '@ionic/angular/standalone';
 import { FriendsStore } from '../friends/friends.store';
+import { LoginPlugin } from 'zeenom';
+import { isWeb } from '../utils';
+import { firstValueFrom } from 'rxjs';
+import { Auth, signInWithPopup } from '@angular/fire/auth';
+import { GoogleAuthProvider } from 'firebase/auth';
 
 export interface User {
   uid: string,
@@ -48,6 +52,7 @@ export const AuthStore = signalStore(
     store,
     helperService = inject(HelperService),
     http = inject(HttpClient),
+    auth = inject(Auth),
     router = inject(Router),
     toastCtrl = inject(ToastController),
     storageService = inject(StorageService),
@@ -77,27 +82,37 @@ export const AuthStore = signalStore(
       }
     },
     async loginWithGoogle(): Promise<void> {
-      // signInWithPopup(auth, new GoogleAuthProvider())
-      //   .then(async () => {
-      //     const loader = await loadingCtrl.create({ duration: 2000 });
-      //     loader.present();
-      //     await this.login((await helperService.getFirebaseAccessToken())!)
-      //     await Promise.all([
-      //       this.fetchAndSaveUserData(),
-      //       friendsStore.loadFriends({ showLoader: false })
-      //     ]);
-      //     await loader.dismiss();
-      //   })
-      Promise.resolve(true)
-        .then(async () => {
-              const loader = await loadingCtrl.create({ duration: 2000 });
-              await loader.present();
-              await this.login()
-              await Promise.all([
-                this.fetchAndSaveUserData(),
-                friendsStore.loadFriends({ showLoader: false })
-              ]);
-              await loader.dismiss();
+      const inputValue = JSON.stringify({
+        CLIENT_ID: "336545645239-ppcpb0k5hc8303p9ek0793f8lkbbqbku.apps.googleusercontent.com",
+        REVERSED_CLIENT_ID: "com.googleusercontent.apps.336545645239-ppcpb0k5hc8303p9ek0793f8lkbbqbku",
+        API_KEY: "AIzaSyB1qt9hOwlzyBWGIe-grrg0Vgp53tcwoLE",
+        GCM_SENDER_ID: "336545645239",
+        PLIST_VERSION: "1",
+        BUNDLE_ID: "com.zeenomlabs.loantracker",
+        PROJECT_ID: "loan-tracker-9b25d",
+        STORAGE_BUCKET: "loan-tracker-9b25d.firebasestorage.app",
+        IS_ADS_ENABLED: false,
+        IS_ANALYTICS_ENABLED: false,
+        IS_APPINVITE_ENABLED: true,
+        IS_GCM_ENABLED: true,
+        IS_SIGNIN_ENABLED: true,
+        GOOGLE_APP_ID: "1:336545645239:ios:90e69a58265af386220332"
+      });
+
+      const loginPromise = isWeb ? signInWithPopup(auth, new GoogleAuthProvider())
+        .then(() => helperService.getFirebaseAccessToken()) : LoginPlugin.echo({value: inputValue})
+        .then(({value: token}) => token);
+
+      loginPromise
+        .then(async (token) => {
+          const loader = await loadingCtrl.create({ duration: 2000 });
+          loader.present();
+          await this.login(token!)
+          await Promise.all([
+            this.fetchAndSaveUserData(),
+            friendsStore.loadFriends({ showLoader: false })
+          ]);
+          await loader.dismiss();
         })
         .then(() => router.navigate(['/']))
         .catch(async (err: Error) => {
@@ -113,12 +128,11 @@ export const AuthStore = signalStore(
     async login(idToken: string) {
       try {
         const url = `${PUBLIC_API}/login`
-        // const { token: apiKey } = await firstValueFrom(
-        //   http.post<{ token: string  }>(url, {
-        //     idToken: `Bearer ${idToken}`
-        //   })
-        // );
-        const apiKey = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzMmVVWHN5Z3JqaFVNVmhsdEhSVHF0YzBXUGoxIiwiaWF0IjoxNzQzMzI3MjgwLCJleHAiOjE3NDU5MTkyODB9.gZc14CPwG_TYmHM8VMjEK9MBwYNAb0RXsTHLUXI8CCs';
+        const { token: apiKey } = await firstValueFrom(
+          http.post<{ token: string  }>(url, {
+            idToken: `Bearer ${idToken}`
+          })
+        );
         await storageService.set('api_key', apiKey);
         patchState(store, { apiKey: apiKey })
       } catch (e) {
