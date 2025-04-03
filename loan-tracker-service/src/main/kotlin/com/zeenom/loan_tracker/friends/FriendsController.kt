@@ -10,7 +10,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
-import java.util.UUID
 
 @RestController
 @RequestMapping("/api/v1/friends")
@@ -61,19 +60,4 @@ class FriendsController(
         }
     }
 
-    @Operation(summary = "Settle up", description = "Settle up with a friend")
-    @PostMapping("/settleUp/{friendId}")
-    suspend fun settleUp(
-        @PathVariable friendId: UUID,
-        @AuthenticationPrincipal userId: String,
-    ): FriendResponse {
-        return FriendResponse(
-            photoUrl = "dummy photo url.com",
-            name = "dummy name",
-            friendId = friendId,
-            settled = false,
-            mainBalance = null,
-            otherBalances = emptyList()
-        )
-    }
 }

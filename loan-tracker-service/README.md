@@ -179,3 +179,7 @@ Here is how u look up records live. removing 8.8.8.8 will look up records coming
 ```bash
 nslookup -type=A loantracker.zflashstudios.com 8.8.8.8
 ```
+```bash
+#kill a task running on port in mac
+lsof -i :8081 | grep LISTEN | awk '{print $2}' | xargs kill -9
+```
