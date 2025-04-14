@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, OnInit } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import {
   IonAccordion, IonAccordionGroup,
@@ -25,6 +25,7 @@ import { ShortenNamePipe } from '../../pipes/shorten-name.pipe';
 import { DateFormatPipe } from '../../pipes/date-format.pipe';
 import { DefineExpenseComponent, SplitOptions } from '../../define-expense/define-expense.component';
 import { SettleUpComponent } from './settle-up/settle-up.component';
+import { AddFriendComponent } from '../../add-friend/add-friend.component';
 
 @Component({
   selector: 'app-friend-transactions',
@@ -82,6 +83,21 @@ export class FriendTransactionsComponent {
     this.friendsStore.setSelectedFriend(this.friend());
   }
 
+  async deleteFriend() {
+    await this.friendsStore.deleteFriend(this.friend());
+  }
+
+  async editFriendInfo() {
+    const modalInstance = await this.modalCtrl.create({
+      component: AddFriendComponent,
+      componentProps: {
+        friend: this.friend(),
+        isUpdating: true
+      }
+    })
+    modalInstance.present();
+  }
+
   async settleUp() {
     const modalInstance = await this.modalCtrl.create({
       component: SettleUpComponent,
@@ -90,9 +106,5 @@ export class FriendTransactionsComponent {
       }
     })
     modalInstance.present();
-    const { data, role } = await modalInstance.onWillDismiss();
-    if (role === 'confirm') {
-      // todo
-    }
   }
 }

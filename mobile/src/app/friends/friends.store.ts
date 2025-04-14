@@ -7,7 +7,7 @@ import { MethodsDictionary } from '@ngrx/signals/src/signal-store-models';
 import { FriendWithBalance, Transaction, TransactionsByMonth } from './model'
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { PRIVATE_API } from '../constants';
-import { AlertController } from '@ionic/angular/standalone';
+import { LoadingController } from '@ionic/angular/standalone';
 import { SplitOptions } from '../define-expense/define-expense.component';
 
 export type AddFriend = {
@@ -57,6 +57,8 @@ const initialState: FriendsState = {
 interface Methods extends MethodsDictionary {
   loadFriends(config?: { showLoader: boolean }): Promise<void>;
   addFriend(friend: AddFriend): Promise<FriendWithBalance>;
+  updateFriend(friend: AddFriend): Promise<FriendWithBalance>;
+  deleteFriend(friend: FriendWithBalance): Promise<void>;
   setSelectedFriend(friend: FriendWithBalance|null): void;
   loadSelectedTransactions(): Promise<void>;
   deleteTransaction(transaction: Transaction): Promise<void>;
@@ -81,6 +83,7 @@ export const FriendsStore = signalStore(
     friendsService = inject(FriendsService),
     helperService = inject(HelperService),
     http = inject(HttpClient),
+    loadingCtrl = inject(LoadingController),
   ): Methods => ({
     async loadFriends(config = { showLoader: true }): Promise<void> {
       if (config.showLoader) {
@@ -106,6 +109,35 @@ export const FriendsStore = signalStore(
       } catch (e: any) {
         helperService.showToast(e.error?.error?.message || 'Unable to add friend at the moment');
         throw e;
+      }
+    },
+    async updateFriend(friend: AddFriend): Promise<FriendWithBalance> {
+      try {
+        const updatedFriend = await firstValueFrom(friendsService.updateFriend(friend));
+        await this.loadFriends();
+        await helperService.showToast('Friend updated successfully');
+        return updatedFriend;
+      } catch (e: any) {
+        await helperService.showToast(e.error?.error?.message || 'Unable to update friend at the moment');
+        throw e;
+      }
+    },
+    async deleteFriend(friend: FriendWithBalance): Promise<void> {
+      const confirmation = await helperService.showConfirmAlert(
+        `Are you sure you want to remove all the transactions related to ${friend.name}.`, 'Let\'s do it'
+      )
+      if (confirmation.role !== 'confirm') return;
+      const loader = await loadingCtrl.create();
+      await loader.present();
+      try {
+        await firstValueFrom(friendsService.deleteFriend(friend));
+        await this.loadFriends();
+        await helperService.showToast('Friend deleted successfully');
+      } catch (e: any) {
+        await helperService.showToast(e.error?.error?.message || 'Unable to delete friend at the moment');
+        throw e;
+      } finally {
+        await loader.dismiss();
       }
     },
     async setSelectedFriend(friend: FriendWithBalance|null) {
@@ -171,8 +203,6 @@ export const FriendsStore = signalStore(
         `You are going to settle up everything with ${friend.name}.`, 'Let\'s do it'
       )
       if (confirmation.role !== 'confirm') return;
-
-      console.log(friend.mainBalance?.isOwed)
       try {
         patchState(store, {loading: true});
         await this.addUpdateExpense(friend, formValue)
