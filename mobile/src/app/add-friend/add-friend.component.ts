@@ -1,7 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  inject,
+  inject, input,
   Input,
   OnInit,
   signal,
@@ -20,6 +20,7 @@ import {
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HelperService } from '../helper.service';
 import { FriendsStore } from '../friends/friends.store';
+import { FriendWithBalance } from '../friends/model';
 
 @Component({
   selector: 'app-add-friend',
@@ -42,6 +43,8 @@ import { FriendsStore } from '../friends/friends.store';
 })
 export class AddFriendComponent implements OnInit {
   @Input() name: string = '';
+  readonly friend = input<FriendWithBalance|null>(null);
+  readonly isUpdating = input(false);
   readonly friendsStore = inject(FriendsStore);
   private formBuilder = inject(FormBuilder);
   private helperService = inject(HelperService);
@@ -58,9 +61,17 @@ export class AddFriendComponent implements OnInit {
 
   ngOnInit() {
     // set the passed name
-    this.addFriendForm.patchValue({
-      name: this.name,
-    })
+    if (this.isUpdating()) {
+      this.addFriendForm.patchValue({
+        name: this.friend()?.name,
+        email: this.friend()?.email,
+        phoneNumber: this.friend()?.phoneNumber
+      })
+    } else {
+      this.addFriendForm.patchValue({
+        name: this.name,
+      })
+    }
   }
 
   cancel() {
@@ -71,7 +82,9 @@ export class AddFriendComponent implements OnInit {
     if (this.addFriendForm.valid) {
       try {
         this.loading.set(true);
-        const friend = await this.friendsStore.addFriend(this.addFriendForm.getRawValue());
+        const friend = this.isUpdating() ?
+          await this.friendsStore.updateFriend(this.addFriendForm.getRawValue()) :
+          await this.friendsStore.addFriend(this.addFriendForm.getRawValue());
         await this.modalCtrl.dismiss(friend, 'confirm')
       } catch (e) {
         console.log(e);

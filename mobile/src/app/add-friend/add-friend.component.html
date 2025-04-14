@@ -3,7 +3,13 @@
     <ion-buttons slot="start">
       <ion-button color="medium" (click)="cancel()">Cancel</ion-button>
     </ion-buttons>
-    <ion-title>Create Friend</ion-title>
+    <ion-title>
+      @if (isUpdating()) {
+        Update friend info
+      } @else {
+        Add friend
+      }
+    </ion-title>
     <ion-buttons slot="end">
       @if (loading()) {
         <ion-spinner></ion-spinner>

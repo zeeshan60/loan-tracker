@@ -43,6 +43,20 @@
       </ion-item>
     }
   </ion-list>
+  <ion-button
+    (click)="editFriendInfo()"
+    size="small"
+  >
+    <ion-icon slot="start" name="create-outline"></ion-icon> Edit
+  </ion-button>
+  <ion-button
+    (click)="deleteFriend()"
+    size="small"
+    color="danger"
+  >
+    <ion-icon slot="start" name="trash-outline"></ion-icon> Delete
+  </ion-button>
+
   @for(transactionsByMonth of transactions(); track transactionsByMonth.date) {
     <ion-list>
       <ion-item class="group-label-item">
