@@ -12,7 +12,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install project dependencies.  Use --omit=dev for production builds.
-RUN npm install --omit=dev  # Or npm ci if you have a package-lock.json
+RUN npm install --omit=dev --force  # Or npm ci if you have a package-lock.json
 
 # Install Angular CLI globally
 RUN npm install -g @angular/cli@latest
