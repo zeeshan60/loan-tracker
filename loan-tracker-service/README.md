@@ -44,6 +44,7 @@ zeeshan60/loan-tracker-service:latest
 sudo docker image prune -f
 sudo docker rmi loantracker
 sudo docker logs -f loantracker
+docker logs -f --tail 50 loan_tracker_service
 sudo docker pull postgres:latest
 sudo docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=postgres --name postgres postgres:latest
 docker build . -t zeeshan60/loan-tracker-service && docker push zeeshan60/loan-tracker-service:latest
