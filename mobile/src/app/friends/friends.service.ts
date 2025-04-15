@@ -37,16 +37,6 @@ export class FriendsService {
         friends: FriendWithBalance[]
       }
     }>(PRIVATE_API + '/friends')
-      // todo: remove this once api is returning the correct data.
-      .pipe(
-        map((response) => {
-          response.data.friends.forEach((friend) => {
-            friend.phoneNumber = '+923154399797';
-            friend.email = `${friend.name.toLowerCase().split(' ').join('')}@gmail.com`
-          })
-          return response;
-        })
-    )
   }
 
   addFriend(friend: AddFriend): Observable<any> {

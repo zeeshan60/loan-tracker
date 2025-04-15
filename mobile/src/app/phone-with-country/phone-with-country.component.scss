@@ -1,0 +1,14 @@
+:host {
+  display: flex;
+  width: 100%;
+}
+
+ion-select.country {
+  &.has-error {
+    margin-bottom: 20px;
+  }
+  &::part(icon) {
+    display: none;
+  }
+  min-width: 25%;
+}

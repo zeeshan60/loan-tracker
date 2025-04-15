@@ -21,30 +21,33 @@
 </ion-header>
 <ion-content class="ion-padding">
     <form [formGroup]="addFriendForm" (ngSubmit)="onSubmit()" id="add-friend-form">
-            <ion-input
-                    type="text"
-                    labelPlacement="stacked"
-                    label="Name"
-                    formControlName="name"
-                    placeholder="Friend name"
-                    errorText="Name is required"
-            ></ion-input>
-            <ion-input
-                    type="email"
-                    labelPlacement="stacked"
-                    label="Email"
-                    errorText="Invalid email"
-                    formControlName="email"
-                    placeholder="John@gmail.com"
-                    email
-            ></ion-input>
-            <ion-input
-                    type="tel"
-                    labelPlacement="stacked"
-                    label="Phone number"
-                    formControlName="phoneNumber"
-                    placeholder="(202) 555-1234"
-                    errorText="Phone is required"
-            ></ion-input>
+      <ion-list>
+        <ion-item>
+          <ion-input
+            type="text"
+            labelPlacement="stacked"
+            label="Name"
+            formControlName="name"
+            placeholder="Friend name"
+            errorText="Name is required"
+          ></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input
+            type="email"
+            labelPlacement="stacked"
+            label="Email"
+            errorText="Invalid email"
+            formControlName="email"
+            placeholder="John@gmail.com"
+            email
+          ></ion-input>
+        </ion-item>
+        <ion-item>
+          <app-phone-with-country
+            [group]="phoneFormGroup()"
+          ></app-phone-with-country>
+        </ion-item>
+      </ion-list>
     </form>
 </ion-content>

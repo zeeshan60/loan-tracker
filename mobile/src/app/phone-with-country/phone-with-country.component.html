@@ -1,0 +1,25 @@
+<ng-container  [formGroup]="group()!">
+  <ion-select
+    class="country"
+    [class.has-error]="!!getErrorTextForPhone() && group()?.touched"
+    interface="action-sheet"
+    [selectedText]="selectedCountryText()"
+    formControlName="country"
+    label="Country"
+    label-placement="stacked"
+  >
+    <ion-select-option *ngFor="let country of countries" [value]="country.code">
+      {{ country.flag }} {{ country.name }} ({{country.dialCode}})
+    </ion-select-option>
+  </ion-select>
+  <ion-input
+    type="tel"
+    labelPlacement="stacked"
+    label="Phone number"
+    formControlName="phoneNumber"
+    [placeholder]="selectedCountryPlaceholder()"
+    [errorText]="getErrorTextForPhone()"
+    [maskito]="phoneMask()"
+    [maskitoElement]="maskPredicate"
+  ></ion-input>
+</ng-container>

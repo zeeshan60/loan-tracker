@@ -11,16 +11,23 @@ import {
   IonButtons,
   IonContent,
   IonHeader,
-  IonInput,
+  IonInput, IonItem, IonList, IonSearchbar, IonSelect, IonSelectOption,
   IonSpinner,
   IonTitle,
   IonToolbar,
   ModalController,
 } from '@ionic/angular/standalone';
-import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder, FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { HelperService } from '../helper.service';
 import { FriendsStore } from '../friends/friends.store';
 import { FriendWithBalance } from '../friends/model';
+import { extractCountryCode, toInternationalPhone, toNationalPhone } from '../utility-functions';
+import { PhoneWithCountryComponent } from '../phone-with-country/phone-with-country.component';
 
 @Component({
   selector: 'app-add-friend',
@@ -39,6 +46,7 @@ import { FriendWithBalance } from '../friends/model';
     IonContent,
     IonSpinner,
     ReactiveFormsModule,
+    IonItem, IonList, PhoneWithCountryComponent,
   ],
 })
 export class AddFriendComponent implements OnInit {
@@ -48,24 +56,32 @@ export class AddFriendComponent implements OnInit {
   readonly friendsStore = inject(FriendsStore);
   private formBuilder = inject(FormBuilder);
   private helperService = inject(HelperService);
-
   readonly loading = signal(false);
   public addFriendForm = this.formBuilder.group({
     name: this.formBuilder.nonNullable.control('', [Validators.required]),
     email: ['', Validators.email],
-    phoneNumber: this.formBuilder.nonNullable.control('', [Validators.required]),
+    phone: this.formBuilder.group({
+      phoneNumber: this.formBuilder.nonNullable.control(''),
+      country: this.formBuilder.nonNullable.control('PK'),
+    }),
   })
 
   constructor(private modalCtrl: ModalController) {
   }
 
+  phoneFormGroup() {
+    return this.addFriendForm.get('phone') as FormGroup;
+  }
+
   ngOnInit() {
-    // set the passed name
     if (this.isUpdating()) {
       this.addFriendForm.patchValue({
         name: this.friend()?.name,
         email: this.friend()?.email,
-        phoneNumber: this.friend()?.phoneNumber
+        phone: {
+          phoneNumber: toNationalPhone(this.friend()?.phone!),
+          country: extractCountryCode(this.friend()?.phone!)
+        }
       })
     } else {
       this.addFriendForm.patchValue({
@@ -82,9 +98,14 @@ export class AddFriendComponent implements OnInit {
     if (this.addFriendForm.valid) {
       try {
         this.loading.set(true);
+        const mappedValue = {
+          name: this.addFriendForm.get('name')!.value,
+          email: this.addFriendForm.get('email')!.value,
+          phoneNumber: toInternationalPhone(this.addFriendForm.get('phone.phoneNumber')!.value, this.addFriendForm.get('phone.country')!.value),
+        }
         const friend = this.isUpdating() ?
-          await this.friendsStore.updateFriend(this.addFriendForm.getRawValue()) :
-          await this.friendsStore.addFriend(this.addFriendForm.getRawValue());
+          await this.friendsStore.updateFriend(mappedValue) :
+          await this.friendsStore.addFriend(mappedValue);
         await this.modalCtrl.dismiss(friend, 'confirm')
       } catch (e) {
         console.log(e);

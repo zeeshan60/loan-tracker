@@ -12,7 +12,7 @@ export interface Friend {
   friendId: string;
   photoUrl: string|null;
   name: string;
-  phoneNumber?: string;
+  phone?: string;
   email: string
 }
 
