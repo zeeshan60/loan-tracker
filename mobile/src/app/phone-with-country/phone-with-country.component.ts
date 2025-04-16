@@ -47,7 +47,10 @@ export class PhoneWithCountryComponent  implements OnInit {
   readonly maskPredicate: MaskitoElementPredicate = async (el) => (el as HTMLIonInputElement).getInputElement();
   countries = COUNTRIES_WITH_CALLING_CODES;
   selectedCountryCodeChanges = signal('');
-  selectedCountryCode = computed(() => this.selectedCountryCodeChanges() || this.group()?.get('country')!.value);
+  selectedCountryCode = computed(() =>
+    this.selectedCountryCodeChanges()
+    || this.group()?.get('country')!.value
+    || this.countries[0].code);
   selectedCountry = computed(() => this.countries.find(
     country => country.code === this.selectedCountryCode()
   ));
@@ -55,8 +58,8 @@ export class PhoneWithCountryComponent  implements OnInit {
     `${this.selectedCountry()!.flag} ${this.selectedCountry()!.dialCode}` :
     ''
   );
-  phoneMask = computed(() => this.phoneMasks[this.selectedCountryCode()!]);
-  selectedCountryPlaceholder = computed(() => this.selectedCountry()!.placeholder);
+  phoneMask = computed(() => this.selectedCountryCode() ? this.phoneMasks[this.selectedCountryCode()] : {});
+  selectedCountryPlaceholder = computed(() => this.selectedCountry()?.placeholder || '');
 
   constructor() { }
 

@@ -1,4 +1,4 @@
-import { Component, computed, inject, input } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import {
   IonAccordion, IonAccordionGroup,
@@ -54,6 +54,7 @@ import { AddFriendComponent } from '../../add-friend/add-friend.component';
 })
 export class FriendTransactionsComponent {
   readonly friend = input.required<FriendWithBalance>();
+  readonly isLoading = signal(false);
   readonly nav = inject(IonNav);
   readonly friendsStore = inject(FriendsStore);
   readonly transactions = this.friendsStore.selectedTransactions;
@@ -79,8 +80,13 @@ export class FriendTransactionsComponent {
     modal.present();
   }
 
-  ionViewWillEnter() {
-    this.friendsStore.setSelectedFriend(this.friend());
+  async ionViewWillEnter() {
+    this.isLoading.set(true);
+    try {
+      await this.friendsStore.setSelectedFriend(this.friend());
+    } finally {
+      this.isLoading.set(false);
+    }
   }
 
   async deleteFriend() {

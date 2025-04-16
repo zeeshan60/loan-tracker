@@ -98,7 +98,7 @@
       }
     </ion-list>
   } @empty {
-    @if (!friendsStore.loading) {
+    @if(!isLoading()) {
       <ion-list lines="none">
         <ion-item>
           <ion-label>

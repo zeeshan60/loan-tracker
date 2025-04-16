@@ -7,16 +7,29 @@ import {
   IonHeader,
   IonIcon, IonItem, IonLabel, IonList, IonNav,
   IonTitle,
-  IonToolbar,
+  IonToolbar, LoadingController,
 } from '@ionic/angular/standalone';
 import { AsyncPipe, CurrencyPipe, DatePipe } from '@angular/common';
 import { ShortenNamePipe } from '../../pipes/shorten-name.pipe';
 import { HttpClient } from '@angular/common/http';
 import { PRIVATE_API } from '../../constants';
-import { catchError, finalize, map, Observable, of, Subject, switchMap, tap, throwError } from 'rxjs';
+import {
+  BehaviorSubject,
+  catchError,
+  filter,
+  finalize,
+  map,
+  Observable,
+  of, ReplaySubject,
+  Subject,
+  switchMap, takeUntil,
+  tap,
+  throwError,
+} from 'rxjs';
 import { TransactionDetailsComponent } from '../../friends/transaction-details/transaction-details.component';
 import { HelperService } from '../../helper.service';
 import { FriendsStore } from '../../friends/friends.store';
+import { ComponentDestroyedMixin } from '../../component-destroyed.mixin';
 
 enum ActivityType {
   CREATED = 'CREATED',
@@ -49,38 +62,43 @@ const ActivityTypeLabel = {
   imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonButtons, CurrencyPipe, IonAvatar, IonItem, IonLabel, IonList, AsyncPipe, ShortenNamePipe, DatePipe, IonBackButton],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListActivitiesComponent implements OnInit {
-  readonly nav = inject(IonNav);
+export class ListActivitiesComponent extends ComponentDestroyedMixin() implements OnInit {
+  readonly nav = inject(IonNav)
+  readonly loadingCtrl = inject(LoadingController);
   protected readonly ActivityType = ActivityType;
   protected readonly ActivityTypeLabel = ActivityTypeLabel;
   readonly http = inject(HttpClient);
   readonly helperService = inject(HelperService);
-  readonly friendStore = inject(FriendsStore);
-  readonly refreshActivities$ = input.required<Subject<boolean>>();
-  activities$: Observable<Activity[]> = of([]);
-  constructor() {}
+  readonly refreshActivities$ = input.required<ReplaySubject<boolean>>();
+  activities$: BehaviorSubject<Activity[]> = new BehaviorSubject([] as Activity[]);
+  constructor() {
+    super()
+  }
 
-  ngOnInit() {
-    this.activities$ = this.refreshActivities$()
+  async ngOnInit() {
+    let loader = await this.loadingCtrl.create();
+    this.refreshActivities$()
       .pipe(
-        tap(() => {
-          this.friendStore.setLoading(true);
+        tap(async (value) => {
+          await loader.present();
         }),
         switchMap(() => this.http
           .get<{ data: Activity[]}>(`${PRIVATE_API}/transactions/activityLogs`)
         ),
-        tap(() => {
-          this.friendStore.setLoading(false);
-        }),
         map(response => response.data),
-        finalize(() => {
-          this.friendStore.setLoading(false);
+        finalize(async () => {
+          await loader.dismiss()
         }),
         catchError(() => {
           this.helperService.showToast('Unable to fetch activities at the moment.');
           return throwError(() => new Error());
         }),
-      );
+        takeUntil(this.componentDestroyed)
+      )
+      .subscribe((activities) => {
+        loader.dismiss()
+        this.activities$.next(activities);
+      });
   }
 
   openTransaction(activity: any) {

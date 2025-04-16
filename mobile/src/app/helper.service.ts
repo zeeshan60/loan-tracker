@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { ToastController } from '@ionic/angular/standalone';
+import { LoadingController, ToastController } from '@ionic/angular/standalone';
 import { DEFAULT_TOAST_DURATION } from './constants';
 import { getAuth } from '@angular/fire/auth';
 import { AlertController } from '@ionic/angular/standalone';
@@ -10,6 +10,7 @@ import { AlertController } from '@ionic/angular/standalone';
 export class HelperService {
   readonly toastCtrl = inject(ToastController);
   readonly alertCtrl = inject(AlertController);
+  readonly loadingCtrl = inject(LoadingController);
   constructor() { }
 
   async showToast(message: string, duration = DEFAULT_TOAST_DURATION) {
@@ -46,5 +47,17 @@ export class HelperService {
     })
     alert.present();
     return alert.onWillDismiss()
+  }
+
+  async withLoader<T>(callback: () => Promise<T>): Promise<T> {
+    const loader = await this.loadingCtrl.create();
+    try {
+      await loader.present();
+      return await callback(); // run the async function
+    } catch (e) {
+      throw e;
+    } finally {
+      await loader.dismiss();
+    }
   }
 }

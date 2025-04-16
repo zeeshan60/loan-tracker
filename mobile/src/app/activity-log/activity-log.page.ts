@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { IonNav } from '@ionic/angular/standalone';
 import { ListActivitiesComponent } from './list-activities/list-activities.component';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs';
 
 @Component({
   selector: 'app-activity-log',
@@ -16,7 +16,7 @@ import { Subject } from 'rxjs';
 export class ActivityLogPage {
   readonly listActivitiesComponent = ListActivitiesComponent;
   rootParams = {
-    refreshActivities$: new Subject()
+    refreshActivities$: new ReplaySubject(1)
   }
   constructor() {}
   ionViewWillEnter() {

@@ -7,6 +7,9 @@ export function shortName(name: string): string {
 }
 
 export function toNationalPhone(internationalPhone: string) {
+  if (!internationalPhone) {
+    return '';
+  }
   const phoneNumberInter = parsePhoneNumber(internationalPhone);
   return phoneNumberInter?.formatNational();
 }
@@ -17,11 +20,17 @@ export function toInternationalPhone(nationalPhone: string, countryCode: string)
 }
 
 export function extractCountryCode(internationalPhone: string) {
+  if (!internationalPhone) {
+    return '';
+  }
   const phoneNumberInter = parsePhoneNumber(internationalPhone);
   return phoneNumberInter?.country;
 }
 
 export function isValidPhoneNumber(internationalPhone: string) {
+  if (!internationalPhone) {
+    return false;
+  }
   const phoneNumberInter = parsePhoneNumber(internationalPhone);
   return phoneNumberInter?.isValid();
 }

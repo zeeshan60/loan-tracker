@@ -9,6 +9,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { PRIVATE_API } from '../constants';
 import { LoadingController } from '@ionic/angular/standalone';
 import { SplitOptions } from '../define-expense/define-expense.component';
+import { help } from 'ionicons/icons';
 
 export type AddFriend = {
   name: string,
@@ -34,7 +35,6 @@ type FriendsState = {
   } | null,
   selectedFriend: FriendWithBalance | null,
   selectedTransactions: TransactionsByMonth[],
-  loading: boolean,
 }
 
 type AddUpdateExpenseFormValue = {
@@ -48,7 +48,6 @@ type AddUpdateExpenseFormValue = {
 const initialState: FriendsState = {
   friends: [],
   overallBalance: null,
-  loading: false,
   selectedFriend: null,
   selectedTransactions: [],
   selectedFriendBalance: null,
@@ -59,10 +58,9 @@ interface Methods extends MethodsDictionary {
   addFriend(friend: AddFriend): Promise<FriendWithBalance>;
   updateFriend(friend: AddFriend): Promise<FriendWithBalance>;
   deleteFriend(friend: FriendWithBalance): Promise<void>;
-  setSelectedFriend(friend: FriendWithBalance|null): void;
+  setSelectedFriend(friend: FriendWithBalance|null): Promise<void>;
   loadSelectedTransactions(): Promise<void>;
   deleteTransaction(transaction: Transaction): Promise<void>;
-  setLoading(isLoading: boolean): void;
   settleUp(friend: FriendWithBalance, formValue: AddUpdateExpenseFormValue): Promise<void>;
   addUpdateExpense(friend: FriendWithBalance, formValue: AddUpdateExpenseFormValue, updatingTransaction?: Transaction): Promise<Transaction>;
 }
@@ -86,18 +84,18 @@ export const FriendsStore = signalStore(
     loadingCtrl = inject(LoadingController),
   ): Methods => ({
     async loadFriends(config = { showLoader: true }): Promise<void> {
-      if (config.showLoader) {
-        patchState(store, { loading: true });
-      }
       try {
-        const {data} = await firstValueFrom(friendsService.loadAllFriends());
-        patchState(store, { friends: data.friends, overallBalance: data.balance })
+        const loadAllFriends = async () => {
+          const {data} = await firstValueFrom(friendsService.loadAllFriends());
+          patchState(store, { friends: data.friends, overallBalance: data.balance })
+        };
+        if (config.showLoader) {
+          await helperService.withLoader(loadAllFriends);
+        } else {
+          await loadAllFriends();
+        }
       } catch (e) {
         await helperService.showToast('Unable to load friends at the moment');
-      } finally {
-        if (config.showLoader) {
-          patchState(store, { loading: false })
-        }
       }
     },
     async addFriend(friend: AddFriend): Promise<FriendWithBalance> {
@@ -144,7 +142,7 @@ export const FriendsStore = signalStore(
       if (store.selectedFriend()?.friendId !== friend?.friendId) {
         patchState(store, { selectedFriend: friend })
         if (friend) {
-          this.loadSelectedTransactions()
+          await this.loadSelectedTransactions()
         }
       }
     },
@@ -153,50 +151,45 @@ export const FriendsStore = signalStore(
         return;
       }
       try {
-        patchState(store, { loading: true })
-        const transactions = await firstValueFrom(http.get<{
-          perMonth: TransactionsByMonth[],
-          balance: {
-            "main": Balance,
-            "other": Balance[]
-          }
-        }>(
-          `${PRIVATE_API}/transactions/friend/byMonth`,
-          {
-            params: {
-              friendId: store.selectedFriend()?.friendId!,
-              timeZone: helperService.getTimeZone()
+        await helperService.withLoader(async () => {
+          const transactions = await firstValueFrom(http.get<{
+            perMonth: TransactionsByMonth[],
+            balance: {
+              "main": Balance,
+              "other": Balance[]
             }
-          }
-        ))
-        patchState(store, {
-          selectedTransactions: transactions.perMonth,
-          selectedFriendBalance: transactions.balance,
-          loading: false
+          }>(
+            `${PRIVATE_API}/transactions/friend/byMonth`,
+            {
+              params: {
+                friendId: store.selectedFriend()?.friendId!,
+                timeZone: helperService.getTimeZone()
+              }
+            }
+          ))
+          patchState(store, {
+            selectedTransactions: transactions.perMonth,
+            selectedFriendBalance: transactions.balance,
+          })
         })
       } catch (e: any) {
-        patchState(store, { loading: false })
-        helperService.showToast(e.toString())
+        await helperService.showToast(e.toString())
       }
     },
     async deleteTransaction(transaction: Transaction): Promise<void> {
       let transactionAdded;
       try {
-        patchState(store, { loading: true })
-        transactionAdded = await firstValueFrom(http.delete(`${PRIVATE_API}/transactions/delete/transactionId/${transaction.transactionId}`))
-        helperService.showToast('Transaction deleted successfully');
+        await helperService.withLoader(async () => {
+          transactionAdded = await firstValueFrom(http.delete(`${PRIVATE_API}/transactions/delete/transactionId/${transaction.transactionId}`))
+        })
+        await helperService.showToast('Transaction deleted successfully');
       } catch (e) {
-        helperService.showToast('Unable to add friend at the moment');
+        await helperService.showToast('Unable to add friend at the moment');
         throw new Error('Unable to add friend at the moment')
-      } finally {
-        patchState(store, { loading: false })
       }
       if (transactionAdded) {
         this.loadSelectedTransactions()
       }
-    },
-    setLoading(isLoading: boolean) {
-      patchState(store, { loading: isLoading })
     },
     async settleUp(friend: FriendWithBalance, formValue: AddUpdateExpenseFormValue) {
       const confirmation = await helperService.showConfirmAlert(
@@ -204,12 +197,11 @@ export const FriendsStore = signalStore(
       )
       if (confirmation.role !== 'confirm') return;
       try {
-        patchState(store, {loading: true});
-        await this.addUpdateExpense(friend, formValue)
+        await helperService.withLoader(async () => {
+          await this.addUpdateExpense(friend, formValue)
+        })
       } catch (e) {
         helperService.showToast('Unable to settle up at the moment. Please try later');
-      } finally {
-        patchState(store, { loading: false })
       }
       await this.loadSelectedTransactions();
     },
