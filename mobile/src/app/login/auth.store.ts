@@ -9,7 +9,7 @@ import { MethodsDictionary } from '@ngrx/signals/src/signal-store-models';
 import { PRIVATE_API, PUBLIC_API } from '../constants';
 import { LoadingController } from '@ionic/angular/standalone';
 import { FriendsStore } from '../friends/friends.store';
-import { LoginPlugin } from 'zeenom';
+import { LoginPlugin } from 'zeenom/src';
 import { isWeb } from '../utils';
 import { firstValueFrom } from 'rxjs';
 import { Auth, signInWithPopup } from '@angular/fire/auth';

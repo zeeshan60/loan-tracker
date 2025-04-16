@@ -1,6 +1,5 @@
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
-import {GoogleAuthProvider} from "firebase/auth";
-import {Auth, signInWithPopup} from '@angular/fire/auth';
+import {Auth} from '@angular/fire/auth';
 import {Router} from '@angular/router';
 import {
   IonButton,
@@ -10,10 +9,7 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
-import {ToastController} from '@ionic/angular/standalone';
-import {UserCredential} from '@firebase/auth';
 import {AuthStore} from './auth.store';
-import {LoginPlugin} from "zeenom";
 
 @Component({
   selector: 'app-login',
@@ -27,10 +23,8 @@ export class LoginComponent {
   public auth = inject(Auth);
   public router = inject(Router);
   private authStore = inject(AuthStore);
-  private toastController = inject(ToastController);
 
-  constructor() {
-  }
+  constructor() {}
 
   loginWithGoogle() {
     this.authStore.loginWithGoogle();
