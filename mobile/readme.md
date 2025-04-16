@@ -43,3 +43,10 @@ npx cap sync
 
 #than open ios folder and run the app
 ```
+switching submodule url to https from ssh
+```bash
+git config -f .gitmodules submodule.mobile/zeenom.url https://github.com/zeeshan60/login_plugin.git
+git submodule sync
+git submodule update --init --recursive
+
+```
