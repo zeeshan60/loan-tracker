@@ -198,7 +198,7 @@ class TransactionService(
             userId = userId,
             friendIds = listOf(friendId)
         )[friendId]?.values?.toList()
-            ?: throw IllegalArgumentException("Friend with id $friendId does not exist")
+            ?: emptyList()
         val balance = allTimeBalanceStrategy.calculateAllTimeBalance(
             amounts = amounts,
             currencyRateMap = currencyClient.fetchCurrencies().rates,
