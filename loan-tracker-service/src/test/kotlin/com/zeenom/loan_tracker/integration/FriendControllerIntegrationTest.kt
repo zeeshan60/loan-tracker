@@ -1,15 +1,83 @@
 package com.zeenom.loan_tracker.integration
 
+import com.zeenom.loan_tracker.friends.CreateFriendRequest
 import com.zeenom.loan_tracker.friends.FriendEventRepository
+import com.zeenom.loan_tracker.friends.FriendResponse
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventRepository
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.web.server.LocalServerPort
 
-class FriendControllerIntegrationTest(@LocalServerPort val port: Int) : BaseIntegration() {
+class FriendControllerAddFriendWithoutEmailFailIntegrationTest(): BaseIntegration() {
+
+    @Autowired
+    private lateinit var friendEventRepository: FriendEventRepository
+
+    @Autowired
+    private lateinit var userEventRepository: UserEventRepository
+
+    private lateinit var zeeToken: String
+    private var zeeDto = UserDto(
+        uid = "123",
+        email = "zee@gmail.com",
+        phoneNumber = "+923001234567",
+        displayName = "Zeeshan Tufail",
+        photoUrl = "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl2",
+        currency = null,
+        emailVerified = true
+    )
+
+    private lateinit var johnToken: String
+    private var johnDto = UserDto(
+        uid = "124",
+        email = "john@gmail.com",
+        phoneNumber = "+923001234568",
+        displayName = "John Doe",
+        photoUrl = "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl3",
+        currency = null,
+        emailVerified = true
+    )
+
+    @BeforeAll
+    fun beforeAll(): Unit = runBlocking {
+        userEventRepository.deleteAll()
+        friendEventRepository.deleteAll()
+        zeeToken = loginUser(
+            userDto = zeeDto
+        ).token
+    }
+
+
+    @Test
+    @Order(1)
+    fun `user zee adds a friend john successfully`() {
+
+        val friendResponse = webTestClient.post()
+            .uri("/api/v1/friends/add")
+            .header("Authorization", "Bearer $zeeToken")
+            .bodyValue(
+                CreateFriendRequest(
+                    name = johnDto.displayName,
+                    email = null,
+                    phoneNumber = "+923001234568",
+                )
+            )
+            .exchange()
+            .expectStatus().isOk
+            .expectBody(FriendResponse::class.java).returnResult().responseBody!!
+        assertThat(friendResponse.friendId).isNotNull()
+        assertThat(friendResponse.name).isEqualTo("John Doe")
+        assertThat(friendResponse.email).isNull()
+        assertThat(friendResponse.phone).isEqualTo("+923001234568")
+        assertThat(friendResponse.photoUrl).isNull()
+        assertThat(friendResponse.mainBalance).isNull()
+        assertThat(friendResponse.otherBalances).isEmpty()
+    }
+}
+
+class FriendControllerIntegrationTest() : BaseIntegration() {
 
     @Autowired
     private lateinit var friendEventRepository: FriendEventRepository
