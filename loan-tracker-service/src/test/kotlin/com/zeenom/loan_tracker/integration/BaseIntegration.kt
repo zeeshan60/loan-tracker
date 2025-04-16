@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.zeenom.loan_tracker.common.Paginated
 import com.zeenom.loan_tracker.firebase.FirebaseService
-import com.zeenom.loan_tracker.friends.CreateFriendRequest
+import com.zeenom.loan_tracker.friends.FriendRequest
 import com.zeenom.loan_tracker.friends.FriendResponse
 import com.zeenom.loan_tracker.friends.FriendsResponse
 import com.zeenom.loan_tracker.friends.TestPostgresConfig
@@ -68,7 +68,7 @@ class BaseIntegration : TestPostgresConfig() {
             .uri("/api/v1/friends/add")
             .header("Authorization", "Bearer $token")
             .bodyValue(
-                CreateFriendRequest(
+                FriendRequest(
                     name = name,
                     email = "${name.replace(" ", "_")}@gmail.com",
                     phoneNumber = "+923001234568",
