@@ -15,9 +15,9 @@ COPY package*.json ./
 RUN npm install --omit=dev --force  # Or npm ci if you have a package-lock.json
 
 # Install Angular CLI globally
-RUN npm install -g @angular/cli@latest
-RUN npm install @angular/cdk@latest
-RUN npm install @angular/material@latest
+RUN npm install -g @angular/cli@latest --force
+RUN npm install @angular/cdk@latest --force
+RUN npm install @angular/material@latest --force
 
 # Copy the rest of the application source code
 COPY . .
