@@ -28,14 +28,14 @@ export const PHONE_MASKS: { [key: string]: any } = {
   },
   'GB': {
     mask: [
-      '0', '7', /\d/, /\d/, /\d/, ' ', /\d/, /\d/, /\d/, /\d/, /\d/
+      '0', '7', /\d/, /\d/, /\d/, ' ', /\d/, /\d/, /\d/, /\d/, /\d/, /\d/
     ],
     autocomplete: 'tel',
     overwriteMode: 'shift',
   },
   'TH': {
     mask: [
-      '0', '8', /\d/, /\d/, ' ', /\d/, /\d/, /\d/, /\d/, /\d/
+      '0', '8', /\d/, ' ', /\d/, /\d/, /\d/, ' ', /\d/, /\d/, /\d/, /\d/
     ],
     autocomplete: 'tel',
     overwriteMode: 'shift',
@@ -49,7 +49,7 @@ export const PHONE_MASKS: { [key: string]: any } = {
   },
   'CN': {
     mask: [
-      '1', /\d/, /\d/, ' ', /\d/, /\d/, /\d/, /\d/, /\d/
+      '1', /\d/, /\d/, ' ', /\d/, /\d/, /\d/, /\d/, ' ', /\d/, /\d/, /\d/, /\d/
     ],
     autocomplete: 'tel',
     overwriteMode: 'shift',

@@ -10,7 +10,7 @@ import {
 } from '@angular/forms';
 import { IonInput, IonSelect, IonSelectOption } from '@ionic/angular/standalone';
 import { NgForOf } from '@angular/common';
-import { isValidPhoneNumber, toInternationalPhone } from '../utility-functions';
+import { isPhoneNumberValid, toInternationalPhone } from '../utility-functions';
 import { MaskitoElementPredicate } from '@maskito/core';
 import { MaskitoDirective } from '@maskito/angular';
 
@@ -38,7 +38,7 @@ export class PhoneWithCountryComponent  implements OnInit {
         return null;
       }
 
-      return isValidPhoneNumber(toInternationalPhone(value, this.group()!.get('country')!.value))
+      return isPhoneNumberValid(toInternationalPhone(value, this.group()!.get('country')!.value))
         ? null
         : { invalidPhone: true };
     };

@@ -79,8 +79,11 @@ export class ListActivitiesComponent extends ComponentDestroyedMixin() implement
     let loader = await this.loadingCtrl.create();
     this.refreshActivities$()
       .pipe(
-        tap(async (value) => {
+        switchMap(async (value) => {
+          await loader?.dismiss();
+          loader = await this.loadingCtrl.create();
           await loader.present();
+          return of(value)
         }),
         switchMap(() => this.http
           .get<{ data: Activity[]}>(`${PRIVATE_API}/transactions/activityLogs`)

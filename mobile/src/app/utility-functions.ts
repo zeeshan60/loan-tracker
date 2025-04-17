@@ -27,7 +27,7 @@ export function extractCountryCode(internationalPhone: string) {
   return phoneNumberInter?.country;
 }
 
-export function isValidPhoneNumber(internationalPhone: string) {
+export function isPhoneNumberValid(internationalPhone: string) {
   if (!internationalPhone) {
     return false;
   }
