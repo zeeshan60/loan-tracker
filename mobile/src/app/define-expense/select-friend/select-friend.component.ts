@@ -40,6 +40,7 @@ export class SelectFriendComponent {
   defineExpenseService = inject(DefineExpenseService);
   loadingCtrl = inject(LoadingController);
   friend = input<FriendWithBalance>();
+  context = input<'ChooseFriend'|'AddFriend'>('ChooseFriend');
   filter = model<string>('');
   readonly friends = computed(() => this.friendsStore.friends().filter(friend =>
     friend.name.toLowerCase().includes(this.filter().toLowerCase())

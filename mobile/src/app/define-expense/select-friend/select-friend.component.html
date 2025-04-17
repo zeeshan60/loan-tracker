@@ -3,7 +3,13 @@
     <ion-buttons slot="start">
       <ion-button color="medium" (click)="closePopup()">Cancel</ion-button>
     </ion-buttons>
-    <ion-title>Select Friend</ion-title>
+    <ion-title>
+      @if (context() === 'ChooseFriend') {
+        Select Friend
+      } @else {
+        Add Friend
+      }
+    </ion-title>
   </ion-toolbar>
   <ion-toolbar>
     <ion-searchbar [(ngModel)]="filter"></ion-searchbar>
@@ -30,44 +36,50 @@
         <ion-icon size="large" name="add-outline"></ion-icon>
       </ion-avatar>
       <ion-label>
-        <h2>Add <span style="color: green">{{filter()}}</span></h2>
+        @if (filter()) {
+          <h2>Add <span style="color: green">{{filter()}}</span></h2>
+        } @else {
+          <h2>Add New Friend</h2>
+        }
       </ion-label>
     </ion-item>
   </ion-list>
-  <ion-list>
-    @if (isMobile) {
-      <ion-list-header>
-        <ion-label>Friends</ion-label>
-      </ion-list-header>
-    }
-    @for( friend of friends(); track friend.name) {
-      <ion-item (click)="chooseFriend(friend)">
-        <ion-avatar slot="start">
-          @if (friend.photoUrl) {
-            <img [src]="friend.photoUrl" alt="Friend's photo" />
-          } @else {
-            <ion-icon size="large" name="person" color="medium"></ion-icon>
+  @if (context() === 'ChooseFriend') {
+    <ion-list>
+      @if (isMobile) {
+        <ion-list-header>
+          <ion-label>Friends</ion-label>
+        </ion-list-header>
+      }
+      @for( friend of friends(); track friend.name) {
+        <ion-item (click)="chooseFriend(friend)">
+          <ion-avatar slot="start">
+            @if (friend.photoUrl) {
+              <img [src]="friend.photoUrl" alt="Friend's photo" />
+            } @else {
+              <ion-icon size="large" name="person" color="medium"></ion-icon>
+            }
+          </ion-avatar>
+          <ion-label>
+            <h2>{{ friend.name }}</h2>
+          </ion-label>
+          @if (friend.mainBalance?.amount) {
+            <p>
+              <ion-label [color]="friend.mainBalance?.isOwed ? 'success': 'danger'">
+                {{ friend.mainBalance?.amount | currency: friend.mainBalance?.currency : 'symbol-narrow' }}
+              </ion-label>
+            </p>
           }
-        </ion-avatar>
-        <ion-label>
-          <h2>{{ friend.name }}</h2>
-        </ion-label>
-        @if (friend.mainBalance?.amount) {
-          <p>
-            <ion-label [color]="friend.mainBalance?.isOwed ? 'success': 'danger'">
-              {{ friend.mainBalance?.amount | currency: friend.mainBalance?.currency : 'symbol-narrow' }}
-            </ion-label>
-          </p>
-        }
-      </ion-item>
-    } @empty {
-      <ion-item disabled="true">
-        <ion-label>
-          <h2>No friends in you friend list.</h2>
-        </ion-label>
-      </ion-item>
-    }
-  </ion-list>
+        </ion-item>
+      } @empty {
+        <ion-item disabled="true">
+          <ion-label>
+            <h2>No friends in you friend list.</h2>
+          </ion-label>
+        </ion-item>
+      }
+    </ion-list>
+  }
   @if (isMobile) {
     <ion-list>
       <ion-list-header>
@@ -90,7 +102,7 @@
       } @empty {
         <ion-item disabled="true">
           <ion-label>
-            <h2>No friends in you contact list.</h2>
+            <h2>No friends in your contact list.</h2>
           </ion-label>
         </ion-item>
       }

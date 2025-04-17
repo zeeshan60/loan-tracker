@@ -73,8 +73,11 @@ export class AppComponent implements OnInit {
       await Promise.all([
         this.authStore.setApiKey(),
         this.authStore.loadUserData(),
-        this.authStore.loadUserRegion(),
       ])
+
+      this.authStore.loadUserRegion().catch((res) => {
+        console.error(res);
+      });
 
       if(this.authStore.apiKey()) {
         await this.friendsStore.loadFriends()

@@ -18,6 +18,8 @@ import { FriendWithBalance } from '../model';
 import { FriendTransactionsComponent } from '../friend-transactions/friend-transactions.component';
 import { ShortenNamePipe } from '../../pipes/shorten-name.pipe';
 import { AuthStore } from '../../login/auth.store';
+import { SelectFriendComponent } from '../../define-expense/select-friend/select-friend.component';
+import { DefineExpenseService } from '../../define-expense/define-expense.service';
 
 @Component({
   selector: 'app-list-friends',
@@ -47,6 +49,7 @@ import { AuthStore } from '../../login/auth.store';
 export class ListFriendsComponent  implements OnInit {
   readonly friendsStore = inject(FriendsStore);
   readonly authStore = inject(AuthStore);
+  readonly defineExpenseService = inject(DefineExpenseService);
   readonly modalCtrl = inject(ModalController);
   readonly nav = inject(IonNav);
   readonly sortedOtherBalance = computed(() => this.friendsStore.overallBalance()?.other
@@ -64,9 +67,18 @@ export class ListFriendsComponent  implements OnInit {
   }
 
   async addFriend() {
-    const modal = await this.modalCtrl.create({
-      component: AddFriendComponent,
+    this.defineExpenseService.selectFriendModalInstance = await this.modalCtrl.create({
+      component: SelectFriendComponent,
+      componentProps: {
+        context: 'AddFriend'
+      }
     })
-    modal.present();
+    await this.defineExpenseService.selectFriendModalInstance.present();
+
+    const { data, role } = await this.defineExpenseService.selectFriendModalInstance.onWillDismiss();
+    if (role === 'confirm') {
+      console.log(data);
+    }
+    return role;
   }
 }
