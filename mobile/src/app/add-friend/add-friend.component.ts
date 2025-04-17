@@ -28,6 +28,7 @@ import { FriendsStore } from '../friends/friends.store';
 import { FriendWithBalance } from '../friends/model';
 import { extractCountryCode, toInternationalPhone, toNationalPhone } from '../utility-functions';
 import { PhoneWithCountryComponent } from '../phone-with-country/phone-with-country.component';
+import { COUNTRIES_WITH_CALLING_CODES } from '../constants';
 
 @Component({
   selector: 'app-add-friend',
@@ -55,6 +56,7 @@ export class AddFriendComponent implements OnInit {
   readonly isUpdating = input(false);
   readonly friendsStore = inject(FriendsStore);
   private formBuilder = inject(FormBuilder);
+  private modalCtrl = inject(ModalController);
   private helperService = inject(HelperService);
   readonly loading = signal(false);
   public addFriendForm = this.formBuilder.group({
@@ -62,11 +64,11 @@ export class AddFriendComponent implements OnInit {
     email: ['', Validators.email],
     phone: this.formBuilder.group({
       phoneNumber: this.formBuilder.nonNullable.control(''),
-      country: this.formBuilder.nonNullable.control('PK'),
+      country: this.formBuilder.nonNullable.control(COUNTRIES_WITH_CALLING_CODES[0].code),
     }),
   })
 
-  constructor(private modalCtrl: ModalController) {
+  constructor() {
   }
 
   phoneFormGroup() {
@@ -107,8 +109,6 @@ export class AddFriendComponent implements OnInit {
           await this.friendsStore.updateFriend(mappedValue) :
           await this.friendsStore.addFriend(mappedValue);
         await this.modalCtrl.dismiss(friend, 'confirm')
-      } catch (e) {
-        console.log(e);
       } finally {
         this.loading.set(false);
       }

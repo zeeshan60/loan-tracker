@@ -70,7 +70,11 @@ export class AppComponent implements OnInit {
   }
   async initApp() {
     this.storageService.storageReady$.subscribe(async () => {
-      await this.authStore.setApiKey();
+      await Promise.all([
+        this.authStore.setApiKey(),
+        this.authStore.loadUserData(),
+        this.authStore.loadUserRegion(),
+      ])
 
       if(this.authStore.apiKey()) {
         await this.friendsStore.loadFriends()

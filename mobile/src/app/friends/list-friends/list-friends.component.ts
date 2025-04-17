@@ -17,6 +17,7 @@ import { FormsModule } from '@angular/forms';
 import { FriendWithBalance } from '../model';
 import { FriendTransactionsComponent } from '../friend-transactions/friend-transactions.component';
 import { ShortenNamePipe } from '../../pipes/shorten-name.pipe';
+import { AuthStore } from '../../login/auth.store';
 
 @Component({
   selector: 'app-list-friends',
@@ -45,6 +46,7 @@ import { ShortenNamePipe } from '../../pipes/shorten-name.pipe';
 })
 export class ListFriendsComponent  implements OnInit {
   readonly friendsStore = inject(FriendsStore);
+  readonly authStore = inject(AuthStore);
   readonly modalCtrl = inject(ModalController);
   readonly nav = inject(IonNav);
   readonly sortedOtherBalance = computed(() => this.friendsStore.overallBalance()?.other

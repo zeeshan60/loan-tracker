@@ -15,10 +15,10 @@ import { MaskitoElementPredicate } from '@maskito/core';
 import { MaskitoDirective } from '@maskito/angular';
 
 @Component({
-    selector: 'app-phone-with-country',
-    templateUrl: './phone-with-country.component.html',
-    styleUrls: ['./phone-with-country.component.scss'],
-    standalone: true,
+  selector: 'app-phone-with-country',
+  templateUrl: './phone-with-country.component.html',
+  styleUrls: ['./phone-with-country.component.scss'],
+  standalone: true,
   imports: [
     FormsModule,
     IonInput,
@@ -66,8 +66,10 @@ export class PhoneWithCountryComponent  implements OnInit {
   getErrorTextForPhone() {
     if (this.group()?.controls['phoneNumber'].hasError('invalidPhone')) {
       return 'Invalid phone number.'
+    } else if (this.group()?.controls['phoneNumber'].hasError('required')) {
+      return 'Phone is required'
     } else {
-      return '';
+      return 'Invalid';
     }
   }
 
@@ -80,7 +82,7 @@ export class PhoneWithCountryComponent  implements OnInit {
 
     const phoneNumberControl = this.group()!.get('phoneNumber');
     if (phoneNumberControl) {
-      phoneNumberControl.setValidators([
+      phoneNumberControl.addValidators([
         this.phoneNumberValidator()
       ]);
       phoneNumberControl.updateValueAndValidity();

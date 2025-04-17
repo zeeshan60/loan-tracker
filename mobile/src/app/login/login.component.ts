@@ -27,6 +27,11 @@ export class LoginComponent {
   constructor() {}
 
   loginWithGoogle() {
-    this.authStore.loginWithGoogle();
+    this.authStore.loginWithGoogle()
+      .then(() => {
+        if (!this.authStore.user()?.phoneNumber) {
+          this.authStore.askForPhoneNumber();
+        }
+      });
   }
 }

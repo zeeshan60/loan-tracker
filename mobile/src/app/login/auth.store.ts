@@ -3,7 +3,7 @@ import { inject } from '@angular/core';
 import { HelperService } from '../helper.service';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { ToastController } from '@ionic/angular/standalone';
+import { ModalController, ToastController } from '@ionic/angular/standalone';
 import { StorageService } from '../services/storage.service';
 import { MethodsDictionary } from '@ngrx/signals/src/signal-store-models';
 import { PRIVATE_API, PUBLIC_API } from '../constants';
@@ -14,25 +14,43 @@ import { isWeb } from '../utils';
 import { firstValueFrom } from 'rxjs';
 import { Auth, signInWithPopup } from '@angular/fire/auth';
 import { GoogleAuthProvider } from 'firebase/auth';
+import { AskForPhoneComponent } from '../ask-for-phone/ask-for-phone.component';
 
 export interface User {
   uid: string,
   email: string,
-  phoneNumber: number|null,
+  phoneNumber: string|null,
   displayName: string,
   currency: string|null,
   photoUrl: string,
   emailVerified: boolean
 }
 
+export interface Region {
+  ip: string,
+  city: string,
+  region: string,
+  region_code: string,
+  country_name: string,
+  country_code: string,
+  timezone: string,
+  utc_offset: string,
+  country_calling_code: string,
+  currency: string,
+  currency_name: string,
+  languages: string,
+}
+
 type AuthState = {
   apiKey: string,
   user: User|null,
+  region: Region|null,
 }
 
 const initialState: AuthState = {
   apiKey: '',
-  user: null
+  user: null,
+  region: null
 }
 
 interface Methods extends MethodsDictionary {
@@ -41,8 +59,10 @@ interface Methods extends MethodsDictionary {
   signOut(): Promise<void>;
   login(idToken?: string): Promise<void>;
   loadUserData(userData?: User): Promise<void>;
+  loadUserRegion(): Promise<void>;
   fetchAndSaveUserData(): Promise<void>;
   updateUserData(data: Partial<User>): Promise<void>;
+  askForPhoneNumber(): Promise<void>;
 }
 
 export const AuthStore = signalStore(
@@ -55,12 +75,16 @@ export const AuthStore = signalStore(
     auth = inject(Auth),
     router = inject(Router),
     toastCtrl = inject(ToastController),
+    modalCtrl = inject(ModalController),
     storageService = inject(StorageService),
     loadingCtrl = inject(LoadingController),
     friendsStore = inject(FriendsStore),
   ): Methods => ({
     async loadUserData(userData?: User): Promise<void> {
       patchState(store, { user: userData || await storageService.get('user_data') })
+    },
+    async loadUserRegion(): Promise<void> {
+      patchState(store, { region: await firstValueFrom(http.get<Region>('https://ipapi.co/json')) })
     },
     async fetchAndSaveUserData(): Promise<void> {
       const userData = await firstValueFrom(http.get<User>(`${PRIVATE_API}/users`));
@@ -123,6 +147,17 @@ export const AuthStore = signalStore(
           });
           toast.present();
         });
+    },
+
+    async askForPhoneNumber() {
+      const modal = await modalCtrl.create({
+        component: AskForPhoneComponent,
+        componentProps: {
+          user: store.user(),
+          region: store.region()
+        }
+      })
+      modal.present();
     },
 
     async login(idToken: string) {
