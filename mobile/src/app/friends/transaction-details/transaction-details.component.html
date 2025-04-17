@@ -101,6 +101,9 @@
                     @case (HistoryChangeType.DELETED) {
                       "{{change.oldValue}}" to "{{change.newValue}}"
                     }
+                    @case (HistoryChangeType.SPLIT_TYPE) {
+                      "{{splitOptionsText[change.oldValue]}}" to "{{splitOptionsText[change.newValue]}}"
+                    }
                     @default {
                       {{change.oldValue}} to {{change.newValue}}
                     }

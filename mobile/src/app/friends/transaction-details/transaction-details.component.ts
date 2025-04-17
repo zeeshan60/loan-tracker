@@ -24,6 +24,7 @@ const historyChangeType = {
   [HistoryChangeType.DELETED]: "deleted",
   [HistoryChangeType.TRANSACTION_DATE]: "transaction date"
 }
+
 @Component({
     selector: 'app-transaction-details',
     templateUrl: './transaction-details.component.html',
@@ -55,6 +56,17 @@ export class TransactionDetailsComponent  implements OnInit {
   readonly nav = inject(IonNav);
   readonly transaction = model.required<Transaction>();
   readonly friend = input.required<FriendWithBalance>();
+  protected readonly historyChangeType = historyChangeType;
+  protected readonly HistoryChangeType = HistoryChangeType;
+  protected splitOptionsText : {[key: string]: string} = {
+    [SplitOptions.YouPaidSplitEqually]: 'You paid split equally',
+    [SplitOptions.TheyPaidSplitEqually]: 'They paid split equally',
+    [SplitOptions.TheyOweYouAll]: 'They owe you all',
+    [SplitOptions.YouOweThemAll]: 'You owe them all',
+    [SplitOptions.TheyPaidToSettle]: 'They paid to settle',
+    [SplitOptions.YouPaidToSettle]: 'You paid to settle',
+  }
+
   constructor() {
   }
 
@@ -85,7 +97,4 @@ export class TransactionDetailsComponent  implements OnInit {
       this.transaction.set(updatedTransaction);
     }
   }
-
-  protected readonly historyChangeType = historyChangeType;
-  protected readonly HistoryChangeType = HistoryChangeType;
 }

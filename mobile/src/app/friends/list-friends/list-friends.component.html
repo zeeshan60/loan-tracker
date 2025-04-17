@@ -70,12 +70,26 @@
         }
       </ion-item>
     }
+    @for( friend of friendsStore.inActiveFriends(); track friend.name) {
+      <ion-item (click)="chooseFriend(friend)" button>
+        <ion-avatar slot="start">
+          @if (friend.photoUrl) {
+            <img [src]="friend.photoUrl" alt="Friend's photo" />
+          } @else {
+            <ion-icon size="large" name="person" color="medium"></ion-icon>
+          }
+        </ion-avatar>
+        <ion-label>
+          <h2>{{ friend.name }}</h2>
+        </ion-label>
+      </ion-item>
+    }
   </ion-list>
-    @if(!friendsStore.unSettledFriends().length) {
+    @if(!friendsStore.friends().length) {
         <ion-list lines="none">
             <ion-item>
                 <ion-label>
-                    <p>Nothing here yet. Please add expense</p>
+                    <p>Nothing here yet. Please add friends</p>
                 </ion-label>
             </ion-item>
         </ion-list>

@@ -72,8 +72,12 @@ export const FriendsStore = signalStore(
     const unSettledFriends = computed(() => {
       return friends().filter(friend => friend.mainBalance?.amount)
     });
+    const inActiveFriends = computed(() => {
+      return friends().filter(friend => !friend.mainBalance?.amount).sort((a, b) => a.name.localeCompare(b.name));
+    });
     return {
       unSettledFriends,
+      inActiveFriends,
     }
   }),
   withMethods((
