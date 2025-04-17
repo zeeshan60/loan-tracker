@@ -39,6 +39,16 @@ data class FriendEvent(
                 version = version,
                 createdBy = userUid
             )
+            FriendEventType.FRIEND_UPDATED -> FriendUpdated(
+                friendEmail = friendEmail,
+                friendPhoneNumber = friendPhoneNumber,
+                friendDisplayName = friendDisplayName,
+                userId = userUid,
+                createdAt = createdAt,
+                streamId = streamId,
+                version = version,
+                createdBy = userUid
+            )
         }
     }
 }
@@ -92,8 +102,45 @@ data class FriendCreated(
     }
 }
 
+data class FriendUpdated(
+    val friendEmail: String?,
+    val friendPhoneNumber: String?,
+    val friendDisplayName: String,
+    override val userId: String,
+    override val createdAt: Instant,
+    override val streamId: UUID,
+    override val version: Int,
+    override val createdBy: String,
+) : IFriendEvent {
+    override fun toEntity(): FriendEvent {
+        return FriendEvent(
+            userUid = userId,
+            friendEmail = friendEmail,
+            friendPhoneNumber = friendPhoneNumber,
+            friendDisplayName = friendDisplayName,
+            createdAt = createdAt,
+            streamId = streamId,
+            version = version,
+            eventType = FriendEventType.FRIEND_UPDATED
+        )
+    }
+
+    override fun applyEvent(existing: FriendModel?): FriendModel {
+        return existing?.copy(
+            userUid = userId,
+            friendEmail = friendEmail,
+            friendPhoneNumber = friendPhoneNumber,
+            friendDisplayName = friendDisplayName,
+            createdAt = createdAt,
+            streamId = streamId,
+            version = version
+        ) ?: throw IllegalStateException("Friend not found")
+    }
+}
+
 enum class FriendEventType {
-    FRIEND_CREATED
+    FRIEND_CREATED,
+    FRIEND_UPDATED
 }
 
 @Repository

@@ -2,9 +2,10 @@ package com.zeenom.loan_tracker.friends
 
 import com.zeenom.loan_tracker.events.CommandPayloadDto
 import io.swagger.v3.oas.annotations.media.Schema
+import java.util.UUID
 
 @Schema(description = "Request to create a new friend. Either email or phone number must be provided.")
-data class CreateFriendRequest(
+data class FriendRequest(
     @Schema(description = "Email address of the friend", example = "friend@example.com")
     val email: String?,
 
@@ -15,8 +16,21 @@ data class CreateFriendRequest(
     val name: String,
 )
 
+interface BaseFriendDto {
+    val name: String
+    val email: String?
+    val phoneNumber: String?
+}
+
 data class CreateFriendDto(
-    val email: String?,
-    val phoneNumber: String?,
-    val name: String,
-) : CommandPayloadDto
+    override val email: String?,
+    override val phoneNumber: String?,
+    override val name: String,
+) : CommandPayloadDto, BaseFriendDto
+
+data class UpdateFriendDto(
+    override val email: String?,
+    override val phoneNumber: String?,
+    override val name: String,
+    val friendId: UUID,
+) : CommandPayloadDto, BaseFriendDto

@@ -1,15 +1,17 @@
 package com.zeenom.loan_tracker.integration
 
 import com.zeenom.loan_tracker.friends.FriendEventRepository
+import com.zeenom.loan_tracker.friends.FriendRequest
+import com.zeenom.loan_tracker.friends.FriendResponse
+import com.zeenom.loan_tracker.prettyAndPrint
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventRepository
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.web.server.LocalServerPort
 
-class FriendControllerIntegrationTest(@LocalServerPort val port: Int) : BaseIntegration() {
+class FriendControllerIntegrationTest() : BaseIntegration() {
 
     @Autowired
     private lateinit var friendEventRepository: FriendEventRepository
@@ -109,6 +111,38 @@ class FriendControllerIntegrationTest(@LocalServerPort val port: Int) : BaseInte
         assertThat(response.data.friends[0].mainBalance).isNull()
         assertThat(response.data.friends[0].otherBalances).isEmpty()
         assertThat(response.data.friends[0].friendId).isNotNull()
+        assertThat(response.data.balance.main).isNull()
+        assertThat(response.data.balance.other).isEmpty()
+    }
+
+    @Order(7)
+    @Test
+    fun `update john friend information successfully`() {
+        val existing = queryFriend(zeeToken)
+        val friendRequest = FriendRequest(
+            email = "johnupdated@gmail.com",
+            phoneNumber = johnDto.phoneNumber + "1",
+            name = "John Doe Updated",
+        )
+
+        webTestClient.put()
+            .uri("/api/v1/friends/${existing.data.friends[0].friendId}")
+            .header("Authorization", "Bearer $zeeToken")
+            .bodyValue(
+                friendRequest
+            )
+            .exchange()
+            .expectStatus().isOk
+            .expectBody(FriendResponse::class.java).returnResult().responseBody!!.also { it.prettyAndPrint(objectMapper) }
+
+        val response = queryFriend(zeeToken)
+
+        assertThat(response.data.friends).hasSize(1)
+        assertThat(response.data.friends[0].name).isEqualTo("John Doe Updated")
+        assertThat(response.data.friends[0].photoUrl).isNull()
+        assertThat(response.data.friends[0].mainBalance).isNull()
+        assertThat(response.data.friends[0].otherBalances).isEmpty()
+        assertThat(response.data.friends[0].friendId).isEqualTo(existing.data.friends[0].friendId)
         assertThat(response.data.balance.main).isNull()
         assertThat(response.data.balance.other).isEmpty()
     }

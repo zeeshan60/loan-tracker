@@ -108,7 +108,7 @@ class FriendsControllerTest(
             .uri("/api/v1/friends/add")
             .header("Authorization", "Bearer ${authService.generateJwt("sample uid")}")
             .bodyValue(
-                CreateFriendRequest(
+                FriendRequest(
                     name = "John Doe",
                     email = "john@gmail.com",
                     phoneNumber = "+923001234567",
