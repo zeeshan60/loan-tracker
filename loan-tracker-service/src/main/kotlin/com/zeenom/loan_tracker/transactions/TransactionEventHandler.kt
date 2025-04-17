@@ -153,7 +153,7 @@ class TransactionEventHandler(
         myStreamId: UUID,
     ): TransactionEvent = this.toEvent().let {
         if (it is CrossTransactionable) it.crossTransaction(friendUserId, myStreamId)
-            .toEntity() as TransactionEvent
+            .toEntity()
         else throw IllegalArgumentException("Invalid event type ${it.javaClass}")
     }
 
