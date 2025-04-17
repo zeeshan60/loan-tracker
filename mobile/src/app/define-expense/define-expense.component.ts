@@ -30,6 +30,7 @@ import { ShortenNamePipe } from '../pipes/shorten-name.pipe';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { ComponentDestroyedMixin } from '../component-destroyed.mixin';
 import { DefineExpenseService } from './define-expense.service';
+import { AuthStore } from '../login/auth.store';
 
 export enum SplitOptions {
   YouPaidSplitEqually = 'YouPaidSplitEqually',
@@ -79,12 +80,13 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
   readonly formBuilder = inject(FormBuilder);
   readonly actionSheetCtrl = inject(ActionSheetController);
   readonly friendsStore = inject(FriendsStore);
+  readonly authStore = inject(AuthStore);
   readonly SplitOption = SplitOptions;
   readonly supportedCurrencies = CURRENCIES;
   readonly router = inject(Router);
   readonly defineExpenseForm = this.formBuilder.group({
     description: this.formBuilder.nonNullable.control('', [Validators.required, Validators.maxLength(1000)]),
-    currency: this.formBuilder.nonNullable.control('PKR', [Validators.required]),
+    currency: this.formBuilder.nonNullable.control(CURRENCIES[0], [Validators.required]),
     amount: this.formBuilder.nonNullable.control<number|null>(null, [Validators.required, Validators.min(1), Validators.max(100000000)]),
     type: this.formBuilder.nonNullable.control({ value: SplitOptions.YouPaidSplitEqually, disabled: !this.friend() }, [Validators.required]),
     transactionDate: this.formBuilder.nonNullable.control((new Date()).toISOString(), [Validators.required]),
@@ -119,6 +121,8 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
         type: this.transaction()?.splitType || formInitialValue.type,
         transactionDate: this.transaction()?.date || formInitialValue.transactionDate,
       });
+    } else {
+      this.setAppropriateCurrency();
     }
 
     if (!this.friend()) {
@@ -127,6 +131,22 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
         this.defineExpenseService.defineExpenseModalInstance?.dismiss();
       }
     }
+  }
+
+  /**
+   * This method tries to find the most appropriate currency to pre-select for the transaction
+   * @private
+   */
+  private setAppropriateCurrency() {
+    let currency = CURRENCIES[0];
+    if (this.authStore.user()?.currency) {
+      currency = this.authStore.user()?.currency!;
+    } else if (this.friend()?.otherBalances?.[0].currency) {
+      currency = this.friend()?.otherBalances?.[0].currency!;
+    } else if (CURRENCIES.includes(this.authStore.region()?.currency || '')) {
+      currency = this.authStore.region()?.currency!;
+    }
+    this.defineExpenseForm.get('currency')?.setValue(currency);
   }
 
   canDismiss = async () => {
