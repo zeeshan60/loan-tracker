@@ -11,13 +11,11 @@ import {
   IonItem,
   IonLabel, IonList, IonNav, IonTitle, IonToolbar, ModalController,
 } from '@ionic/angular/standalone';
-import { AddFriendComponent } from '../../add-friend/add-friend.component';
 import { FriendsStore } from '../friends.store';
 import { FormsModule } from '@angular/forms';
 import { FriendWithBalance } from '../model';
 import { FriendTransactionsComponent } from '../friend-transactions/friend-transactions.component';
 import { ShortenNamePipe } from '../../pipes/shorten-name.pipe';
-import { AuthStore } from '../../login/auth.store';
 import { SelectFriendComponent } from '../../define-expense/select-friend/select-friend.component';
 import { DefineExpenseService } from '../../define-expense/define-expense.service';
 
@@ -48,7 +46,6 @@ import { DefineExpenseService } from '../../define-expense/define-expense.servic
 })
 export class ListFriendsComponent  implements OnInit {
   readonly friendsStore = inject(FriendsStore);
-  readonly authStore = inject(AuthStore);
   readonly defineExpenseService = inject(DefineExpenseService);
   readonly modalCtrl = inject(ModalController);
   readonly nav = inject(IonNav);
