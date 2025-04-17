@@ -18,3 +18,14 @@ class CreateFriendCommand(
         friendService.createFriend(commandDto.userId, commandDto.payload)
     }
 }
+
+@Service
+class UpdateFriendCommand(
+    private val friendService: FriendService,
+    private val commandDao: CommandDao,
+) : Command<UpdateFriendDto> {
+    override suspend fun execute(commandDto: CommandDto<UpdateFriendDto>) {
+        CoroutineScope(Dispatchers.IO).launch { commandDao.addCommand(commandDto) }
+        friendService.updateFriend(commandDto.userId, commandDto.payload)
+    }
+}

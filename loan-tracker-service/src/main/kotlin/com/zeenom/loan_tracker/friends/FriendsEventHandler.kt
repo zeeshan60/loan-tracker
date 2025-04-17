@@ -14,15 +14,24 @@ class FriendsEventHandler(
     private val eventRepository: FriendEventRepository,
 ) {
 
-    suspend fun findAllEventsByUserId(userId: String) = eventRepository.findAllByUserUid(userId)
+    suspend fun findAllFriendsByUserId(userId: String) =
+        eventRepository.findAllByUserUid(userId).toList().groupBy { it.streamId }
+            .mapNotNull { resolveStream(it.value.map { it.toEvent() }) }
 
     suspend fun findByUserUidAndFriendEmail(userUid: String, email: String): FriendModel? {
-        val events = eventRepository.findByUserUidAndFriendEmail(userUid, email)
-        return resolveStream(events.map { it.toEvent() }.toList())
+        val friends = eventRepository.findAllByUserUid(userUid).toList().groupBy { it.streamId }
+            .mapNotNull { resolveStream(it.value.map { it.toEvent() }) }
+        return friends.singleOrNull { it.friendEmail == email }
     }
 
     suspend fun findByUserUidAndFriendPhoneNumber(userUid: String, phoneNumber: String): FriendModel? {
-        val events = eventRepository.findByUserUidAndFriendPhoneNumber(userUid, phoneNumber)
+        val friends = eventRepository.findAllByUserUid(userUid).toList().groupBy { it.streamId }
+            .mapNotNull { resolveStream(it.value.map { it.toEvent() }) }
+        return friends.singleOrNull { it.friendPhoneNumber == phoneNumber }
+    }
+
+    suspend fun findByUserUidAndFriendId(userUid: String, friendId: UUID): FriendModel? {
+        val events = eventRepository.findByUserUidAndStreamId(userUid, friendId)
         return resolveStream(events.map { it.toEvent() }.toList())
     }
 

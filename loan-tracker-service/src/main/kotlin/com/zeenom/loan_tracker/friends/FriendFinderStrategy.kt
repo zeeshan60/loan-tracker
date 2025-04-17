@@ -1,7 +1,6 @@
 package com.zeenom.loan_tracker.friends
 
 import com.zeenom.loan_tracker.users.UserEventHandler
-import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
 
 @Service
@@ -10,7 +9,7 @@ class FriendFinderStrategy(
     private val userEventHandler: UserEventHandler,
 ) {
     suspend fun findUserFriends(userId: String): List<FriendUserDto> {
-        val friends = friendsEventHandler.findAllEventsByUserId(userId).toList()
+        val friends = friendsEventHandler.findAllFriendsByUserId(userId).toList()
         val usersByPhones =
             userEventHandler.findUsersByPhoneNumbers(friends.mapNotNull { it.friendPhoneNumber }).toList()
                 .associateBy { it.phoneNumber }

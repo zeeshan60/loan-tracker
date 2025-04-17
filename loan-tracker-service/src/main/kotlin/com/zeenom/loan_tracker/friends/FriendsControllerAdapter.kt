@@ -2,6 +2,7 @@ package com.zeenom.loan_tracker.friends
 
 import com.zeenom.loan_tracker.common.Paginated
 import org.springframework.stereotype.Service
+import java.util.UUID
 
 @Service
 class FriendsControllerAdapter {
@@ -22,11 +23,20 @@ class FriendsControllerAdapter {
         )
     }
 
-            fun fromRequestToDto(createFriendRequest: CreateFriendRequest): CreateFriendDto {
-                return CreateFriendDto(
-                    email = createFriendRequest.email,
-            phoneNumber = createFriendRequest.phoneNumber,
-            name = createFriendRequest.name
+    fun fromRequestToDto(friendRequest: FriendRequest): CreateFriendDto {
+        return CreateFriendDto(
+            email = friendRequest.email,
+            phoneNumber = friendRequest.phoneNumber,
+            name = friendRequest.name
+        )
+    }
+
+    fun fromRequestToDto(friendRequest: FriendRequest, friendId: UUID): UpdateFriendDto {
+        return UpdateFriendDto(
+            email = friendRequest.email,
+            phoneNumber = friendRequest.phoneNumber,
+            name = friendRequest.name,
+            friendId = friendId
         )
     }
 

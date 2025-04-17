@@ -61,22 +61,9 @@ class FriendService(
     }
 
     suspend fun createFriend(userId: String, friendDto: CreateFriendDto) {
-        if (friendDto.email == null && friendDto.phoneNumber == null) {
-            throw IllegalArgumentException("Email or phone number is required")
-        }
-
         val user = userEventHandler.findUserById(userId) ?: throw IllegalArgumentException("User $userId not found")
-        if (user.email == friendDto.email || user.phoneNumber == friendDto.phoneNumber) {
-            throw IllegalArgumentException("Your friend can't have same email or phone as yours")
-        }
+        validateFriendInformation(friendDto, user)
 
-        if (friendDto.email != null)
-            friendsEventHandler.findByUserUidAndFriendEmail(userId, friendDto.email)
-                ?.let { throw IllegalArgumentException("Friend with email ${friendDto.email} already exist") }
-
-        if (friendDto.phoneNumber != null)
-            friendsEventHandler.findByUserUidAndFriendPhoneNumber(userId, friendDto.phoneNumber)
-                ?.let { throw IllegalArgumentException("Friend with phone number ${friendDto.phoneNumber} already exist") }
 
         friendsEventHandler.addEvent(
             FriendCreated(
@@ -92,6 +79,50 @@ class FriendService(
             )
         )
         makeMeThisUsersFriendAsWell(friendDto.email, friendDto.phoneNumber, user)
+    }
+
+    suspend fun updateFriend(userId: String, friendDto: UpdateFriendDto) {
+        val user = userEventHandler.findUserById(userId) ?: throw IllegalArgumentException("User $userId not found")
+        validateFriendInformation(friendDto, user)
+        val friend = friendsEventHandler.findByUserUidAndFriendId(
+            userId,
+            friendDto.friendId
+        ) ?: throw IllegalArgumentException("Friend not found")
+
+        friendsEventHandler.addEvent(
+            FriendUpdated(
+                userId = userId,
+                friendEmail = friendDto.email,
+                friendPhoneNumber = friendDto.phoneNumber,
+                friendDisplayName = friendDto.name,
+                createdAt = Instant.now(),
+                streamId = friend.streamId,
+                version = friend.version + 1,
+                createdBy = userId,
+            )
+        )
+    }
+
+
+    private suspend fun validateFriendInformation(
+        friendDto: BaseFriendDto,
+        user: UserDto
+    ) {
+        if (friendDto.email == null && friendDto.phoneNumber == null) {
+            throw IllegalArgumentException("Email or phone number is required")
+        }
+
+        if (user.email == friendDto.email || user.phoneNumber == friendDto.phoneNumber) {
+            throw IllegalArgumentException("Your friend can't have same email or phone as yours")
+        }
+
+        if (friendDto.email != null)
+            friendsEventHandler.findByUserUidAndFriendEmail(user.uid, friendDto.email!!)
+                ?.let { throw IllegalArgumentException("Friend with email ${friendDto.email} already exist") }
+
+        if (friendDto.phoneNumber != null)
+            friendsEventHandler.findByUserUidAndFriendPhoneNumber(user.uid, friendDto.phoneNumber!!)
+                ?.let { throw IllegalArgumentException("Friend with phone number ${friendDto.phoneNumber} already exist") }
     }
 
     private suspend fun makeMeThisUsersFriendAsWell(friendEmail: String?, phoneNumber: String?, me: UserDto) {
@@ -187,5 +218,4 @@ class FriendService(
                 )
         )
     }
-
 }

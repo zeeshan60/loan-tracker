@@ -10,6 +10,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
+import java.util.UUID
 
 @RestController
 @RequestMapping("/api/v1/friends")
@@ -17,6 +18,7 @@ class FriendsController(
     val friendsQuery: FriendsQuery,
     val friendsAdapter: FriendsControllerAdapter,
     private val createFriendCommand: CreateFriendCommand,
+    private val updateFriendCommand: UpdateFriendCommand,
     private val friendQuery: FriendQuery,
 ) {
 
@@ -35,10 +37,36 @@ class FriendsController(
         }
     }
 
+    @Operation(summary = "Update friend", description = "Update a friend's details")
+    @PutMapping("/{friendId}")
+    suspend fun updateFriend(
+        @PathVariable friendId: UUID,
+        @RequestBody friendRequest: FriendRequest,
+        @AuthenticationPrincipal userId: String,
+    ): FriendResponse {
+        logger.info("Updating friend $friendId for user $userId")
+        updateFriendCommand.execute(
+            CommandDto(
+                commandType = CommandType.UPDATE_FRIEND,
+                payload = friendsAdapter.fromRequestToDto(friendRequest, friendId),
+                userId = userId
+            )
+        )
+        return friendQuery.execute(
+            FriendQueryDto(
+                userId = userId,
+                friendEmail = friendRequest.email,
+                friendPhoneNumber = friendRequest.phoneNumber,
+            )
+        ).let {
+            friendsAdapter.fromDtoToResponse(it)
+        }
+    }
+
     @Operation(summary = "Add friend", description = "Add a friend")
     @PostMapping("/add")
     suspend fun addFriend(
-        @RequestBody friendRequest: CreateFriendRequest,
+        @RequestBody friendRequest: FriendRequest,
         @AuthenticationPrincipal userId: String,
     ): FriendResponse {
         logger.info("Adding friend for user $userId")
