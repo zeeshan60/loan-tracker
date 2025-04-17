@@ -84,10 +84,23 @@ class FriendService(
     suspend fun updateFriend(userId: String, friendDto: UpdateFriendDto) {
         val user = userEventHandler.findUserById(userId) ?: throw IllegalArgumentException("User $userId not found")
         validateFriendInformation(friendDto, user)
-        val friend = friendsEventHandler.findFriendByUserIdAndFriendId(
+        val friend = friendsEventHandler.findByUserUidAndFriendId(
             userId,
             friendDto.friendId
         ) ?: throw IllegalArgumentException("Friend not found")
+
+        friendsEventHandler.addEvent(
+            FriendUpdated(
+                userId = userId,
+                friendEmail = friendDto.email,
+                friendPhoneNumber = friendDto.phoneNumber,
+                friendDisplayName = friendDto.name,
+                createdAt = Instant.now(),
+                streamId = friend.streamId,
+                version = friend.version + 1,
+                createdBy = userId,
+            )
+        )
     }
 
 
