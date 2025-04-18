@@ -6,9 +6,12 @@ import com.zeenom.loan_tracker.events.CommandDto
 import com.zeenom.loan_tracker.events.CommandType
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
+import jakarta.validation.Valid
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.propertyeditors.StringTrimmerEditor
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.web.bind.WebDataBinder
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
@@ -41,7 +44,7 @@ class FriendsController(
     @Operation(summary = "Add friend", description = "Add a friend")
     @PostMapping("/add")
     suspend fun addFriend(
-        @RequestBody friendRequest: FriendRequest,
+        @Valid @RequestBody friendRequest: FriendRequest,
         @AuthenticationPrincipal userId: String,
     ): FriendResponse {
         logger.info("Adding friend for user $userId")
@@ -67,7 +70,7 @@ class FriendsController(
     @PutMapping("/{friendId}")
     suspend fun updateFriend(
         @PathVariable friendId: UUID,
-        @RequestBody friendRequest: UpdateFriendRequest,
+        @Valid @RequestBody friendRequest: UpdateFriendRequest,
         @AuthenticationPrincipal userId: String,
     ): FriendResponse {
         logger.info("Updating friend $friendId for user $userId")

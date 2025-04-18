@@ -2,25 +2,58 @@ package com.zeenom.loan_tracker.friends
 
 import com.zeenom.loan_tracker.events.CommandPayloadDto
 import io.swagger.v3.oas.annotations.media.Schema
-import java.util.UUID
+import jakarta.validation.constraints.Email
+import jakarta.validation.constraints.Pattern
+import java.util.*
 
 @Schema(description = "Request to create a new friend. Either email or phone number must be provided.")
 data class FriendRequest(
-    @Schema(description = "Email address of the friend", example = "friend@example.com")
-    val email: String?,
+    @field:Schema(description = "Email address of the friend", example = "friend@example.com")
+    @field:Email(message = "Invalid email format")
+    var email: String? = null,
 
-    @Schema(description = "Phone number of the friend", example = "+1234567890")
-    val phoneNumber: String?,
+    @field:Schema(description = "Phone number of the friend", example = "+1234567890")
+    @field:Pattern(
+        regexp = "\\+?[0-9]+",
+        message = "Invalid phone number format"
+    )
+    var phoneNumber: String? = null,
 
-    @Schema(description = "Name of the friend", required = true, example = "John Doe")
-    val name: String,
-)
+    @field:Schema(description = "Name of the friend", required = true, example = "John Doe")
+    var name: String
+) {
+    init {
+        if (email != null && email!!.isBlank()) {
+            email = null
+        }
+        if (phoneNumber != null && phoneNumber!!.isBlank()) {
+            phoneNumber = null
+        }
+        require(email != null || phoneNumber != null) {
+            "Either email or phone number must be provided"
+        }
+    }
+}
 
 data class UpdateFriendRequest(
-    val email: String?,
-    val phoneNumber: String?,
-    val name: String?,
-)
+    @field:Email(message = "Invalid email format")
+    var email: String?,
+    @field:Pattern(
+        regexp = "\\+?[0-9]+",
+        message = "Invalid phone number format"
+    )
+    var phoneNumber: String?,
+    var name: String?,
+) {
+    init {
+        if (email != null && email!!.isBlank()) {
+            email = null
+        }
+        if (phoneNumber != null && phoneNumber!!.isBlank()) {
+            phoneNumber = null
+        }
+    }
+}
 
 interface BaseFriendDto {
     val name: String?
