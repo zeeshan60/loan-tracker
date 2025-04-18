@@ -41,7 +41,7 @@ class FriendsController(
     @PutMapping("/{friendId}")
     suspend fun updateFriend(
         @PathVariable friendId: UUID,
-        @RequestBody friendRequest: FriendRequest,
+        @RequestBody friendRequest: UpdateFriendRequest,
         @AuthenticationPrincipal userId: String,
     ): FriendResponse {
         logger.info("Updating friend $friendId for user $userId")

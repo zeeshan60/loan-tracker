@@ -16,8 +16,14 @@ data class FriendRequest(
     val name: String,
 )
 
+data class UpdateFriendRequest(
+    val email: String?,
+    val phoneNumber: String?,
+    val name: String?,
+)
+
 interface BaseFriendDto {
-    val name: String
+    val name: String?
     val email: String?
     val phoneNumber: String?
 }
@@ -31,6 +37,6 @@ data class CreateFriendDto(
 data class UpdateFriendDto(
     override val email: String?,
     override val phoneNumber: String?,
-    override val name: String,
+    override val name: String?,
     val friendId: UUID,
 ) : CommandPayloadDto, BaseFriendDto

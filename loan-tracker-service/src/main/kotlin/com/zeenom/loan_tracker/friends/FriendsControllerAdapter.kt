@@ -31,7 +31,7 @@ class FriendsControllerAdapter {
         )
     }
 
-    fun fromRequestToDto(friendRequest: FriendRequest, friendId: UUID): UpdateFriendDto {
+    fun fromRequestToDto(friendRequest: UpdateFriendRequest, friendId: UUID): UpdateFriendDto {
         return UpdateFriendDto(
             email = friendRequest.email,
             phoneNumber = friendRequest.phoneNumber,
@@ -39,6 +39,7 @@ class FriendsControllerAdapter {
             friendId = friendId
         )
     }
+
 
     fun fromDtoToPaginatedResponse(friendsDto: FriendsWithAllTimeBalancesDto): Paginated<FriendsResponse> {
         return Paginated(

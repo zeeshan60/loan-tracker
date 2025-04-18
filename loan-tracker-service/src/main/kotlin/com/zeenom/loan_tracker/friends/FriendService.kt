@@ -105,8 +105,19 @@ class FriendService(
         )
         makeMeThisUsersFriendAsWell(friendDto.email, friendDto.phoneNumber, user)
         val friendUser = friendFinderStrategy.findUserFriend(userId, friendDto.email, friendDto.phoneNumber)
+        if (friendUser.friendUid == null) {
+            return
+        }
+        val findSelf = friendFinderStrategy.findUserFriend(friendUser.friendUid, user.email, user.phoneNumber)
+        Json.prettyPrint(friendUser)
+        println("Friend Dto")
+        Json.prettyPrint(friendDto)
+        println("Friend")
+        Json.prettyPrint(friend)
+        println("Find self")
+        Json.prettyPrint(findSelf)
         val friendModel =
-            friendUser.friendUid?.let { friendsEventHandler.findByUserUidAndFriendId(it, friendDto.friendId) }
+            friendsEventHandler.findByUserUidAndFriendId(friendUser.friendUid, findSelf.friendStreamId)
         friendModel?.let {
             transactionEventHandler.syncTransactions(friendModel, friend)
         }

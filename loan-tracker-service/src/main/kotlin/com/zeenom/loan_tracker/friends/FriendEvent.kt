@@ -20,7 +20,7 @@ data class FriendEvent(
     val userUid: String,
     val friendEmail: String?,
     val friendPhoneNumber: String?,
-    val friendDisplayName: String,
+    val friendDisplayName: String?,
     val createdAt: Instant,
     val streamId: UUID,
     val version: Int,
@@ -32,7 +32,7 @@ data class FriendEvent(
                 id = id,
                 friendEmail = friendEmail,
                 friendPhoneNumber = friendPhoneNumber,
-                friendDisplayName = friendDisplayName,
+                friendDisplayName = friendDisplayName ?: throw IllegalStateException("Friend display name is required"),
                 userId = userUid,
                 createdAt = createdAt,
                 streamId = streamId,
@@ -105,7 +105,7 @@ data class FriendCreated(
 data class FriendUpdated(
     val friendEmail: String?,
     val friendPhoneNumber: String?,
-    val friendDisplayName: String,
+    val friendDisplayName: String?,
     override val userId: String,
     override val createdAt: Instant,
     override val streamId: UUID,
@@ -128,9 +128,9 @@ data class FriendUpdated(
     override fun applyEvent(existing: FriendModel?): FriendModel {
         return existing?.copy(
             userUid = userId,
-            friendEmail = friendEmail,
-            friendPhoneNumber = friendPhoneNumber,
-            friendDisplayName = friendDisplayName,
+            friendEmail = friendEmail ?: existing.friendEmail,
+            friendPhoneNumber = friendPhoneNumber ?: existing.friendPhoneNumber,
+            friendDisplayName = friendDisplayName ?: existing.friendDisplayName,
             createdAt = createdAt,
             streamId = streamId,
             version = version
