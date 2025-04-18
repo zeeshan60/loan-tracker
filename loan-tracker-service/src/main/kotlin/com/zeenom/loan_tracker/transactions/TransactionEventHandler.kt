@@ -4,6 +4,7 @@ import com.zeenom.loan_tracker.common.apply
 import com.zeenom.loan_tracker.common.events.IEvent
 import com.zeenom.loan_tracker.common.exceptions.NotFoundException
 import com.zeenom.loan_tracker.common.isOwed
+import com.zeenom.loan_tracker.friends.FriendModel
 import io.swagger.v3.core.util.Json
 import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
@@ -169,6 +170,32 @@ class TransactionEventHandler(
                 Json.prettyPrint(it)
                 transactionEventRepository.saveAll(it).toList()
             }
+    }
+
+    /**
+     * Only synchronize transactions if one user has some transactions with other and other dont have any
+     * This could happen if one user is added as a friend and other user has transactions with him
+     * Or if user updated friend phone or email and other user has transactions with him
+     */
+    suspend fun syncTransactions(friend1: FriendModel, friend2: FriendModel) {
+        val transactions1 = findAllByUserIdFriendId(friend1.userUid, friend1.streamId)
+        val transactions2 = findAllByUserIdFriendId(friend2.userUid, friend2.streamId)
+
+        if (transactions1.isEmpty() && transactions2.isNotEmpty()) {
+            transactionEventRepository.saveAll(transactions2.map { transaction ->
+                transaction.crossTransaction(
+                    recipientUserId = friend1.userUid,
+                    userStreamId = friend1.streamId
+                ).toEntity()
+            }.toList()).toList()
+        } else if (transactions2.isEmpty() && transactions1.isNotEmpty()) {
+            transactionEventRepository.saveAll(transactions1.map { transaction ->
+                transaction.crossTransaction(
+                    recipientUserId = friend2.userUid,
+                    userStreamId = friend2.streamId
+                ).toEntity()
+            }.toList()).toList()
+        }
     }
 }
 

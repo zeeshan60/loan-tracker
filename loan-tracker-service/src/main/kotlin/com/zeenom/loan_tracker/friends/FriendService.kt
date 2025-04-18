@@ -3,9 +3,10 @@ package com.zeenom.loan_tracker.friends
 import com.zeenom.loan_tracker.transactions.AmountDto
 import com.zeenom.loan_tracker.transactions.ICurrencyClient
 import com.zeenom.loan_tracker.transactions.TransactionEventHandler
+import com.zeenom.loan_tracker.transactions.TransactionEventRepository
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventHandler
-import kotlinx.coroutines.flow.emptyFlow
+import io.swagger.v3.core.util.Json
 import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -19,6 +20,8 @@ class FriendService(
     private val friendFinderStrategy: FriendFinderStrategy,
     private val allTimeBalanceStrategy: AllTimeBalanceStrategy,
     private val currencyClient: ICurrencyClient,
+    private val friendEventRepository: FriendEventRepository,
+    private val transactionEventRepository: TransactionEventRepository,
 ) {
 
     suspend fun findAllByUserId(userId: String): FriendsWithAllTimeBalancesDto {
@@ -101,6 +104,7 @@ class FriendService(
                 createdBy = userId,
             )
         )
+        makeMeThisUsersFriendAsWell(friendDto.email, friendDto.phoneNumber, user)
     }
 
 
@@ -164,15 +168,24 @@ class FriendService(
 
     suspend fun searchUsersImFriendOfAndAddThemAsMyFriends(uid: String) {
         val user = userEventHandler.findUserById(uid) ?: throw IllegalArgumentException("User not found")
-        val emailFriends = user.email?.let { friendsEventHandler.findByFriendEmail(user.email) } ?: emptyFlow()
+        val emailFriends = user.email?.let { friendsEventHandler.findByFriendEmail(user.email) } ?: emptyList()
         val phoneFriends =
-            user.phoneNumber?.let { friendsEventHandler.findByFriendPhoneNumber(user.phoneNumber) } ?: emptyFlow()
+            user.phoneNumber?.let { friendsEventHandler.findByFriendPhoneNumber(user.phoneNumber) } ?: emptyList()
 
-        val myFriendIds = emailFriends.toList().plus(phoneFriends.toList()).map { it.userUid }.distinct()
+        val allFriends = emailFriends.plus(phoneFriends).distinct()
+        val myFriendIds = allFriends.map { it.userUid }
         val friends =
-            userEventHandler.findUsersByUids(myFriendIds).toList()
+            userEventHandler.findUsersByUids(myFriendIds)
 
         friendsEventHandler.saveAllUsersAsFriends(uid, friends)
+
+        val userFriends = friendsEventHandler.findAllFriendsByUserId(uid)
+        userFriends.forEach { friend ->
+            val friendUser =
+                allFriends.find { it.friendEmail == user.email || it.friendPhoneNumber == user.phoneNumber }
+            friendUser?.let { transactionEventHandler.syncTransactions(friend, friendUser) }
+            Json.prettyPrint(transactionEventRepository.findAll().toList())
+        }
     }
 
 
