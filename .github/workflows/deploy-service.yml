@@ -44,5 +44,5 @@ jobs:
       - name: Deploy via Flask API
         run: |
           curl -X POST "https://loandeploy.codewithzeeshan.com/deploy" \
-            -H "Authorization: Bearer ${{ secrets.FLASK_DEPLOY_TOKEN }}" \
+            -H "Authorization: Bearer ${{ secrets.FLASK_DEPLOY_DEV_TOKEN }}" \
             -H "Content-Type: application/json"
