@@ -5,7 +5,6 @@ import com.zeenom.loan_tracker.common.events.IEvent
 import com.zeenom.loan_tracker.common.exceptions.NotFoundException
 import com.zeenom.loan_tracker.common.isOwed
 import com.zeenom.loan_tracker.friends.FriendModel
-import io.swagger.v3.core.util.Json
 import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
@@ -156,20 +155,6 @@ class TransactionEventHandler(
         if (it is CrossTransactionable) it.crossTransaction(friendUserId, myStreamId)
             .toEntity()
         else throw IllegalArgumentException("Invalid event type ${it.javaClass}")
-    }
-
-    suspend fun addReverseEventsForUserAndFriend(
-        myUid: String,
-        myStreamId: UUID,
-        friendUid: String,
-        friendStreamId: UUID,
-    ) {
-
-        findAllEventsByUserIdFriendId(friendUid, myStreamId)
-            .map { it.reverse(myUid, friendStreamId) }.let {
-                Json.prettyPrint(it)
-                transactionEventRepository.saveAll(it).toList()
-            }
     }
 
     /**

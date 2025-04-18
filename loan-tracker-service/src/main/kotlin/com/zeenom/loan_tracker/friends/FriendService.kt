@@ -109,13 +109,6 @@ class FriendService(
             return
         }
         val findSelf = friendFinderStrategy.findUserFriend(friendUser.friendUid, user.email, user.phoneNumber)
-        Json.prettyPrint(friendUser)
-        println("Friend Dto")
-        Json.prettyPrint(friendDto)
-        println("Friend")
-        Json.prettyPrint(friend)
-        println("Find self")
-        Json.prettyPrint(findSelf)
         val friendModel =
             friendsEventHandler.findByUserUidAndFriendId(friendUser.friendUid, findSelf.friendStreamId)
         friendModel?.let {
@@ -207,7 +200,6 @@ class FriendService(
             val friendUser =
                 allFriends.find { it.friendEmail == user.email || it.friendPhoneNumber == user.phoneNumber }
             friendUser?.let { transactionEventHandler.syncTransactions(friend, friendUser) }
-            Json.prettyPrint(transactionEventRepository.findAll().toList())
         }
     }
 
