@@ -56,7 +56,7 @@ const initialState: FriendsState = {
 interface Methods extends MethodsDictionary {
   loadFriends(config?: { showLoader: boolean }): Promise<void>;
   addFriend(friend: AddFriend): Promise<FriendWithBalance>;
-  updateFriend(friend: AddFriend): Promise<FriendWithBalance>;
+  updateFriend(friendId: string, friend: AddFriend): Promise<FriendWithBalance>;
   deleteFriend(friend: FriendWithBalance): Promise<void>;
   setSelectedFriend(friend: FriendWithBalance|null): Promise<void>;
   loadSelectedTransactions(): Promise<void>;
@@ -113,9 +113,9 @@ export const FriendsStore = signalStore(
         throw e;
       }
     },
-    async updateFriend(friend: AddFriend): Promise<FriendWithBalance> {
+    async updateFriend(friendId: string, friend: AddFriend): Promise<FriendWithBalance> {
       try {
-        const updatedFriend = await firstValueFrom(friendsService.updateFriend(friend));
+        const updatedFriend = await firstValueFrom(friendsService.updateFriend(friendId, friend));
         await this.loadFriends();
         await helperService.showToast('Friend updated successfully');
         return updatedFriend;

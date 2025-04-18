@@ -106,7 +106,7 @@ export class AddFriendComponent implements OnInit {
           phoneNumber: toInternationalPhone(this.addFriendForm.get('phone.phoneNumber')!.value, this.addFriendForm.get('phone.country')!.value),
         }
         const friend = this.isUpdating() ?
-          await this.friendsStore.updateFriend(mappedValue) :
+          await this.friendsStore.updateFriend(this.friend()!.friendId, mappedValue) :
           await this.friendsStore.addFriend(mappedValue);
         await this.modalCtrl.dismiss(friend, 'confirm')
       } finally {
