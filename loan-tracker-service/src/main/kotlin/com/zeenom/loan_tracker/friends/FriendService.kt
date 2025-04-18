@@ -3,7 +3,6 @@ package com.zeenom.loan_tracker.friends
 import com.zeenom.loan_tracker.transactions.AmountDto
 import com.zeenom.loan_tracker.transactions.ICurrencyClient
 import com.zeenom.loan_tracker.transactions.TransactionEventHandler
-import com.zeenom.loan_tracker.transactions.TransactionEventRepository
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventHandler
 import org.springframework.stereotype.Service
@@ -18,17 +17,15 @@ class FriendService(
     private val friendFinderStrategy: FriendFinderStrategy,
     private val allTimeBalanceStrategy: AllTimeBalanceStrategy,
     private val currencyClient: ICurrencyClient,
-    private val friendEventRepository: FriendEventRepository,
-    private val transactionEventRepository: TransactionEventRepository,
 ) {
 
     suspend fun findAllByUserId(userId: String): FriendsWithAllTimeBalancesDto {
         val user = userEventHandler.findUserById(userId) ?: throw IllegalArgumentException("User $userId not found")
-        val events = friendFinderStrategy.findUserFriends(userId)
+        val friendDtos = friendFinderStrategy.findUserFriends(userId)
         val amountsPerFriend =
-            transactionEventHandler.balancesOfFriendsByCurrency(userId, events.map { it.friendStreamId })
+            transactionEventHandler.balancesOfFriendsByCurrency(userId, friendDtos.map { it.friendStreamId })
         val mainCurrency = user.currency?.let { Currency.getInstance(user.currency) } ?: Currency.getInstance("USD")
-        val friends = events.map {
+        val friends = friendDtos.map {
             FriendDto(
                 friendId = it.friendStreamId,
                 email = it.email,
@@ -89,6 +86,9 @@ class FriendService(
             friendDto.friendId
         ) ?: throw IllegalArgumentException("Friend not found")
 
+        if (friend.deleted) {
+            throw IllegalArgumentException("Friend is deleted")
+        }
         friendsEventHandler.addEvent(
             FriendUpdated(
                 userId = userId,
@@ -114,6 +114,20 @@ class FriendService(
         }
     }
 
+    suspend fun deleteFriend(userId: String, friendId: UUID) {
+        userEventHandler.findUserById(userId) ?: throw IllegalArgumentException("User $userId not found")
+        val friend = friendsEventHandler.findByUserUidAndFriendId(userId, friendId)
+            ?: throw IllegalArgumentException("Friend not found")
+        friendsEventHandler.addEvent(
+            FriendDeleted(
+                userId = userId,
+                createdAt = Instant.now(),
+                streamId = friend.streamId,
+                version = friend.version + 1,
+                createdBy = userId,
+            )
+        )
+    }
 
     private suspend fun validateFriendInformation(
         friendDto: BaseFriendDto,

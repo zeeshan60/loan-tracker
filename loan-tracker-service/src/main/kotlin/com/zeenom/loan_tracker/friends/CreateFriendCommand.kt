@@ -29,3 +29,14 @@ class UpdateFriendCommand(
         friendService.updateFriend(commandDto.userId, commandDto.payload)
     }
 }
+
+@Service
+class DeleteFriendCommand(
+    private val friendService: FriendService,
+    private val commandDao: CommandDao,
+) : Command<DeleteFriendDto> {
+    override suspend fun execute(commandDto: CommandDto<DeleteFriendDto>) {
+        CoroutineScope(Dispatchers.IO).launch { commandDao.addCommand(commandDto) }
+        friendService.deleteFriend(commandDto.userId, commandDto.payload.friendId)
+    }
+}

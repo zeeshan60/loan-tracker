@@ -40,3 +40,7 @@ data class UpdateFriendDto(
     override val name: String?,
     val friendId: UUID,
 ) : CommandPayloadDto, BaseFriendDto
+
+data class DeleteFriendDto(
+    val friendId: UUID,
+) : CommandPayloadDto

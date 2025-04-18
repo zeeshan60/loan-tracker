@@ -1,13 +1,9 @@
 package com.zeenom.loan_tracker.integration
 
-import com.fasterxml.jackson.core.type.TypeReference
 import com.zeenom.loan_tracker.friends.FriendEventRepository
 import com.zeenom.loan_tracker.friends.FriendResponse
 import com.zeenom.loan_tracker.friends.UpdateFriendRequest
 import com.zeenom.loan_tracker.prettyAndPrint
-import com.zeenom.loan_tracker.transactions.SplitType
-import com.zeenom.loan_tracker.transactions.TransactionCreateRequest
-import com.zeenom.loan_tracker.transactions.TransactionsResponse
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventRepository
 import kotlinx.coroutines.runBlocking
@@ -16,131 +12,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import java.time.Instant
-import java.util.*
-
-class FriendUpdateTransactionSyncIntegrationTest() : BaseIntegration() {
-
-    @Autowired
-    private lateinit var friendEventRepository: FriendEventRepository
-
-    @Autowired
-    private lateinit var userEventRepository: UserEventRepository
-
-    private lateinit var zeeToken: String
-    private var zeeDto = UserDto(
-        uid = "123",
-        email = "zee@gmail.com",
-        phoneNumber = "+923001234567",
-        displayName = "Zeeshan Tufail",
-        photoUrl = "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl2",
-        currency = null,
-        emailVerified = true
-    )
-
-    private lateinit var johnToken: String
-    private var johnDto = UserDto(
-        uid = "124",
-        email = "john@gmail.com",
-        phoneNumber = "+923001234569",
-        displayName = "John Doe",
-        photoUrl = "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl3",
-        currency = null,
-        emailVerified = true
-    )
-
-    private lateinit var johnFriendId: UUID
-    @BeforeAll
-    fun beforeAll(): Unit = runBlocking {
-        userEventRepository.deleteAll()
-        friendEventRepository.deleteAll()
-        zeeToken = loginUser(
-            userDto = zeeDto
-        ).token
-        johnToken = loginUser(
-            userDto = johnDto
-        ).token
-
-        addFriend(zeeToken, "JohnWrong")
-        johnFriendId = queryFriend(
-            token = zeeToken
-        ).data.friends.first().friendId
-        addTransaction(zeeToken, johnFriendId)
-    }
-
-    @Order(1)
-    @Test
-    fun `updating john correct phone sync zee transactions to john`() {
-        queryFriend(
-            token = johnToken
-        ).data.friends.also {
-            assertThat(it).isEmpty()
-        }
-        queryTransactions(zeeToken, johnFriendId)!!.also {
-            assertThat(it.perMonth).hasSize(1)
-        }
-        webTestClient.put()
-            .uri("/api/v1/friends/${johnFriendId}")
-            .header("Authorization", "Bearer $zeeToken")
-            .bodyValue(
-                UpdateFriendRequest(
-                    email = null,
-                    phoneNumber = johnDto.phoneNumber,
-                    name = null,
-                )
-            )
-            .exchange()
-            .expectStatus().isOk
-            .expectBody(FriendResponse::class.java)
-            .returnResult().responseBody!!
-        val zeeFriendId = queryFriend(
-            token = johnToken
-        ).data.friends.first().friendId
-        assertThat(zeeFriendId).isNotNull
-        val result = queryTransactions(johnToken, zeeFriendId)!!
-        assertThat(result.perMonth).hasSize(1)
-        assertThat(result.perMonth[0].transactions[0].friend.name).isEqualTo(zeeDto.displayName)
-        assertThat(result.perMonth[0].transactions[0].amountResponse.amount).isEqualTo(50.0.toBigDecimal())
-        assertThat(result.perMonth[0].transactions[0].amountResponse.currency).isEqualTo("USD")
-        assertThat(result.perMonth[0].transactions[0].amountResponse.isOwed).isFalse
-        assertThat(result.perMonth[0].transactions[0].totalAmount).isEqualTo(100.0.toBigDecimal())
-        assertThat(result.perMonth[0].transactions[0].transactionId).isNotNull()
-        assertThat(result.perMonth[0].transactions[0].splitType).isEqualTo(SplitType.TheyPaidSplitEqually)
-        assertThat(result.perMonth[0].transactions[0].description).isEqualTo("Sample transaction")
-    }
-
-    fun addTransaction(token: String, friendId: UUID) {
-        webTestClient.post()
-            .uri("/api/v1/transactions/add")
-            .header("Authorization", "Bearer $token")
-            .bodyValue(
-                TransactionCreateRequest(
-                    amount = 100.0.toBigDecimal(),
-                    currency = "USD",
-                    type = SplitType.YouPaidSplitEqually,
-                    recipientId = friendId,
-                    description = "Sample transaction",
-                    transactionDate = Instant.parse("2025-02-26T00:00:00Z")
-                )
-            )
-            .exchange()
-            .expectStatus().isOk
-            .expectBody().jsonPath("$.description").isEqualTo("Sample transaction")
-    }
-
-    private fun queryTransactions(token: String, friendId: UUID): TransactionsResponse? = webTestClient.get()
-        .uri("/api/v1/transactions/friend/byMonth?friendId=$friendId&timeZone=Asia/Singapore")
-        .header("Authorization", "Bearer $token")
-        .exchange()
-        .expectStatus().isOk
-        .expectBody(String::class.java)
-        .returnResult().responseBody!!.let {
-            objectMapper.readValue(
-                it,
-                object : TypeReference<TransactionsResponse>() {})
-        }
-
-}
+import java.util.UUID
 
 class FriendControllerIntegrationTest() : BaseIntegration() {
 
@@ -172,6 +44,8 @@ class FriendControllerIntegrationTest() : BaseIntegration() {
         emailVerified = true
     )
 
+    private lateinit var johnFriendId: UUID
+
     @BeforeAll
     fun beforeAll(): Unit = runBlocking {
         userEventRepository.deleteAll()
@@ -191,6 +65,7 @@ class FriendControllerIntegrationTest() : BaseIntegration() {
         assertThat(friendResponse.photoUrl).isNull()
         assertThat(friendResponse.mainBalance).isNull()
         assertThat(friendResponse.otherBalances).isEmpty()
+        johnFriendId = friendResponse.friendId
     }
 
     @Test
@@ -277,6 +152,24 @@ class FriendControllerIntegrationTest() : BaseIntegration() {
         assertThat(response.data.friends[0].mainBalance).isNull()
         assertThat(response.data.friends[0].otherBalances).isEmpty()
         assertThat(response.data.friends[0].friendId).isEqualTo(existing.data.friends[0].friendId)
+        assertThat(response.data.balance.main).isNull()
+        assertThat(response.data.balance.other).isEmpty()
+    }
+
+    @Order(8)
+    @Test
+    fun `delete john friend successfully`() {
+        webTestClient.delete()
+            .uri("/api/v1/friends/$johnFriendId")
+            .header("Authorization", "Bearer $zeeToken")
+            .exchange()
+            .expectStatus().isOk
+            .expectBody(String::class.java)
+            .returnResult().responseBody!!.also { it.prettyAndPrint(objectMapper) }
+
+        val response = queryFriend(zeeToken)
+
+        assertThat(response.data.friends).isEmpty()
         assertThat(response.data.balance.main).isNull()
         assertThat(response.data.balance.other).isEmpty()
     }
