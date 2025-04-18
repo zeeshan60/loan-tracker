@@ -65,8 +65,7 @@ class FriendService(
 
     suspend fun createFriend(userId: String, friendDto: CreateFriendDto) {
         val user = userEventHandler.findUserById(userId) ?: throw IllegalArgumentException("User $userId not found")
-        validateFriendInformation(friendDto, user)
-
+        validateFriendInformation(friendDto = friendDto, user = user, friendId = null)
 
         friendsEventHandler.addEvent(
             FriendCreated(
@@ -86,7 +85,7 @@ class FriendService(
 
     suspend fun updateFriend(userId: String, friendDto: UpdateFriendDto) {
         val user = userEventHandler.findUserById(userId) ?: throw IllegalArgumentException("User $userId not found")
-        validateFriendInformation(friendDto, user)
+        validateFriendInformation(friendDto = friendDto, user = user, friendId = friendDto.friendId)
         val friend = friendsEventHandler.findByUserUidAndFriendId(
             userId,
             friendDto.friendId
@@ -105,12 +104,19 @@ class FriendService(
             )
         )
         makeMeThisUsersFriendAsWell(friendDto.email, friendDto.phoneNumber, user)
+        val friendUser = friendFinderStrategy.findUserFriend(userId, friendDto.email, friendDto.phoneNumber)
+        val friendModel =
+            friendUser.friendUid?.let { friendsEventHandler.findByUserUidAndFriendId(it, friendDto.friendId) }
+        friendModel?.let {
+            transactionEventHandler.syncTransactions(friendModel, friend)
+        }
     }
 
 
     private suspend fun validateFriendInformation(
         friendDto: BaseFriendDto,
-        user: UserDto
+        user: UserDto,
+        friendId: UUID?
     ) {
         if (friendDto.email == null && friendDto.phoneNumber == null) {
             throw IllegalArgumentException("Email or phone number is required")
@@ -122,11 +128,17 @@ class FriendService(
 
         if (friendDto.email != null)
             friendsEventHandler.findByUserUidAndFriendEmail(user.uid, friendDto.email!!)
-                ?.let { throw IllegalArgumentException("Friend with email ${friendDto.email} already exist") }
+                ?.let {
+                    if (friendId == null || it.streamId != friendId)
+                        throw IllegalArgumentException("Friend with email ${friendDto.email} already exist")
+                }
 
         if (friendDto.phoneNumber != null)
             friendsEventHandler.findByUserUidAndFriendPhoneNumber(user.uid, friendDto.phoneNumber!!)
-                ?.let { throw IllegalArgumentException("Friend with phone number ${friendDto.phoneNumber} already exist") }
+                ?.let {
+                    if (friendId == null || it.streamId != friendId)
+                        throw IllegalArgumentException("Friend with phone number ${friendDto.phoneNumber} already exist")
+                }
     }
 
     private suspend fun makeMeThisUsersFriendAsWell(friendEmail: String?, phoneNumber: String?, me: UserDto) {
