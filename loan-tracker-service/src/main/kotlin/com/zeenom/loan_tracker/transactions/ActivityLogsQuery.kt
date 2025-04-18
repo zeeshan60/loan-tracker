@@ -32,12 +32,12 @@ class ActivityLogsQuery(
                     date = log.transactionDto.transactionDate,
                     transactionId = log.transactionDto.transactionStreamId,
                     friend = log.transactionDto.friendSummaryDto,
-                    amountResponse = AmountResponse(
+                    amount = AmountResponse(
                         amount = log.transactionDto.splitType.apply(log.transactionDto.originalAmount),
                         currency = log.transactionDto.currency.currencyCode,
                         isOwed = log.transactionDto.splitType.isOwed()
                     ),
-                    defaultCurrencyAmountResponse = log.transactionDto.amountInDefaultCurrency?.let {
+                    defaultCurrencyAmount = log.transactionDto.amountInDefaultCurrency?.let {
                         AmountResponse(
                             amount = log.transactionDto.amountInDefaultCurrency,
                             currency = log.transactionDto.defaultCurrency

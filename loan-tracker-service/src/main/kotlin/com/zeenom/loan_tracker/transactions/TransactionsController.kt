@@ -57,12 +57,12 @@ class TransactionsController(
         transactionId = transactionStreamId,
         totalAmount = originalAmount,
         splitType = splitType,
-        amountResponse = AmountResponse(
+        amount = AmountResponse(
             amount = splitType.apply(originalAmount),
             currency = currency.currencyCode,
             isOwed = splitType.isOwed()
         ),
-        defaultCurrencyAmountResponse = amountInDefaultCurrency?.let {
+        defaultCurrencyAmount = amountInDefaultCurrency?.let {
             AmountResponse(
                 amount = amountInDefaultCurrency,
                 currency = defaultCurrency ?: throw IllegalStateException("Default currency is required"),
@@ -266,8 +266,8 @@ data class TransactionResponse(
     val totalAmount: BigDecimal,
     val splitType: SplitType,
     val friend: FriendSummaryDto,
-    val amountResponse: AmountResponse,
-    val defaultCurrencyAmountResponse: AmountResponse?,
+    val amount: AmountResponse,
+    val defaultCurrencyAmount: AmountResponse?,
     val history: List<ChangeSummaryResponse>,
     val createdAt: Instant,
     val updatedAt: Instant?,

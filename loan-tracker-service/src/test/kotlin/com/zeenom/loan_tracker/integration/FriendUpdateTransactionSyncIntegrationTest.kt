@@ -99,9 +99,9 @@ class FriendUpdateTransactionSyncIntegrationTest() : BaseIntegration() {
         val result = queryTransactions(johnToken, zeeFriendId)!!
         Assertions.assertThat(result.perMonth).hasSize(1)
         Assertions.assertThat(result.perMonth[0].transactions[0].friend.name).isEqualTo(zeeDto.displayName)
-        Assertions.assertThat(result.perMonth[0].transactions[0].amountResponse.amount).isEqualTo(50.0.toBigDecimal())
-        Assertions.assertThat(result.perMonth[0].transactions[0].amountResponse.currency).isEqualTo("USD")
-        Assertions.assertThat(result.perMonth[0].transactions[0].amountResponse.isOwed).isFalse
+        Assertions.assertThat(result.perMonth[0].transactions[0].amount.amount).isEqualTo(50.0.toBigDecimal())
+        Assertions.assertThat(result.perMonth[0].transactions[0].amount.currency).isEqualTo("USD")
+        Assertions.assertThat(result.perMonth[0].transactions[0].amount.isOwed).isFalse
         Assertions.assertThat(result.perMonth[0].transactions[0].totalAmount).isEqualTo(100.0.toBigDecimal())
         Assertions.assertThat(result.perMonth[0].transactions[0].transactionId).isNotNull()
         Assertions.assertThat(result.perMonth[0].transactions[0].splitType).isEqualTo(SplitType.TheyPaidSplitEqually)
