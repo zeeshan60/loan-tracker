@@ -20,7 +20,7 @@ data class FriendEvent(
     val userUid: String,
     val friendEmail: String?,
     val friendPhoneNumber: String?,
-    val friendDisplayName: String,
+    val friendDisplayName: String?,
     val createdAt: Instant,
     val streamId: UUID,
     val version: Int,
@@ -32,7 +32,7 @@ data class FriendEvent(
                 id = id,
                 friendEmail = friendEmail,
                 friendPhoneNumber = friendPhoneNumber,
-                friendDisplayName = friendDisplayName,
+                friendDisplayName = friendDisplayName ?: throw IllegalStateException("Friend display name is required"),
                 userId = userUid,
                 createdAt = createdAt,
                 streamId = streamId,
@@ -43,6 +43,13 @@ data class FriendEvent(
                 friendEmail = friendEmail,
                 friendPhoneNumber = friendPhoneNumber,
                 friendDisplayName = friendDisplayName,
+                userId = userUid,
+                createdAt = createdAt,
+                streamId = streamId,
+                version = version,
+                createdBy = userUid
+            )
+            FriendEventType.FRIEND_DELETED -> FriendDeleted(
                 userId = userUid,
                 createdAt = createdAt,
                 streamId = streamId,
@@ -62,6 +69,7 @@ data class FriendModel(
     val createdAt: Instant,
     val streamId: UUID,
     val version: Int,
+    val deleted: Boolean,
 )
 
 data class FriendCreated(
@@ -97,7 +105,8 @@ data class FriendCreated(
             friendDisplayName = friendDisplayName,
             createdAt = createdAt,
             streamId = streamId,
-            version = version
+            version = version,
+            deleted = false
         )
     }
 }
@@ -105,7 +114,7 @@ data class FriendCreated(
 data class FriendUpdated(
     val friendEmail: String?,
     val friendPhoneNumber: String?,
-    val friendDisplayName: String,
+    val friendDisplayName: String?,
     override val userId: String,
     override val createdAt: Instant,
     override val streamId: UUID,
@@ -128,9 +137,9 @@ data class FriendUpdated(
     override fun applyEvent(existing: FriendModel?): FriendModel {
         return existing?.copy(
             userUid = userId,
-            friendEmail = friendEmail,
-            friendPhoneNumber = friendPhoneNumber,
-            friendDisplayName = friendDisplayName,
+            friendEmail = friendEmail ?: existing.friendEmail,
+            friendPhoneNumber = friendPhoneNumber ?: existing.friendPhoneNumber,
+            friendDisplayName = friendDisplayName ?: existing.friendDisplayName,
             createdAt = createdAt,
             streamId = streamId,
             version = version
@@ -138,17 +147,48 @@ data class FriendUpdated(
     }
 }
 
+data class FriendDeleted(
+    override val userId: String,
+    override val createdAt: Instant,
+    override val streamId: UUID,
+    override val version: Int,
+    override val createdBy: String,
+) : IFriendEvent {
+    override fun toEntity(): FriendEvent {
+        return FriendEvent(
+            userUid = userId,
+            createdAt = createdAt,
+            streamId = streamId,
+            version = version,
+            eventType = FriendEventType.FRIEND_DELETED,
+            id = null,
+            friendEmail = null,
+            friendPhoneNumber = null,
+            friendDisplayName = null,
+        )
+    }
+
+    override fun applyEvent(existing: FriendModel?): FriendModel {
+        return existing?.copy(
+            userUid = userId,
+            createdAt = createdAt,
+            streamId = streamId,
+            version = version,
+            deleted = true
+        ) ?: throw IllegalStateException("Friend not found while trying to resolve friend deletion")
+    }
+}
+
 enum class FriendEventType {
     FRIEND_CREATED,
-    FRIEND_UPDATED
+    FRIEND_UPDATED,
+    FRIEND_DELETED
 }
 
 @Repository
 interface FriendEventRepository : CoroutineCrudRepository<FriendEvent, UUID> {
     suspend fun findAllByUserUid(userUid: String): Flow<FriendEvent>
     suspend fun findByFriendEmail(email: String): Flow<FriendEvent>
-    suspend fun findByUserUidAndFriendEmail(userUid: String, email: String): Flow<FriendEvent>
-    suspend fun findByUserUidAndFriendPhoneNumber(userUid: String, phoneNumber: String): Flow<FriendEvent>
     suspend fun findByFriendPhoneNumber(phoneNumber: String): Flow<FriendEvent>
     suspend fun findByUserUidAndStreamId(userUid: String, recipientId: UUID): Flow<FriendEvent>
 }

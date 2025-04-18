@@ -3,11 +3,8 @@ package com.zeenom.loan_tracker.friends
 import com.zeenom.loan_tracker.transactions.AmountDto
 import com.zeenom.loan_tracker.transactions.ICurrencyClient
 import com.zeenom.loan_tracker.transactions.TransactionEventHandler
-import com.zeenom.loan_tracker.transactions.TransactionEventRepository
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventHandler
-import io.swagger.v3.core.util.Json
-import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.util.*
@@ -20,17 +17,15 @@ class FriendService(
     private val friendFinderStrategy: FriendFinderStrategy,
     private val allTimeBalanceStrategy: AllTimeBalanceStrategy,
     private val currencyClient: ICurrencyClient,
-    private val friendEventRepository: FriendEventRepository,
-    private val transactionEventRepository: TransactionEventRepository,
 ) {
 
     suspend fun findAllByUserId(userId: String): FriendsWithAllTimeBalancesDto {
         val user = userEventHandler.findUserById(userId) ?: throw IllegalArgumentException("User $userId not found")
-        val events = friendFinderStrategy.findUserFriends(userId)
+        val friendDtos = friendFinderStrategy.findUserFriends(userId)
         val amountsPerFriend =
-            transactionEventHandler.balancesOfFriendsByCurrency(userId, events.map { it.friendStreamId })
+            transactionEventHandler.balancesOfFriendsByCurrency(userId, friendDtos.map { it.friendStreamId })
         val mainCurrency = user.currency?.let { Currency.getInstance(user.currency) } ?: Currency.getInstance("USD")
-        val friends = events.map {
+        val friends = friendDtos.map {
             FriendDto(
                 friendId = it.friendStreamId,
                 email = it.email,
@@ -91,6 +86,9 @@ class FriendService(
             friendDto.friendId
         ) ?: throw IllegalArgumentException("Friend not found")
 
+        if (friend.deleted) {
+            throw IllegalArgumentException("Friend is deleted")
+        }
         friendsEventHandler.addEvent(
             FriendUpdated(
                 userId = userId,
@@ -105,13 +103,31 @@ class FriendService(
         )
         makeMeThisUsersFriendAsWell(friendDto.email, friendDto.phoneNumber, user)
         val friendUser = friendFinderStrategy.findUserFriend(userId, friendDto.email, friendDto.phoneNumber)
+        if (friendUser.friendUid == null) {
+            return
+        }
+        val findSelf = friendFinderStrategy.findUserFriend(friendUser.friendUid, user.email, user.phoneNumber)
         val friendModel =
-            friendUser.friendUid?.let { friendsEventHandler.findByUserUidAndFriendId(it, friendDto.friendId) }
+            friendsEventHandler.findByUserUidAndFriendId(friendUser.friendUid, findSelf.friendStreamId)
         friendModel?.let {
             transactionEventHandler.syncTransactions(friendModel, friend)
         }
     }
 
+    suspend fun deleteFriend(userId: String, friendId: UUID) {
+        userEventHandler.findUserById(userId) ?: throw IllegalArgumentException("User $userId not found")
+        val friend = friendsEventHandler.findByUserUidAndFriendId(userId, friendId)
+            ?: throw IllegalArgumentException("Friend not found")
+        friendsEventHandler.addEvent(
+            FriendDeleted(
+                userId = userId,
+                createdAt = Instant.now(),
+                streamId = friend.streamId,
+                version = friend.version + 1,
+                createdBy = userId,
+            )
+        )
+    }
 
     private suspend fun validateFriendInformation(
         friendDto: BaseFriendDto,
@@ -196,25 +212,7 @@ class FriendService(
             val friendUser =
                 allFriends.find { it.friendEmail == user.email || it.friendPhoneNumber == user.phoneNumber }
             friendUser?.let { transactionEventHandler.syncTransactions(friend, friendUser) }
-            Json.prettyPrint(transactionEventRepository.findAll().toList())
         }
-    }
-
-
-    suspend fun findFriendAndUserStreamId(
-        userUid: String,
-        userEmail: String?,
-        userPhone: String?,
-        recipientId: UUID,
-    ): Pair<UserDto?, UUID?> {
-        val friend = friendsEventHandler.findFriendByUserIdAndFriendId(userUid, recipientId)
-            ?: throw IllegalArgumentException("User with id $userUid does not have friend with id $recipientId")
-        val friendUser = userEventHandler.findUserByEmailOrPhoneNumber(friend.email, friend.phoneNumber)
-        val userStreamId = friendUser?.let {
-            friendsEventHandler.findFriendStreamIdByEmailOrPhoneNumber(friendUser.uid, userEmail, userPhone)
-                ?: throw IllegalArgumentException("Friend with email ${friend.email} or phone number ${friend.phoneNumber} does not exist")
-        }
-        return Pair(friendUser, userStreamId)
     }
 
     suspend fun findByUserIdFriendId(userId: String, friendEmail: String?, friendPhone: String?): FriendDto {

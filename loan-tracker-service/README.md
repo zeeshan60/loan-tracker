@@ -184,3 +184,12 @@ nslookup -type=A loantracker.zflashstudios.com 8.8.8.8
 #kill a task running on port in mac
 lsof -i :8081 | grep LISTEN | awk '{print $2}' | xargs kill -9
 ```
+
+```bash
+# if deployment stops most likely deploy script is killed
+nohup python3 /home/ec2-user/app.py &
+#smaple curl
+curl --location --request POST 'https://loandeploy.codewithzeeshan.com/deploy' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer 49cf14928048efa5569abb0b6330251d'
+```
