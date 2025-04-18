@@ -6,8 +6,6 @@ import com.zeenom.loan_tracker.transactions.TransactionEventHandler
 import com.zeenom.loan_tracker.transactions.TransactionEventRepository
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventHandler
-import io.swagger.v3.core.util.Json
-import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.util.*
@@ -201,23 +199,6 @@ class FriendService(
                 allFriends.find { it.friendEmail == user.email || it.friendPhoneNumber == user.phoneNumber }
             friendUser?.let { transactionEventHandler.syncTransactions(friend, friendUser) }
         }
-    }
-
-
-    suspend fun findFriendAndUserStreamId(
-        userUid: String,
-        userEmail: String?,
-        userPhone: String?,
-        recipientId: UUID,
-    ): Pair<UserDto?, UUID?> {
-        val friend = friendsEventHandler.findFriendByUserIdAndFriendId(userUid, recipientId)
-            ?: throw IllegalArgumentException("User with id $userUid does not have friend with id $recipientId")
-        val friendUser = userEventHandler.findUserByEmailOrPhoneNumber(friend.email, friend.phoneNumber)
-        val userStreamId = friendUser?.let {
-            friendsEventHandler.findFriendStreamIdByEmailOrPhoneNumber(friendUser.uid, userEmail, userPhone)
-                ?: throw IllegalArgumentException("Friend with email ${friend.email} or phone number ${friend.phoneNumber} does not exist")
-        }
-        return Pair(friendUser, userStreamId)
     }
 
     suspend fun findByUserIdFriendId(userId: String, friendEmail: String?, friendPhone: String?): FriendDto {
