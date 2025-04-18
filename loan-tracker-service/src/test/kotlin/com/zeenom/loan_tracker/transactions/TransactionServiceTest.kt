@@ -82,7 +82,9 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
             updatedBy = null,
             updatedByName = null,
             deleted = false,
-            transactionDate = Instant.parse("2025-02-27T00:00:00Z")
+            transactionDate = Instant.parse("2025-02-27T00:00:00Z"),
+            defaultCurrency = null,
+            amountInDefaultCurrency = null,
         )
 
         transactionService.addTransaction(
@@ -129,6 +131,8 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
             deleted = false,
             transactionDate = Instant.parse("2025-02-27T00:00:00Z"),
             transactionStreamId = UUID.randomUUID(),
+            defaultCurrency = null,
+            amountInDefaultCurrency = null,
         )
 
         transactionService.addTransaction(
@@ -190,6 +194,8 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
             deleted = false,
             transactionDate = Instant.parse("2025-02-27T00:00:00Z"),
             transactionStreamId = UUID.randomUUID(),
+            defaultCurrency = null,
+            amountInDefaultCurrency = null,
         )
 
         assertThatThrownBy {
@@ -241,6 +247,8 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
             deleted = false,
             transactionDate = Instant.parse("2025-02-27T00:00:00Z"),
             transactionStreamId = UUID.randomUUID(),
+            defaultCurrency = null,
+            amountInDefaultCurrency = null,
         )
 
         assertThatThrownBy { runBlocking { transactionService.addTransaction("123", transactionDto) } }
@@ -273,6 +281,8 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
             deleted = false,
             transactionDate = Instant.parse("2025-02-27T00:00:00Z"),
             transactionStreamId = UUID.randomUUID(),
+            defaultCurrency = null,
+            amountInDefaultCurrency = null,
         )
 
         transactionService.addTransaction(
@@ -351,6 +361,8 @@ class TransactionServiceTest(@Autowired private val transactionEventRepository: 
             deleted = false,
             transactionDate = Instant.parse("2025-02-27T00:00:00Z"),
             transactionStreamId = UUID.randomUUID(),
+            defaultCurrency = null,
+            amountInDefaultCurrency = null,
         )
 
         transactionService.addTransaction(

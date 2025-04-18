@@ -62,6 +62,13 @@ class TransactionsController(
             currency = currency.currencyCode,
             isOwed = splitType.isOwed()
         ),
+        defaultCurrencyAmountResponse = amountInDefaultCurrency?.let {
+            AmountResponse(
+                amount = amountInDefaultCurrency,
+                currency = defaultCurrency ?: throw IllegalStateException("Default currency is required"),
+                isOwed = splitType.isOwed()
+            )
+        },
         history = history.groupBy { Pair(it.date, it.changedBy) }.map {
             ChangeSummaryResponse(
                 changedBy = it.value.first().changedBy,
@@ -197,7 +204,9 @@ class TransactionsController(
                 phoneNumber = null,
                 photoUrl = null,
                 name = null
-            )
+            ),
+            defaultCurrency = null,
+            amountInDefaultCurrency = null,
         )
 }
 
@@ -258,6 +267,7 @@ data class TransactionResponse(
     val splitType: SplitType,
     val friend: FriendSummaryDto,
     val amountResponse: AmountResponse,
+    val defaultCurrencyAmountResponse: AmountResponse?,
     val history: List<ChangeSummaryResponse>,
     val createdAt: Instant,
     val updatedAt: Instant?,

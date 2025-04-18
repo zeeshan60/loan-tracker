@@ -209,7 +209,9 @@ class TransactionService(
                 friendUsersByStreamId = friendUsersByStreamId,
                 friendUsersByUserId = friendUsersByUid,
                 userDto = user,
-                history = it.changeSummary
+                history = it.changeSummary,
+                currencyRateMap = currencyClient.fetchCurrencies().rates,
+                baseCurrency = user.currency?.let { Currency.getInstance(it).currencyCode } ?: "USD"
             )
         }.let {
             TransactionsDto(
@@ -286,7 +288,9 @@ class TransactionService(
                         friendUsersByStreamId = friendUsersByStreamId,
                         friendUsersByUserId = friendUsersByUid,
                         userDto = user,
-                        history = transactionWithLogs.changeSummary
+                        history = transactionWithLogs.changeSummary,
+                        currencyRateMap = currencyClient.fetchCurrencies().rates,
+                        baseCurrency = user.currency?.let { Currency.getInstance(it).currencyCode } ?: "USD"
                     ),
                 )
             }
@@ -300,7 +304,9 @@ class TransactionService(
             friendUsersByStreamId = friendUsersByStreamId,
             friendUsersByUserId = friendUsersByUid,
             userDto = user,
-            history = emptyList()
+            history = emptyList(),
+            currencyRateMap = currencyClient.fetchCurrencies().rates,
+            baseCurrency = user.currency?.let { Currency.getInstance(it).currencyCode } ?: "USD"
         )
     }
 
@@ -309,6 +315,8 @@ class TransactionService(
         friendUsersByUserId: Map<String, FriendUserDto>,
         userDto: UserDto,
         history: List<ChangeSummary>,
+        currencyRateMap: Map<String, BigDecimal>,
+        baseCurrency: String,
     ): TransactionDto {
         return TransactionDto(
             currency = Currency.getInstance(currency),
@@ -342,7 +350,14 @@ class TransactionService(
             updatedAt = updatedAt,
             updatedBy = updatedBy,
             updatedByName = if (updatedBy == userDto.uid) "You" else friendUsersByUserId[updatedBy]?.name,
-            transactionDate = transactionDate
+            transactionDate = transactionDate,
+            defaultCurrency = baseCurrency,
+            amountInDefaultCurrency = allTimeBalanceStrategy.convertCurrency(
+                amount = totalAmount,
+                currentCurrency = currency,
+                targetCurrency = baseCurrency,
+                currencyRateMap = currencyRateMap,
+            )
         )
     }
 }

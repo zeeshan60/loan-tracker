@@ -37,6 +37,14 @@ class ActivityLogsQuery(
                         currency = log.transactionDto.currency.currencyCode,
                         isOwed = log.transactionDto.splitType.isOwed()
                     ),
+                    defaultCurrencyAmountResponse = log.transactionDto.amountInDefaultCurrency?.let {
+                        AmountResponse(
+                            amount = log.transactionDto.amountInDefaultCurrency,
+                            currency = log.transactionDto.defaultCurrency
+                                ?: throw IllegalStateException("Default currency is required"),
+                            isOwed = log.transactionDto.splitType.isOwed()
+                        )
+                    },
                     history = log.transactionDto.history.groupBy { Pair(it.date, it.changedBy) }
                         .map {
                             ChangeSummaryResponse(

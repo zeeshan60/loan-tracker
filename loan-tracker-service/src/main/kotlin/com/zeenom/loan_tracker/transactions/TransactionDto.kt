@@ -13,6 +13,8 @@ data class TransactionsDto(
 )
 
 data class TransactionDto(
+    val defaultCurrency: String?,
+    val amountInDefaultCurrency: BigDecimal?,
     val currency: Currency,
     val description: String,
     val originalAmount: BigDecimal,

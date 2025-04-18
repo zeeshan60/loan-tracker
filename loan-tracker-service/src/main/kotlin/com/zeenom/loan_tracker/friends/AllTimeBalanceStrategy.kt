@@ -48,6 +48,7 @@ class AllTimeBalanceStrategy {
             ?: throw IllegalArgumentException("Currency rate for $targetCurrency not found")
         val currentRate = currencyRateMap[currentCurrency]
             ?: throw IllegalArgumentException("Currency rate for $currentCurrency not found")
-        return amount.multiply(rate).divide(currentRate, 10, RoundingMode.HALF_UP).setScale(2, RoundingMode.HALF_UP).stripTrailingZeros()
+        return amount.multiply(rate).divide(currentRate, 10, RoundingMode.HALF_UP).setScale(2, RoundingMode.HALF_UP)
+            .stripTrailingZeros().toPlainString().toBigDecimal()
     }
 }
