@@ -1,5 +1,6 @@
 package com.zeenom.loan_tracker.friends
 
+import com.zeenom.loan_tracker.common.MessageResponse
 import com.zeenom.loan_tracker.common.Paginated
 import com.zeenom.loan_tracker.common.PaginationDto
 import com.zeenom.loan_tracker.events.CommandDto
@@ -97,7 +98,7 @@ class FriendsController(
     suspend fun deleteFriend(
         @PathVariable friendId: UUID,
         @AuthenticationPrincipal userId: String,
-    ): String {
+    ): MessageResponse {
         logger.info("Deleting friend $friendId for user $userId")
         deleteFriendCommand.execute(
             CommandDto(
@@ -106,7 +107,7 @@ class FriendsController(
                 userId = userId
             )
         )
-        return "Friend with ID $friendId deleted successfully"
+        return MessageResponse("Friend with ID $friendId deleted successfully")
     }
 
 }
