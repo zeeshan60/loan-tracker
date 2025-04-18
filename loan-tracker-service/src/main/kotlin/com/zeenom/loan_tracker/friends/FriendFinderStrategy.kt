@@ -31,8 +31,7 @@ class FriendFinderStrategy(
     }
 
     suspend fun findUserFriend(userId: String, friendEmail: String?, friendPhone: String?): FriendUserDto {
-        val friend = friendEmail?.let { friendsEventHandler.findByUserUidAndFriendEmail(userId, friendEmail) }
-            ?: friendPhone?.let { friendsEventHandler.findByUserUidAndFriendPhoneNumber(userId, friendPhone) }
+        val friend = findFriendModel(userId = userId, friendEmail = friendEmail, friendPhone = friendPhone)
             ?: throw IllegalStateException("Friend not found with email or phone")
         val user = friend.friendPhoneNumber?.let { userEventHandler.findUserByPhoneNumber(friend.friendPhoneNumber) }
             ?: friend.friendEmail?.let { userEventHandler.findUserByEmail(friend.friendEmail) }
@@ -44,5 +43,15 @@ class FriendFinderStrategy(
             name = friend.friendDisplayName,
             photoUrl = user?.photoUrl,
         )
+    }
+
+    suspend fun findFriendModel(
+        userId: String,
+        friendEmail: String?,
+        friendPhone: String?
+    ): FriendModel? {
+        val friend = friendEmail?.let { friendsEventHandler.findByUserUidAndFriendEmail(userId, friendEmail) }
+            ?: friendPhone?.let { friendsEventHandler.findByUserUidAndFriendPhoneNumber(userId, friendPhone) }
+        return friend
     }
 }

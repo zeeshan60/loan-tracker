@@ -3,9 +3,10 @@ package com.zeenom.loan_tracker.friends
 import com.zeenom.loan_tracker.transactions.AmountDto
 import com.zeenom.loan_tracker.transactions.ICurrencyClient
 import com.zeenom.loan_tracker.transactions.TransactionEventHandler
+import com.zeenom.loan_tracker.transactions.TransactionEventRepository
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventHandler
-import kotlinx.coroutines.flow.emptyFlow
+import io.swagger.v3.core.util.Json
 import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -19,6 +20,8 @@ class FriendService(
     private val friendFinderStrategy: FriendFinderStrategy,
     private val allTimeBalanceStrategy: AllTimeBalanceStrategy,
     private val currencyClient: ICurrencyClient,
+    private val friendEventRepository: FriendEventRepository,
+    private val transactionEventRepository: TransactionEventRepository,
 ) {
 
     suspend fun findAllByUserId(userId: String): FriendsWithAllTimeBalancesDto {
@@ -62,8 +65,7 @@ class FriendService(
 
     suspend fun createFriend(userId: String, friendDto: CreateFriendDto) {
         val user = userEventHandler.findUserById(userId) ?: throw IllegalArgumentException("User $userId not found")
-        validateFriendInformation(friendDto, user)
-
+        validateFriendInformation(friendDto = friendDto, user = user, friendId = null)
 
         friendsEventHandler.addEvent(
             FriendCreated(
@@ -83,7 +85,7 @@ class FriendService(
 
     suspend fun updateFriend(userId: String, friendDto: UpdateFriendDto) {
         val user = userEventHandler.findUserById(userId) ?: throw IllegalArgumentException("User $userId not found")
-        validateFriendInformation(friendDto, user)
+        validateFriendInformation(friendDto = friendDto, user = user, friendId = friendDto.friendId)
         val friend = friendsEventHandler.findByUserUidAndFriendId(
             userId,
             friendDto.friendId
@@ -101,12 +103,20 @@ class FriendService(
                 createdBy = userId,
             )
         )
+        makeMeThisUsersFriendAsWell(friendDto.email, friendDto.phoneNumber, user)
+        val friendUser = friendFinderStrategy.findUserFriend(userId, friendDto.email, friendDto.phoneNumber)
+        val friendModel =
+            friendUser.friendUid?.let { friendsEventHandler.findByUserUidAndFriendId(it, friendDto.friendId) }
+        friendModel?.let {
+            transactionEventHandler.syncTransactions(friendModel, friend)
+        }
     }
 
 
     private suspend fun validateFriendInformation(
         friendDto: BaseFriendDto,
-        user: UserDto
+        user: UserDto,
+        friendId: UUID?
     ) {
         if (friendDto.email == null && friendDto.phoneNumber == null) {
             throw IllegalArgumentException("Email or phone number is required")
@@ -118,11 +128,17 @@ class FriendService(
 
         if (friendDto.email != null)
             friendsEventHandler.findByUserUidAndFriendEmail(user.uid, friendDto.email!!)
-                ?.let { throw IllegalArgumentException("Friend with email ${friendDto.email} already exist") }
+                ?.let {
+                    if (friendId == null || it.streamId != friendId)
+                        throw IllegalArgumentException("Friend with email ${friendDto.email} already exist")
+                }
 
         if (friendDto.phoneNumber != null)
             friendsEventHandler.findByUserUidAndFriendPhoneNumber(user.uid, friendDto.phoneNumber!!)
-                ?.let { throw IllegalArgumentException("Friend with phone number ${friendDto.phoneNumber} already exist") }
+                ?.let {
+                    if (friendId == null || it.streamId != friendId)
+                        throw IllegalArgumentException("Friend with phone number ${friendDto.phoneNumber} already exist")
+                }
     }
 
     private suspend fun makeMeThisUsersFriendAsWell(friendEmail: String?, phoneNumber: String?, me: UserDto) {
@@ -164,15 +180,24 @@ class FriendService(
 
     suspend fun searchUsersImFriendOfAndAddThemAsMyFriends(uid: String) {
         val user = userEventHandler.findUserById(uid) ?: throw IllegalArgumentException("User not found")
-        val emailFriends = user.email?.let { friendsEventHandler.findByFriendEmail(user.email) } ?: emptyFlow()
+        val emailFriends = user.email?.let { friendsEventHandler.findByFriendEmail(user.email) } ?: emptyList()
         val phoneFriends =
-            user.phoneNumber?.let { friendsEventHandler.findByFriendPhoneNumber(user.phoneNumber) } ?: emptyFlow()
+            user.phoneNumber?.let { friendsEventHandler.findByFriendPhoneNumber(user.phoneNumber) } ?: emptyList()
 
-        val myFriendIds = emailFriends.toList().plus(phoneFriends.toList()).map { it.userUid }.distinct()
+        val allFriends = emailFriends.plus(phoneFriends).distinct()
+        val myFriendIds = allFriends.map { it.userUid }
         val friends =
-            userEventHandler.findUsersByUids(myFriendIds).toList()
+            userEventHandler.findUsersByUids(myFriendIds)
 
         friendsEventHandler.saveAllUsersAsFriends(uid, friends)
+
+        val userFriends = friendsEventHandler.findAllFriendsByUserId(uid)
+        userFriends.forEach { friend ->
+            val friendUser =
+                allFriends.find { it.friendEmail == user.email || it.friendPhoneNumber == user.phoneNumber }
+            friendUser?.let { transactionEventHandler.syncTransactions(friend, friendUser) }
+            Json.prettyPrint(transactionEventRepository.findAll().toList())
+        }
     }
 
 

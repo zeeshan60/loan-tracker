@@ -63,12 +63,14 @@ class FriendsEventHandler(
         }
     }
 
-    suspend fun findByFriendEmail(email: String): Flow<FriendEvent> {
-        return eventRepository.findByFriendEmail(email)
+    suspend fun findByFriendEmail(email: String): List<FriendModel> {
+        return eventRepository.findByFriendEmail(email).toList().groupBy { it.streamId }
+            .mapNotNull { resolveStream(it.value.map { it.toEvent() }) }
     }
 
-    suspend fun findByFriendPhoneNumber(phoneNumber: String): Flow<FriendEvent> {
-        return eventRepository.findByFriendPhoneNumber(phoneNumber)
+    suspend fun findByFriendPhoneNumber(phoneNumber: String): List<FriendModel> {
+        return eventRepository.findByFriendPhoneNumber(phoneNumber).toList().groupBy { it.streamId }
+            .mapNotNull { resolveStream(it.value.map { it.toEvent() }) }
     }
 
     suspend fun findFriendByUserIdAndFriendId(userUid: String, friendId: UUID): FriendId? {
