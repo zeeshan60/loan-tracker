@@ -18,6 +18,8 @@ import { FriendTransactionsComponent } from '../friend-transactions/friend-trans
 import { ShortenNamePipe } from '../../pipes/shorten-name.pipe';
 import { SelectFriendComponent } from '../../define-expense/select-friend/select-friend.component';
 import { DefineExpenseService } from '../../define-expense/define-expense.service';
+import { isMobile } from '../../utils';
+import { AddFriendComponent } from '../../add-friend/add-friend.component';
 
 @Component({
   selector: 'app-list-friends',
@@ -64,18 +66,19 @@ export class ListFriendsComponent  implements OnInit {
   }
 
   async addFriend() {
-    this.defineExpenseService.selectFriendModalInstance = await this.modalCtrl.create({
-      component: SelectFriendComponent,
-      componentProps: {
-        context: 'AddFriend'
-      }
-    })
-    await this.defineExpenseService.selectFriendModalInstance.present();
-
-    const { data, role } = await this.defineExpenseService.selectFriendModalInstance.onWillDismiss();
-    if (role === 'confirm') {
-      console.log(data);
+    if (isMobile) {
+      this.defineExpenseService.selectFriendModalInstance = await this.modalCtrl.create({
+        component: SelectFriendComponent,
+        componentProps: {
+          context: 'AddFriend'
+        }
+      })
+      await this.defineExpenseService.selectFriendModalInstance.present();
+    } else {
+      const modal = await this.modalCtrl.create({
+        component: AddFriendComponent,
+      })
+      modal.present();
     }
-    return role;
   }
 }

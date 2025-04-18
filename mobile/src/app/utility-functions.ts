@@ -16,7 +16,7 @@ export function toNationalPhone(internationalPhone: string) {
 
 export function toInternationalPhone(nationalPhone: string, countryCode: string) {
   const phoneNumberInter = parsePhoneNumber(nationalPhone, countryCode as CountryCode);
-  return phoneNumberInter?.formatInternational() || '';
+  return phoneNumberInter?.number || '';
 }
 
 export function extractCountryCode(internationalPhone: string) {

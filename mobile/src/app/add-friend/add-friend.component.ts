@@ -18,7 +18,7 @@ import {
   ModalController,
 } from '@ionic/angular/standalone';
 import {
-  FormBuilder, FormGroup,
+  FormBuilder, FormControl, FormGroup,
   FormsModule,
   ReactiveFormsModule,
   Validators,
@@ -61,7 +61,7 @@ export class AddFriendComponent implements OnInit {
   readonly loading = signal(false);
   public addFriendForm = this.formBuilder.group({
     name: this.formBuilder.nonNullable.control('', [Validators.required]),
-    email: ['', Validators.email],
+    email: new FormControl<string|null>(null, [Validators.email]),
     phone: this.formBuilder.group({
       phoneNumber: this.formBuilder.nonNullable.control(''),
       country: this.formBuilder.nonNullable.control(COUNTRIES_WITH_CALLING_CODES[0].code),
@@ -102,7 +102,7 @@ export class AddFriendComponent implements OnInit {
         this.loading.set(true);
         const mappedValue = {
           name: this.addFriendForm.get('name')!.value,
-          email: this.addFriendForm.get('email')!.value,
+          email: this.addFriendForm.get('email')!.value || null,
           phoneNumber: toInternationalPhone(this.addFriendForm.get('phone.phoneNumber')!.value, this.addFriendForm.get('phone.country')!.value),
         }
         const friend = this.isUpdating() ?

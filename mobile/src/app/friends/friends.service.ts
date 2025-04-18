@@ -48,7 +48,6 @@ export class FriendsService {
   }
 
   deleteFriend(friend: FriendWithBalance) {
-    return timer(1000).pipe(map((response) => true));
-    // return this.http.delete(PRIVATE_API + '/friends/delete')
+    return this.http.delete(PRIVATE_API + `/friends/${friend.friendId}`)
   }
 }

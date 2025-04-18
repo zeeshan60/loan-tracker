@@ -91,6 +91,7 @@ export class FriendTransactionsComponent {
 
   async deleteFriend() {
     await this.friendsStore.deleteFriend(this.friend());
+    await this.nav.pop();
   }
 
   async editFriendInfo() {
