@@ -121,7 +121,7 @@ class FriendControllerIntegrationTest() : BaseIntegration() {
         val existing = queryFriend(zeeToken)
         val friendRequest = FriendRequest(
             email = "johnupdated@gmail.com",
-            phoneNumber = johnDto.phoneNumber + "1",
+            phoneNumber = johnDto.phoneNumber,
             name = "John Doe Updated",
         )
 
@@ -139,7 +139,9 @@ class FriendControllerIntegrationTest() : BaseIntegration() {
 
         assertThat(response.data.friends).hasSize(1)
         assertThat(response.data.friends[0].name).isEqualTo("John Doe Updated")
-        assertThat(response.data.friends[0].photoUrl).isNull()
+        assertThat(response.data.friends[0].email).isEqualTo("johnupdated@gmail.com")
+        assertThat(response.data.friends[0].phone).isEqualTo(johnDto.phoneNumber)
+        assertThat(response.data.friends[0].photoUrl).isNotNull
         assertThat(response.data.friends[0].mainBalance).isNull()
         assertThat(response.data.friends[0].otherBalances).isEmpty()
         assertThat(response.data.friends[0].friendId).isEqualTo(existing.data.friends[0].friendId)
