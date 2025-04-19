@@ -8,18 +8,18 @@ import java.util.*
 
 @Schema(description = "Request to create a new friend. Either email or phone number must be provided.")
 data class FriendRequest(
-    @field:Schema(description = "Email address of the friend", example = "friend@example.com")
+    @Schema(description = "Email address of the friend", example = "friend@example.com")
     @field:Email(message = "Invalid email format")
     var email: String? = null,
 
-    @field:Schema(description = "Phone number of the friend", example = "+1234567890")
+    @Schema(description = "Phone number of the friend", example = "+1234567890")
     @field:Pattern(
         regexp = "\\+?[0-9]+",
         message = "Invalid phone number format"
     )
     var phoneNumber: String? = null,
 
-    @field:Schema(description = "Name of the friend", required = true, example = "John Doe")
+    @Schema(description = "Name of the friend", required = true, example = "John Doe")
     var name: String
 ) {
     init {

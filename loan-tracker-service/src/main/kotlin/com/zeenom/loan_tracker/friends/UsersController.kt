@@ -5,8 +5,6 @@ import com.zeenom.loan_tracker.events.CommandType
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.Pattern
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
@@ -65,16 +63,14 @@ class UsersController(
     }
 }
 
+@Schema(description = "Request to update user details. Null values will not update the field")
 data class UpdateUserRequest(
-    @Schema(description = "User display name. Passing null will not update the field")
     var displayName: String?,
-    @Schema(description = "User phone number. Passing null will not update the field")
     @field:Pattern(
         regexp = "\\+?[0-9]+",
         message = "Invalid phone number format"
     )
     var phoneNumber: String?,
-    @Schema(description = "User currency. Passing null will not update the field")
     var currency: String?,
 ) {
     init {
