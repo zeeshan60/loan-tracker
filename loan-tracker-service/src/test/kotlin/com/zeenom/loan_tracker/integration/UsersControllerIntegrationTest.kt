@@ -6,11 +6,13 @@ import com.zeenom.loan_tracker.friends.UserResponse
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventRepository
 import kotlinx.coroutines.runBlocking
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.web.server.LocalServerPort
+import java.net.http.HttpHeaders
 
 class UsersControllerIntegrationTest(@LocalServerPort private val port: Int) : BaseIntegration() {
 
@@ -49,11 +51,11 @@ class UsersControllerIntegrationTest(@LocalServerPort private val port: Int) : B
     @Test
     fun `update user successfully`(): Unit = runBlocking {
         val userRequest = UpdateUserRequest(
-            displayName = "Zeeshan Tufail",
-            phoneNumber = "+923001234567",
+            displayName = null,
+            phoneNumber = "+923001234568",
             currency = "USD"
         )
-        val userResponse = webTestClient.put()
+        webTestClient.put()
             .uri("/api/v1/users")
             .header("Authorization", "Bearer $zeeToken")
             .bodyValue(userRequest)
@@ -62,9 +64,17 @@ class UsersControllerIntegrationTest(@LocalServerPort private val port: Int) : B
             .expectBody(UserResponse::class.java)
             .returnResult().responseBody!!
 
-        assert(userResponse.displayName == userRequest.displayName)
-        assert(userResponse.phoneNumber == userRequest.phoneNumber)
-        assert(userResponse.currency == userRequest.currency)
+        val userResponse = webTestClient.get()
+            .uri("/api/v1/users")
+            .header("Authorization", "Bearer $zeeToken")
+            .exchange()
+            .expectStatus().isOk
+            .expectBody(UserResponse::class.java)
+            .returnResult().responseBody!!
+
+        assertThat(userResponse.displayName).isEqualTo(zeeDto.displayName)
+        assertThat(userResponse.phoneNumber).isEqualTo(userRequest.phoneNumber)
+        assertThat(userResponse.currency).isEqualTo(userRequest.currency)
     }
 
 }

@@ -42,22 +42,54 @@ class UserService(
 
     suspend fun updateUser(userDto: UserUpdateDto) {
 
-        val existing = userEventHandler.findUserModelByUid(userDto.uid)
+        var existing = userEventHandler.findUserModelByUid(userDto.uid)
             ?: throw IllegalArgumentException("User with this unique identifier does not exist")
 
-        if (existing.currency == userDto.currency) {
-            return
-        }
-        userEventHandler.addEvent(
-            UserCurrencyChanged(
-                userId = userDto.uid,
-                currency = userDto.currency,
-                createdAt = Instant.now(),
-                streamId = existing.streamId,
-                version = existing.version + 1,
-                createdBy = userDto.uid
+
+        if (userDto.currency != null && userDto.currency != existing.currency) {
+            userEventHandler.addEvent(
+                UserCurrencyChanged(
+                    userId = userDto.uid,
+                    currency = userDto.currency,
+                    createdAt = Instant.now(),
+                    streamId = existing.streamId,
+                    version = existing.version + 1,
+                    createdBy = userDto.uid
+                ).also {
+                    existing = it.applyEvent(existing)
+                }
             )
-        )
+        }
+
+        if (userDto.displayName != null && userDto.displayName != existing.displayName) {
+            userEventHandler.addEvent(
+                UserDisplayNameChanged(
+                    userId = userDto.uid,
+                    displayName = userDto.displayName,
+                    createdAt = Instant.now(),
+                    streamId = existing.streamId,
+                    version = existing.version + 1,
+                    createdBy = userDto.uid
+                ).also {
+                    existing = it.applyEvent(existing)
+                }
+            )
+        }
+
+        if (userDto.phoneNumber != null && userDto.phoneNumber != existing.phoneNumber) {
+            userEventHandler.addEvent(
+                UserPhoneNumberChanged(
+                    userId = userDto.uid,
+                    phoneNumber = userDto.phoneNumber,
+                    createdAt = Instant.now(),
+                    streamId = existing.streamId,
+                    version = existing.version + 1,
+                    createdBy = userDto.uid
+                ).also {
+                    existing = it.applyEvent(existing)
+                }
+            )
+        }
     }
 
     suspend fun findUserById(uid: String): UserDto? {

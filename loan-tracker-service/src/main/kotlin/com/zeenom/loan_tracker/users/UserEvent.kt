@@ -40,10 +40,25 @@ data class UserEvent(
                 streamId = streamId,
                 createdBy = uid
             )
-
             UserEventType.CURRENCY_CHANGED -> UserCurrencyChanged(
                 userId = uid,
                 currency = currency ?: throw IllegalStateException("Currency is required"),
+                createdAt = createdAt,
+                version = version,
+                streamId = streamId,
+                createdBy = uid
+            )
+            UserEventType.PHONE_NUMBER_CHANGED -> UserPhoneNumberChanged(
+                userId = uid,
+                phoneNumber = phoneNumber,
+                createdAt = createdAt,
+                version = version,
+                streamId = streamId,
+                createdBy = uid
+            )
+            UserEventType.DISPLAY_NAME_CHANGED -> UserDisplayNameChanged(
+                userId = uid,
+                displayName = displayName ?: throw IllegalStateException("Display name is required"),
                 createdAt = createdAt,
                 version = version,
                 streamId = streamId,
@@ -151,7 +166,91 @@ data class UserCurrencyChanged(
     }
 }
 
+data class UserPhoneNumberChanged(
+    val phoneNumber: String?,
+    override val userId: String,
+    override val createdAt: Instant,
+    override val version: Int,
+    override val streamId: UUID,
+    override val createdBy: String,
+) : IUserEvent {
+    override fun toEntity(): UserEvent {
+        return UserEvent(
+            uid = userId,
+            streamId = streamId,
+            displayName = null,
+            phoneNumber = phoneNumber,
+            email = null,
+            photoUrl = null,
+            emailVerified = null,
+            currency = null,
+            createdAt = createdAt,
+            version = version,
+            eventType = UserEventType.PHONE_NUMBER_CHANGED
+        )
+    }
+
+    override fun applyEvent(existing: UserModel?): UserModel {
+        requireNotNull(existing) { "User must exist" }
+        return UserModel(
+            uid = existing.uid,
+            streamId = existing.streamId,
+            displayName = existing.displayName,
+            phoneNumber = phoneNumber,
+            email = existing.email,
+            photoUrl = existing.photoUrl,
+            currency = existing.currency,
+            emailVerified = existing.emailVerified,
+            createdAt = createdAt,
+            version = version
+        )
+    }
+}
+
+data class UserDisplayNameChanged(
+    val displayName: String,
+    override val userId: String,
+    override val createdAt: Instant,
+    override val version: Int,
+    override val streamId: UUID,
+    override val createdBy: String,
+) : IUserEvent {
+    override fun toEntity(): UserEvent {
+        return UserEvent(
+            uid = userId,
+            streamId = streamId,
+            displayName = displayName,
+            phoneNumber = null,
+            email = null,
+            photoUrl = null,
+            emailVerified = null,
+            currency = null,
+            createdAt = createdAt,
+            version = version,
+            eventType = UserEventType.DISPLAY_NAME_CHANGED
+        )
+    }
+
+    override fun applyEvent(existing: UserModel?): UserModel {
+        requireNotNull(existing) { "User must exist" }
+        return UserModel(
+            uid = existing.uid,
+            streamId = existing.streamId,
+            displayName = displayName,
+            phoneNumber = existing.phoneNumber,
+            email = existing.email,
+            photoUrl = existing.photoUrl,
+            currency = existing.currency,
+            emailVerified = existing.emailVerified,
+            createdAt = createdAt,
+            version = version
+        )
+    }
+}
+
 enum class UserEventType {
     USER_CREATED,
     CURRENCY_CHANGED,
+    PHONE_NUMBER_CHANGED,
+    DISPLAY_NAME_CHANGED,
 }

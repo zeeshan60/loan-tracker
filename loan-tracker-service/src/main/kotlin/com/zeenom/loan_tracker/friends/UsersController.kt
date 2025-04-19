@@ -3,6 +3,7 @@ package com.zeenom.loan_tracker.friends
 import com.zeenom.loan_tracker.events.CommandDto
 import com.zeenom.loan_tracker.events.CommandType
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.Schema
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -64,8 +65,11 @@ class UsersController(
 }
 
 data class UpdateUserRequest(
-    val displayName: String,
+    @Schema(description = "User display name. Passing null will not update the field")
+    val displayName: String?,
+    @Schema(description = "User phone number. Passing null will not update the field")
     val phoneNumber: String?,
+    @Schema(description = "User currency. Passing null will not update the field")
     val currency: String?,
 )
 
