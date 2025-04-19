@@ -4,6 +4,7 @@ import com.zeenom.loan_tracker.events.CommandDto
 import com.zeenom.loan_tracker.events.CommandType
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Schema
+import jakarta.validation.constraints.Pattern
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -66,12 +67,30 @@ class UsersController(
 
 data class UpdateUserRequest(
     @Schema(description = "User display name. Passing null will not update the field")
-    val displayName: String?,
+    var displayName: String?,
     @Schema(description = "User phone number. Passing null will not update the field")
-    val phoneNumber: String?,
+    @field:Pattern(
+        regexp = "\\+?[0-9]+",
+        message = "Invalid phone number format"
+    )
+    var phoneNumber: String?,
     @Schema(description = "User currency. Passing null will not update the field")
-    val currency: String?,
-)
+    var currency: String?,
+) {
+    init {
+        if (phoneNumber != null && phoneNumber!!.isBlank()) {
+            phoneNumber = null
+        }
+
+        if (displayName != null && displayName!!.isBlank()) {
+            displayName = null
+        }
+
+        if (currency != null && currency!!.isBlank()) {
+            currency = null
+        }
+    }
+}
 
 data class UserResponse(
     val uid: String,
