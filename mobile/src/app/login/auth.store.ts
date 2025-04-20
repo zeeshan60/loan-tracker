@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 import { ModalController, ToastController } from '@ionic/angular/standalone';
 import { StorageService } from '../services/storage.service';
 import { MethodsDictionary } from '@ngrx/signals/src/signal-store-models';
-import { PRIVATE_API, PUBLIC_API } from '../constants';
+import { DEFAULT_TOAST_DURATION, PRIVATE_API, PUBLIC_API } from '../constants';
 import { LoadingController } from '@ionic/angular/standalone';
 import { FriendsStore } from '../friends/friends.store';
 import { LoginPlugin } from 'zeenom/src';
@@ -54,7 +54,7 @@ const initialState: AuthState = {
 }
 
 interface Methods extends MethodsDictionary {
-  loginWithGoogle(): Promise<void>;
+  loginWithGoogle(): Promise<boolean|void>;
   setApiKey(): Promise<void>;
   signOut(): Promise<void>;
   login(idToken?: string): Promise<void>;
@@ -99,13 +99,13 @@ export const AuthStore = signalStore(
       } catch (e) {
         await toastCtrl.create({
           message: 'Unable to save data.',
-          duration: 1500
+          duration: DEFAULT_TOAST_DURATION
         });
       } finally {
         await loader.dismiss();
       }
     },
-    async loginWithGoogle(): Promise<void> {
+    async loginWithGoogle(): Promise<boolean|void> {
       const inputValue = JSON.stringify({
         CLIENT_ID: "336545645239-ppcpb0k5hc8303p9ek0793f8lkbbqbku.apps.googleusercontent.com",
         REVERSED_CLIENT_ID: "com.googleusercontent.apps.336545645239-ppcpb0k5hc8303p9ek0793f8lkbbqbku",
@@ -127,7 +127,7 @@ export const AuthStore = signalStore(
         .then(() => helperService.getFirebaseAccessToken()) : LoginPlugin.echo({value: inputValue})
         .then(({value: token}) => token);
 
-      loginPromise
+      return loginPromise
         .then(async (token) => {
           const loader = await loadingCtrl.create({ duration: 2000 });
           loader.present();

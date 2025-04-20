@@ -38,7 +38,12 @@ export interface Transaction {
   totalAmount: number,
   splitType: SplitOptions,
   friend: Friend,
-  amountResponse: {
+  amount: {
+    amount: number,
+    currency: string,
+    isOwed: true
+  },
+  defaultCurrencyAmount: {
     amount: number,
     currency: string,
     isOwed: true

@@ -117,7 +117,7 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
       this.defineExpenseForm.patchValue({
         description: this.transaction()?.description || formInitialValue.description,
         amount: this.transaction()?.totalAmount || formInitialValue.amount,
-        currency: this.transaction()?.amountResponse.currency || formInitialValue.currency,
+        currency: this.transaction()?.amount.currency || formInitialValue.currency,
         type: this.transaction()?.splitType || formInitialValue.type,
         transactionDate: this.transaction()?.date || formInitialValue.transactionDate,
       });

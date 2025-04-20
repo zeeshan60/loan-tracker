@@ -1,7 +1,6 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import {
-  IonAccordion, IonAccordionGroup,
   IonAvatar,
   IonBackButton,
   IonButton,
@@ -23,9 +22,10 @@ import { FriendsStore } from '../friends.store';
 import { shortName } from '../../utility-functions';
 import { ShortenNamePipe } from '../../pipes/shorten-name.pipe';
 import { DateFormatPipe } from '../../pipes/date-format.pipe';
-import { DefineExpenseComponent, SplitOptions } from '../../define-expense/define-expense.component';
+import { DefineExpenseComponent } from '../../define-expense/define-expense.component';
 import { SettleUpComponent } from './settle-up/settle-up.component';
 import { AddFriendComponent } from '../../add-friend/add-friend.component';
+import { OverallBalanceComponent } from '../overall-balance/overall-balance.component';
 
 @Component({
   selector: 'app-friend-transactions',
@@ -48,8 +48,7 @@ import { AddFriendComponent } from '../../add-friend/add-friend.component';
     IonBackButton,
     ShortenNamePipe,
     DateFormatPipe,
-    IonAccordion,
-    IonAccordionGroup,
+    OverallBalanceComponent,
   ],
 })
 export class FriendTransactionsComponent {

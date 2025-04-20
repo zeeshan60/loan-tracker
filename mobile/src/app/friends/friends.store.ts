@@ -17,7 +17,7 @@ export type AddFriend = {
   phoneNumber: string
 }
 
-type Balance = {
+export type Balance = {
   currency: string,
   amount: number,
   isOwed: boolean

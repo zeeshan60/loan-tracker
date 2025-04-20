@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import {
-  IonAccordion, IonAccordionGroup,
   IonAvatar,
   IonButton,
   IonButtons,
@@ -20,6 +19,7 @@ import { SelectFriendComponent } from '../../define-expense/select-friend/select
 import { DefineExpenseService } from '../../define-expense/define-expense.service';
 import { isMobile } from '../../utils';
 import { AddFriendComponent } from '../../add-friend/add-friend.component';
+import { OverallBalanceComponent } from '../overall-balance/overall-balance.component';
 
 @Component({
   selector: 'app-list-friends',
@@ -41,8 +41,7 @@ import { AddFriendComponent } from '../../add-friend/add-friend.component';
     IonLabel,
     CurrencyPipe,
     ShortenNamePipe,
-    IonAccordion,
-    IonAccordionGroup,
+    OverallBalanceComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -51,8 +50,7 @@ export class ListFriendsComponent  implements OnInit {
   readonly defineExpenseService = inject(DefineExpenseService);
   readonly modalCtrl = inject(ModalController);
   readonly nav = inject(IonNav);
-  readonly sortedOtherBalance = computed(() => this.friendsStore.overallBalance()?.other
-    .sort((a, b) => b.amount - a.amount));
+
   constructor() {}
 
   ngOnInit() {}

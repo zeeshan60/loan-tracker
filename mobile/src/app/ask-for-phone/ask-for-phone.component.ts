@@ -28,11 +28,9 @@ import { COUNTRIES_WITH_CALLING_CODES, DEFAULT_TOAST_DURATION } from '../constan
     IonButtons,
     IonContent,
     IonHeader,
-    IonInput,
     IonItem,
     IonList,
     IonSpinner,
-    IonTitle,
     IonToolbar,
     PhoneWithCountryComponent,
     ReactiveFormsModule,
@@ -77,8 +75,6 @@ export class AskForPhoneComponent  implements OnInit {
           this.phoneForm.get('country')!.value
         );
         await this.authStore.updateUserData({
-          currency: this.user().currency, // todo: remove this once api is fixed
-          displayName: this.user().displayName, // todo: remove this once api is fixed
           phoneNumber,
         })
         await this.modalCtrl.dismiss(phoneNumber, 'confirm')
