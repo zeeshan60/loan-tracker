@@ -5,3 +5,9 @@ ion-card-content {
     top: 3px;
   }
 }
+
+:host {
+  ::ng-deep .input-bottom {
+    border: none;
+  }
+}

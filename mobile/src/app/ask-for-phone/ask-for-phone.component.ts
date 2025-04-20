@@ -1,14 +1,13 @@
-import { ChangeDetectionStrategy, Component, inject, input, Input, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
   IonButton,
   IonButtons,
   IonContent,
   IonHeader,
-  IonInput,
   IonItem,
   IonList,
-  IonSpinner, IonTitle, IonToolbar, ModalController, ToastController,
+  IonSpinner, IonToolbar, ModalController, ToastController,
 } from '@ionic/angular/standalone';
 import { PhoneWithCountryComponent } from '../phone-with-country/phone-with-country.component';
 import { HelperService } from '../helper.service';
@@ -37,7 +36,6 @@ import { COUNTRIES_WITH_CALLING_CODES, DEFAULT_TOAST_DURATION } from '../constan
   ],
 })
 export class AskForPhoneComponent  implements OnInit {
-  readonly user = input.required<User>();
   readonly region = input.required<Region>();
   readonly authStore = inject(AuthStore);
   private formBuilder = inject(FormBuilder);

@@ -39,8 +39,22 @@
         </ion-select>
       </ion-item>
       <ion-item>
-        <ion-icon name="call-outline"></ion-icon>
-        <ion-label>{{user()?.phoneNumber || 'N/A'}}</ion-label>
+        @if (!phoneInEditMode()) {
+          <ion-icon name="call-outline"></ion-icon>
+          <ion-label>{{user()?.phoneNumber | phone }}</ion-label>
+          <ion-icon (click)="phoneInEditMode.set(true)" slot="end" name="create-outline"></ion-icon>
+        } @else {
+          <form [formGroup]="phoneForm" (ngSubmit)="savePhoneNumber()" id="save-phone-form">
+          <app-phone-with-country
+            [group]="phoneForm"
+          ></app-phone-with-country>
+          </form>
+          @if (loading()) {
+            <ion-spinner slot="end"></ion-spinner>
+          } @else {
+            <ion-button slot="end" type="submit" form="save-phone-form" [strong]="true">Save</ion-button>
+          }
+        }
       </ion-item>
     </ion-list>
   </ion-content>

@@ -19,7 +19,7 @@ export function toInternationalPhone(nationalPhone: string, countryCode: string)
   return phoneNumberInter?.number || '';
 }
 
-export function extractCountryCode(internationalPhone: string) {
+export function extractCountryCode(internationalPhone?: string) {
   if (!internationalPhone) {
     return '';
   }
