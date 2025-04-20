@@ -125,7 +125,7 @@ class TransactionsControllerIntegrationTest:
         assertThat(result.perMonth[0].transactions[0].splitType).isEqualTo(SplitType.YouPaidSplitEqually)
         assertThat(result.perMonth[0].transactions[0].description).isEqualTo("Sample transaction")
         assertThat(result.perMonth[0].transactions[0].defaultCurrencyAmount).isNotNull
-        assertThat(result.perMonth[0].transactions[0].defaultCurrencyAmount!!.amount).isEqualTo(100.toBigDecimal())
+        assertThat(result.perMonth[0].transactions[0].defaultCurrencyAmount!!.amount).isEqualTo(50.toBigDecimal())
         assertThat(result.perMonth[0].transactions[0].defaultCurrencyAmount!!.currency).isEqualTo("USD")
         transaction = result.perMonth[0].transactions[0]
     }

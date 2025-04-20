@@ -64,7 +64,7 @@ class TransactionsController(
         ),
         defaultCurrencyAmount = amountInDefaultCurrency?.let {
             AmountResponse(
-                amount = amountInDefaultCurrency,
+                amount = splitType.apply(amountInDefaultCurrency),
                 currency = defaultCurrency ?: throw IllegalStateException("Default currency is required"),
                 isOwed = splitType.isOwed()
             )
