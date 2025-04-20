@@ -25,6 +25,7 @@ import { FriendsStore } from './friends/friends.store';
 import { IonicStorageModule } from '@ionic/storage-angular';
 import { AuthStore } from './login/auth.store';
 import { StorageService } from './services/storage.service';
+import { Capacitor } from '@capacitor/core';
 
 @Component({
   selector: 'app-root',

@@ -214,6 +214,7 @@ export const FriendsStore = signalStore(
       formValue: AddUpdateExpenseFormValue,
       updatingTransaction?: Transaction,
     ) {
+      console.log((new Date(formValue.transactionDate)), (new Date(formValue.transactionDate)).toISOString());
       formValue.transactionDate = (new Date(formValue.transactionDate)).toISOString();
 
       let transactionAddUpdateResponse;

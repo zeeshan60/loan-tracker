@@ -4,7 +4,7 @@
       Overall balance:
     </ion-label>
     @if (overallBalance) {
-      @if (sortedOtherBalance() && sortedOtherBalance().length > 1) {
+      @if (hasDifferentCurrencies()) {
         <p>
           <ion-accordion-group>
             <ion-accordion value="first">
@@ -16,8 +16,11 @@
                 </ion-label>
               </ion-item>
               @for (otherBalance of sortedOtherBalance(); track otherBalance.currency) {
-                <ion-label class="other-balance-amount" slot="content"
-                           [color]="otherBalance.isOwed ? 'success': 'danger'">
+                <ion-label
+                  class="other-balance-amount"
+                  slot="content"
+                  [color]="otherBalance.isOwed ? 'success': 'danger'"
+                >
                   {{ otherBalance.amount | currency: otherBalance.currency: 'symbol' }}
                 </ion-label>
               }

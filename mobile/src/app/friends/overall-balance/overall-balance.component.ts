@@ -26,6 +26,10 @@ export class OverallBalanceComponent implements OnInit {
 
   readonly sortedOtherBalance = computed(() => this.overallBalance?.other
     .sort((a, b) => b.amount - a.amount) || []);
+  readonly hasDifferentCurrencies = computed(() => {
+    return this.sortedOtherBalance()
+      .some((balance) => balance.currency !== this.overallBalance?.main.currency);
+  });
 
   constructor() {
   }

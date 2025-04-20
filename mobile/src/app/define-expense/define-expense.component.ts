@@ -119,7 +119,7 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
         amount: this.transaction()?.totalAmount || formInitialValue.amount,
         currency: this.transaction()?.amount.currency || formInitialValue.currency,
         type: this.transaction()?.splitType || formInitialValue.type,
-        transactionDate: this.transaction()?.date || formInitialValue.transactionDate,
+        transactionDate: this.transaction()?.date,
       });
     } else {
       this.setAppropriateCurrency();
@@ -181,6 +181,8 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
     }
     if (this.defineExpenseForm.valid) {
       try {
+        console.log(this.defineExpenseForm.getRawValue().transactionDate, this.transaction()?.date);
+
         this.loading.set(true);
         const updatedExpense = await this.friendsStore.addUpdateExpense(
           this.friend()!,
@@ -214,27 +216,5 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
       this.friend.set(data['friend']);
     }
     return role;
-  }
-
-  async saveExpense(formValue: {
-    description: string,
-    currency: string,
-    amount: number|null,
-    type: SplitOptions,
-    transactionDate: string,
-  }) {
-    formValue.transactionDate = (new Date(formValue.transactionDate)).toISOString();
-    if (this.isUpdating()) {
-      return firstValueFrom(
-        this.http.put(`${PRIVATE_API}/transactions/update/transactionId/${this.transaction()?.transactionId}`, {
-          ...formValue,
-        })
-      );
-    } else {
-      return firstValueFrom(this.http.post(`${PRIVATE_API}/transactions/add`, {
-        ...formValue,
-        recipientId: this.friend()!.friendId
-      }));
-    }
   }
 }

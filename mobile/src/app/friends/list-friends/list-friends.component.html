@@ -14,7 +14,9 @@
 <ion-content [fullscreen]="true">
   <ion-list>
     <app-overall-balance
-      [overallBalance]="friendsStore['overallBalance']()"></app-overall-balance>
+      [overallBalance]="friendsStore['overallBalance']()"
+    >
+    </app-overall-balance>
     @for( friend of friendsStore.unSettledFriends(); track friend.name) {
       <ion-item (click)="chooseFriend(friend)" button>
         <ion-avatar slot="start">

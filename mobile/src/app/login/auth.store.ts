@@ -15,6 +15,7 @@ import { firstValueFrom } from 'rxjs';
 import { Auth, signInWithPopup } from '@angular/fire/auth';
 import { GoogleAuthProvider } from 'firebase/auth';
 import { AskForPhoneComponent } from '../ask-for-phone/ask-for-phone.component';
+import { Capacitor } from '@capacitor/core';
 
 export interface User {
   uid: string,
@@ -123,7 +124,7 @@ export const AuthStore = signalStore(
         GOOGLE_APP_ID: "1:336545645239:ios:90e69a58265af386220332"
       });
 
-      const loginPromise = isWeb ? signInWithPopup(auth, new GoogleAuthProvider())
+      const loginPromise = Capacitor.getPlatform() !== 'ios' ? signInWithPopup(auth, new GoogleAuthProvider())
         .then(() => helperService.getFirebaseAccessToken()) : LoginPlugin.echo({value: inputValue})
         .then(({value: token}) => token);
 

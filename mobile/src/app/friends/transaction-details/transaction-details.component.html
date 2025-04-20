@@ -26,9 +26,11 @@
         <h1>
           {{ transaction().defaultCurrencyAmount.amount | currency: transaction().defaultCurrencyAmount.currency: 'symbol' }}
         </h1>
-        <ion-label>
-          {{ transaction().amount.amount | currency: transaction().amount.currency: 'symbol' }}
-        </ion-label>
+        @if (transaction().defaultCurrencyAmount.currency !== transaction().amount.currency) {
+          <ion-label>
+            {{ transaction().amount.amount | currency: transaction().amount.currency: 'symbol' }}
+          </ion-label>
+        }
         <p>Added by {{transaction().createdBy.name}} on {{transaction().createdAt|date}}</p>
         @if (transaction().updatedBy?.name) {
           <p>Updated by {{transaction().updatedBy?.name}} on {{transaction().updatedAt|date}}</p>
