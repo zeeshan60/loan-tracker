@@ -188,6 +188,8 @@ lsof -i :8081 | grep LISTEN | awk '{print $2}' | xargs kill -9
 ```bash
 # if deployment stops most likely deploy script is killed
 nohup python3 /home/ec2-user/app.py &
+ps aux | grep app.py
+tail -f nohup.out
 #smaple curl
 curl --location --request POST 'https://loandeploy.codewithzeeshan.com/deploy' \
 --header 'Content-Type: application/json' \
