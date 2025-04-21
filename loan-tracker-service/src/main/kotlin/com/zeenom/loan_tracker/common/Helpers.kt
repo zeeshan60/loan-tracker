@@ -14,13 +14,13 @@ import java.time.temporal.ChronoField
 fun String.toInstant(): Instant {
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
     val localDate = LocalDate.parse(this, formatter)
-    val sgZone = ZoneId.of("Asia/Singapore")
+    val sgZone = ZoneId.of("UTC")
     val singaporeDateTime = localDate.atStartOfDay(sgZone)
     return singaporeDateTime.toInstant()
 }
 
 fun Instant.toReadableDateFormat(): String {
-    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX").withZone(ZoneId.of("Asia/Singapore"))
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX").withZone(ZoneId.of("UTC"))
     return formatter.format(this)
 }
 
@@ -32,21 +32,21 @@ fun Instant.startOfMonth(timeZone: String): Instant {
 }
 
 fun Instant.singaporeStartOfDay(): Instant {
-    val sgZone = ZoneId.of("Asia/Singapore")
+    val sgZone = ZoneId.of("UTC")
     val singaporeDateTime = this.atZone(sgZone)
     val startOfDay = singaporeDateTime.toLocalDate().atStartOfDay(sgZone)
     return startOfDay.toInstant()
 }
 
 fun Instant.nextSingaporeStartOfDay(): Instant {
-    val sgZone = ZoneId.of("Asia/Singapore")
+    val sgZone = ZoneId.of("UTC")
     val singaporeDateTime = this.atZone(sgZone)
     val nextDay = singaporeDateTime.toLocalDate().plusDays(1).atStartOfDay(sgZone)
     return nextDay.toInstant()
 }
 
 fun Instant.isToday(): Boolean {
-    val sgZone = ZoneId.of("Asia/Singapore")
+    val sgZone = ZoneId.of("UTC")
     val singaporeDateTime = this.atZone(sgZone)
     val today = singaporeDateTime.toLocalDate()
     return today.isEqual(LocalDate.now(sgZone))
@@ -57,20 +57,20 @@ fun Instant.plusHours(hour: Int): Instant {
 }
 
 fun Instant.withHour(hour: Int): Instant {
-    val sgZone = ZoneId.of("Asia/Singapore")
+    val sgZone = ZoneId.of("UTC")
     val singaporeDateTime = this.singaporeStartOfDay().atZone(sgZone)
     val dayWithHour = singaporeDateTime.plusHours(hour.toLong())
     return dayWithHour.toInstant()
 }
 
 fun Instant.minute(): Int {
-    val sgZone = ZoneId.of("Asia/Singapore")
+    val sgZone = ZoneId.of("UTC")
     val singaporeDateTime = this.atZone(sgZone)
     return singaporeDateTime.minute
 }
 
 fun Instant.withMinute(minute: Int): Instant {
-    val sgZone = ZoneId.of("Asia/Singapore")
+    val sgZone = ZoneId.of("UTC")
     val singaporeDateTime = this.atZone(sgZone)
     val dayWithMinute = singaporeDateTime.withMinute(minute).withSecond(0).withNano(0)
     return dayWithMinute.toInstant()
@@ -105,12 +105,12 @@ fun Instant.emailDateTimeFormat(): String {
 }
 
 fun String.fromEmailDateTimeFormat(): Instant {
-    val formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm a").withZone(ZoneId.of("Asia/Singapore"))
+    val formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm a").withZone(ZoneId.of("UTC"))
     return Instant.from(formatter.parse(this))
 }
 
 fun Instant.format(format: String): String {
-    val formatter = DateTimeFormatter.ofPattern(format).withZone(ZoneId.of("Asia/Singapore"))
+    val formatter = DateTimeFormatter.ofPattern(format).withZone(ZoneId.of("UTC"))
     return formatter.format(this)
 }
 
