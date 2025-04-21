@@ -4,7 +4,7 @@
       <ion-back-button></ion-back-button>
     </ion-buttons>
     <ion-title>Details</ion-title>
-    @if (!transaction().deleted) {
+    @if (!latestTransaction()?.deleted) {
       <ion-buttons slot="end">
         <ion-button (click)="updateTransaction()">
           <ion-icon name="create-outline"></ion-icon>
@@ -15,110 +15,113 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-list lines="none">
-    <ion-item>
-      <ion-label>
-        {{ transaction().description }}
-      </ion-label>
-    </ion-item>
-    <ion-item>
-      <ion-label>
-        <h1>
-          {{ transaction().defaultCurrencyAmount.amount | currency: transaction().defaultCurrencyAmount.currency: 'symbol' }}
-        </h1>
-        @if (transaction().defaultCurrencyAmount.currency !== transaction().amount.currency) {
-          <ion-label>
-            {{ transaction().amount.amount | currency: transaction().amount.currency: 'symbol' }}
-          </ion-label>
-        }
-        <p>Added by {{transaction().createdBy.name}} on {{transaction().createdAt|date}}</p>
-        @if (transaction().updatedBy?.name) {
-          <p>Updated by {{transaction().updatedBy?.name}} on {{transaction().updatedAt|date}}</p>
-        }
-      </ion-label>
-    </ion-item>
-    <ion-item>
-      <ion-label>
-        @switch (transaction().splitType) {
-          @case (SplitOptions.YouOweThemAll) {
-            {{transaction().friend.name|shortenName}} paid {{transaction().totalAmount|currency: transaction().amount.currency: 'symbol'}}.
-            <p>You owe {{transaction().friend.name|shortenName}} the full amount.</p>
-          }
-          @case (SplitOptions.TheyOweYouAll) {
-            You paid {{transaction().totalAmount|currency: transaction().amount.currency: 'symbol'}}.
-            <p>{{transaction().friend.name|shortenName}} owe you the full amount.</p>
-          }
-          @case (SplitOptions.TheyPaidSplitEqually) {
-            {{transaction().friend.name|shortenName}} paid {{transaction().totalAmount|currency: transaction().amount.currency: 'symbol'}}.
-              <p>You owe {{transaction().friend.name|shortenName}} {{transaction().amount.amount|currency: transaction().amount.currency: 'symbol'}}.</p>
-          }
-          @case (SplitOptions.YouPaidSplitEqually) {
-            You paid {{transaction().totalAmount|currency: transaction().amount.currency: 'symbol'}}.
-              <p>{{transaction().friend.name|shortenName}} owe you {{transaction().amount.amount|currency: transaction().amount.currency: 'symbol'}}.</p>
-          }
-        }
-      </ion-label>
-    </ion-item>
-    @if (!transaction().deleted) {
-      <ion-item>
-        <ion-button fill="solid" color="danger" size="small" (click)="deleteTransaction()">
-          <ion-icon slot="start" name="trash-outline"></ion-icon>
-          Delete
-        </ion-button>
-      </ion-item>
-    }
-  </ion-list>
-  @if (transaction().history.length) {
+  @if (latestTransaction()) {
     <ion-list lines="none">
       <ion-item>
         <ion-label>
-          <h1>History</h1>
+          {{ latestTransaction().description }}
         </ion-label>
       </ion-item>
-      @for (history of transaction().history; track history) {
+      <ion-item>
+        <ion-label>
+          <h1>
+            {{ latestTransaction().defaultCurrencyAmount.amount | currency: latestTransaction().defaultCurrencyAmount.currency: 'symbol' }}
+          </h1>
+          @if (latestTransaction().defaultCurrencyAmount.currency !== latestTransaction().amount.currency) {
+            <ion-label>
+              {{ latestTransaction().amount.amount | currency: latestTransaction().amount.currency: 'symbol' }}
+            </ion-label>
+          }
+          <p>Added by {{latestTransaction().createdBy.name}} on {{latestTransaction().createdAt|date}}</p>
+          @if (latestTransaction().updatedBy?.name) {
+            <p>Updated by {{latestTransaction().updatedBy?.name}} on {{latestTransaction().updatedAt|date}}</p>
+          }
+        </ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          @switch (latestTransaction().splitType) {
+            @case (SplitOptions.YouOweThemAll) {
+              {{latestTransaction().friend.name|shortenName}} paid {{latestTransaction().totalAmount|currency: latestTransaction().amount.currency: 'symbol'}}.
+              <p>You owe {{latestTransaction().friend.name|shortenName}} the full amount.</p>
+            }
+            @case (SplitOptions.TheyOweYouAll) {
+              You paid {{latestTransaction().totalAmount|currency: latestTransaction().amount.currency: 'symbol'}}.
+              <p>{{latestTransaction().friend.name|shortenName}} owe you the full amount.</p>
+            }
+            @case (SplitOptions.TheyPaidSplitEqually) {
+              {{latestTransaction().friend.name|shortenName}} paid {{latestTransaction().totalAmount|currency: latestTransaction().amount.currency: 'symbol'}}.
+              <p>You owe {{latestTransaction().friend.name|shortenName}} {{latestTransaction().amount.amount|currency: latestTransaction().amount.currency: 'symbol'}}.</p>
+            }
+            @case (SplitOptions.YouPaidSplitEqually) {
+              You paid {{latestTransaction().totalAmount|currency: latestTransaction().amount.currency: 'symbol'}}.
+              <p>{{latestTransaction().friend.name|shortenName}} owe you {{latestTransaction().amount.amount|currency: latestTransaction().amount.currency: 'symbol'}}.</p>
+            }
+          }
+        </ion-label>
+      </ion-item>
+      @if (!latestTransaction().deleted) {
         <ion-item>
-          <ion-avatar slot="start">
-            @if (history.changedByPhoto) {
-              <img [src]="history.changedByPhoto" alt="Friend's photo" />
-            } @else {
-              <ion-icon size="large" color="medium" name="person"></ion-icon>
-            }
-          </ion-avatar>
-          <ion-label>
-            {{history.changedByName|shortenName}}
-            @if (history.changes[0].type === HistoryChangeType.DELETED) {
-              deleted this transaction
-            } @else {
-              updated this transaction
-              @for (change of history.changes; track change.type) {
-                <p>
-                  -{{historyChangeType[change.type]}} changed from
-                  @switch (change.type) {
-                    @case (HistoryChangeType.TOTAL_AMOUNT) {
-                      {{change.oldValue|currency: transaction().amount.currency: 'symbol-narrow'}} to {{change.newValue|currency: transaction().amount.currency: 'symbol-narrow'}}
-                    }
-                    @case (HistoryChangeType.TRANSACTION_DATE) {
-                      {{change.oldValue|date}} to {{change.newValue|date}}
-                    }
-                    @case (HistoryChangeType.DESCRIPTION) {
-                      "{{change.oldValue}}" to "{{change.newValue}}"
-                    }
-                    @case (HistoryChangeType.DELETED) {
-                      "{{change.oldValue}}" to "{{change.newValue}}"
-                    }
-                    @case (HistoryChangeType.SPLIT_TYPE) {
-                      "{{splitOptionsText[change.oldValue]}}" to "{{splitOptionsText[change.newValue]}}"
-                    }
-                    @default {
-                      {{change.oldValue}} to {{change.newValue}}
-                    }
-                  }
-                </p>
-              }
-            }
-          </ion-label>
+          <ion-button fill="solid" color="danger" size="small" (click)="deleteTransaction()">
+            <ion-icon slot="start" name="trash-outline"></ion-icon>
+            Delete
+          </ion-button>
         </ion-item>
       }
     </ion-list>
+
+    @if (latestTransaction().history.length) {
+      <ion-list lines="none">
+        <ion-item>
+          <ion-label>
+            <h1>History</h1>
+          </ion-label>
+        </ion-item>
+        @for (history of latestTransaction().history; track history) {
+          <ion-item>
+            <ion-avatar slot="start">
+              @if (history.changedByPhoto) {
+                <img [src]="history.changedByPhoto" alt="Friend's photo" />
+              } @else {
+                <ion-icon size="large" color="medium" name="person"></ion-icon>
+              }
+            </ion-avatar>
+            <ion-label>
+              {{history.changedByName|shortenName}}
+              @if (history.changes[0].type === HistoryChangeType.DELETED) {
+                deleted this transaction
+              } @else {
+                updated this transaction
+                @for (change of history.changes; track change.type) {
+                  <p>
+                    -{{historyChangeType[change.type]}} changed from
+                    @switch (change.type) {
+                      @case (HistoryChangeType.TOTAL_AMOUNT) {
+                        {{change.oldValue|currency: latestTransaction().amount.currency: 'symbol-narrow'}} to {{change.newValue|currency: latestTransaction().amount.currency: 'symbol-narrow'}}
+                      }
+                      @case (HistoryChangeType.TRANSACTION_DATE) {
+                        {{change.oldValue|date}} to {{change.newValue|date}}
+                      }
+                      @case (HistoryChangeType.DESCRIPTION) {
+                        "{{change.oldValue}}" to "{{change.newValue}}"
+                      }
+                      @case (HistoryChangeType.DELETED) {
+                        "{{change.oldValue}}" to "{{change.newValue}}"
+                      }
+                      @case (HistoryChangeType.SPLIT_TYPE) {
+                        "{{splitOptionsText[change.oldValue]}}" to "{{splitOptionsText[change.newValue]}}"
+                      }
+                      @default {
+                        {{change.oldValue}} to {{change.newValue}}
+                      }
+                    }
+                  </p>
+                }
+              }
+            </ion-label>
+          </ion-item>
+        }
+      </ion-list>
+    }
   }
 </ion-content>

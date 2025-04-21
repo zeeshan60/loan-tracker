@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, signal } from '@angular/core';
+import { Component, computed, inject, input, Signal, signal } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import {
   IonAvatar,
@@ -66,7 +66,7 @@ export class FriendTransactionsComponent {
 
   openTransactionDetails(transaction: any) {
     this.nav.push(TransactionDetailsComponent, {
-      transaction,
+      transactionId: transaction.transactionId,
       friend: this.friend()
     });
   }

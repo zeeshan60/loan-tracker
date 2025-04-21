@@ -181,8 +181,6 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
     }
     if (this.defineExpenseForm.valid) {
       try {
-        console.log(this.defineExpenseForm.getRawValue().transactionDate, this.transaction()?.date);
-
         this.loading.set(true);
         const updatedExpense = await this.friendsStore.addUpdateExpense(
           this.friend()!,
@@ -201,7 +199,7 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
 
   async chooseFriend() {
     if (this.isUpdating()) {
-      return;
+      return null;
     }
     this.defineExpenseService.selectFriendModalInstance = await this.modalCtrl.create({
       component: SelectFriendComponent,

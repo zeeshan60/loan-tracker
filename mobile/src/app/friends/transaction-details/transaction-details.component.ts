@@ -1,4 +1,4 @@
-import { Component, inject, input, model, OnInit } from '@angular/core';
+import { Component, computed, inject, input, model } from '@angular/core';
 import {
   IonAvatar,
   IonBackButton, IonButton,
@@ -48,14 +48,27 @@ const historyChangeType = {
     DatePipe,
   ],
 })
-export class TransactionDetailsComponent  implements OnInit {
+export class TransactionDetailsComponent {
   readonly SplitOptions = SplitOptions;
   readonly friendsStore = inject(FriendsStore);
   readonly helperService = inject(HelperService);
   readonly modalCtrl = inject(ModalController);
   readonly nav = inject(IonNav);
-  readonly transaction = model.required<Transaction>();
+  readonly transactionId = input.required<string>();
   readonly friend = input.required<FriendWithBalance>();
+  readonly latestTransaction = computed(() => {
+    let found: Transaction | undefined;
+    this.friendsStore.selectedTransactions().some((transactionsByMonth) => {
+      return transactionsByMonth.transactions.some((transaction) => {
+        if (transaction.transactionId === this.transactionId()) {
+          found = transaction;
+          return true;
+        }
+        return false;
+      })
+    })
+    return found;
+  })
   protected readonly historyChangeType = historyChangeType;
   protected readonly HistoryChangeType = HistoryChangeType;
   protected splitOptionsText : {[key: string]: string} = {
@@ -70,13 +83,11 @@ export class TransactionDetailsComponent  implements OnInit {
   constructor() {
   }
 
-  ngOnInit() {}
-
   async deleteTransaction() {
     const response = await this.helperService.showConfirmAlert()
     if (response.role === 'confirm') {
       try {
-        await this.friendsStore.deleteTransaction(this.transaction());
+        await this.friendsStore.deleteTransaction(this.transactionId());
         this.nav.pop();
       } catch (e) {}
     }
@@ -88,13 +99,9 @@ export class TransactionDetailsComponent  implements OnInit {
       componentProps: {
         friend: this.friend(),
         isUpdating: true,
-        transaction: this.transaction(),
+        transaction: this.latestTransaction(),
       }
     })
     modal.present();
-    const { data: updatedTransaction, role } = await modal.onWillDismiss();
-    if (role === 'confirm') {
-      this.transaction.set(updatedTransaction);
-    }
   }
 }

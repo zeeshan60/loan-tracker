@@ -60,7 +60,7 @@ interface Methods extends MethodsDictionary {
   deleteFriend(friend: FriendWithBalance): Promise<void>;
   setSelectedFriend(friend: FriendWithBalance|null): Promise<void>;
   loadSelectedTransactions(): Promise<void>;
-  deleteTransaction(transaction: Transaction): Promise<void>;
+  deleteTransaction(transactionId: string): Promise<void>;
   settleUp(friend: FriendWithBalance, formValue: AddUpdateExpenseFormValue): Promise<void>;
   addUpdateExpense(friend: FriendWithBalance, formValue: AddUpdateExpenseFormValue, updatingTransaction?: Transaction): Promise<Transaction>;
 }
@@ -180,11 +180,11 @@ export const FriendsStore = signalStore(
         await helperService.showToast(e.toString())
       }
     },
-    async deleteTransaction(transaction: Transaction): Promise<void> {
+    async deleteTransaction(transactionId: string): Promise<void> {
       let transactionAdded;
       try {
         await helperService.withLoader(async () => {
-          transactionAdded = await firstValueFrom(http.delete(`${PRIVATE_API}/transactions/delete/transactionId/${transaction.transactionId}`))
+          transactionAdded = await firstValueFrom(http.delete(`${PRIVATE_API}/transactions/delete/transactionId/${transactionId}`))
         })
         await helperService.showToast('Transaction deleted successfully');
       } catch (e) {
