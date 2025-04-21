@@ -54,9 +54,13 @@ export class TransactionDetailsComponent {
   readonly helperService = inject(HelperService);
   readonly modalCtrl = inject(ModalController);
   readonly nav = inject(IonNav);
-  readonly transactionId = input.required<string>();
+  readonly transactionId = input<string>();
+  readonly transaction = input<Transaction>();
   readonly friend = input.required<FriendWithBalance>();
   readonly latestTransaction = computed(() => {
+    if (this.transaction()) {
+      return this.transaction();
+    }
     let found: Transaction | undefined;
     this.friendsStore.selectedTransactions().some((transactionsByMonth) => {
       return transactionsByMonth.transactions.some((transaction) => {
