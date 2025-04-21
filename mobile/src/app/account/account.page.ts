@@ -43,7 +43,7 @@ export class AccountPage {
   readonly loading = signal(false);
   public phoneForm = this.formBuilder.group({
     phoneNumber: this.formBuilder.nonNullable.control(toNationalPhone(this.user()?.phoneNumber || ''), [Validators.required]),
-    country: this.formBuilder.nonNullable.control(extractCountryCode(this.user()?.phoneNumber || undefined)),
+    country: this.formBuilder.nonNullable.control(extractCountryCode(this.user()?.phoneNumber || COUNTRIES_WITH_CALLING_CODES[0].code)),
   })
 
   constructor() {
