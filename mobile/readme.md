@@ -37,6 +37,8 @@ to import plugin run following command in ios plugin branch
 ```bash
 git submodule update --init
 
+#i had to do force install cause of conflicting dependencies
+npm install --force
 #than in mobile directory
 npm run build
 npx cap sync
