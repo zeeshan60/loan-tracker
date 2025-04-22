@@ -5,7 +5,6 @@ import com.zeenom.loan_tracker.transactions.ICurrencyClient
 import com.zeenom.loan_tracker.transactions.TransactionEventHandler
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventHandler
-import io.swagger.v3.core.util.Json
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.util.*
@@ -22,7 +21,7 @@ class FriendService(
 
     suspend fun findAllByUserId(userId: String): FriendsWithAllTimeBalancesDto {
         val user = userEventHandler.findUserById(userId) ?: throw IllegalArgumentException("User $userId not found")
-        val friendDtos = friendFinderStrategy.findUserFriends(userId).filter { !it.deleted }
+        val friendDtos = friendFinderStrategy.findUserFriends(userId, false)
         val amountsPerFriend =
             transactionEventHandler.balancesOfFriendsByCurrency(userId, friendDtos.map { it.friendStreamId })
         val mainCurrency = user.currency?.let { Currency.getInstance(user.currency) } ?: Currency.getInstance("USD")

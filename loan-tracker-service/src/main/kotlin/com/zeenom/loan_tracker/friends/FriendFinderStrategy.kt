@@ -8,8 +8,8 @@ class FriendFinderStrategy(
     private val friendsEventHandler: FriendsEventHandler,
     private val userEventHandler: UserEventHandler,
 ) {
-    suspend fun findUserFriends(userId: String): List<FriendUserDto> {
-        val friends = friendsEventHandler.findAllFriendsByUserId(userId)
+    suspend fun findUserFriends(userId: String, includeDeleted: Boolean = false): List<FriendUserDto> {
+        val friends = friendsEventHandler.findAllFriendsByUserId(userId = userId, includeDeleted = includeDeleted)
         val usersByPhones =
             userEventHandler.findUsersByPhoneNumbers(friends.mapNotNull { it.friendPhoneNumber })
                 .associateBy { it.phoneNumber }

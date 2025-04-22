@@ -4,6 +4,7 @@ import com.zeenom.loan_tracker.common.events.IEvent
 import com.zeenom.loan_tracker.transactions.IEventAble
 import kotlinx.coroutines.flow.Flow
 import org.springframework.data.annotation.Id
+import org.springframework.data.r2dbc.repository.Query
 import org.springframework.data.relational.core.mapping.Table
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import org.springframework.stereotype.Repository
@@ -62,13 +63,14 @@ data class FriendEvent(
 
 @Repository
 interface FriendModelRepository : CoroutineCrudRepository<FriendModel, UUID> {
-    suspend fun findAllByUserUid(userUid: String): Flow<FriendModel>
-    suspend fun findByUserUidAndFriendEmail(userUid: String, email: String): FriendModel?
-    suspend fun findAllByFriendEmail(email: String): Flow<FriendModel>
-    suspend fun findByUserUidAndFriendPhoneNumber(userUid: String, phoneNumber: String): FriendModel?
-    suspend fun findAllByFriendPhoneNumber(phoneNumber: String): Flow<FriendModel>
-    suspend fun findByUserUidAndStreamId(userUid: String, recipientId: UUID): FriendModel?
-    suspend fun findByStreamId(streamId: UUID): FriendModel?
+    suspend fun findAllByUserUidAndDeletedIsFalse(userUid: String): Flow<FriendModel>
+    suspend fun findByUserUidAndFriendEmailAndDeletedIsFalse(userUid: String, email: String): FriendModel?
+    suspend fun findAllByFriendEmailAndDeletedIsFalse(email: String): Flow<FriendModel>
+    suspend fun findByUserUidAndFriendPhoneNumberAndDeletedIsFalse(userUid: String, phoneNumber: String): FriendModel?
+    suspend fun findAllByFriendPhoneNumberAndDeletedIsFalse(phoneNumber: String): Flow<FriendModel>
+    suspend fun findByUserUidAndStreamIdAndDeletedIsFalse(userUid: String, recipientId: UUID): FriendModel?
+    suspend fun findByStreamIdAndDeletedIsFalse(streamId: UUID): FriendModel?
+    suspend fun findAllByUserUid(string: String): Flow<FriendModel>
 }
 
 @Table("friend_model")
