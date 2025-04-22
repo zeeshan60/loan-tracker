@@ -1,5 +1,5 @@
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
-import {Auth} from '@angular/fire/auth';
+import { Auth, getAuth, signOut } from '@angular/fire/auth';
 import {Router} from '@angular/router';
 import {
   IonButton,
@@ -26,6 +26,9 @@ export class LoginComponent {
 
   constructor() {}
 
+  signOutNow() {
+    signOut(getAuth());
+  }
   loginWithGoogle() {
     this.authStore.loginWithGoogle()
       .then(() => {

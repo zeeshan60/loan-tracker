@@ -26,6 +26,10 @@ import { IonicStorageModule } from '@ionic/storage-angular';
 import { AuthStore } from './login/auth.store';
 import { StorageService } from './services/storage.service';
 import { Capacitor } from '@capacitor/core';
+import { Auth, getAuth, getRedirectResult, onAuthStateChanged } from '@angular/fire/auth';
+import { GoogleAuthProvider } from 'firebase/auth';
+import { environment } from '../environments/environment';
+import { FirebaseApp } from '@angular/fire/app';
 
 @Component({
   selector: 'app-root',
@@ -42,6 +46,7 @@ export class AppComponent implements OnInit {
   readonly authStore = inject(AuthStore);
   readonly storageService = inject(StorageService);
   readonly friendsStore = inject(FriendsStore);
+  auth = inject(Auth);
 
   constructor() {
     addIcons({
@@ -67,7 +72,37 @@ export class AppComponent implements OnInit {
   }
 
   async ngOnInit() {
-    await this.initApp();
+    const auth = getAuth()
+    setTimeout(() => {
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          console.log("User is already signed in:", user);
+        } else {
+          getRedirectResult(auth)
+            .then((result) => {
+              if (!result) return;
+              // This gives you a Google Access Token. You can use it to access Google APIs.
+              const credential = GoogleAuthProvider.credentialFromResult(result);
+              const token = credential.accessToken;
+
+              // The signed-in user info.
+              const user = result.user;
+              // IdP data available using getAdditionalUserInfo(result)
+              // ...
+            }).catch((error) => {
+            // Handle Errors here.
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            // The email of the user's account used.
+            const email = error.customData.email;
+            // The AuthCredential type that was used.
+            const credential = GoogleAuthProvider.credentialFromError(error);
+            // ...
+          });
+        }
+      });
+    }, 2000);
+    // await this.initApp();
   }
   async initApp() {
     this.storageService.storageReady$.subscribe(async () => {
