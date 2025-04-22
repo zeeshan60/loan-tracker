@@ -12,12 +12,10 @@ import { FriendsStore } from '../friends/friends.store';
 import { LoginPlugin } from 'zeenom/src';
 import { isWeb } from '../utils';
 import { firstValueFrom } from 'rxjs';
-import { Auth, getAuth, getRedirectResult, signInWithPopup, signInWithRedirect } from '@angular/fire/auth';
+import { Auth, signInWithPopup } from '@angular/fire/auth';
 import { GoogleAuthProvider } from 'firebase/auth';
 import { AskForPhoneComponent } from '../ask-for-phone/ask-for-phone.component';
 import { Capacitor } from '@capacitor/core';
-import { environment } from '../../environments/environment';
-import { FirebaseApp } from '@angular/fire/app';
 
 export interface User {
   uid: string,
@@ -126,39 +124,30 @@ export const AuthStore = signalStore(
         GOOGLE_APP_ID: "1:336545645239:ios:90e69a58265af386220332"
       });
 
-      const googleAuthProvider = new GoogleAuthProvider();
-      // googleAuthProvider.setCustomParameters({
-      //
-      // })
-      const provider = new GoogleAuthProvider();
-      // provider.addScope('https://www.googleapis.com/auth/plus.login');
-      signInWithRedirect(auth, provider);
-      // const loginPromise = Capacitor.getPlatform() !== 'ios' ? signInWithRedirect(getAuth(environment.firebaseConfig as unknown as FirebaseApp), new GoogleAuthProvider())
-      //   .then(() => helperService.getFirebaseAccessToken()) : LoginPlugin.echo({value: inputValue})
-      //   .then(({value: token}) => token);
-      //
-      // return loginPromise
-      //   .then(async (token) => {
-      //     console.log(token);
-      //     const loader = await loadingCtrl.create({ duration: 2000 });
-      //     loader.present();
-      //     await this.login(token!)
-      //     await Promise.all([
-      //       this.fetchAndSaveUserData(),
-      //       friendsStore.loadFriends({ showLoader: false })
-      //     ]);
-      //     await loader.dismiss();
-      //   })
-      //   .then(() => router.navigate(['/']))
-      //   .catch(async (err: Error) => {
-      //     console.log(err);
-      //     this.signOut();
-      //     const toast = await toastCtrl.create({
-      //       message: 'Unable to login at the moment',
-      //       duration: 1500
-      //     });
-      //     toast.present();
-      //   });
+      const loginPromise = Capacitor.getPlatform() !== 'ios' ? signInWithPopup(auth, new GoogleAuthProvider())
+        .then(() => helperService.getFirebaseAccessToken()) : LoginPlugin.echo({value: inputValue})
+        .then(({value: token}) => token);
+
+      return loginPromise
+        .then(async (token) => {
+          const loader = await loadingCtrl.create({ duration: 2000 });
+          loader.present();
+          await this.login(token!)
+          await Promise.all([
+            this.fetchAndSaveUserData(),
+            friendsStore.loadFriends({ showLoader: false })
+          ]);
+          await loader.dismiss();
+        })
+        .then(() => router.navigate(['/']))
+        .catch(async (err: Error) => {
+          this.signOut();
+          const toast = await toastCtrl.create({
+            message: 'Unable to login at the moment',
+            duration: 1500
+          });
+          toast.present();
+        });
     },
 
     async askForPhoneNumber() {
