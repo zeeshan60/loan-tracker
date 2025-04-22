@@ -9,6 +9,7 @@ import com.zeenom.loan_tracker.transactions.TransactionCreateRequest
 import com.zeenom.loan_tracker.transactions.TransactionsResponse
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventRepository
+import com.zeenom.loan_tracker.users.UserModelRepository
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeAll
@@ -25,6 +26,9 @@ class FriendUpdateTransactionSyncIntegrationTest() : BaseIntegration() {
 
     @Autowired
     private lateinit var userEventRepository: UserEventRepository
+
+    @Autowired
+    private lateinit var userModelRepository: UserModelRepository
 
     private lateinit var zeeToken: String
     private var zeeDto = UserDto(
@@ -51,6 +55,7 @@ class FriendUpdateTransactionSyncIntegrationTest() : BaseIntegration() {
     private lateinit var johnFriendId: UUID
     @BeforeAll
     fun beforeAll(): Unit = runBlocking {
+        userModelRepository.deleteAll()
         userEventRepository.deleteAll()
         friendEventRepository.deleteAll()
         zeeToken = loginUser(

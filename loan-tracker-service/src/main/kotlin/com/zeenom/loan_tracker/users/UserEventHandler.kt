@@ -1,20 +1,23 @@
 package com.zeenom.loan_tracker.users
 
+import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
 
 @Service
-class UserEventHandler(private val userRepository: UserEventRepository) {
+class UserEventHandler(private val userRepository: UserEventRepository, private val userModelRepository: UserModelRepository) {
 
     suspend fun addEvent(event: IUserEvent) {
         userRepository.save(event.toEntity())
+        val existing = userModelRepository.findByStreamId(event.streamId)
+        userModelRepository.save(event.applyEvent(existing))
     }
 
     suspend fun findUserModelByUid(uid: String): UserModel? {
-        return userRepository.findByUid(uid)
+        return userModelRepository.findByUid(uid)
     }
 
     suspend fun findUserById(uid: String): UserDto? {
-        return userRepository.findByUid(uid)?.let {
+        return userModelRepository.findByUid(uid)?.let {
             UserDto(
                 uid = it.uid,
                 displayName = it.displayName,
@@ -29,14 +32,14 @@ class UserEventHandler(private val userRepository: UserEventRepository) {
 
     suspend fun findUsersByUids(uids: List<String>): List<UserDto> {
         if (uids.isEmpty()) return emptyList()
-        return userRepository.findAllByUidIn(uids).map {
+        return userModelRepository.findAllByUidIn(uids).toList().map {
             UserDto(
                 uid = it.uid,
                 displayName = it.displayName,
                 phoneNumber = it.phoneNumber,
                 currency = it.currency,
                 email = it.email,
-                emailVerified = it.emailVerified ?: false,
+                emailVerified = it.emailVerified == true,
                 photoUrl = it.photoUrl
             )
         }
@@ -44,7 +47,7 @@ class UserEventHandler(private val userRepository: UserEventRepository) {
 
     suspend fun findUsersByEmails(emails: List<String>): List<UserDto> {
         if (emails.isEmpty()) return emptyList()
-        return userRepository.findAllByEmailIn(emails).map {
+        return userModelRepository.findAllByEmailIn(emails).toList().map {
             UserDto(
                 uid = it.uid,
                 displayName = it.displayName,
@@ -59,7 +62,7 @@ class UserEventHandler(private val userRepository: UserEventRepository) {
 
     suspend fun findUsersByPhoneNumbers(phoneNumbers: List<String>): List<UserDto> {
         if (phoneNumbers.isEmpty()) return emptyList()
-        return userRepository.findAllByPhoneNumberIn(phoneNumbers).map {
+        return userModelRepository.findAllByPhoneNumberIn(phoneNumbers).toList().map {
             UserDto(
                 uid = it.uid,
                 displayName = it.displayName,
@@ -73,7 +76,7 @@ class UserEventHandler(private val userRepository: UserEventRepository) {
     }
 
     suspend fun findUserByEmail(email: String): UserDto? {
-        return userRepository.findByEmail(email)?.let {
+        return userModelRepository.findByEmail(email)?.let {
             UserDto(
                 uid = it.uid,
                 displayName = it.displayName,
@@ -87,7 +90,7 @@ class UserEventHandler(private val userRepository: UserEventRepository) {
     }
 
     suspend fun findUserByPhoneNumber(phoneNumber: String): UserDto? {
-        return userRepository.findByPhoneNumber(phoneNumber)?.let {
+        return userModelRepository.findByPhoneNumber(phoneNumber)?.let {
             UserDto(
                 uid = it.uid,
                 displayName = it.displayName,

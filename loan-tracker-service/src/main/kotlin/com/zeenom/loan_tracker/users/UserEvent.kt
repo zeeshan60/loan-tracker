@@ -2,6 +2,7 @@ package com.zeenom.loan_tracker.users
 
 import com.zeenom.loan_tracker.common.events.IEvent
 import com.zeenom.loan_tracker.transactions.IEventAble
+import kotlinx.coroutines.flow.Flow
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
@@ -74,11 +75,20 @@ data class UserEvent(
 }
 
 @Repository
-interface UserModelRepository : CoroutineCrudRepository<UserModel, UUID>
+interface UserModelRepository : CoroutineCrudRepository<UserModel, UUID> {
+    suspend fun findByUid(uid: String): UserModel?
+    suspend fun findAllByUidIn(uids: List<String>): Flow<UserModel>
+    suspend fun findAllByEmailIn(emails: List<String>): Flow<UserModel>
+    suspend fun findAllByPhoneNumberIn(phones: List<String>): Flow<UserModel>
+    suspend fun findByEmail(email: String): UserModel?
+    suspend fun findByPhoneNumber(phone: String): UserModel?
+    suspend fun findByStreamId(streamId: UUID): UserModel?
+}
 
 @Table("user_model")
 data class UserModel(
-    @Id
+    @Id()
+    val id: UUID?,
     val streamId: UUID,
     val uid: String,
     val displayName: String,
@@ -122,6 +132,7 @@ data class UserCreated(
 
     override fun applyEvent(existing: UserModel?): UserModel {
         return UserModel(
+            id = null,
             uid = userId,
             streamId = streamId,
             displayName = displayName,

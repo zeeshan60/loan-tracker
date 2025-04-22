@@ -10,6 +10,7 @@ import com.zeenom.loan_tracker.prettyAndPrint
 import com.zeenom.loan_tracker.transactions.*
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventRepository
+import com.zeenom.loan_tracker.users.UserModelRepository
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.AutoCloseableSoftAssertions
@@ -31,6 +32,9 @@ class TransactionsControllerIntegrationTest :
 
     @Autowired
     private lateinit var transactionEventRepository: TransactionEventRepository
+
+    @Autowired
+    private lateinit var userModelRepository: UserModelRepository
 
     private lateinit var zeeToken: String
     private lateinit var johnToken: String
@@ -68,6 +72,7 @@ class TransactionsControllerIntegrationTest :
 
     @BeforeAll
     fun setupBeforeAll(): Unit = runBlocking {
+        userModelRepository.deleteAll()
         userEventRepository.deleteAll()
         friendEventRepository.deleteAll()
         transactionEventRepository.deleteAll()
