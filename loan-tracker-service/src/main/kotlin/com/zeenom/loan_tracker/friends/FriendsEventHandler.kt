@@ -14,30 +14,24 @@ class FriendsEventHandler(
 ) {
 
     suspend fun findAllFriendsByUserId(userId: String) =
-        eventRepository.findAllByUserUid(userId).toList().groupBy { it.streamId }
-            .mapNotNull { resolveStream(it.value.map { it.toEvent() }) }.filter { !it.deleted }
+        models().filter { it.userUid == userId }
 
     suspend fun findByUserUidAndFriendEmail(userUid: String, email: String): FriendModel? {
-        val friends = findAllFriendsByUserId(userUid)
-        return friends.singleOrNull { it.friendEmail == email }
+        return models().find { it.userUid == userUid && it.friendEmail == email }
     }
 
     suspend fun findByUserUidAndFriendPhoneNumber(userUid: String, phoneNumber: String): FriendModel? {
-        val friends = findAllFriendsByUserId(userUid)
-        return friends.singleOrNull { it.friendPhoneNumber == phoneNumber }
+        return models().find { it.userUid == userUid && it.friendPhoneNumber == phoneNumber }
     }
 
     suspend fun findByUserUidAndFriendId(userUid: String, friendId: UUID): FriendModel? {
-        val events = eventRepository.findByUserUidAndStreamId(userUid, friendId)
-        return resolveStream(events.map { it.toEvent() }.toList())?.let { if (it.deleted) null else it }
+        return models().find { it.userUid == userUid && it.streamId == friendId }
     }
 
     fun resolveStream(events: List<IEvent<FriendModel>>): FriendModel? {
         val sorted = events.sortedBy { it.version }
         return sorted.fold(null as FriendModel?) { model, event ->
             event.applyEvent(model)
-        }?.let {
-            if (it.deleted) null else it
         }
     }
 
@@ -63,30 +57,31 @@ class FriendsEventHandler(
     }
 
     suspend fun findByFriendEmail(email: String): List<FriendModel> {
-        return eventRepository.findByFriendEmail(email).toList().groupBy { it.streamId }
-            .mapNotNull { resolveStream(it.value.map { it.toEvent() }) }.filter { !it.deleted }
+        return models().filter { !it.deleted && it.friendEmail == email }
     }
 
     suspend fun findByFriendPhoneNumber(phoneNumber: String): List<FriendModel> {
-        return eventRepository.findByFriendPhoneNumber(phoneNumber).toList().groupBy { it.streamId }
-            .mapNotNull { resolveStream(it.value.map { it.toEvent() }) }.filter { !it.deleted }
+        return models().filter { !it.deleted && it.friendPhoneNumber == phoneNumber }
     }
 
+    private suspend fun models(): List<FriendModel> = eventRepository.findAll().toList().groupBy { it.streamId }
+        .mapNotNull { resolveStream(it.value.map { it.toEvent() }) }
+
     suspend fun findFriendByUserIdAndFriendId(userUid: String, friendId: UUID): FriendId? {
-        return resolveStream(eventRepository.findByUserUidAndStreamId(userUid, friendId).map { it.toEvent() }
-            .toList())?.let {
+        return models().find { it.userUid == userUid && it.streamId == friendId }?.let {
             if (it.deleted) null else FriendId(it.friendEmail, it.friendPhoneNumber, it.friendDisplayName)
         }
     }
 
     suspend fun friendExistsByUserIdAndFriendId(userUid: String, recipientId: UUID): Boolean {
-        return resolveStream(eventRepository.findByUserUidAndStreamId(userUid, recipientId).map { it.toEvent() }
-            .toList())?.let { if (it.deleted) null else it } != null
+        return models().find { it.userUid == userUid && it.streamId == recipientId }
+            ?.let { if (it.deleted) null else it } != null
     }
 
     suspend fun findFriendStreamIdByEmailOrPhoneNumber(userUid: String, email: String?, phoneNumber: String?): UUID? {
-        return (email?.let { findByUserUidAndFriendEmail(userUid, it) }
-            ?: phoneNumber?.let { findByUserUidAndFriendPhoneNumber(userUid, it) })?.streamId
+        val models = models()
+        return (email?.let { models.find { it.userUid == userUid && it.friendEmail == email } }
+            ?: phoneNumber?.let { models.find { it.userUid == userUid && it.friendPhoneNumber == phoneNumber } })?.streamId
     }
 }
 

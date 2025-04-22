@@ -26,6 +26,7 @@ class FriendFinderStrategy(
                 phoneNumber = it.friendPhoneNumber,
                 name = it.friendDisplayName,
                 photoUrl = user?.photoUrl,
+                deleted = it.deleted,
             )
         }
     }
@@ -42,6 +43,7 @@ class FriendFinderStrategy(
             phoneNumber = friend.friendPhoneNumber,
             name = friend.friendDisplayName,
             photoUrl = user?.photoUrl,
+            deleted = friend.deleted,
         )
     }
 

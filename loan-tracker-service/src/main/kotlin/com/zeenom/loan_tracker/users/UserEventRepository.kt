@@ -1,5 +1,6 @@
 package com.zeenom.loan_tracker.users
 
+import kotlinx.coroutines.flow.toList
 import org.springframework.data.r2dbc.repository.Query
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import org.springframework.stereotype.Repository
@@ -29,32 +30,32 @@ interface UserEventRepository : CoroutineCrudRepository<UserEvent, UUID> {
 }
 
 suspend fun UserEventRepository.findByUid(uid: String): UserModel? {
-    val eventStream = findUserEventStream(uid)
-    return userModel(eventStream)
+    return userModels(findAll().toList()).find { it.uid == uid }
 }
 
 suspend fun UserEventRepository.findAllByUidIn(uids: List<String>): List<UserModel> {
-    val eventStreams = findUserEventStreamByUidIn(uids)
-    return userModels(eventStreams)
+    val eventStreams = findAll().toList()
+    return userModels(eventStreams).filter { it.uid in uids }
 }
 
 suspend fun UserEventRepository.findByEmail(email: String): UserModel? {
-    return userModel(findUserEventStreamByEmail(email))
+    return userModels(findAll().toList())
+        .find { it.email == email }
 }
 
 suspend fun UserEventRepository.findByPhoneNumber(phoneNumber: String): UserModel? {
-    val eventStream = findUserEventStreamByPhoneNumber(phoneNumber)
-    return userModel(eventStream)
+    val eventStream = findAll().toList()
+    return userModels(eventStream).find { it.phoneNumber == phoneNumber }
 }
 
 suspend fun UserEventRepository.findAllByEmailIn(emails: List<String>): List<UserModel> {
-    val eventStreams = findUserEventStreamByEmailsIn(emails)
-    return userModels(eventStreams)
+    val eventStreams = findAll().toList()
+    return userModels(eventStreams).filter { it.email in emails }
 }
 
 suspend fun UserEventRepository.findAllByPhoneNumberIn(phoneNumbers: List<String>): List<UserModel> {
-    val eventStreams = findUserEventStreamByPhoneNumberIn(phoneNumbers)
-    return userModels(eventStreams)
+    val eventStreams = findAll().toList()
+    return userModels(eventStreams).filter { it.phoneNumber in phoneNumbers }
 }
 
 fun userModels(eventStreams: List<UserEvent>) =

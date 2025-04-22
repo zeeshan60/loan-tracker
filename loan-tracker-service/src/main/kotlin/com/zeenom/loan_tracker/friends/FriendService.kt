@@ -21,7 +21,7 @@ class FriendService(
 
     suspend fun findAllByUserId(userId: String): FriendsWithAllTimeBalancesDto {
         val user = userEventHandler.findUserById(userId) ?: throw IllegalArgumentException("User $userId not found")
-        val friendDtos = friendFinderStrategy.findUserFriends(userId)
+        val friendDtos = friendFinderStrategy.findUserFriends(userId).filter { !it.deleted }
         val amountsPerFriend =
             transactionEventHandler.balancesOfFriendsByCurrency(userId, friendDtos.map { it.friendStreamId })
         val mainCurrency = user.currency?.let { Currency.getInstance(user.currency) } ?: Currency.getInstance("USD")
