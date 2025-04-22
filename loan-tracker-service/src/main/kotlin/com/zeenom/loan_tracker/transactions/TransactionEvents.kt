@@ -49,7 +49,7 @@ data class TransactionCreated(
 
     override fun applyEvent(existing: TransactionModel?): TransactionModel {
         return TransactionModel(
-            id = streamId,
+            historyLogId = streamId,
             userUid = userId,
             description = description,
             currency = currency,
@@ -88,7 +88,7 @@ data class TransactionCreated(
 
     override fun activityLog(current: TransactionModel): ActivityLog {
         return ActivityLog(
-            id = current.id ?: throw IllegalStateException("Transaction event id is required for activity log"),
+            id = current.historyLogId ?: throw IllegalStateException("Transaction event id is required for activity log"),
             userUid = userId,
             activityType = ActivityType.CREATED,
             amount = splitType.apply(totalAmount),
@@ -119,7 +119,7 @@ data class TransactionDateChanged(
     override fun applyEvent(existing: TransactionModel?): TransactionModel {
         requireNotNull(existing) {"TransactionModel cannot be null"}
         return existing.copy(
-            id = id,
+            historyLogId = id,
             transactionDate = transactionDate,
             version = version,
             updatedBy = userId,
@@ -169,7 +169,7 @@ data class TransactionDateChanged(
 
     override fun activityLog(current: TransactionModel): ActivityLog {
         return ActivityLog(
-            id = current.id ?: throw IllegalStateException("Transaction event id is required for activity log"),
+            id = current.historyLogId ?: throw IllegalStateException("Transaction event id is required for activity log"),
             userUid = userId,
             activityType = ActivityType.UPDATED,
             amount = current.splitType.apply(current.totalAmount),
@@ -198,7 +198,7 @@ data class DescriptionChanged(
     override fun applyEvent(existing: TransactionModel?): TransactionModel {
         requireNotNull(existing) {"TransactionModel cannot be null"}
         return existing.copy(
-            id = id,
+            historyLogId = id,
             description = description,
             version = version,
             updatedBy = userId,
@@ -249,7 +249,7 @@ data class DescriptionChanged(
 
     override fun activityLog(current: TransactionModel): ActivityLog {
         return ActivityLog(
-            id = current.id ?: throw IllegalStateException("Transaction event id is required for activity log"),
+            id = current.historyLogId ?: throw IllegalStateException("Transaction event id is required for activity log"),
             userUid = userId,
             activityType = ActivityType.UPDATED,
             amount = current.splitType.apply(current.totalAmount),
@@ -276,7 +276,7 @@ data class TransactionDeleted(
     override fun applyEvent(existing: TransactionModel?): TransactionModel {
         requireNotNull(existing) {"TransactionModel cannot be null"}
         return existing.copy(
-            id = id,
+            historyLogId = id,
             version = version,
             deleted = true,
             updatedBy = userId,
@@ -326,7 +326,7 @@ data class TransactionDeleted(
 
     override fun activityLog(current: TransactionModel): ActivityLog {
         return ActivityLog(
-            id = current.id ?: throw IllegalStateException("Transaction event id is required for activity log"),
+            id = current.historyLogId ?: throw IllegalStateException("Transaction event id is required for activity log"),
             userUid = userId,
             activityType = ActivityType.DELETED,
             amount = current.splitType.apply(current.totalAmount),
@@ -355,7 +355,7 @@ data class TotalAmountChanged(
     override fun applyEvent(existing: TransactionModel?): TransactionModel {
         requireNotNull(existing) {"TransactionModel cannot be null"}
         return existing.copy(
-            id = id,
+            historyLogId = id,
             totalAmount = totalAmount,
             version = version,
             updatedBy = userId,
@@ -406,7 +406,7 @@ data class TotalAmountChanged(
 
     override fun activityLog(current: TransactionModel): ActivityLog {
         return ActivityLog(
-            id = current.id ?: throw IllegalStateException("Transaction event id is required for activity log"),
+            id = current.historyLogId ?: throw IllegalStateException("Transaction event id is required for activity log"),
             userUid = userId,
             activityType = ActivityType.UPDATED,
             currency = current.currency,
@@ -434,7 +434,7 @@ data class CurrencyChanged(
     override fun applyEvent(existing: TransactionModel?): TransactionModel {
         requireNotNull(existing) {"TransactionModel cannot be null"}
         return existing.copy(
-            id = id,
+            historyLogId = id,
             currency = currency,
             version = version,
             updatedBy = userId,
@@ -485,7 +485,7 @@ data class CurrencyChanged(
 
     override fun activityLog(current: TransactionModel): ActivityLog {
         return ActivityLog(
-            id = current.id ?: throw IllegalStateException("Transaction event id is required for activity log"),
+            id = current.historyLogId ?: throw IllegalStateException("Transaction event id is required for activity log"),
             userUid = userId,
             activityType = ActivityType.UPDATED,
             currency = currency,
@@ -513,7 +513,7 @@ data class SplitTypeChanged(
     override fun applyEvent(existing: TransactionModel?): TransactionModel {
         requireNotNull(existing) {"TransactionModel cannot be null"}
         return existing.copy(
-            id = id,
+            historyLogId = id,
             splitType = splitType,
             version = version,
             updatedBy = userId,
@@ -564,7 +564,7 @@ data class SplitTypeChanged(
 
     override fun activityLog(current: TransactionModel): ActivityLog {
         return ActivityLog(
-            id = current.id ?: throw IllegalStateException("Transaction event id is required for activity log"),
+            id = current.historyLogId ?: throw IllegalStateException("Transaction event id is required for activity log"),
             userUid = userId,
             activityType = ActivityType.UPDATED,
             currency = current.currency,

@@ -39,7 +39,6 @@ CREATE INDEX idx_friend_model_deleted ON friend_model (deleted);
 
 CREATE TABLE IF NOT EXISTS transaction_model
 (
-    id               UUID,
     stream_id        UUID PRIMARY KEY NOT NULL,
     user_uid         VARCHAR(255)     NOT NULL,
     description      VARCHAR,
@@ -54,7 +53,8 @@ CREATE TABLE IF NOT EXISTS transaction_model
     split_type       VARCHAR(255),
     total_amount     NUMERIC,
     version          INT              NOT NULL,
-    deleted          BOOLEAN          DEFAULT FALSE
+    history_log_id   UUID,
+    deleted          BOOLEAN DEFAULT FALSE
 );
 
 CREATE INDEX idx_transaction_model_user_uid ON transaction_model (user_uid);

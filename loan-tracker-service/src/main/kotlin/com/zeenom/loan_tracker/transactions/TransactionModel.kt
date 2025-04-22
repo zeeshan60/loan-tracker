@@ -13,7 +13,6 @@ interface TransactionModelRepository : CoroutineCrudRepository<TransactionModel,
 
 @Table("transaction_model")
 data class TransactionModel(
-    val id: UUID?,
     @Id
     val streamId: UUID,
     val userUid: String,
@@ -29,7 +28,8 @@ data class TransactionModel(
     val updatedBy: String?,
     val deleted: Boolean = false,
     val version: Int,
-    val transactionDate: Instant
+    val transactionDate: Instant,
+    val historyLogId: UUID?
 )
 
 data class ActivityLog(
