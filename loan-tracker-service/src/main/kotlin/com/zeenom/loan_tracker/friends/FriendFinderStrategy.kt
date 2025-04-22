@@ -9,13 +9,13 @@ class FriendFinderStrategy(
     private val userEventHandler: UserEventHandler,
 ) {
     suspend fun findUserFriends(userId: String): List<FriendUserDto> {
-        val friends = friendsEventHandler.findAllFriendsByUserId(userId).toList()
+        val friends = friendsEventHandler.findAllFriendsByUserId(userId)
         val usersByPhones =
-            userEventHandler.findUsersByPhoneNumbers(friends.mapNotNull { it.friendPhoneNumber }).toList()
+            userEventHandler.findUsersByPhoneNumbers(friends.mapNotNull { it.friendPhoneNumber })
                 .associateBy { it.phoneNumber }
         val usersByEmails =
             userEventHandler.findUsersByEmails(friends.filter { it.friendPhoneNumber !in usersByPhones.keys }
-                .mapNotNull { it.friendEmail }).toList().associateBy { it.email }
+                .mapNotNull { it.friendEmail }).associateBy { it.email }
         return friends.map {
             val user =
                 it.friendPhoneNumber?.let { usersByPhones[it] } ?: it.friendEmail?.let { usersByEmails[it] }

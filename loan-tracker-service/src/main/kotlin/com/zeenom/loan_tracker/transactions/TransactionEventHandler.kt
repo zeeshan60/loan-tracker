@@ -148,15 +148,6 @@ class TransactionEventHandler(
         transactionEventRepository.save(event.toEntity())
     }
 
-    private fun TransactionEvent.reverse(
-        friendUserId: String,
-        myStreamId: UUID,
-    ): TransactionEvent = this.toEvent().let {
-        if (it is CrossTransactionable) it.crossTransaction(friendUserId, myStreamId)
-            .toEntity()
-        else throw IllegalArgumentException("Invalid event type ${it.javaClass}")
-    }
-
     /**
      * Only synchronize transactions if one user has some transactions with other and other dont have any
      * This could happen if one user is added as a friend and other user has transactions with him

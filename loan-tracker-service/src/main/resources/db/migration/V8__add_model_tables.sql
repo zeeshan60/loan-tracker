@@ -39,31 +39,6 @@ CREATE INDEX idx_friend_model_friend_phone_number ON friend_model (friend_phone_
 CREATE INDEX idx_friend_model_updated_at ON friend_model (updated_at);
 CREATE INDEX idx_friend_model_deleted ON friend_model (deleted);
 
-CREATE TABLE IF NOT EXISTS transaction_model
-(
-    id               UUID PRIMARY KEY DEFAULT uuid_generate_v1(),
-    stream_id        UUID UNIQUE  NOT NULL,
-    user_uid         VARCHAR(255) NOT NULL,
-    description      VARCHAR,
-    amount           NUMERIC,
-    currency         VARCHAR(255),
-    transaction_type VARCHAR(255),
-    recipient_id     UUID,
-    created_at       TIMESTAMP    NOT NULL,
-    updated_at       TIMESTAMP,
-    created_by       VARCHAR(255) NOT NULL,
-    updated_by       VARCHAR(255),
-    split_type       VARCHAR(255),
-    total_amount     NUMERIC,
-    version          INT          NOT NULL,
-    history_log_id   UUID,
-    deleted          BOOLEAN          DEFAULT FALSE
-);
-
-CREATE INDEX idx_transaction_model_user_uid ON transaction_model (user_uid);
-CREATE INDEX idx_transaction_model_recipient_id ON transaction_model (recipient_id);
-CREATE INDEX idx_transaction_model_updated_at ON transaction_model (updated_at);
-CREATE INDEX idx_transaction_model_deleted ON transaction_model (deleted);
 
 CREATE TABLE IF NOT EXISTS migration_status
 (

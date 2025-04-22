@@ -23,9 +23,8 @@ interface MigrationStatusRepository : CoroutineCrudRepository<MigrationStatus, U
     suspend fun findByVersion(version: Int): MigrationStatus?
 
     @Query(
-
         """
-        SELECT ms FROM migration_status ms WHERE ms.finished_at IS NOT NULL ORDER BY ms.version DESC LIMIT 1
+        SELECT * FROM migration_status WHERE finished_at IS NOT NULL ORDER BY version DESC LIMIT 1
         """
     )
     suspend fun findLastFinishedByOrderByVersionDesc(): MigrationStatus?

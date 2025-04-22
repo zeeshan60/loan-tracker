@@ -4,10 +4,6 @@ import com.zeenom.loan_tracker.friends.FriendEvent
 import com.zeenom.loan_tracker.friends.FriendEventRepository
 import com.zeenom.loan_tracker.friends.FriendModel
 import com.zeenom.loan_tracker.friends.FriendModelRepository
-import com.zeenom.loan_tracker.transactions.TransactionEvent
-import com.zeenom.loan_tracker.transactions.TransactionEventRepository
-import com.zeenom.loan_tracker.transactions.TransactionModel
-import com.zeenom.loan_tracker.transactions.TransactionModelRepository
 import com.zeenom.loan_tracker.users.UserEventRepository
 import com.zeenom.loan_tracker.users.UserModelRepository
 import com.zeenom.loan_tracker.users.userModels
@@ -41,10 +37,8 @@ class MigrationService(
     private val migrationStatusRepository: MigrationStatusRepository,
     private val userEventRepository: UserEventRepository,
     private val friendEventRepository: FriendEventRepository,
-    private val transactionEventRepository: TransactionEventRepository,
     private val userModelRepository: UserModelRepository,
-    private val friendModelRepository: FriendModelRepository,
-    private val transactionModelRepository: TransactionModelRepository,
+    private val friendModelRepository: FriendModelRepository
 ) {
     val logger = LoggerFactory.getLogger(MigrationService::class.java)
 
@@ -68,6 +62,7 @@ class MigrationService(
         )
 
         when (version) {
+            0 -> {}
             1 -> {}
             2 -> migrateV2()
             else -> throw IllegalStateException("Migration not found for version $version")
@@ -87,9 +82,6 @@ class MigrationService(
 
         val friendEvents = friendEventRepository.findAll().toList()
         friendModelRepository.saveAll(friendModels(friendEvents)).toList()
-
-        val transactionEvents = transactionEventRepository.findAll().toList()
-        transactionModelRepository.saveAll(transactionModels(transactionEvents)).toList()
     }
 
     fun friendModels(eventStreams: List<FriendEvent>) =
@@ -100,17 +92,6 @@ class MigrationService(
     fun friendModel(eventStream: List<FriendEvent>) =
         eventStream.map { it.toEvent() }.sortedBy { it.version }
             .fold(null as FriendModel?) { model, event ->
-                event.applyEvent(model)
-            }
-
-    fun transactionModels(eventStreams: List<TransactionEvent>) =
-        eventStreams.groupBy { it.streamId }.map { (_, events) ->
-            transactionModel(events) ?: throw IllegalStateException("Transaction model not found")
-        }
-
-    fun transactionModel(eventStream: List<TransactionEvent>) =
-        eventStream.map { it.toEvent() }.sortedBy { it.version }
-            .fold(null as TransactionModel?) { model, event ->
                 event.applyEvent(model)
             }
 }

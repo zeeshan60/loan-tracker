@@ -5,6 +5,7 @@ import com.zeenom.loan_tracker.transactions.ICurrencyClient
 import com.zeenom.loan_tracker.transactions.TransactionEventHandler
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventHandler
+import io.swagger.v3.core.util.Json
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.util.*

@@ -61,11 +61,20 @@ data class FriendEvent(
 }
 
 @Repository
-interface FriendModelRepository : CoroutineCrudRepository<FriendModel, UUID>
+interface FriendModelRepository : CoroutineCrudRepository<FriendModel, UUID> {
+    suspend fun findAllByUserUid(userUid: String): Flow<FriendModel>
+    suspend fun findByUserUidAndFriendEmail(userUid: String, email: String): FriendModel?
+    suspend fun findAllByFriendEmail(email: String): Flow<FriendModel>
+    suspend fun findByUserUidAndFriendPhoneNumber(userUid: String, phoneNumber: String): FriendModel?
+    suspend fun findAllByFriendPhoneNumber(phoneNumber: String): Flow<FriendModel>
+    suspend fun findByUserUidAndStreamId(userUid: String, recipientId: UUID): FriendModel?
+    suspend fun findByStreamId(streamId: UUID): FriendModel?
+}
 
 @Table("friend_model")
 data class FriendModel(
     @Id
+    val id: UUID? = null,
     val streamId: UUID,
     val userUid: String,
     val friendEmail: String?,

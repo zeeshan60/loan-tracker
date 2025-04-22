@@ -2,6 +2,7 @@ package com.zeenom.loan_tracker.integration
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.zeenom.loan_tracker.friends.FriendEventRepository
+import com.zeenom.loan_tracker.friends.FriendModelRepository
 import com.zeenom.loan_tracker.friends.FriendResponse
 import com.zeenom.loan_tracker.friends.UpdateFriendRequest
 import com.zeenom.loan_tracker.transactions.SplitType
@@ -30,6 +31,9 @@ class FriendUpdateTransactionSyncIntegrationTest() : BaseIntegration() {
     @Autowired
     private lateinit var userModelRepository: UserModelRepository
 
+    @Autowired
+    private lateinit var friendModelRepository: FriendModelRepository
+
     private lateinit var zeeToken: String
     private var zeeDto = UserDto(
         uid = "123",
@@ -56,6 +60,7 @@ class FriendUpdateTransactionSyncIntegrationTest() : BaseIntegration() {
     @BeforeAll
     fun beforeAll(): Unit = runBlocking {
         userModelRepository.deleteAll()
+        friendModelRepository.deleteAll()
         userEventRepository.deleteAll()
         friendEventRepository.deleteAll()
         zeeToken = loginUser(
