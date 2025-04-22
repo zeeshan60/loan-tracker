@@ -87,7 +87,7 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
   readonly defineExpenseForm = this.formBuilder.group({
     description: this.formBuilder.nonNullable.control('', [Validators.required, Validators.maxLength(1000)]),
     currency: this.formBuilder.nonNullable.control(CURRENCIES[0], [Validators.required]),
-    amount: this.formBuilder.nonNullable.control<number|null>(null, [Validators.required, Validators.min(1), Validators.max(100000000)]),
+    amount: this.formBuilder.nonNullable.control<number|null>(null, [Validators.required, Validators.min(1), Validators.max(99999999999)]),
     type: this.formBuilder.nonNullable.control({ value: SplitOptions.YouPaidSplitEqually, disabled: !this.friend() }, [Validators.required]),
     transactionDate: this.formBuilder.nonNullable.control((new Date()).toISOString(), [Validators.required]),
   });
