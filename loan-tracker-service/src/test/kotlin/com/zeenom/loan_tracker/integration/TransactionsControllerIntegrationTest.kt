@@ -6,6 +6,7 @@ import com.zeenom.loan_tracker.friends.FriendEventRepository
 import com.zeenom.loan_tracker.friends.FriendsResponse
 import com.zeenom.loan_tracker.friends.UpdateUserRequest
 import com.zeenom.loan_tracker.friends.UserResponse
+import com.zeenom.loan_tracker.prettyAndPrint
 import com.zeenom.loan_tracker.transactions.*
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventRepository
@@ -565,6 +566,8 @@ class TransactionsControllerIntegrationTest :
             }
 
         assertThat(result.data).hasSize(5)
+
+        result.prettyAndPrint(objectMapper)
 
         assertThat(result.data[0].id).isNotNull()
         assertThat(result.data[0].activityType).isEqualTo(ActivityType.DELETED)

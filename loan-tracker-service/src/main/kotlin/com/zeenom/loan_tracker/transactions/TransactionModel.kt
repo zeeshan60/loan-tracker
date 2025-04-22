@@ -1,11 +1,21 @@
 package com.zeenom.loan_tracker.transactions
 
+import org.springframework.data.annotation.Id
+import org.springframework.data.relational.core.mapping.Table
+import org.springframework.data.repository.kotlin.CoroutineCrudRepository
+import org.springframework.stereotype.Repository
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.*
 
+@Repository
+interface TransactionModelRepository : CoroutineCrudRepository<TransactionModel, UUID>
+
+@Table("transaction_model")
 data class TransactionModel(
     val id: UUID?,
+    @Id
+    val streamId: UUID,
     val userUid: String,
     val description: String,
     val currency: String,
@@ -18,7 +28,6 @@ data class TransactionModel(
     val createdBy: String,
     val updatedBy: String?,
     val deleted: Boolean = false,
-    val streamId: UUID,
     val version: Int,
     val transactionDate: Instant
 )

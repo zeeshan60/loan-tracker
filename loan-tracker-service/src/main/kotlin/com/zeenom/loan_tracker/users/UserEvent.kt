@@ -4,6 +4,8 @@ import com.zeenom.loan_tracker.common.events.IEvent
 import com.zeenom.loan_tracker.transactions.IEventAble
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
+import org.springframework.data.repository.kotlin.CoroutineCrudRepository
+import org.springframework.stereotype.Repository
 import java.time.Instant
 import java.util.*
 
@@ -40,6 +42,7 @@ data class UserEvent(
                 streamId = streamId,
                 createdBy = uid
             )
+
             UserEventType.CURRENCY_CHANGED -> UserCurrencyChanged(
                 userId = uid,
                 currency = currency ?: throw IllegalStateException("Currency is required"),
@@ -48,6 +51,7 @@ data class UserEvent(
                 streamId = streamId,
                 createdBy = uid
             )
+
             UserEventType.PHONE_NUMBER_CHANGED -> UserPhoneNumberChanged(
                 userId = uid,
                 phoneNumber = phoneNumber,
@@ -56,6 +60,7 @@ data class UserEvent(
                 streamId = streamId,
                 createdBy = uid
             )
+
             UserEventType.DISPLAY_NAME_CHANGED -> UserDisplayNameChanged(
                 userId = uid,
                 displayName = displayName ?: throw IllegalStateException("Display name is required"),
@@ -68,7 +73,12 @@ data class UserEvent(
     }
 }
 
+@Repository
+interface UserModelRepository : CoroutineCrudRepository<UserModel, UUID>
+
+@Table("user_model")
 data class UserModel(
+    @Id
     val streamId: UUID,
     val uid: String,
     val displayName: String,
@@ -78,6 +88,7 @@ data class UserModel(
     val photoUrl: String?,
     val emailVerified: Boolean?,
     val createdAt: Instant,
+    val updatedAt: Instant,
     val version: Int,
 )
 
@@ -120,6 +131,7 @@ data class UserCreated(
             currency = null,
             emailVerified = emailVerified,
             createdAt = createdAt,
+            updatedAt = createdAt,
             version = version
         )
     }
@@ -151,16 +163,9 @@ data class UserCurrencyChanged(
 
     override fun applyEvent(existing: UserModel?): UserModel {
         requireNotNull(existing) { "User must exist" }
-        return UserModel(
-            uid = existing.uid,
-            streamId = existing.streamId,
-            displayName = existing.displayName,
-            phoneNumber = existing.phoneNumber,
-            email = existing.email,
-            photoUrl = existing.photoUrl,
+        return existing.copy(
             currency = currency,
-            emailVerified = existing.emailVerified,
-            createdAt = createdAt,
+            updatedAt = createdAt,
             version = version
         )
     }
@@ -192,16 +197,9 @@ data class UserPhoneNumberChanged(
 
     override fun applyEvent(existing: UserModel?): UserModel {
         requireNotNull(existing) { "User must exist" }
-        return UserModel(
-            uid = existing.uid,
-            streamId = existing.streamId,
-            displayName = existing.displayName,
+        return existing.copy(
             phoneNumber = phoneNumber,
-            email = existing.email,
-            photoUrl = existing.photoUrl,
-            currency = existing.currency,
-            emailVerified = existing.emailVerified,
-            createdAt = createdAt,
+            updatedAt = createdAt,
             version = version
         )
     }
@@ -233,16 +231,9 @@ data class UserDisplayNameChanged(
 
     override fun applyEvent(existing: UserModel?): UserModel {
         requireNotNull(existing) { "User must exist" }
-        return UserModel(
-            uid = existing.uid,
-            streamId = existing.streamId,
+        return existing.copy(
             displayName = displayName,
-            phoneNumber = existing.phoneNumber,
-            email = existing.email,
-            photoUrl = existing.photoUrl,
-            currency = existing.currency,
-            emailVerified = existing.emailVerified,
-            createdAt = createdAt,
+            updatedAt = createdAt,
             version = version
         )
     }

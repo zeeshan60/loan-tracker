@@ -60,14 +60,19 @@ data class FriendEvent(
     }
 }
 
+@Repository
+interface FriendModelRepository : CoroutineCrudRepository<FriendModel, UUID>
+
+@Table("friend_model")
 data class FriendModel(
-    val id: UUID?,
+    @Id
+    val streamId: UUID,
     val userUid: String,
     val friendEmail: String?,
     val friendPhoneNumber: String?,
     val friendDisplayName: String,
     val createdAt: Instant,
-    val streamId: UUID,
+    val updatedAt: Instant,
     val version: Int,
     val deleted: Boolean,
 )
@@ -98,12 +103,12 @@ data class FriendCreated(
 
     override fun applyEvent(existing: FriendModel?): FriendModel {
         return FriendModel(
-            id = id,
             userUid = userId,
             friendEmail = friendEmail,
             friendPhoneNumber = friendPhoneNumber,
             friendDisplayName = friendDisplayName,
             createdAt = createdAt,
+            updatedAt = createdAt,
             streamId = streamId,
             version = version,
             deleted = false
@@ -140,7 +145,7 @@ data class FriendUpdated(
             friendEmail = friendEmail ?: existing.friendEmail,
             friendPhoneNumber = friendPhoneNumber ?: existing.friendPhoneNumber,
             friendDisplayName = friendDisplayName ?: existing.friendDisplayName,
-            createdAt = createdAt,
+            updatedAt = createdAt,
             streamId = streamId,
             version = version
         ) ?: throw IllegalStateException("Friend not found")
@@ -171,7 +176,7 @@ data class FriendDeleted(
     override fun applyEvent(existing: FriendModel?): FriendModel {
         return existing?.copy(
             userUid = userId,
-            createdAt = createdAt,
+            updatedAt = createdAt,
             streamId = streamId,
             version = version,
             deleted = true
