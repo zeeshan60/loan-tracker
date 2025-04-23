@@ -4,6 +4,7 @@ import com.zeenom.loan_tracker.common.events.IEvent
 import com.zeenom.loan_tracker.transactions.IEventAble
 import kotlinx.coroutines.flow.Flow
 import org.springframework.data.annotation.Id
+import org.springframework.data.r2dbc.repository.Query
 import org.springframework.data.relational.core.mapping.Table
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import org.springframework.stereotype.Repository
@@ -60,14 +61,29 @@ data class FriendEvent(
     }
 }
 
+@Repository
+interface FriendModelRepository : CoroutineCrudRepository<FriendModel, UUID> {
+    suspend fun findAllByUserUidAndDeletedIsFalse(userUid: String): Flow<FriendModel>
+    suspend fun findByUserUidAndFriendEmailAndDeletedIsFalse(userUid: String, email: String): FriendModel?
+    suspend fun findAllByFriendEmailAndDeletedIsFalse(email: String): Flow<FriendModel>
+    suspend fun findByUserUidAndFriendPhoneNumberAndDeletedIsFalse(userUid: String, phoneNumber: String): FriendModel?
+    suspend fun findAllByFriendPhoneNumberAndDeletedIsFalse(phoneNumber: String): Flow<FriendModel>
+    suspend fun findByUserUidAndStreamIdAndDeletedIsFalse(userUid: String, recipientId: UUID): FriendModel?
+    suspend fun findByStreamIdAndDeletedIsFalse(streamId: UUID): FriendModel?
+    suspend fun findAllByUserUid(string: String): Flow<FriendModel>
+}
+
+@Table("friend_model")
 data class FriendModel(
-    val id: UUID?,
+    @Id
+    val id: UUID? = null,
+    val streamId: UUID,
     val userUid: String,
     val friendEmail: String?,
     val friendPhoneNumber: String?,
     val friendDisplayName: String,
     val createdAt: Instant,
-    val streamId: UUID,
+    val updatedAt: Instant,
     val version: Int,
     val deleted: Boolean,
 )
@@ -98,12 +114,12 @@ data class FriendCreated(
 
     override fun applyEvent(existing: FriendModel?): FriendModel {
         return FriendModel(
-            id = id,
             userUid = userId,
             friendEmail = friendEmail,
             friendPhoneNumber = friendPhoneNumber,
             friendDisplayName = friendDisplayName,
             createdAt = createdAt,
+            updatedAt = createdAt,
             streamId = streamId,
             version = version,
             deleted = false
@@ -140,7 +156,7 @@ data class FriendUpdated(
             friendEmail = friendEmail ?: existing.friendEmail,
             friendPhoneNumber = friendPhoneNumber ?: existing.friendPhoneNumber,
             friendDisplayName = friendDisplayName ?: existing.friendDisplayName,
-            createdAt = createdAt,
+            updatedAt = createdAt,
             streamId = streamId,
             version = version
         ) ?: throw IllegalStateException("Friend not found")
@@ -171,7 +187,7 @@ data class FriendDeleted(
     override fun applyEvent(existing: FriendModel?): FriendModel {
         return existing?.copy(
             userUid = userId,
-            createdAt = createdAt,
+            updatedAt = createdAt,
             streamId = streamId,
             version = version,
             deleted = true

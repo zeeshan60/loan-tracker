@@ -9,9 +9,6 @@ import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.*
-import kotlin.compareTo
-import kotlin.jvm.kotlin
-import kotlin.math.abs
 
 @Service
 class TransactionService(
@@ -256,7 +253,7 @@ class TransactionService(
     private suspend fun userAndFriendInfo(userId: String): Triple<UserDto, Map<String, FriendUserDto>, Map<UUID, FriendUserDto>> {
         val user = userEventHandler.findUserById(userId)
         requireNotNull(user) { "User with id $userId does not exist" }
-        val findUserFriends = friendFinderStrategy.findUserFriends(userId)
+        val findUserFriends = friendFinderStrategy.findUserFriends(userId = userId, includeDeleted = true)
         val friendUsersByUid =
             findUserFriends.filter { it.friendUid != null }
                 .associateBy {

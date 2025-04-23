@@ -16,10 +16,12 @@ import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UserServiceTest(
     @Autowired private val userEventRepository: UserEventRepository,
+    @Autowired private val userModelRepository: UserModelRepository,
 ) : TestPostgresConfig() {
 
     private val userEventHandler = UserEventHandler(
-        userRepository = userEventRepository
+        userRepository = userEventRepository,
+        userModelRepository = userModelRepository
     )
 
     private val userService = UserService(
@@ -29,6 +31,7 @@ class UserServiceTest(
     @BeforeEach
     fun beforeAll(): Unit = runBlocking {
         userEventRepository.deleteAll()
+        userModelRepository.deleteAll()
     }
 
     @Test

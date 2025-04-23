@@ -2,10 +2,16 @@ package com.zeenom.loan_tracker.integration
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.zeenom.loan_tracker.common.Paginated
-import com.zeenom.loan_tracker.friends.*
+import com.zeenom.loan_tracker.friends.FriendEventRepository
+import com.zeenom.loan_tracker.friends.FriendModelRepository
+import com.zeenom.loan_tracker.friends.FriendsResponse
+import com.zeenom.loan_tracker.friends.UpdateUserRequest
+import com.zeenom.loan_tracker.friends.UserResponse
+import com.zeenom.loan_tracker.prettyAndPrint
 import com.zeenom.loan_tracker.transactions.*
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventRepository
+import com.zeenom.loan_tracker.users.UserModelRepository
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.AutoCloseableSoftAssertions
@@ -16,7 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.time.Instant
 import java.util.*
 
-class TransactionsControllerIntegrationTest:
+class TransactionsControllerIntegrationTest :
     BaseIntegration() {
 
     @Autowired
@@ -27,6 +33,12 @@ class TransactionsControllerIntegrationTest:
 
     @Autowired
     private lateinit var transactionEventRepository: TransactionEventRepository
+
+    @Autowired
+    private lateinit var userModelRepository: UserModelRepository
+
+    @Autowired
+    private lateinit var friendModelRepository: FriendModelRepository
 
     private lateinit var zeeToken: String
     private lateinit var johnToken: String
@@ -64,9 +76,11 @@ class TransactionsControllerIntegrationTest:
 
     @BeforeAll
     fun setupBeforeAll(): Unit = runBlocking {
+        userModelRepository.deleteAll()
         userEventRepository.deleteAll()
         friendEventRepository.deleteAll()
         transactionEventRepository.deleteAll()
+        friendModelRepository.deleteAll()
         zeeToken = loginUser(
             userDto = zeeDto
         ).token
@@ -562,6 +576,8 @@ class TransactionsControllerIntegrationTest:
             }
 
         assertThat(result.data).hasSize(5)
+
+        result.prettyAndPrint(objectMapper)
 
         assertThat(result.data[0].id).isNotNull()
         assertThat(result.data[0].activityType).isEqualTo(ActivityType.DELETED)

@@ -2,6 +2,7 @@ package com.zeenom.loan_tracker.integration
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.zeenom.loan_tracker.friends.FriendEventRepository
+import com.zeenom.loan_tracker.friends.FriendModelRepository
 import com.zeenom.loan_tracker.transactions.SplitType
 import com.zeenom.loan_tracker.transactions.TransactionCreateRequest
 import com.zeenom.loan_tracker.transactions.TransactionEventRepository
@@ -9,6 +10,7 @@ import com.zeenom.loan_tracker.transactions.TransactionResponse
 import com.zeenom.loan_tracker.transactions.TransactionsResponse
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventRepository
+import com.zeenom.loan_tracker.users.UserModelRepository
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeAll
@@ -29,6 +31,12 @@ class TransactionsDeleteAllBugTest: BaseIntegration() {
     @Autowired
     private lateinit var transactionEventRepository: TransactionEventRepository
 
+    @Autowired
+    private lateinit var userModelRepository: UserModelRepository
+
+    @Autowired
+    private lateinit var friendModelRepository: FriendModelRepository
+
     private lateinit var zeeToken: String
 
     private lateinit var transaction: TransactionResponse
@@ -46,6 +54,8 @@ class TransactionsDeleteAllBugTest: BaseIntegration() {
 
     @BeforeAll
     fun setupBeforeAll(): Unit = runBlocking {
+        userModelRepository.deleteAll()
+        friendModelRepository.deleteAll()
         userEventRepository.deleteAll()
         friendEventRepository.deleteAll()
         transactionEventRepository.deleteAll()

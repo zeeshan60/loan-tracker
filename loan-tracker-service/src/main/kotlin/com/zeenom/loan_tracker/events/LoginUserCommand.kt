@@ -22,22 +22,6 @@ class LoginUserCommand(
         userService.findUserById(commandDto.payload.uid) ?: let {
             userService.createUser(userDto = commandDto.payload)
             friendService.searchUsersImFriendOfAndAddThemAsMyFriends(commandDto.userId)
-
-//            friendService.findAllByUserId(commandDto.userId).friends.forEach { friend ->
-//                val (friendEvent, userStreamId) = friendService.findFriendAndUserStreamId(
-//                    userUid = commandDto.payload.uid,
-//                    userEmail = commandDto.payload.email,
-//                    userPhone = commandDto.payload.phoneNumber,
-//                    recipientId = friend.friendId
-//                )
-//
-//                transactionEventHandler.addReverseEventsForUserAndFriend(
-//                    myUid = commandDto.payload.uid,
-//                    myStreamId = userStreamId!!,
-//                    friendUid = friendEvent!!.uid,
-//                    friendStreamId = friend.friendId
-//                )
-//            }
         }
     }
 }
