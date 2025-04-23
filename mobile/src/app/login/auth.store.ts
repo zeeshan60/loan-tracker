@@ -9,13 +9,12 @@ import { MethodsDictionary } from '@ngrx/signals/src/signal-store-models';
 import { DEFAULT_TOAST_DURATION, PRIVATE_API, PUBLIC_API } from '../constants';
 import { LoadingController } from '@ionic/angular/standalone';
 import { FriendsStore } from '../friends/friends.store';
-import { LoginPlugin } from 'zeenom/src';
-import { isWeb } from '../utils';
 import { firstValueFrom } from 'rxjs';
 import { Auth, signInWithPopup } from '@angular/fire/auth';
 import { GoogleAuthProvider } from 'firebase/auth';
 import { AskForPhoneComponent } from '../ask-for-phone/ask-for-phone.component';
 import { Capacitor } from '@capacitor/core';
+import { LoginPlugin } from 'zeenom-capacitor-social-login';
 
 export interface User {
   uid: string,
