@@ -1,12 +1,11 @@
 package com.zeenom.loan_tracker.integration
 
-import com.zeenom.loan_tracker.friends.FriendEventRepository
-import com.zeenom.loan_tracker.friends.FriendRequest
-import com.zeenom.loan_tracker.friends.FriendResponse
-import com.zeenom.loan_tracker.friends.UpdateFriendRequest
+import com.zeenom.loan_tracker.friends.*
 import com.zeenom.loan_tracker.prettyAndPrint
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventRepository
+import com.zeenom.loan_tracker.users.UserModelRepository
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.CoreMatchers.containsString
@@ -22,6 +21,12 @@ class CreateFriendWithInvalidRequestTest() : BaseIntegration() {
 
     @Autowired
     private lateinit var userEventRepository: UserEventRepository
+
+    @Autowired
+    private lateinit var userModelRepository: UserModelRepository
+
+    @Autowired
+    private lateinit var friendModelRepository: FriendModelRepository
 
     private lateinit var zeeToken: String
     private var zeeDto = UserDto(
@@ -40,6 +45,8 @@ class CreateFriendWithInvalidRequestTest() : BaseIntegration() {
     fun beforeAll(): Unit = runBlocking {
         userEventRepository.deleteAll()
         friendEventRepository.deleteAll()
+        userModelRepository.deleteAll()
+        friendModelRepository.deleteAll()
         zeeToken = loginUser(
             userDto = zeeDto
         ).token
@@ -105,6 +112,12 @@ class FriendControllerIntegrationTest() : BaseIntegration() {
     @Autowired
     private lateinit var userEventRepository: UserEventRepository
 
+    @Autowired
+    private lateinit var friendModelRepository: FriendModelRepository
+
+    @Autowired
+    private lateinit var userModelRepository: UserModelRepository
+
     private lateinit var zeeToken: String
     private var zeeDto = UserDto(
         uid = "123",
@@ -133,6 +146,8 @@ class FriendControllerIntegrationTest() : BaseIntegration() {
     fun beforeAll(): Unit = runBlocking {
         userEventRepository.deleteAll()
         friendEventRepository.deleteAll()
+        userModelRepository.deleteAll()
+        friendModelRepository.deleteAll()
         zeeToken = loginUser(
             userDto = zeeDto
         ).token

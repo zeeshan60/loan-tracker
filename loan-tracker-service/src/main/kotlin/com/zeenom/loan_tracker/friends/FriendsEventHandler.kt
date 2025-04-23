@@ -1,8 +1,6 @@
 package com.zeenom.loan_tracker.friends
 
-import com.zeenom.loan_tracker.common.events.IEvent
 import com.zeenom.loan_tracker.users.UserDto
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -11,38 +9,33 @@ import java.util.*
 @Service
 class FriendsEventHandler(
     private val eventRepository: FriendEventRepository,
+    private val friendModelRepository: FriendModelRepository
 ) {
-
-    suspend fun findAllFriendsByUserId(userId: String) =
-        eventRepository.findAllByUserUid(userId).toList().groupBy { it.streamId }
-            .mapNotNull { resolveStream(it.value.map { it.toEvent() }) }.filter { !it.deleted }
-
-    suspend fun findByUserUidAndFriendEmail(userUid: String, email: String): FriendModel? {
-        val friends = findAllFriendsByUserId(userUid)
-        return friends.singleOrNull { it.friendEmail == email }
-    }
-
-    suspend fun findByUserUidAndFriendPhoneNumber(userUid: String, phoneNumber: String): FriendModel? {
-        val friends = findAllFriendsByUserId(userUid)
-        return friends.singleOrNull { it.friendPhoneNumber == phoneNumber }
-    }
-
-    suspend fun findByUserUidAndFriendId(userUid: String, friendId: UUID): FriendModel? {
-        val events = eventRepository.findByUserUidAndStreamId(userUid, friendId)
-        return resolveStream(events.map { it.toEvent() }.toList())?.let { if (it.deleted) null else it }
-    }
-
-    fun resolveStream(events: List<IEvent<FriendModel>>): FriendModel? {
-        val sorted = events.sortedBy { it.version }
-        return sorted.fold(null as FriendModel?) { model, event ->
-            event.applyEvent(model)
-        }?.let {
-            if (it.deleted) null else it
-        }
-    }
 
     suspend fun addEvent(event: IFriendEvent) {
         eventRepository.save(event.toEntity())
+        val existing = friendModelRepository.findByStreamIdAndDeletedIsFalse(event.streamId)
+        friendModelRepository.save(event.applyEvent(existing))
+    }
+
+    suspend fun findAllFriendsByUserId(userId: String, includeDeleted: Boolean = false): List<FriendModel> {
+        return if (includeDeleted) {
+            friendModelRepository.findAllByUserUid(userId).toList()
+        } else {
+            friendModelRepository.findAllByUserUidAndDeletedIsFalse(userId).toList()
+        }
+    }
+
+    suspend fun findByUserUidAndFriendEmail(userUid: String, email: String): FriendModel? {
+        return friendModelRepository.findByUserUidAndFriendEmailAndDeletedIsFalse(userUid, email)
+    }
+
+    suspend fun findByUserUidAndFriendPhoneNumber(userUid: String, phoneNumber: String): FriendModel? {
+        return friendModelRepository.findByUserUidAndFriendPhoneNumberAndDeletedIsFalse(userUid, phoneNumber)
+    }
+
+    suspend fun findByUserUidAndFriendId(userUid: String, friendId: UUID): FriendModel? {
+        return friendModelRepository.findByUserUidAndStreamIdAndDeletedIsFalse(userUid, friendId)
     }
 
     suspend fun saveAllUsersAsFriends(userId: String, userDtos: List<UserDto>) {
@@ -59,29 +52,41 @@ class FriendsEventHandler(
             )
         }.also {
             eventRepository.saveAll(it).toList()
+            friendModelRepository.saveAll(
+                it.map { event ->
+                    FriendModel(
+                        streamId = event.streamId,
+                        userUid = userId,
+                        friendEmail = event.friendEmail,
+                        friendPhoneNumber = event.friendPhoneNumber,
+                        friendDisplayName = event.friendDisplayName
+                            ?: throw IllegalStateException("Friend display name is required"),
+                        createdAt = event.createdAt,
+                        updatedAt = event.createdAt,
+                        version = event.version,
+                        deleted = false
+                    )
+                }
+            ).toList()
         }
     }
 
     suspend fun findByFriendEmail(email: String): List<FriendModel> {
-        return eventRepository.findByFriendEmail(email).toList().groupBy { it.streamId }
-            .mapNotNull { resolveStream(it.value.map { it.toEvent() }) }.filter { !it.deleted }
+        return friendModelRepository.findAllByFriendEmailAndDeletedIsFalse(email).toList()
     }
 
     suspend fun findByFriendPhoneNumber(phoneNumber: String): List<FriendModel> {
-        return eventRepository.findByFriendPhoneNumber(phoneNumber).toList().groupBy { it.streamId }
-            .mapNotNull { resolveStream(it.value.map { it.toEvent() }) }.filter { !it.deleted }
+        return friendModelRepository.findAllByFriendPhoneNumberAndDeletedIsFalse(phoneNumber).toList()
     }
 
     suspend fun findFriendByUserIdAndFriendId(userUid: String, friendId: UUID): FriendId? {
-        return resolveStream(eventRepository.findByUserUidAndStreamId(userUid, friendId).map { it.toEvent() }
-            .toList())?.let {
-            if (it.deleted) null else FriendId(it.friendEmail, it.friendPhoneNumber, it.friendDisplayName)
+        return friendModelRepository.findByUserUidAndStreamIdAndDeletedIsFalse(userUid, friendId)?.let {
+            FriendId(it.friendEmail, it.friendPhoneNumber, it.friendDisplayName)
         }
     }
 
     suspend fun friendExistsByUserIdAndFriendId(userUid: String, recipientId: UUID): Boolean {
-        return resolveStream(eventRepository.findByUserUidAndStreamId(userUid, recipientId).map { it.toEvent() }
-            .toList())?.let { if (it.deleted) null else it } != null
+        return friendModelRepository.findByUserUidAndStreamIdAndDeletedIsFalse(userUid, recipientId) != null
     }
 
     suspend fun findFriendStreamIdByEmailOrPhoneNumber(userUid: String, email: String?, phoneNumber: String?): UUID? {

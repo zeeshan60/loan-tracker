@@ -58,7 +58,7 @@ class TransactionEventHandler(
                 changeSummary = historyByStream[it.streamId] ?: emptyList()
             )
         }
-            .sortedWith(compareByDescending<TransactionModelWithChangeSummary> { it.transactionModel.transactionDate }.thenByDescending { it.transactionModel.id })
+            .sortedWith(compareByDescending<TransactionModelWithChangeSummary> { it.transactionModel.transactionDate }.thenByDescending { it.transactionModel.streamId })
     }
 
     suspend fun transactionModelByTransactionId(
@@ -94,7 +94,7 @@ class TransactionEventHandler(
         val byStreamId = transactions.groupBy { Pair(it.streamId, it.recipientId) }
         return byStreamId.map { (_, events) ->
             val (model, logs) = resolveStreamAndGenerateLogs(events)
-                ?: throw IllegalStateException("Events cant be emtpy at this stage")
+                ?: throw IllegalStateException("Events cant be empty at this stage")
             TransactionModelWithActivityLogs(model, logs, changeSummaryByTransactionId[model.streamId] ?: emptyList())
         }
     }
@@ -146,15 +146,6 @@ class TransactionEventHandler(
 
     suspend fun addEvent(event: ITransactionEvent) {
         transactionEventRepository.save(event.toEntity())
-    }
-
-    private fun TransactionEvent.reverse(
-        friendUserId: String,
-        myStreamId: UUID,
-    ): TransactionEvent = this.toEvent().let {
-        if (it is CrossTransactionable) it.crossTransaction(friendUserId, myStreamId)
-            .toEntity()
-        else throw IllegalArgumentException("Invalid event type ${it.javaClass}")
     }
 
     /**

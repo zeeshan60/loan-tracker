@@ -9,4 +9,5 @@ data class FriendUserDto(
     val phoneNumber: String?,
     val photoUrl: String?,
     val name: String,
+    val deleted: Boolean,
 )

@@ -5,7 +5,7 @@ import java.time.Instant
 import java.util.*
 
 data class TransactionModel(
-    val id: UUID?,
+    val streamId: UUID,
     val userUid: String,
     val description: String,
     val currency: String,
@@ -18,9 +18,9 @@ data class TransactionModel(
     val createdBy: String,
     val updatedBy: String?,
     val deleted: Boolean = false,
-    val streamId: UUID,
     val version: Int,
-    val transactionDate: Instant
+    val transactionDate: Instant,
+    val historyLogId: UUID?
 )
 
 data class ActivityLog(

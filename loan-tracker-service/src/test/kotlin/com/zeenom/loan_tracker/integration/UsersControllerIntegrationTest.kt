@@ -1,10 +1,12 @@
 package com.zeenom.loan_tracker.integration
 
 import com.zeenom.loan_tracker.friends.FriendEventRepository
+import com.zeenom.loan_tracker.friends.FriendModelRepository
 import com.zeenom.loan_tracker.friends.UpdateUserRequest
 import com.zeenom.loan_tracker.friends.UserResponse
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventRepository
+import com.zeenom.loan_tracker.users.UserModelRepository
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeAll
@@ -25,6 +27,12 @@ class UsersControllerIntegrationTest(@LocalServerPort private val port: Int) : B
     @Autowired
     private lateinit var transactionEventRepository: FriendEventRepository
 
+    @Autowired
+    private lateinit var userModelRepository: UserModelRepository
+
+    @Autowired
+    private lateinit var friendModelRepository: FriendModelRepository
+
     private var zeeDto = UserDto(
         uid = "123",
         email = "zee@gmail.com",
@@ -38,6 +46,8 @@ class UsersControllerIntegrationTest(@LocalServerPort private val port: Int) : B
 
     @BeforeAll
     fun setupBeforeAll(): Unit = runBlocking {
+        userModelRepository.deleteAll()
+        friendModelRepository.deleteAll()
         userEventRepository.deleteAll()
         friendEventRepository.deleteAll()
         transactionEventRepository.deleteAll()

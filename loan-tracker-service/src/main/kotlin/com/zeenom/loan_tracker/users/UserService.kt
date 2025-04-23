@@ -7,7 +7,7 @@ import java.util.*
 
 @Service
 class UserService(
-    private val userEventHandler: UserEventHandler,
+    private val userEventHandler: UserEventHandler
 ) {
 
     suspend fun createUser(userDto: UserDto) {
