@@ -82,7 +82,7 @@ export class AddFriendComponent implements OnInit {
         email: this.friend()?.email,
         phone: {
           phoneNumber: toNationalPhone(this.friend()?.phone!),
-          country: extractCountryCode(this.friend()?.phone!)
+          country: extractCountryCode(this.friend()?.phone!) || COUNTRIES_WITH_CALLING_CODES[0].code
         }
       })
     } else {

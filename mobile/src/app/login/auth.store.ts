@@ -144,7 +144,7 @@ export const AuthStore = signalStore(
           this.signOut();
           const toast = await toastCtrl.create({
             message: 'Unable to login at the moment',
-            duration: 1500
+            duration: DEFAULT_TOAST_DURATION
           });
           toast.present();
         });
@@ -180,9 +180,16 @@ export const AuthStore = signalStore(
     },
 
     async signOut(): Promise<void> {
-      // await signOut(auth)
-      storageService.remove('api_key');
-      router.navigate(['login']);
+      try {
+        await storageService.remove('api_key');
+        await router.navigate(['login']);
+      } catch (e) {
+        const toast = await toastCtrl.create({
+          message: 'Unable to logout at the moment',
+          duration: DEFAULT_TOAST_DURATION
+        });
+        toast.present();
+      }
     }
   }))
 );
