@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, OnInit } from '@angular/core';
 import {
   IonAvatar,
   IonContent,
@@ -8,7 +8,7 @@ import {
   IonList,
   IonSearchbar,
 } from '@ionic/angular/standalone';
-import { ModalService } from '../modal.service';
+import { ModalIndex, ModalService } from '../modal.service';
 
 @Component({
   selector: 'app-currencies-modal',
@@ -27,7 +27,7 @@ import { ModalService } from '../modal.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CurrenciesModalComponent  implements OnInit {
-
+  modalIndex = input.required<ModalIndex>()
   modalService = inject(ModalService);
   constructor() { }
 

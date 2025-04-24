@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import {
   IonAvatar,
@@ -45,14 +45,12 @@ import { ModalService } from '../../modal.service';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ListFriendsComponent  implements OnInit {
+export class ListFriendsComponent {
   readonly friendsStore = inject(FriendsStore);
   readonly nav = inject(IonNav);
   readonly modalService = inject(ModalService);
 
   constructor() {}
-
-  ngOnInit() {}
 
   async chooseFriend(friend: FriendWithBalance) {
     this.nav.push(FriendTransactionsComponent, { friend });

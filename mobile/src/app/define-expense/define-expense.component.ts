@@ -215,9 +215,9 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
       }
     })
 
-    const { data, role } = await this.modalService.getModalByIndex(modalIndex).onWillDismiss();
+    const { data: friend, role } = await this.modalService.onWillDismiss<FriendWithBalance>(modalIndex);
     if (role === 'confirm') {
-      this.friend.set(data['friend']);
+      this.friend.set(friend);
     }
     return role;
   }

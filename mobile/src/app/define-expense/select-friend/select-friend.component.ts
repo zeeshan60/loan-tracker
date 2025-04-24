@@ -83,7 +83,7 @@ export class SelectFriendComponent {
   }
 
   async chooseFriend(friend: FriendWithBalance) {
-      this.modalService.dismiss(this.modalIndex(), {friend}, 'confirm');
+      this.modalService.dismiss(this.modalIndex(), friend, 'confirm');
   }
 
   async chooseContact(contact: { name: string, phoneNumber: string}) {

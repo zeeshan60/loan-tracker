@@ -34,30 +34,28 @@ export class ModalService {
     });
     await modalInstance.present();
     this._modals[modalIndex] = modalInstance;
+
+    // clear the space once the modal is closed.
+    modalInstance.onDidDismiss().then(() => {
+      this._modals[modalIndex] = null;
+    })
     return modalIndex;
   }
 
   public async dismiss(modalIndex: ModalIndex, data?: any, role?: 'confirm') {
     await this.getModalByIndex(modalIndex)?.dismiss(data, role)
-    this._modals[modalIndex] = null;
   }
 
   public getModalByIndex(index: ModalIndex): HTMLIonModalElement | null {
     return this._modals[index] as HTMLIonModalElement | null;
   }
 
-  public getAvailableIndex(): ModalIndex {
-    const index = Object.keys(this._modals).find((index) => !this._modals[+index as ModalIndex])
-    return index ? +index as ModalIndex : 0;
-  }
-
-  public async keepModalInstance(modalInstance: HTMLIonModalElement) {
-    const modalIndex = this.getAvailableIndex();
-    this._modals[modalIndex] = modalInstance;
-    return modalIndex;
-  }
-
   public async onWillDismiss<T>(index: ModalIndex) {
     return this.getModalByIndex(index).onWillDismiss<T>();
+  }
+
+  private getAvailableIndex(): ModalIndex {
+    const index = Object.keys(this._modals).find((index) => !this._modals[+index as ModalIndex])
+    return index ? +index as ModalIndex : 0;
   }
 }
