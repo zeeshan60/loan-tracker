@@ -20,6 +20,7 @@ import {
   createOutline,
   closeCircle,
   checkmarkOutline,
+  chevronDownOutline
 } from 'ionicons/icons';
 import { FriendsStore } from './friends/friends.store';
 import { IonicStorageModule } from '@ionic/storage-angular';
@@ -62,7 +63,8 @@ export class AppComponent implements OnInit {
       trashOutline,
       createOutline,
       closeCircle,
-      checkmarkOutline
+      checkmarkOutline,
+      chevronDownOutline
     });
   }
 

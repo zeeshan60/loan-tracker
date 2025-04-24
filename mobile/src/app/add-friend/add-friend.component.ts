@@ -11,11 +11,10 @@ import {
   IonButtons,
   IonContent,
   IonHeader,
-  IonInput, IonItem, IonList, IonSearchbar, IonSelect, IonSelectOption,
+  IonInput, IonItem, IonList,
   IonSpinner,
   IonTitle,
   IonToolbar,
-  ModalController,
 } from '@ionic/angular/standalone';
 import {
   FormBuilder, FormControl, FormGroup,
@@ -29,6 +28,7 @@ import { FriendWithBalance } from '../friends/model';
 import { extractCountryCode, toInternationalPhone, toNationalPhone } from '../utility-functions';
 import { PhoneWithCountryComponent } from '../phone-with-country/phone-with-country.component';
 import { COUNTRIES_WITH_CALLING_CODES } from '../constants';
+import { ModalIndex, ModalService } from '../modal.service';
 
 @Component({
   selector: 'app-add-friend',
@@ -54,10 +54,11 @@ export class AddFriendComponent implements OnInit {
   @Input() name: string = '';
   readonly friend = input<FriendWithBalance|null>(null);
   readonly isUpdating = input(false);
+  readonly modalIndex = input.required<ModalIndex>();
   readonly friendsStore = inject(FriendsStore);
   private formBuilder = inject(FormBuilder);
-  private modalCtrl = inject(ModalController);
   private helperService = inject(HelperService);
+  private modalService = inject(ModalService);
   readonly loading = signal(false);
   public addFriendForm = this.formBuilder.group({
     name: this.formBuilder.nonNullable.control('', [Validators.required]),
@@ -93,7 +94,7 @@ export class AddFriendComponent implements OnInit {
   }
 
   cancel() {
-    this.modalCtrl.dismiss(null, 'cancel');
+    this.modalService.dismiss(this.modalIndex());
   }
 
   async onSubmit() {
@@ -108,7 +109,7 @@ export class AddFriendComponent implements OnInit {
         const friend = this.isUpdating() ?
           await this.friendsStore.updateFriend(this.friend()!.friendId, mappedValue) :
           await this.friendsStore.addFriend(mappedValue);
-        await this.modalCtrl.dismiss(friend, 'confirm')
+        await this.modalService.dismiss(this.modalIndex(), friend, 'confirm')
       } finally {
         this.loading.set(false);
       }

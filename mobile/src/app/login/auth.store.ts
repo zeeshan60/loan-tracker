@@ -3,7 +3,7 @@ import { inject } from '@angular/core';
 import { HelperService } from '../helper.service';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { ModalController, ToastController } from '@ionic/angular/standalone';
+import { ToastController } from '@ionic/angular/standalone';
 import { StorageService } from '../services/storage.service';
 import { MethodsDictionary } from '@ngrx/signals/src/signal-store-models';
 import { DEFAULT_TOAST_DURATION, PRIVATE_API, PUBLIC_API } from '../constants';
@@ -15,6 +15,7 @@ import { GoogleAuthProvider } from 'firebase/auth';
 import { AskForPhoneComponent } from '../ask-for-phone/ask-for-phone.component';
 import { Capacitor } from '@capacitor/core';
 import { LoginPlugin } from 'zeenom-capacitor-social-login';
+import { ModalService } from '../modal.service';
 
 export interface User {
   uid: string,
@@ -75,7 +76,7 @@ export const AuthStore = signalStore(
     auth = inject(Auth),
     router = inject(Router),
     toastCtrl = inject(ToastController),
-    modalCtrl = inject(ModalController),
+    modalService = inject(ModalService),
     storageService = inject(StorageService),
     loadingCtrl = inject(LoadingController),
     friendsStore = inject(FriendsStore),
@@ -150,14 +151,13 @@ export const AuthStore = signalStore(
     },
 
     async askForPhoneNumber() {
-      const modal = await modalCtrl.create({
+      await modalService.showModal({
         component: AskForPhoneComponent,
         componentProps: {
           user: store.user(),
           region: store.region()
         }
       })
-      modal.present();
     },
 
     async login(idToken: string) {

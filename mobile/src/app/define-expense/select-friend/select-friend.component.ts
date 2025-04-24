@@ -7,7 +7,6 @@ import {
   IonLabel,
   IonList, IonListHeader,
   IonSearchbar, IonTitle, IonToolbar, LoadingController,
-  ModalController,
 } from '@ionic/angular/standalone';
 import { AddFriendComponent } from '../../add-friend/add-friend.component';
 import { FriendsStore } from '../../friends/friends.store';
@@ -17,6 +16,7 @@ import { FriendWithBalance } from '../../friends/model';
 import { DefineExpenseService } from '../define-expense.service';
 import { isMobile } from '../../utils';
 import { Contacts } from '@capacitor-community/contacts';
+import { ModalIndex, ModalService } from '../../modal.service';
 
 @Component({
   selector: 'app-select-friend',
@@ -35,9 +35,10 @@ import { Contacts } from '@capacitor-community/contacts';
   ],
 })
 export class SelectFriendComponent {
-  modalCtrl = inject(ModalController);
+  modalIndex = input.required<ModalIndex>()
   friendsStore = inject(FriendsStore);
   defineExpenseService = inject(DefineExpenseService);
+  modalService = inject(ModalService);
   loadingCtrl = inject(LoadingController);
   friend = input<FriendWithBalance>();
   context = input<'ChooseFriend'|'AddFriend'>('ChooseFriend');
@@ -82,9 +83,7 @@ export class SelectFriendComponent {
   }
 
   async chooseFriend(friend: FriendWithBalance) {
-    this.defineExpenseService.selectFriendModalInstance ?
-      this.defineExpenseService.selectFriendModalInstance.dismiss({friend}, 'confirm') :
-      this.modalCtrl.dismiss({friend}, 'confirm');
+      this.modalService.dismiss(this.modalIndex(), {friend}, 'confirm');
   }
 
   async chooseContact(contact: { name: string, phoneNumber: string}) {
@@ -103,18 +102,15 @@ export class SelectFriendComponent {
   }
 
   closePopup() {
-    this.defineExpenseService.selectFriendModalInstance ?
-      this.defineExpenseService.selectFriendModalInstance.dismiss() :
-      this.modalCtrl.dismiss();
+    this.modalService.dismiss(this.modalIndex());
   }
 
   async createNewFriend() {
-    const modal = await this.modalCtrl.create({
+    const modalIndex = await this.modalService.showModal({
       component: AddFriendComponent,
       componentProps: { name: this.filter()}
     })
-    modal.present();
-    const { data: friend, role } = await modal.onWillDismiss();
+    const { data: friend, role } = await this.modalService.onWillDismiss<FriendWithBalance>(modalIndex);
     if (role === 'confirm') {
       this.chooseFriend(friend);
     }

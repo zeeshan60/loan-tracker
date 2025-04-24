@@ -1,8 +1,7 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, viewChild } from '@angular/core';
-import { IonTabs, IonTabBar, IonTabButton, IonIcon, ModalController } from '@ionic/angular/standalone';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { IonTabs, IonTabBar, IonTabButton, IonIcon } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { FriendsStore } from '../friends/friends.store';
-import { DefineExpenseComponent } from '../define-expense/define-expense.component';
 import { DefineExpenseService } from '../define-expense/define-expense.service';
 
 @Component({
@@ -14,7 +13,6 @@ import { DefineExpenseService } from '../define-expense/define-expense.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TabsPage {
-  readonly modalCtrl = inject(ModalController);
   readonly router = inject(Router);
   readonly friendsStore = inject(FriendsStore);
   readonly defineExpenseService = inject(DefineExpenseService);

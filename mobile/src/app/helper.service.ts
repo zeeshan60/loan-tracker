@@ -11,6 +11,7 @@ export class HelperService {
   readonly toastCtrl = inject(ToastController);
   readonly alertCtrl = inject(AlertController);
   readonly loadingCtrl = inject(LoadingController);
+  readonly _activeModals: [] = []
   constructor() { }
 
   async showToast(message: string, duration = DEFAULT_TOAST_DURATION) {

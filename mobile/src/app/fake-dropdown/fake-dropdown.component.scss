@@ -1,0 +1,12 @@
+.fake-dropdown {
+  cursor: pointer;
+  .label {
+    font-size: 12px;
+  }
+  .selected-wrapper {
+    ion-icon {
+      margin-left: 10px;
+    }
+    margin-top: 5px
+  }
+}

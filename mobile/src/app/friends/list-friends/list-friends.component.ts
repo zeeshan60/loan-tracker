@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import {
   IonAvatar,
@@ -8,7 +8,7 @@ import {
   IonHeader,
   IonIcon,
   IonItem,
-  IonLabel, IonList, IonNav, IonTitle, IonToolbar, ModalController,
+  IonLabel, IonList, IonNav, IonTitle, IonToolbar,
 } from '@ionic/angular/standalone';
 import { FriendsStore } from '../friends.store';
 import { FormsModule } from '@angular/forms';
@@ -16,10 +16,10 @@ import { FriendWithBalance } from '../model';
 import { FriendTransactionsComponent } from '../friend-transactions/friend-transactions.component';
 import { ShortenNamePipe } from '../../pipes/shorten-name.pipe';
 import { SelectFriendComponent } from '../../define-expense/select-friend/select-friend.component';
-import { DefineExpenseService } from '../../define-expense/define-expense.service';
 import { isMobile } from '../../utils';
 import { AddFriendComponent } from '../../add-friend/add-friend.component';
 import { OverallBalanceComponent } from '../overall-balance/overall-balance.component';
+import { ModalService } from '../../modal.service';
 
 @Component({
   selector: 'app-list-friends',
@@ -47,9 +47,8 @@ import { OverallBalanceComponent } from '../overall-balance/overall-balance.comp
 })
 export class ListFriendsComponent  implements OnInit {
   readonly friendsStore = inject(FriendsStore);
-  readonly defineExpenseService = inject(DefineExpenseService);
-  readonly modalCtrl = inject(ModalController);
   readonly nav = inject(IonNav);
+  readonly modalService = inject(ModalService);
 
   constructor() {}
 
@@ -65,18 +64,16 @@ export class ListFriendsComponent  implements OnInit {
 
   async addFriend() {
     if (isMobile) {
-      this.defineExpenseService.selectFriendModalInstance = await this.modalCtrl.create({
+      await this.modalService.showModal({
         component: SelectFriendComponent,
         componentProps: {
           context: 'AddFriend'
         }
       })
-      await this.defineExpenseService.selectFriendModalInstance.present();
     } else {
-      const modal = await this.modalCtrl.create({
+      await this.modalService.showModal({
         component: AddFriendComponent,
       })
-      modal.present();
     }
   }
 }

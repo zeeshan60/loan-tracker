@@ -12,13 +12,13 @@ import {
   IonButton,
   IonButtons,
   IonContent, IonDatetime, IonDatetimeButton,
-  IonHeader,
+  IonHeader, IonIcon,
   IonInput, IonItem, IonLabel, IonList, IonModal, IonSelect, IonSelectOption, IonSpinner,
   IonTitle,
-  IonToolbar, ModalController,
+  IonToolbar,
 } from '@ionic/angular/standalone';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { firstValueFrom, takeUntil } from 'rxjs';
+import { takeUntil } from 'rxjs';
 import { Router } from '@angular/router';
 import { HelperService } from '../helper.service';
 import { FriendsStore } from '../friends/friends.store';
@@ -31,6 +31,9 @@ import { toObservable } from '@angular/core/rxjs-interop';
 import { ComponentDestroyedMixin } from '../component-destroyed.mixin';
 import { DefineExpenseService } from './define-expense.service';
 import { AuthStore } from '../login/auth.store';
+import { FakeDropdownComponent } from '../fake-dropdown/fake-dropdown.component';
+import { CurrenciesModalComponent } from '../currencies-modal/currencies-modal.component';
+import { ModalIndex, ModalService } from '../modal.service';
 
 export enum SplitOptions {
   YouPaidSplitEqually = 'YouPaidSplitEqually',
@@ -66,16 +69,19 @@ export enum SplitOptions {
     IonModal,
     IonDatetimeButton,
     IonDatetime,
+    IonIcon,
+    FakeDropdownComponent,
   ],
 })
 export class DefineExpenseComponent extends ComponentDestroyedMixin() implements OnInit {
   readonly friend = model<FriendWithBalance|null>(null);
   readonly loading = signal(false);
   readonly isUpdating = input(false);
+  readonly modalIndex = input.required<ModalIndex>();
   readonly transaction = input<Transaction>();
   readonly http = inject(HttpClient);
-  readonly modalCtrl = inject(ModalController);
   readonly helperService = inject<HelperService>(HelperService);
+  readonly modalService = inject(ModalService);
   readonly defineExpenseService = inject(DefineExpenseService);
   readonly formBuilder = inject(FormBuilder);
   readonly actionSheetCtrl = inject(ActionSheetController);
@@ -128,7 +134,7 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
     if (!this.friend()) {
       const role = await this.chooseFriend();
       if (role !== 'confirm') {
-        this.defineExpenseService.defineExpenseModalInstance?.dismiss();
+        this.modalService.dismiss(this.modalIndex());
       }
     }
   }
@@ -170,7 +176,7 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
 
   async closePopup() {
     if (!this.defineExpenseForm.dirty || await this.canDismiss()) {
-      this.modalCtrl.dismiss();
+      this.modalService.dismiss(this.modalIndex())
     }
   }
 
@@ -187,7 +193,7 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
           this.defineExpenseForm.getRawValue(),
           this.isUpdating() ? this.transaction() : undefined
         );
-        this.modalCtrl.dismiss(updatedExpense, 'confirm');
+        this.modalService.dismiss(this.modalIndex(), updatedExpense, 'confirm');
       } catch (e) {} finally {
         this.loading.set(false);
       }
@@ -201,18 +207,33 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
     if (this.isUpdating()) {
       return null;
     }
-    this.defineExpenseService.selectFriendModalInstance = await this.modalCtrl.create({
+
+    const modalIndex = await this.modalService.showModal({
       component: SelectFriendComponent,
       componentProps: {
         friend: this.friend()
       }
     })
-    this.defineExpenseService.selectFriendModalInstance.present();
 
-    const { data, role } = await this.defineExpenseService.selectFriendModalInstance.onWillDismiss();
+    const { data, role } = await this.modalService.getModalByIndex(modalIndex).onWillDismiss();
     if (role === 'confirm') {
       this.friend.set(data['friend']);
     }
     return role;
+  }
+
+  async chooseCurrency() {
+    const modalIndex = await this.modalService.showModal({
+      component: CurrenciesModalComponent,
+      handleBehavior: 'cycle',
+      initialBreakpoint: 0.5,
+      breakpoints: [0.25, 0.5, 0.75]
+    })
+    await this.modalService.onWillDismiss<string>(modalIndex)
+      .then((value) => {
+        if (value.role === 'confirm') {
+          console.log(value.data);
+        }
+      })
   }
 }

@@ -1,12 +1,11 @@
 import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
 import {
   IonButton,
-  IonButtons, IonContent, IonDatetime, IonDatetimeButton,
-  IonHeader, IonInput, IonItem, IonLabel, IonList, IonModal, IonSelect, IonSelectOption,
+  IonButtons, IonContent,
+  IonHeader, IonInput, IonItem, IonList, IonSelect, IonSelectOption,
   IonSpinner,
   IonTitle,
   IonToolbar,
-  ModalController,
 } from '@ionic/angular/standalone';
 import { FriendsStore } from '../../friends.store';
 import { FriendWithBalance } from '../../model';
@@ -19,6 +18,7 @@ import { Router } from '@angular/router';
 import { ComponentDestroyedMixin } from '../../../component-destroyed.mixin';
 import { takeUntil } from 'rxjs';
 import { NgClass } from '@angular/common';
+import { ModalIndex, ModalService } from '../../../modal.service';
 
 @Component({
   selector: 'app-settle-up',
@@ -44,7 +44,8 @@ import { NgClass } from '@angular/common';
   ],
 })
 export class SettleUpComponent extends ComponentDestroyedMixin() implements OnInit {
-  modalCtrl = inject(ModalController);
+  modalIndex = input.required<ModalIndex>();
+  modalService = inject(ModalService);
   friendsStore = inject(FriendsStore);
   friend = input.required<FriendWithBalance>();
   readonly loading = signal(false);
@@ -80,7 +81,7 @@ export class SettleUpComponent extends ComponentDestroyedMixin() implements OnIn
   }
 
   async closePopup() {
-    this.modalCtrl.dismiss();
+    this.modalService.dismiss(this.modalIndex());
   }
 
   async submit() {
@@ -95,7 +96,7 @@ export class SettleUpComponent extends ComponentDestroyedMixin() implements OnIn
           description: 'settlement'
         }
         await this.friendsStore.settleUp(this.friend(), transaction);
-        this.modalCtrl.dismiss('done', 'confirm');
+        this.modalService.dismiss(this.modalIndex(), 'done', 'confirm');
       } catch (e) {} finally {
         this.loading.set(false);
       }

@@ -1,18 +1,16 @@
 import { inject, Injectable } from '@angular/core';
 import { DefineExpenseComponent } from './define-expense.component';
 import { FriendsStore } from '../friends/friends.store';
-import { ModalController } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
+import { ModalService } from '../modal.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DefineExpenseService {
   readonly friendsStore = inject(FriendsStore);
-  readonly modalCtrl = inject(ModalController);
   readonly router = inject(Router);
-  public defineExpenseModalInstance: HTMLIonModalElement|null = null;
-  public selectFriendModalInstance: HTMLIonModalElement|null = null;
+  readonly modalService = inject(ModalService);
 
   constructor() { }
 
@@ -21,10 +19,9 @@ export class DefineExpenseService {
     if (this.router.url.endsWith('tabs/friends')) {
       selectedFriend = this.friendsStore.selectedFriend();
     }
-    this.defineExpenseModalInstance = await this.modalCtrl.create({
+    await this.modalService.showModal({
       component: DefineExpenseComponent,
       componentProps: { friend: selectedFriend }
     })
-    this.defineExpenseModalInstance.present();
   }
 }

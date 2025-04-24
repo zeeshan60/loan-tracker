@@ -7,13 +7,14 @@ import {
   IonHeader,
   IonItem,
   IonList,
-  IonSpinner, IonToolbar, ModalController, ToastController,
+  IonSpinner, IonToolbar, ToastController,
 } from '@ionic/angular/standalone';
 import { PhoneWithCountryComponent } from '../phone-with-country/phone-with-country.component';
 import { HelperService } from '../helper.service';
 import { AuthStore, Region, User } from '../login/auth.store';
 import { toInternationalPhone } from '../utility-functions';
 import { COUNTRIES_WITH_CALLING_CODES, DEFAULT_TOAST_DURATION } from '../constants';
+import { ModalIndex, ModalService } from '../modal.service';
 
 @Component({
   selector: 'app-ask-for-phone',
@@ -37,10 +38,11 @@ import { COUNTRIES_WITH_CALLING_CODES, DEFAULT_TOAST_DURATION } from '../constan
 })
 export class AskForPhoneComponent  implements OnInit {
   readonly region = input.required<Region>();
+  readonly modalIndex = input.required<ModalIndex>();
   readonly authStore = inject(AuthStore);
   private formBuilder = inject(FormBuilder);
   private helperService = inject(HelperService);
-  private modalCtrl = inject(ModalController);
+  private modalService = inject(ModalService);
   private toastCtrl = inject(ToastController);
   readonly loading = signal(false);
   public phoneForm = this.formBuilder.group({
@@ -61,7 +63,7 @@ export class AskForPhoneComponent  implements OnInit {
   }
 
   cancel() {
-    this.modalCtrl.dismiss(null, 'cancel');
+    this.modalService.dismiss(this.modalIndex());
   }
 
   async onSubmit() {
@@ -75,7 +77,7 @@ export class AskForPhoneComponent  implements OnInit {
         await this.authStore.updateUserData({
           phoneNumber,
         })
-        await this.modalCtrl.dismiss(phoneNumber, 'confirm')
+        await this.modalService.dismiss(this.modalIndex(), phoneNumber, 'confirm')
       } catch (e) {
         await this.toastCtrl.create({
           message: 'Unable to save phone number. Please try later.',

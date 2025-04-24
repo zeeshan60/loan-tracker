@@ -7,7 +7,7 @@ import {
   IonHeader, IonIcon, IonItem, IonLabel,
   IonList, IonNav,
   IonTitle,
-  IonToolbar, ModalController,
+  IonToolbar,
 } from '@ionic/angular/standalone';
 import { FriendWithBalance, HistoryChangeType, Transaction } from '../model';
 import { CurrencyPipe, DatePipe } from '@angular/common';
@@ -15,6 +15,7 @@ import { ShortenNamePipe } from '../../pipes/shorten-name.pipe';
 import { DefineExpenseComponent, SplitOptions } from '../../define-expense/define-expense.component';
 import { FriendsStore } from '../friends.store';
 import { HelperService } from '../../helper.service';
+import { ModalService } from '../../modal.service';
 
 const historyChangeType = {
   [HistoryChangeType.DESCRIPTION]: "description",
@@ -52,7 +53,7 @@ export class TransactionDetailsComponent {
   readonly SplitOptions = SplitOptions;
   readonly friendsStore = inject(FriendsStore);
   readonly helperService = inject(HelperService);
-  readonly modalCtrl = inject(ModalController);
+  readonly modalService = inject(ModalService);
   readonly nav = inject(IonNav);
   readonly transactionId = input<string>();
   readonly transaction = input<Transaction>();
@@ -98,7 +99,7 @@ export class TransactionDetailsComponent {
   }
 
   async updateTransaction() {
-    const modal = await this.modalCtrl.create({
+    this.modalService.showModal({
       component: DefineExpenseComponent,
       componentProps: {
         friend: this.friend(),
@@ -106,6 +107,5 @@ export class TransactionDetailsComponent {
         transaction: this.latestTransaction(),
       }
     })
-    modal.present();
   }
 }

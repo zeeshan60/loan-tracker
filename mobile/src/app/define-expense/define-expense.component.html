@@ -51,18 +51,24 @@
       ></ion-input>
     </ion-item>
     <ion-item class="currency-expense">
-      <ion-select
-        formControlName="currency"
-        class="currency"
-        placeholder="Select currency"
-        label="Currency"
-        label-placement="stacked"
-        interface="action-sheet"
-      >
-        @for (currency of supportedCurrencies; track currency) {
-          <ion-select-option value="{{currency}}">{{currency}}</ion-select-option>
-        }
-      </ion-select>
+      <app-fake-dropdown
+        class="currency-dropdown"
+        [selectedText]="defineExpenseForm.get('currency').value"
+        [label]="'Currency'"
+        (click)="chooseCurrency()"
+      ></app-fake-dropdown>
+<!--      <ion-select-->
+<!--        formControlName="currency"-->
+<!--        class="currency"-->
+<!--        placeholder="Select currency"-->
+<!--        label="Currency"-->
+<!--        label-placement="stacked"-->
+<!--        interface="action-sheet"-->
+<!--      >-->
+<!--        @for (currency of supportedCurrencies; track currency) {-->
+<!--          <ion-select-option value="{{currency}}">{{currency}}</ion-select-option>-->
+<!--        }-->
+<!--      </ion-select>-->
       <ion-input
         type="number"
         labelPlacement="stacked"

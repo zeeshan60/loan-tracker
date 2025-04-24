@@ -14,7 +14,6 @@ import {
   IonNav,
   IonTitle,
   IonToolbar,
-  ModalController,
 } from '@ionic/angular/standalone';
 import { FriendWithBalance } from '../model';
 import { TransactionDetailsComponent } from '../transaction-details/transaction-details.component';
@@ -26,6 +25,7 @@ import { DefineExpenseComponent } from '../../define-expense/define-expense.comp
 import { SettleUpComponent } from './settle-up/settle-up.component';
 import { AddFriendComponent } from '../../add-friend/add-friend.component';
 import { OverallBalanceComponent } from '../overall-balance/overall-balance.component';
+import { ModalService } from '../../modal.service';
 
 @Component({
   selector: 'app-friend-transactions',
@@ -57,10 +57,7 @@ export class FriendTransactionsComponent {
   readonly nav = inject(IonNav);
   readonly friendsStore = inject(FriendsStore);
   readonly transactions = this.friendsStore.selectedTransactions;
-  readonly modalCtrl = inject(ModalController);
-  protected readonly shortName = shortName;
-  readonly sortedOtherBalance = computed(() => this.friendsStore.selectedFriendBalance()?.other
-    .sort((a, b) => b.amount - a.amount));
+  readonly modalService = inject(ModalService);
 
   constructor() {}
 
@@ -72,11 +69,10 @@ export class FriendTransactionsComponent {
   }
 
   async addExpense() {
-    const modal = await this.modalCtrl.create({
+    this.modalService.showModal({
       component: DefineExpenseComponent,
       componentProps: { friend: this.friend() }
     })
-    modal.present();
   }
 
   async ionViewWillEnter() {
@@ -94,23 +90,21 @@ export class FriendTransactionsComponent {
   }
 
   async editFriendInfo() {
-    const modalInstance = await this.modalCtrl.create({
+    this.modalService.showModal({
       component: AddFriendComponent,
       componentProps: {
         friend: this.friend(),
         isUpdating: true
       }
     })
-    modalInstance.present();
   }
 
   async settleUp() {
-    const modalInstance = await this.modalCtrl.create({
+    this.modalService.showModal({
       component: SettleUpComponent,
       componentProps: {
         friend: this.friend()
       }
     })
-    modalInstance.present();
   }
 }

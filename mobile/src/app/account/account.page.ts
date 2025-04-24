@@ -9,7 +9,7 @@ import {
   IonButtons,
   IonList,
   IonItem,
-  IonLabel, IonSelect, IonSelectOption, ModalController, ToastController, IonSpinner,
+  IonLabel, IonSelect, IonSelectOption, ToastController, IonSpinner,
 } from '@ionic/angular/standalone';
 import { AuthStore } from '../login/auth.store';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -38,7 +38,6 @@ export class AccountPage {
 
   private formBuilder = inject(FormBuilder);
   private helperService = inject(HelperService);
-  private modalCtrl = inject(ModalController);
   private toastCtrl = inject(ToastController);
   readonly loading = signal(false);
   public phoneForm = this.formBuilder.group({
@@ -62,7 +61,6 @@ export class AccountPage {
           phoneNumber,
         })
         this.phoneInEditMode.set(false);
-        await this.modalCtrl.dismiss(phoneNumber, 'confirm')
       } catch (e) {
         await this.toastCtrl.create({
           message: 'Unable to save phone number. Please try later.',
