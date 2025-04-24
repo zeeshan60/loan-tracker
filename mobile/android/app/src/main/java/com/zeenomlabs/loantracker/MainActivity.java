@@ -1,4 +1,4 @@
-package io.ionic.starter;
+package com.zeenomlabs.loantracker;
 
 import com.getcapacitor.BridgeActivity;
 
