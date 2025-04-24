@@ -24,7 +24,6 @@ export class ModalService {
   public async showModal(options: ModalOptions): Promise<ModalIndex> {
     const modalIndex = this.getAvailableIndex();
     this._modals[modalIndex] = 'booked';
-    console.log(modalIndex);
     const modalInstance = await this.modalCtrl.create({
       ...options,
       componentProps: {

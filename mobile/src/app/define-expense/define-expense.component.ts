@@ -232,7 +232,7 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
     await this.modalService.onWillDismiss<string>(modalIndex)
       .then((value) => {
         if (value.role === 'confirm') {
-          console.log(value.data);
+          console.log(value.data); // todo
         }
       })
   }
