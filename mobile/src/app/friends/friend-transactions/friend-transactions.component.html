@@ -72,7 +72,7 @@
               {{ transaction.defaultCurrencyAmount.amount | currency: transaction.defaultCurrencyAmount.currency: 'symbol' }}
             </ion-label>
             @if (transaction.defaultCurrencyAmount.currency !== transaction.amount.currency) {
-              <ion-label color="medium">
+              <ion-label color="medium" class="actual-amount-label">
                 {{ transaction.amount.amount | currency: transaction.amount.currency: 'symbol' }}
               </ion-label>
             }

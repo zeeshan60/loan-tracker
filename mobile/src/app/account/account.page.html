@@ -34,7 +34,7 @@
           (ngModelChange)="updateDefaultCurrency($event)"
         >
           @for (currency of currencies; track currency) {
-            <ion-select-option value="{{currency}}">{{currency}}</ion-select-option>
+            <ion-select-option value="{{currency.code}}">{{currency.code}}</ion-select-option>
           }
         </ion-select>
       </ion-item>

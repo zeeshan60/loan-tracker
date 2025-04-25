@@ -53,7 +53,8 @@ export class ListFriendsComponent {
   constructor() {}
 
   async chooseFriend(friend: FriendWithBalance) {
-    this.nav.push(FriendTransactionsComponent, { friend });
+    this.friendsStore.setSelectedFriend(friend.friendId);
+    this.nav.push(FriendTransactionsComponent);
   }
 
   ionViewDidEnter() {

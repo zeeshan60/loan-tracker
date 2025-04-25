@@ -17,7 +17,7 @@ import { HelperService } from '../../../helper.service';
 import { Router } from '@angular/router';
 import { ComponentDestroyedMixin } from '../../../component-destroyed.mixin';
 import { takeUntil } from 'rxjs';
-import { NgClass } from '@angular/common';
+import { DecimalPipe, NgClass } from '@angular/common';
 import { ModalIndex, ModalService } from '../../../modal.service';
 
 @Component({
@@ -41,6 +41,7 @@ import { ModalIndex, ModalService } from '../../../modal.service';
     IonSelectOption,
     ReactiveFormsModule,
     NgClass,
+    DecimalPipe,
   ],
 })
 export class SettleUpComponent extends ComponentDestroyedMixin() implements OnInit {

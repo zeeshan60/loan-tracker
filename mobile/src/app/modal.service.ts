@@ -57,4 +57,8 @@ export class ModalService {
     const index = Object.keys(this._modals).find((index) => !this._modals[+index as ModalIndex])
     return index ? +index as ModalIndex : 0;
   }
+
+  public setCurrentBreakpoint(index: ModalIndex, breakPoint: 0.25|0.5|0.75|1) {
+    this.getModalByIndex(index)?.setCurrentBreakpoint(breakPoint);
+  }
 }

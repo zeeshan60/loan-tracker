@@ -15,10 +15,8 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
-import { FriendWithBalance } from '../model';
 import { TransactionDetailsComponent } from '../transaction-details/transaction-details.component';
 import { FriendsStore } from '../friends.store';
-import { shortName } from '../../utility-functions';
 import { ShortenNamePipe } from '../../pipes/shorten-name.pipe';
 import { DateFormatPipe } from '../../pipes/date-format.pipe';
 import { DefineExpenseComponent } from '../../define-expense/define-expense.component';
@@ -52,7 +50,7 @@ import { ModalService } from '../../modal.service';
   ],
 })
 export class FriendTransactionsComponent {
-  readonly friend = input.required<FriendWithBalance>();
+  readonly friend = computed(() => this.friendsStore.selectedFriend());
   readonly isLoading = signal(false);
   readonly nav = inject(IonNav);
   readonly friendsStore = inject(FriendsStore);
@@ -75,15 +73,6 @@ export class FriendTransactionsComponent {
     })
   }
 
-  async ionViewWillEnter() {
-    this.isLoading.set(true);
-    try {
-      await this.friendsStore.setSelectedFriend(this.friend());
-    } finally {
-      this.isLoading.set(false);
-    }
-  }
-
   async deleteFriend() {
     await this.friendsStore.deleteFriend(this.friend());
     await this.nav.pop();
@@ -100,6 +89,7 @@ export class FriendTransactionsComponent {
   }
 
   async settleUp() {
+    console.log(this.friend());
     this.modalService.showModal({
       component: SettleUpComponent,
       componentProps: {

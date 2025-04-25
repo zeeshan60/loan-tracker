@@ -1,9 +1,18 @@
 import { environment } from '../environments/environment';
+import currencies from '../assets/data/currencies.json'
 
+export interface Currency {
+  symbol: string,
+  name: string,
+  "symbol_native": string,
+  "decimal_digits": number,
+  "code": string,
+}
 export const DEFAULT_TOAST_DURATION = 2000;
 export const PRIVATE_API = `${environment.apiBaseUrl}/api/v1`;
 export const PUBLIC_API = environment.apiBaseUrl;
-export const CURRENCIES = [ 'PKR', 'USD', 'SGD', 'THB'];
+export const CURRENCIES: Currency[] = currencies;
+export const CURRENCIES_CODES: string[] = currencies.map(currency => currency.code);
 export const PHONE_MASKS: { [key: string]: any } = {
   'PK': {
     mask: [

@@ -12,22 +12,22 @@ import {
   IonButton,
   IonButtons,
   IonContent, IonDatetime, IonDatetimeButton,
-  IonHeader, IonIcon,
+  IonHeader,
   IonInput, IonItem, IonLabel, IonList, IonModal, IonSelect, IonSelectOption, IonSpinner,
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { takeUntil } from 'rxjs';
+import { startWith, takeUntil } from 'rxjs';
 import { Router } from '@angular/router';
 import { HelperService } from '../helper.service';
 import { FriendsStore } from '../friends/friends.store';
 import { FriendWithBalance, Transaction } from '../friends/model';
 import { SelectFriendComponent } from './select-friend/select-friend.component';
 import { HttpClient } from '@angular/common/http';
-import { CURRENCIES, PRIVATE_API } from '../constants';
+import { CURRENCIES, CURRENCIES_CODES, Currency, PRIVATE_API } from '../constants';
 import { ShortenNamePipe } from '../pipes/shorten-name.pipe';
-import { toObservable } from '@angular/core/rxjs-interop';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ComponentDestroyedMixin } from '../component-destroyed.mixin';
 import { DefineExpenseService } from './define-expense.service';
 import { AuthStore } from '../login/auth.store';
@@ -69,7 +69,6 @@ export enum SplitOptions {
     IonModal,
     IonDatetimeButton,
     IonDatetime,
-    IonIcon,
     FakeDropdownComponent,
   ],
 })
@@ -88,11 +87,10 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
   readonly friendsStore = inject(FriendsStore);
   readonly authStore = inject(AuthStore);
   readonly SplitOption = SplitOptions;
-  readonly supportedCurrencies = CURRENCIES;
   readonly router = inject(Router);
   readonly defineExpenseForm = this.formBuilder.group({
     description: this.formBuilder.nonNullable.control('', [Validators.required, Validators.maxLength(1000)]),
-    currency: this.formBuilder.nonNullable.control(CURRENCIES[0], [Validators.required]),
+    currency: this.formBuilder.nonNullable.control(CURRENCIES[0].code, [Validators.required]),
     amount: this.formBuilder.nonNullable.control<number|null>(null, [Validators.required, Validators.min(1), Validators.max(99999999999)]),
     type: this.formBuilder.nonNullable.control({ value: SplitOptions.YouPaidSplitEqually, disabled: !this.friend() }, [Validators.required]),
     transactionDate: this.formBuilder.nonNullable.control((new Date()).toISOString(), [Validators.required]),
@@ -101,6 +99,9 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
     return [SplitOptions.YouPaidSplitEqually, SplitOptions.TheyOweYouAll]
       .includes(this.defineExpenseForm.value.type!);
   };
+  selectedCurrencyCode = toSignal(this.defineExpenseForm.get('currency')!.valueChanges
+    .pipe(startWith(this.defineExpenseForm.get('currency')!.value)));
+
   constructor() {
     super();
 
@@ -144,12 +145,12 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
    * @private
    */
   private setAppropriateCurrency() {
-    let currency = CURRENCIES[0];
+    let currency = CURRENCIES[0].code;
     if (this.authStore.user()?.currency) {
       currency = this.authStore.user()?.currency!;
     } else if (this.friend()?.otherBalances?.[0].currency) {
       currency = this.friend()?.otherBalances?.[0].currency!;
-    } else if (CURRENCIES.includes(this.authStore.region()?.currency || '')) {
+    } else if (CURRENCIES_CODES.includes(this.authStore.region()?.currency || '')) {
       currency = this.authStore.region()?.currency!;
     }
     this.defineExpenseForm.get('currency')?.setValue(currency);
@@ -225,14 +226,17 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
   async chooseCurrency() {
     const modalIndex = await this.modalService.showModal({
       component: CurrenciesModalComponent,
+      componentProps: {
+        selectedCurrencyCode: this.selectedCurrencyCode()
+      },
       handleBehavior: 'cycle',
       initialBreakpoint: 0.5,
       breakpoints: [0.25, 0.5, 0.75]
     })
-    await this.modalService.onWillDismiss<string>(modalIndex)
+    await this.modalService.onWillDismiss<Currency>(modalIndex)
       .then((value) => {
         if (value.role === 'confirm') {
-          console.log(value.data); // todo
+          this.defineExpenseForm.get('currency').setValue(value.data.code);
         }
       })
   }

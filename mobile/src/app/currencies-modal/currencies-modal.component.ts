@@ -1,14 +1,14 @@
-import { ChangeDetectionStrategy, Component, inject, input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, model, OnInit } from '@angular/core';
 import {
-  IonAvatar,
-  IonContent,
-  IonImg,
+  IonContent, IonIcon,
   IonItem,
   IonLabel,
   IonList,
   IonSearchbar,
 } from '@ionic/angular/standalone';
 import { ModalIndex, ModalService } from '../modal.service';
+import { FormsModule } from '@angular/forms';
+import { CURRENCIES, Currency } from '../constants';
 
 @Component({
   selector: 'app-currencies-modal',
@@ -20,18 +20,26 @@ import { ModalIndex, ModalService } from '../modal.service';
     IonSearchbar,
     IonList,
     IonItem,
-    IonAvatar,
-    IonImg,
     IonLabel,
+    FormsModule,
+    IonIcon,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CurrenciesModalComponent  implements OnInit {
   modalIndex = input.required<ModalIndex>()
+  selectedCurrencyCode = input<string>();
+  filter = model<string>('');
+  filteredCurrencies = computed(() => {
+    return CURRENCIES.filter((currency) => `${currency.code} ${currency.name} ${currency.symbol}`.toLowerCase().includes(this.filter().toLowerCase()))
+  });
   modalService = inject(ModalService);
   constructor() { }
 
   ngOnInit() {
   }
 
+  selectCurrency(currency: Currency) {
+    this.modalService.dismiss(this.modalIndex(), currency, 'confirm');
+  }
 }

@@ -33,7 +33,7 @@ type FriendsState = {
     main: Balance,
     other: Balance[]
   } | null,
-  selectedFriend: FriendWithBalance | null,
+  selectedFriendId: string | null,
   selectedTransactions: TransactionsByMonth[],
 }
 
@@ -48,7 +48,7 @@ type AddUpdateExpenseFormValue = {
 const initialState: FriendsState = {
   friends: [],
   overallBalance: null,
-  selectedFriend: null,
+  selectedFriendId: null,
   selectedTransactions: [],
   selectedFriendBalance: null,
 }
@@ -58,7 +58,7 @@ interface Methods extends MethodsDictionary {
   addFriend(friend: AddFriend): Promise<FriendWithBalance>;
   updateFriend(friendId: string, friend: AddFriend): Promise<FriendWithBalance>;
   deleteFriend(friend: FriendWithBalance): Promise<void>;
-  setSelectedFriend(friend: FriendWithBalance|null): Promise<void>;
+  setSelectedFriend(friendId: string|null): Promise<void>;
   loadSelectedTransactions(): Promise<void>;
   deleteTransaction(transactionId: string): Promise<void>;
   settleUp(friend: FriendWithBalance, formValue: AddUpdateExpenseFormValue): Promise<void>;
@@ -68,16 +68,22 @@ interface Methods extends MethodsDictionary {
 export const FriendsStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
-  withComputed(({ friends }) => {
+  withComputed(({ friends, selectedFriendId }) => {
     const unSettledFriends = computed(() => {
       return friends().filter(friend => friend.mainBalance?.amount)
     });
     const inActiveFriends = computed(() => {
       return friends().filter(friend => !friend.mainBalance?.amount).sort((a, b) => a.name.localeCompare(b.name));
     });
+    const selectedFriend = computed(() => {
+      return friends().find(friend => {
+        return friend.friendId === selectedFriendId()
+      })
+    });
     return {
       unSettledFriends,
       inActiveFriends,
+      selectedFriend
     }
   }),
   withMethods((
@@ -142,16 +148,16 @@ export const FriendsStore = signalStore(
         await loader.dismiss();
       }
     },
-    async setSelectedFriend(friend: FriendWithBalance|null) {
-      if (store.selectedFriend()?.friendId !== friend?.friendId) {
-        patchState(store, { selectedFriend: friend })
-        if (friend) {
+    async setSelectedFriend(friendId: string|null) {
+      if (store.selectedFriendId() !== friendId) {
+        patchState(store, { selectedFriendId: friendId })
+        if (friendId) {
           await this.loadSelectedTransactions()
         }
       }
     },
     async loadSelectedTransactions() {
-      if (!store.selectedFriend()) {
+      if (!store.selectedFriendId()) {
         return;
       }
       try {
@@ -166,7 +172,7 @@ export const FriendsStore = signalStore(
             `${PRIVATE_API}/transactions/friend/byMonth`,
             {
               params: {
-                friendId: store.selectedFriend()?.friendId!,
+                friendId: store.selectedFriendId(),
                 timeZone: helperService.getTimeZone()
               }
             }
@@ -235,10 +241,7 @@ export const FriendsStore = signalStore(
       }
 
       let postSaveActions = [this.loadFriends()];
-      if (
-        store.selectedFriend()
-        && friend.friendId === store.selectedFriend()?.friendId
-      ) {
+      if (friend.friendId === store.selectedFriendId()) {
         postSaveActions.push(this.loadSelectedTransactions())
       }
       await Promise.all(postSaveActions);
