@@ -61,3 +61,14 @@
   }
 }
 
+/**
+this rule used to style the heading of the ion-list
+ */
+ion-item.group-label-item {
+  height: 30px;
+  ion-label {
+    margin: 0;
+    font-size: 12px !important;
+  }
+}
+

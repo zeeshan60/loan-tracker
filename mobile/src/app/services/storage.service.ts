@@ -34,4 +34,12 @@ export class StorageService {
   public clear() {
     return this._storage?.clear();
   }
+
+  public getMostlyUsedCurrencies(): Promise<string[]> {
+    return this.get('used_currencies');
+  }
+
+  public setMostlyUsedCurrencies(currencies: string[] = []): Promise<string[]> {
+    return this.set('used_currencies', currencies);
+  }
 }

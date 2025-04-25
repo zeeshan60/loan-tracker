@@ -76,6 +76,7 @@ export class AppComponent implements OnInit {
       await Promise.all([
         this.authStore.setApiKey(),
         this.authStore.loadUserData(),
+        this.friendsStore.loadMostlyUsedCurrencies()
       ])
 
       this.authStore.loadUserRegion().catch((res) => {

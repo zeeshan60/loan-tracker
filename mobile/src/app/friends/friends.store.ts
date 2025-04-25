@@ -10,6 +10,7 @@ import { PRIVATE_API } from '../constants';
 import { LoadingController } from '@ionic/angular/standalone';
 import { SplitOptions } from '../define-expense/define-expense.component';
 import { help } from 'ionicons/icons';
+import { StorageService } from '../services/storage.service';
 
 export type AddFriend = {
   name: string,
@@ -35,6 +36,7 @@ type FriendsState = {
   } | null,
   selectedFriendId: string | null,
   selectedTransactions: TransactionsByMonth[],
+  mostlyUsedCurrencies: string[],
 }
 
 type AddUpdateExpenseFormValue = {
@@ -51,6 +53,7 @@ const initialState: FriendsState = {
   selectedFriendId: null,
   selectedTransactions: [],
   selectedFriendBalance: null,
+  mostlyUsedCurrencies: [],
 }
 
 interface Methods extends MethodsDictionary {
@@ -63,23 +66,19 @@ interface Methods extends MethodsDictionary {
   deleteTransaction(transactionId: string): Promise<void>;
   settleUp(friend: FriendWithBalance, formValue: AddUpdateExpenseFormValue): Promise<void>;
   addUpdateExpense(friend: FriendWithBalance, formValue: AddUpdateExpenseFormValue, updatingTransaction?: Transaction): Promise<Transaction>;
+  saveUsedCurrency(currency: string): Promise<void>;
+  loadMostlyUsedCurrencies(): Promise<void>;
 }
 
 export const FriendsStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
   withComputed(({ friends, selectedFriendId }) => {
-    const unSettledFriends = computed(() => {
-      return friends().filter(friend => friend.mainBalance?.amount)
-    });
-    const inActiveFriends = computed(() => {
-      return friends().filter(friend => !friend.mainBalance?.amount).sort((a, b) => a.name.localeCompare(b.name));
-    });
-    const selectedFriend = computed(() => {
-      return friends().find(friend => {
-        return friend.friendId === selectedFriendId()
-      })
-    });
+    const unSettledFriends = computed(() => friends().filter(friend => friend.mainBalance?.amount));
+    const inActiveFriends = computed(() => friends().filter(friend => !friend.mainBalance?.amount)
+      .sort((a, b) => a.name.localeCompare(b.name)));
+    const selectedFriend = computed(() => friends().find(friend => friend.friendId === selectedFriendId()));
+
     return {
       unSettledFriends,
       inActiveFriends,
@@ -90,6 +89,7 @@ export const FriendsStore = signalStore(
     store,
     friendsService = inject(FriendsService),
     helperService = inject(HelperService),
+    storageService = inject(StorageService),
     http = inject(HttpClient),
     loadingCtrl = inject(LoadingController),
   ): Methods => ({
@@ -240,13 +240,24 @@ export const FriendsStore = signalStore(
         throw e;
       }
 
-      let postSaveActions = [this.loadFriends()];
+      let postSaveActions = [this.loadFriends(), this.saveUsedCurrency(formValue.currency)];
       if (friend.friendId === store.selectedFriendId()) {
         postSaveActions.push(this.loadSelectedTransactions())
       }
       await Promise.all(postSaveActions);
 
       return transactionAddUpdateResponse;
+    },
+    async saveUsedCurrency(currency: string) {
+      const previousCurrencies = (await storageService.getMostlyUsedCurrencies()) || [];
+      if (!previousCurrencies.includes(currency)) {
+        const mostlyUsedCurrencies = [...previousCurrencies, currency];
+        await storageService.setMostlyUsedCurrencies(mostlyUsedCurrencies)
+        patchState(store, { mostlyUsedCurrencies })
+      }
+    },
+    async loadMostlyUsedCurrencies(): Promise<void> {
+      patchState(store, { mostlyUsedCurrencies: (await storageService.getMostlyUsedCurrencies()) || [] })
     }
   }))
 );

@@ -1,7 +1,29 @@
 <ion-content class="ion-padding">
   <ion-searchbar [(ngModel)]="filter" placeholder="Search" (click)="modalService.setCurrentBreakpoint(this.modalIndex(), 0.75)"></ion-searchbar>
+  @if (mostlyUsedCurrencies().length) {
+    <ion-list>
+      <ion-item class="group-label-item">
+        <ion-label color="medium">Mostly used</ion-label>
+      </ion-item>
+      @for (currency of mostlyUsedCurrencies(); track currency) {
+        <ion-item [class.selected]="selectedCurrencyCode() === currency.code" (click)="selectCurrency(currency)">
+          <ion-label>
+            {{currency.code}} - {{currency.name}} ({{currency.symbol}})
+          </ion-label>
+          @if (selectedCurrencyCode() === currency.code) {
+            <ion-icon slot="end" name="checkmark-outline"></ion-icon>
+          }
+        </ion-item>
+      }
+    </ion-list>
+  }
   <ion-list>
-    @for (currency of filteredCurrencies(); track currency) {
+    @if (mostlyUsedCurrencies().length) {
+      <ion-item class="group-label-item">
+        <ion-label color="medium">Other currencies</ion-label>
+      </ion-item>
+    }
+    @for (currency of unUsedCurrencies(); track currency) {
       <ion-item [class.selected]="selectedCurrencyCode() === currency.code" (click)="selectCurrency(currency)">
         <ion-label>
           {{currency.code}} - {{currency.name}} ({{currency.symbol}})
