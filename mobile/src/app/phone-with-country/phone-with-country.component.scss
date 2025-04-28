@@ -3,14 +3,9 @@
   width: 100%;
 }
 
-ion-select.country {
-  &.has-error {
-    margin-bottom: 20px;
-  }
-  &::part(icon) {
-    display: none;
-  }
-  min-width: 25%;
+app-fake-dropdown {
+  min-width: 30%;
+  margin-top: 7px;
 }
 
 ion-input {

@@ -8,7 +8,7 @@ ion-searchbar {
     }
     &.selected {
       &::part(native) {
-        background-color: floralwhite;
+        font-weight: bold;
       }
     }
   }

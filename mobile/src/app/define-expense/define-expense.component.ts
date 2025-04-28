@@ -18,7 +18,7 @@ import {
   IonToolbar,
 } from '@ionic/angular/standalone';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { startWith, takeUntil } from 'rxjs';
+import { map, startWith, takeUntil } from 'rxjs';
 import { Router } from '@angular/router';
 import { HelperService } from '../helper.service';
 import { FriendsStore } from '../friends/friends.store';
@@ -32,8 +32,8 @@ import { ComponentDestroyedMixin } from '../component-destroyed.mixin';
 import { DefineExpenseService } from './define-expense.service';
 import { AuthStore } from '../login/auth.store';
 import { FakeDropdownComponent } from '../fake-dropdown/fake-dropdown.component';
-import { CurrenciesModalComponent } from '../currencies-modal/currencies-modal.component';
 import { ModalIndex, ModalService } from '../modal.service';
+import { CurrenciesDropdownComponent } from '../currencies-dropdown/currencies-dropdown.component';
 
 export enum SplitOptions {
   YouPaidSplitEqually = 'YouPaidSplitEqually',
@@ -70,6 +70,7 @@ export enum SplitOptions {
     IonDatetimeButton,
     IonDatetime,
     FakeDropdownComponent,
+    CurrenciesDropdownComponent,
   ],
 })
 export class DefineExpenseComponent extends ComponentDestroyedMixin() implements OnInit {
@@ -100,7 +101,12 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
       .includes(this.defineExpenseForm.value.type!);
   };
   selectedCurrencyCode = toSignal(this.defineExpenseForm.get('currency')!.valueChanges
-    .pipe(startWith(this.defineExpenseForm.get('currency')!.value)));
+    .pipe(
+      startWith(this.defineExpenseForm.get('currency')!.value),
+      map((value) => {
+        return CURRENCIES.find(currency => currency.code === value)
+      }),
+    ));
 
   constructor() {
     super();
@@ -223,21 +229,7 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
     return role;
   }
 
-  async chooseCurrency() {
-    const modalIndex = await this.modalService.showModal({
-      component: CurrenciesModalComponent,
-      componentProps: {
-        selectedCurrencyCode: this.selectedCurrencyCode()
-      },
-      handleBehavior: 'cycle',
-      initialBreakpoint: 0.5,
-      breakpoints: [0.25, 0.5, 0.75]
-    })
-    await this.modalService.onWillDismiss<Currency>(modalIndex)
-      .then((value) => {
-        if (value.role === 'confirm') {
-          this.defineExpenseForm.get('currency').setValue(value.data.code);
-        }
-      })
+  async currencySelected(currency: string) {
+    this.defineExpenseForm.get('currency').setValue(currency)
   }
 }

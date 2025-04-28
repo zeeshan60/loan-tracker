@@ -25,14 +25,14 @@
         <ion-label>{{user()?.email || 'N/A'}}</ion-label>
       </ion-item>
       <ion-item>
-        <ion-label slot="start">Default currency</ion-label>
-        <app-fake-dropdown
+        <ion-label>Default currency</ion-label>
+        <app-currencies-dropdown
           slot="end"
           class="currency-dropdown"
-          [selectedText]="user()!.currency"
+          [selectedCurrency]="userCurrency()"
           [label]="''"
-          (click)="chooseCurrency()"
-        ></app-fake-dropdown>
+          (selected)="updateDefaultCurrency($event)"
+        ></app-currencies-dropdown>
       </ion-item>
       <ion-item>
         @if (!phoneInEditMode()) {

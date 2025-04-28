@@ -1,5 +1,5 @@
-import { Component, computed, Input, input, OnInit, signal } from '@angular/core';
-import { COUNTRIES_WITH_CALLING_CODES, PHONE_MASKS } from '../constants';
+import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
+import { COUNTRIES_WITH_CALLING_CODES, Country, CURRENCIES, Currency, PHONE_MASKS } from '../constants';
 import {
   AbstractControl,
   FormGroup,
@@ -13,6 +13,10 @@ import { NgForOf } from '@angular/common';
 import { isPhoneNumberValid, toInternationalPhone } from '../utility-functions';
 import { MaskitoElementPredicate } from '@maskito/core';
 import { MaskitoDirective } from '@maskito/angular';
+import { CurrenciesDropdownComponent } from '../currencies-dropdown/currencies-dropdown.component';
+import { SelectModalComponent } from '../currencies-modal/select-modal.component';
+import { FakeDropdownComponent } from '../fake-dropdown/fake-dropdown.component';
+import { ModalService } from '../modal.service';
 
 @Component({
   selector: 'app-phone-with-country',
@@ -27,6 +31,9 @@ import { MaskitoDirective } from '@maskito/angular';
     NgForOf,
     ReactiveFormsModule,
     MaskitoDirective,
+    CurrenciesDropdownComponent,
+    SelectModalComponent,
+    FakeDropdownComponent,
   ],
 })
 export class PhoneWithCountryComponent  implements OnInit {
@@ -61,6 +68,8 @@ export class PhoneWithCountryComponent  implements OnInit {
   phoneMask = computed(() => this.selectedCountryCode() ? this.phoneMasks[this.selectedCountryCode()] : {});
   selectedCountryPlaceholder = computed(() => this.selectedCountry()?.placeholder || '');
 
+  modalService = inject(ModalService);
+
   constructor() { }
 
   getErrorTextForPhone() {
@@ -87,5 +96,30 @@ export class PhoneWithCountryComponent  implements OnInit {
       ]);
       phoneNumberControl.updateValueAndValidity();
     }
+  }
+
+  async chooseCountry() {
+    const optionLabel = (country: Country) => `${country.flag} ${country.name} (${country.dialCode})`;
+    const modalIndex = await this.modalService.showModal({
+      component: SelectModalComponent,
+      componentProps: {
+        items: COUNTRIES_WITH_CALLING_CODES.map((currency) => ({...currency, optionLabel: optionLabel(currency)})),
+        selectedItem: {
+          ...this.selectedCountry(),
+          optionLabel: optionLabel(this.selectedCountry())
+        },
+        mostlyUsedItems: []
+      },
+      handleBehavior: 'cycle',
+      initialBreakpoint: 0.5,
+      breakpoints: [0.25, 0.5, 0.75]
+    })
+    await this.modalService.onWillDismiss<Country>(modalIndex)
+      .then((value) => {
+        if (value.role === 'confirm') {
+          this.group()!.get('country').setValue(value.data.code)
+        }
+      })
+
   }
 }

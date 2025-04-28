@@ -1,17 +1,11 @@
 <ng-container  [formGroup]="group()!">
-  <ion-select
+  <app-fake-dropdown
     class="country"
     [class.has-error]="!!getErrorTextForPhone() && group()?.touched"
-    interface="action-sheet"
+    [label]="'Country'"
     [selectedText]="selectedCountryText()"
-    formControlName="country"
-    label="Country"
-    label-placement="stacked"
-  >
-    <ion-select-option *ngFor="let country of countries" [value]="country.code">
-      {{ country.flag }} {{ country.name }} ({{country.dialCode}})
-    </ion-select-option>
-  </ion-select>
+    (click)="chooseCountry()"
+  ></app-fake-dropdown>
   <ion-input
     type="tel"
     labelPlacement="stacked"

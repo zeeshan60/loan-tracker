@@ -20,15 +20,15 @@ import { PhoneWithCountryComponent } from '../phone-with-country/phone-with-coun
 import { extractCountryCode, toInternationalPhone, toNationalPhone } from '../utility-functions';
 import { PhonePipe } from '../pipes/phone.pipe';
 import { FakeDropdownComponent } from '../fake-dropdown/fake-dropdown.component';
-import { CurrenciesModalComponent } from '../currencies-modal/currencies-modal.component';
 import { ModalService } from '../modal.service';
+import { CurrenciesDropdownComponent } from '../currencies-dropdown/currencies-dropdown.component';
 
 @Component({
   selector: 'app-account',
   templateUrl: 'account.page.html',
   styleUrls: ['account.page.scss'],
   standalone: true,
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonIcon, IonButtons, IonList, IonItem, IonLabel, IonSelect, IonSelectOption, ReactiveFormsModule, FormsModule, PhoneWithCountryComponent, IonSpinner, PhonePipe, FakeDropdownComponent],
+  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonIcon, IonButtons, IonList, IonItem, IonLabel, IonSelect, IonSelectOption, ReactiveFormsModule, FormsModule, PhoneWithCountryComponent, IonSpinner, PhonePipe, FakeDropdownComponent, CurrenciesDropdownComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccountPage {
@@ -36,6 +36,9 @@ export class AccountPage {
   readonly authStore = inject(AuthStore);
   readonly friendsStore = inject(FriendsStore);
   readonly user = computed(() => this.authStore.user())
+  readonly userCurrency = computed(() => {
+    return CURRENCIES.find(currency => currency.code === this.user()!.currency)
+  });
   readonly currencies = CURRENCIES;
   phoneInEditMode = signal(false);
 
@@ -79,25 +82,7 @@ export class AccountPage {
     }
   }
 
-  async chooseCurrency() {
-    const modalIndex = await this.modalService.showModal({
-      component: CurrenciesModalComponent,
-      componentProps: {
-        selectedCurrencyCode: this.user().currency
-      },
-      handleBehavior: 'cycle',
-      initialBreakpoint: 0.5,
-      breakpoints: [0.25, 0.5, 0.75]
-    })
-    await this.modalService.onWillDismiss<Currency>(modalIndex)
-      .then((value) => {
-        if (value.role === 'confirm') {
-          this.updateDefaultCurrency(value.data.code);
-        }
-      })
-  }
-
-  private async updateDefaultCurrency(value: string) {
+  public async updateDefaultCurrency(value: string) {
     await this.authStore.updateUserData({
       currency: value,
       phoneNumber: this.user()!.phoneNumber || null,
