@@ -1,5 +1,5 @@
 import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
-import { COUNTRIES_WITH_CALLING_CODES, Country, CURRENCIES, Currency, PHONE_MASKS } from '../constants';
+import { COUNTRIES_WITH_CALLING_CODES, Country, PHONE_MASKS } from '../constants';
 import {
   AbstractControl,
   FormGroup,
@@ -8,12 +8,10 @@ import {
   ValidationErrors,
   ValidatorFn,
 } from '@angular/forms';
-import { IonInput, IonSelect, IonSelectOption } from '@ionic/angular/standalone';
-import { NgForOf } from '@angular/common';
+import { IonInput } from '@ionic/angular/standalone';
 import { isPhoneNumberValid, toInternationalPhone } from '../utility-functions';
 import { MaskitoElementPredicate } from '@maskito/core';
 import { MaskitoDirective } from '@maskito/angular';
-import { CurrenciesDropdownComponent } from '../currencies-dropdown/currencies-dropdown.component';
 import { SelectModalComponent } from '../currencies-modal/select-modal.component';
 import { FakeDropdownComponent } from '../fake-dropdown/fake-dropdown.component';
 import { ModalService } from '../modal.service';
@@ -26,13 +24,8 @@ import { ModalService } from '../modal.service';
   imports: [
     FormsModule,
     IonInput,
-    IonSelect,
-    IonSelectOption,
-    NgForOf,
     ReactiveFormsModule,
     MaskitoDirective,
-    CurrenciesDropdownComponent,
-    SelectModalComponent,
     FakeDropdownComponent,
   ],
 })

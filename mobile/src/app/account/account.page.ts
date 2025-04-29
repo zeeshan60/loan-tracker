@@ -9,11 +9,13 @@ import {
   IonButtons,
   IonList,
   IonItem,
-  IonLabel, IonSelect, IonSelectOption, ToastController, IonSpinner,
+  IonLabel,
+  ToastController,
+  IonSpinner,
 } from '@ionic/angular/standalone';
 import { AuthStore } from '../login/auth.store';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { COUNTRIES_WITH_CALLING_CODES, CURRENCIES, Currency, DEFAULT_TOAST_DURATION } from '../constants';
+import { COUNTRIES_WITH_CALLING_CODES, CURRENCIES, DEFAULT_TOAST_DURATION } from '../constants';
 import { FriendsStore } from '../friends/friends.store';
 import { HelperService } from '../helper.service';
 import { PhoneWithCountryComponent } from '../phone-with-country/phone-with-country.component';
@@ -28,7 +30,7 @@ import { CurrenciesDropdownComponent } from '../currencies-dropdown/currencies-d
   templateUrl: 'account.page.html',
   styleUrls: ['account.page.scss'],
   standalone: true,
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonIcon, IonButtons, IonList, IonItem, IonLabel, IonSelect, IonSelectOption, ReactiveFormsModule, FormsModule, PhoneWithCountryComponent, IonSpinner, PhonePipe, FakeDropdownComponent, CurrenciesDropdownComponent],
+  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonIcon, IonButtons, IonList, IonItem, IonLabel, ReactiveFormsModule, FormsModule, PhoneWithCountryComponent, IonSpinner, PhonePipe, CurrenciesDropdownComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccountPage {
@@ -39,12 +41,10 @@ export class AccountPage {
   readonly userCurrency = computed(() => {
     return CURRENCIES.find(currency => currency.code === this.user()!.currency)
   });
-  readonly currencies = CURRENCIES;
   phoneInEditMode = signal(false);
 
   private formBuilder = inject(FormBuilder);
   private helperService = inject(HelperService);
-  private modalService = inject(ModalService);
   private toastCtrl = inject(ToastController);
   readonly loading = signal(false);
   public phoneForm = this.formBuilder.group({

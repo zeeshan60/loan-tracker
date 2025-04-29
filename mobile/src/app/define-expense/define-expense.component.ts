@@ -31,7 +31,6 @@ import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ComponentDestroyedMixin } from '../component-destroyed.mixin';
 import { DefineExpenseService } from './define-expense.service';
 import { AuthStore } from '../login/auth.store';
-import { FakeDropdownComponent } from '../fake-dropdown/fake-dropdown.component';
 import { ModalIndex, ModalService } from '../modal.service';
 import { CurrenciesDropdownComponent } from '../currencies-dropdown/currencies-dropdown.component';
 
@@ -69,7 +68,6 @@ export enum SplitOptions {
     IonModal,
     IonDatetimeButton,
     IonDatetime,
-    FakeDropdownComponent,
     CurrenciesDropdownComponent,
   ],
 })

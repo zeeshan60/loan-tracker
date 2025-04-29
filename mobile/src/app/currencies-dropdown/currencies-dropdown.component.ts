@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, inject, input, output } from '@angular/core';
-import { IonIcon } from '@ionic/angular/standalone';
 import { FakeDropdownComponent } from '../fake-dropdown/fake-dropdown.component';
 import { SelectModalComponent } from '../currencies-modal/select-modal.component';
 import { CURRENCIES, Currency } from '../constants';
@@ -14,7 +13,6 @@ import { FriendsStore } from '../friends/friends.store';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    IonIcon,
     FakeDropdownComponent,
   ],
 })
