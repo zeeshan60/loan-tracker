@@ -9,21 +9,21 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
-import { FriendWithBalance, HistoryChangeType, Transaction } from '../model';
+import { FriendWithBalance, HistoryChangeTypeEnum, Transaction } from '../model';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { ShortenNamePipe } from '../../pipes/shorten-name.pipe';
-import { DefineExpenseComponent, SplitOptions } from '../../define-expense/define-expense.component';
+import { DefineExpenseComponent, SplitOptionsEnum } from '../../define-expense/define-expense.component';
 import { FriendsStore } from '../friends.store';
 import { HelperService } from '../../helper.service';
 import { ModalService } from '../../modal.service';
 
 const historyChangeType = {
-  [HistoryChangeType.DESCRIPTION]: "description",
-  [HistoryChangeType.TOTAL_AMOUNT]: "total amount",
-  [HistoryChangeType.CURRENCY]: "currency",
-  [HistoryChangeType.SPLIT_TYPE]: "split type",
-  [HistoryChangeType.DELETED]: "deleted",
-  [HistoryChangeType.TRANSACTION_DATE]: "transaction date"
+  [HistoryChangeTypeEnum.DESCRIPTION]: "description",
+  [HistoryChangeTypeEnum.TOTAL_AMOUNT]: "total amount",
+  [HistoryChangeTypeEnum.CURRENCY]: "currency",
+  [HistoryChangeTypeEnum.SPLIT_TYPE]: "split type",
+  [HistoryChangeTypeEnum.DELETED]: "deleted",
+  [HistoryChangeTypeEnum.TRANSACTION_DATE]: "transaction date"
 }
 
 @Component({
@@ -50,7 +50,7 @@ const historyChangeType = {
   ],
 })
 export class TransactionDetailsComponent {
-  readonly SplitOptions = SplitOptions;
+  readonly SplitOptions = SplitOptionsEnum;
   readonly friendsStore = inject(FriendsStore);
   readonly helperService = inject(HelperService);
   readonly modalService = inject(ModalService);
@@ -75,14 +75,14 @@ export class TransactionDetailsComponent {
     return found;
   })
   protected readonly historyChangeType = historyChangeType;
-  protected readonly HistoryChangeType = HistoryChangeType;
+  protected readonly HistoryChangeType = HistoryChangeTypeEnum;
   protected splitOptionsText : {[key: string]: string} = {
-    [SplitOptions.YouPaidSplitEqually]: 'You paid split equally',
-    [SplitOptions.TheyPaidSplitEqually]: 'They paid split equally',
-    [SplitOptions.TheyOweYouAll]: 'They owe you all',
-    [SplitOptions.YouOweThemAll]: 'You owe them all',
-    [SplitOptions.TheyPaidToSettle]: 'They paid to settle',
-    [SplitOptions.YouPaidToSettle]: 'You paid to settle',
+    [SplitOptionsEnum.YouPaidSplitEqually]: 'You paid split equally',
+    [SplitOptionsEnum.TheyPaidSplitEqually]: 'They paid split equally',
+    [SplitOptionsEnum.TheyOweYouAll]: 'They owe you all',
+    [SplitOptionsEnum.YouOweThemAll]: 'You owe them all',
+    [SplitOptionsEnum.TheyPaidToSettle]: 'They paid to settle',
+    [SplitOptionsEnum.YouPaidToSettle]: 'You paid to settle',
   }
 
   constructor() {

@@ -11,7 +11,7 @@ import { FriendsStore } from '../../friends.store';
 import { FriendWithBalance } from '../../model';
 import { ShortenNamePipe } from '../../../pipes/shorten-name.pipe';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { SplitOptions } from '../../../define-expense/define-expense.component';
+import { SplitOptionsEnum } from '../../../define-expense/define-expense.component';
 import { HttpClient } from '@angular/common/http';
 import { HelperService } from '../../../helper.service';
 import { Router } from '@angular/router';
@@ -92,7 +92,7 @@ export class SettleUpComponent extends ComponentDestroyedMixin() implements OnIn
         const transaction = {
           currency: this.settleUpForm.get('balance')!.value.currency,
           amount: this.settleUpForm.get('amount')!.value,
-          type: this.settleUpForm.get('balance')!.value.isOwed ? SplitOptions.TheyPaidToSettle : SplitOptions.YouPaidToSettle,
+          type: this.settleUpForm.get('balance')!.value.isOwed ? SplitOptionsEnum.TheyPaidToSettle : SplitOptionsEnum.YouPaidToSettle,
           transactionDate: (new Date()).toISOString(),
           description: 'settlement'
         }

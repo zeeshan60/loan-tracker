@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Storage } from '@ionic/storage-angular';
 import { AsyncSubject } from 'rxjs';
 
@@ -8,8 +8,9 @@ import { AsyncSubject } from 'rxjs';
 export class StorageService {
   private _storage: Storage | null = null;
   public storageReady$: AsyncSubject<boolean> = new AsyncSubject();
+  storage = inject(Storage);
 
-  constructor(private storage: Storage) {
+  constructor() {
     this.init();
   }
 

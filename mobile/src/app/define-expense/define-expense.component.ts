@@ -34,14 +34,15 @@ import { AuthStore } from '../login/auth.store';
 import { ModalIndex, ModalService } from '../modal.service';
 import { CurrenciesDropdownComponent } from '../currencies-dropdown/currencies-dropdown.component';
 
-export enum SplitOptions {
-  YouPaidSplitEqually = 'YouPaidSplitEqually',
-  TheyPaidSplitEqually = 'TheyPaidSplitEqually',
-  TheyOweYouAll = 'TheyOweYouAll',
-  YouOweThemAll = 'YouOweThemAll',
-  TheyPaidToSettle = 'TheyPaidToSettle',
-  YouPaidToSettle = 'YouPaidToSettle',
-}
+export type SplitOption = (typeof SplitOptionsEnum)[keyof typeof SplitOptionsEnum]
+export const SplitOptionsEnum = {
+  YouPaidSplitEqually: 'YouPaidSplitEqually',
+  TheyPaidSplitEqually: 'TheyPaidSplitEqually',
+  TheyOweYouAll: 'TheyOweYouAll',
+  YouOweThemAll: 'YouOweThemAll',
+  TheyPaidToSettle: 'TheyPaidToSettle',
+  YouPaidToSettle: 'YouPaidToSettle',
+} as const satisfies Record<string, string>;
 
 @Component({
   selector: 'app-define-expense',
@@ -85,17 +86,17 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
   readonly actionSheetCtrl = inject(ActionSheetController);
   readonly friendsStore = inject(FriendsStore);
   readonly authStore = inject(AuthStore);
-  readonly SplitOption = SplitOptions;
+  readonly SplitOption = SplitOptionsEnum;
   readonly router = inject(Router);
   readonly defineExpenseForm = this.formBuilder.group({
     description: this.formBuilder.nonNullable.control('', [Validators.required, Validators.maxLength(1000)]),
     currency: this.formBuilder.nonNullable.control(CURRENCIES[0].code, [Validators.required]),
     amount: this.formBuilder.nonNullable.control<number|null>(null, [Validators.required, Validators.min(1), Validators.max(99999999999)]),
-    type: this.formBuilder.nonNullable.control({ value: SplitOptions.YouPaidSplitEqually, disabled: !this.friend() }, [Validators.required]),
+    type: this.formBuilder.nonNullable.control<SplitOption>({ value: SplitOptionsEnum.YouPaidSplitEqually, disabled: !this.friend() }, [Validators.required]),
     transactionDate: this.formBuilder.nonNullable.control((new Date()).toISOString(), [Validators.required]),
   });
   isOwed = () => {
-    return [SplitOptions.YouPaidSplitEqually, SplitOptions.TheyOweYouAll]
+    return ([SplitOptionsEnum.YouPaidSplitEqually, SplitOptionsEnum.TheyOweYouAll] as SplitOption[])
       .includes(this.defineExpenseForm.value.type!);
   };
   selectedCurrencyCode = toSignal(this.defineExpenseForm.get('currency')!.valueChanges

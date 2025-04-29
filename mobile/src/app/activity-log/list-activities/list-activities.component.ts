@@ -28,14 +28,15 @@ import {
 } from 'rxjs';
 import { TransactionDetailsComponent } from '../../friends/transaction-details/transaction-details.component';
 import { HelperService } from '../../helper.service';
-import { FriendsStore } from '../../friends/friends.store';
 import { ComponentDestroyedMixin } from '../../component-destroyed.mixin';
 
-enum ActivityType {
-  CREATED = 'CREATED',
-  UPDATED = 'UPDATED',
-  DELETED = 'DELETED',
-}
+type ActivityType = (typeof ActivityTypeEnum)[keyof typeof ActivityTypeEnum];
+const ActivityTypeEnum = {
+  CREATED: 'CREATED',
+  UPDATED: 'UPDATED',
+  DELETED: 'DELETED',
+} as const satisfies Record<string, string>
+
 interface Activity {
   userUid: string,
   activityByName: string,
@@ -49,9 +50,9 @@ interface Activity {
   transactionResponse: Transaction
 }
 const ActivityTypeLabel = {
-  [ActivityType.CREATED]: 'Added',
-  [ActivityType.UPDATED]: 'Updated',
-  [ActivityType.DELETED]: 'Deleted',
+  [ActivityTypeEnum.CREATED]: 'Added',
+  [ActivityTypeEnum.UPDATED]: 'Updated',
+  [ActivityTypeEnum.DELETED]: 'Deleted',
 }
 
 @Component({
@@ -65,7 +66,7 @@ const ActivityTypeLabel = {
 export class ListActivitiesComponent extends ComponentDestroyedMixin() implements OnInit {
   readonly nav = inject(IonNav)
   readonly loadingCtrl = inject(LoadingController);
-  protected readonly ActivityType = ActivityType;
+  protected readonly ActivityType = ActivityTypeEnum;
   protected readonly ActivityTypeLabel = ActivityTypeLabel;
   readonly http = inject(HttpClient);
   readonly helperService = inject(HelperService);

@@ -7,8 +7,9 @@ import { StorageService } from '../services/storage.service';
 })
 export class AuthGuard implements CanActivate {
   storageService = inject(StorageService);
+  router = inject(Router);
 
-  constructor(private router: Router) {}
+  constructor() {}
 
   async canActivate(
     route: ActivatedRouteSnapshot,

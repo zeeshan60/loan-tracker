@@ -1,15 +1,14 @@
 import { patchState, signalStore, withComputed, withMethods, withState, WritableStateSource } from '@ngrx/signals';
-import { computed, inject, Signal } from '@angular/core';
+import { computed, inject } from '@angular/core';
 import { FriendsService } from './friends.service';
-import { firstValueFrom, map, Observable } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { HelperService } from '../helper.service';
 import { MethodsDictionary } from '@ngrx/signals/src/signal-store-models';
 import { FriendWithBalance, Transaction, TransactionsByMonth } from './model'
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { PRIVATE_API } from '../constants';
 import { LoadingController } from '@ionic/angular/standalone';
-import { SplitOptions } from '../define-expense/define-expense.component';
-import { help } from 'ionicons/icons';
+import { SplitOption } from '../define-expense/define-expense.component';
 import { StorageService } from '../services/storage.service';
 
 export type AddFriend = {
@@ -43,7 +42,7 @@ type AddUpdateExpenseFormValue = {
   description: string,
   currency: string,
   amount: number|null,
-  type: SplitOptions,
+  type: SplitOption,
   transactionDate: string,
 }
 

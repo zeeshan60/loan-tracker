@@ -1,13 +1,14 @@
-import { SplitOptions } from '../define-expense/define-expense.component';
+import { SplitOption, SplitOptionsEnum } from '../define-expense/define-expense.component';
 
-export enum HistoryChangeType {
-  DESCRIPTION = "DESCRIPTION",
-  TOTAL_AMOUNT = "TOTAL_AMOUNT",
-  CURRENCY = "CURRENCY",
-  SPLIT_TYPE = "SPLIT_TYPE",
-  DELETED = "DELETED",
-  TRANSACTION_DATE = "TRANSACTION_DATE"
-}
+export type HistoryChangeType = (typeof HistoryChangeTypeEnum)[keyof typeof HistoryChangeTypeEnum];
+export const HistoryChangeTypeEnum = {
+  DESCRIPTION: "DESCRIPTION",
+  TOTAL_AMOUNT: "TOTAL_AMOUNT",
+  CURRENCY: "CURRENCY",
+  SPLIT_TYPE: "SPLIT_TYPE",
+  DELETED: "DELETED",
+  TRANSACTION_DATE: "TRANSACTION_DATE"
+} as const satisfies Record<string, string>
 export interface Friend {
   friendId: string;
   photoUrl: string|null;
@@ -36,7 +37,7 @@ export interface Transaction {
   description: string,
   transactionId: string,
   totalAmount: number,
-  splitType: SplitOptions,
+  splitType: SplitOption,
   friend: Friend,
   amount: {
     amount: number,
