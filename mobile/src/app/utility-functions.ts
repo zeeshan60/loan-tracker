@@ -34,3 +34,10 @@ export function isPhoneNumberValid(internationalPhone: string) {
   const phoneNumberInter = parsePhoneNumber(internationalPhone);
   return phoneNumberInter?.isValid();
 }
+
+export const extractFirebaseErrorMessage = (errorCode: string): string => {
+  const cleaned = errorCode.replace(/[()]/g, '');
+  const parts = cleaned.split('/');
+  const message = parts[1] || '';
+  return message.replace(/-/g, ' ');
+};

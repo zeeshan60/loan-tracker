@@ -1,9 +1,8 @@
-.login-container {
+.social-login-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100vh;
 }
 
 .app-name {
@@ -11,4 +10,10 @@
   font-weight: bold;
   margin-bottom: 20px;
   color: #333;
+}
+
+ion-item {
+  &::part(native) {
+    --inner-border-width: 0;
+  }
 }
