@@ -1,4 +1,4 @@
-import { SplitOption, SplitOptionsEnum } from '../define-expense/define-expense.component';
+import { SplitOption } from '../define-expense/define-expense.component';
 
 export type HistoryChangeType = (typeof HistoryChangeTypeEnum)[keyof typeof HistoryChangeTypeEnum];
 export const HistoryChangeTypeEnum = {
@@ -21,7 +21,6 @@ export interface FriendWithBalance extends Friend {
   mainBalance?: { amount: number, currency: string, isOwed: boolean };
   otherBalances?: { amount: number, currency: string, isOwed: boolean }[]
 }
-
 export interface Transaction {
   date: string,
   createdAt: string,
