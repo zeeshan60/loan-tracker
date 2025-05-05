@@ -1,11 +1,116 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Login</ion-title>
+    <ion-title>
+      @if (activeUi() === 'login') {
+        Login
+      }
+      @if (activeUi() === 'signup') {
+        SignUp
+      }
+      @if (activeUi() === 'forgotPassword') {
+        Recover Password
+      }
+    </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-  <div class="login-container">
+  @if (activeUi() === 'login') {
+    @if (invalidCreds()) {
+      <ion-label color="danger">Invalid Email/Password</ion-label>
+    }
+    <form (submit)="onLoginWithCreds()" [formGroup]="loginForm">
+      <ion-item>
+        <ion-label position="floating">Email</ion-label>
+        <ion-input
+          [errorText]="emailErrorMessage(loginForm)"
+          type="email"
+          formControlName="email"
+          name="email"
+        ></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Password</ion-label>
+        <ion-input
+          type="password"
+          formControlName="password"
+          name="password"
+          required
+          errorText="Password is required"
+        ></ion-input>
+      </ion-item>
+
+      <ion-button expand="full" type="submit" [disabled]="loading()">
+        {{ loading() ? 'Logging in...' : 'Login' }}
+      </ion-button>
+
+      <ion-button fill="clear" (click)="activateUi('forgotPassword')">Forgot Password?</ion-button>
+    </form>
+    <ion-label color="medium">Don't have an account?
+      <ion-button fill="clear" color="primary" (click)="activateUi('signup')">
+        Sign Up
+      </ion-button>
+    </ion-label>
+  } @else if (activeUi() === 'signup') {
+    @if (invalidCreds()) {
+      <ion-label color="danger">Email already exists</ion-label>
+    }
+    <form (submit)="onSignUpWithCreds()" [formGroup]="signUpForm">
+      <ion-item>
+        <ion-label position="floating">Email</ion-label>
+        <ion-input
+          [errorText]="emailErrorMessage(signUpForm)"
+          type="email"
+          formControlName="email"
+          name="email"
+        ></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Password</ion-label>
+        <ion-input
+          type="password"
+          formControlName="password"
+          name="password"
+          required
+          errorText="Password is required"
+        ></ion-input>
+      </ion-item>
+
+      <ion-button expand="full" type="submit" [disabled]="loading()">
+        {{ loading() ? 'Signing up...' : 'Sign Up' }}
+      </ion-button>
+    </form>
+    <ion-label color="medium">Already have an account?
+      <ion-button fill="clear" color="primary" (click)="activateUi('login')">
+        Login
+      </ion-button>
+    </ion-label>
+  } @else if (activeUi() === 'forgotPassword') {
+    @if (invalidCreds()) {
+      <ion-label color="danger">Email doesn't exist</ion-label>
+    }
+    <form (submit)="onPasswordRecovery()" [formGroup]="forgotPasswordForm">
+      <ion-item>
+        <ion-label position="floating">Email</ion-label>
+        <ion-input
+          [errorText]="emailErrorMessage(forgotPasswordForm)"
+          type="email"
+          formControlName="email"
+          name="email"
+        ></ion-input>
+      </ion-item>
+      <ion-button expand="full" type="submit" [disabled]="loading()">
+        Submit
+      </ion-button>
+    </form>
+    <ion-button fill="clear" (click)="activateUi('login')">Back to Login</ion-button>
+  }
+
+
+  <hr>
+  <div class="social-login-container">
     <ion-button expand="full" (click)="loginWithGoogle()">
       <ion-icon name="logo-google" slot="start"></ion-icon>
       Login with Google
