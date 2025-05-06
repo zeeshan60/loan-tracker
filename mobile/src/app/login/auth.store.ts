@@ -64,6 +64,7 @@ interface Methods extends MethodsDictionary {
   fetchAndSaveUserData(): Promise<void>;
   updateUserData(data: Partial<User>): Promise<void>;
   askForPhoneNumber(): Promise<void>;
+  getLoginPluginToken(): Promise<string>;
 }
 
 export const AuthStore = signalStore(
@@ -106,8 +107,10 @@ export const AuthStore = signalStore(
         await loader.dismiss();
       }
     },
-    async loginWithGoogle(): Promise<boolean|void> {
-      const inputValue = JSON.stringify({
+
+    async getLoginPluginToken(): Promise<string> {
+
+      const inputValueIOS = JSON.stringify({
         CLIENT_ID: "336545645239-ppcpb0k5hc8303p9ek0793f8lkbbqbku.apps.googleusercontent.com",
         REVERSED_CLIENT_ID: "com.googleusercontent.apps.336545645239-ppcpb0k5hc8303p9ek0793f8lkbbqbku",
         API_KEY: "AIzaSyB1qt9hOwlzyBWGIe-grrg0Vgp53tcwoLE",
@@ -124,9 +127,43 @@ export const AuthStore = signalStore(
         GOOGLE_APP_ID: "1:336545645239:ios:90e69a58265af386220332"
       });
 
-      const loginPromise = Capacitor.getPlatform() !== 'ios' ? signInWithPopup(auth, new GoogleAuthProvider())
-        .then(() => helperService.getFirebaseAccessToken()) : LoginPlugin.echo({value: inputValue})
-        .then(({value: token}) => token);
+      const inputValueAndroid = JSON.stringify({
+        CLIENT_ID: "336545645239-ppcpb0k5hc8303p9ek0793f8lkbbqbku.apps.googleusercontent.com",
+        REVERSED_CLIENT_ID: "com.googleusercontent.apps.336545645239-ppcpb0k5hc8303p9ek0793f8lkbbqbku",
+        API_KEY: "AIzaSyB1qt9hOwlzyBWGIe-grrg0Vgp53tcwoLE",
+        GCM_SENDER_ID: "336545645239",
+        PLIST_VERSION: "1",
+        BUNDLE_ID: "com.zeenomlabs.loantracker",
+        PROJECT_ID: "loan-tracker-9b25d",
+        STORAGE_BUCKET: "loan-tracker-9b25d.firebasestorage.app",
+        IS_ADS_ENABLED: false,
+        IS_ANALYTICS_ENABLED: false,
+        IS_APPINVITE_ENABLED: true,
+        IS_GCM_ENABLED: true,
+        IS_SIGNIN_ENABLED: true,
+        GOOGLE_APP_ID: "1:336545645239:ios:90e69a58265af386220332"
+      });
+
+      switch (Capacitor.getPlatform()) {
+        case 'ios':
+          return LoginPlugin.echo({value: inputValueIOS})
+            .then(({value: token}) => token);
+        case 'android':
+          console.log('zeeshan_debug: Android calling echo');
+          return LoginPlugin.echo({value: inputValueAndroid})
+            .then(({value: token}) => {
+              console.log('zeeshan_debug: Android token:', token);
+              return token;
+            });
+        default:
+          return signInWithPopup(auth, new GoogleAuthProvider())
+            .then(() => helperService.getFirebaseAccessToken());
+      }
+    },
+
+    async loginWithGoogle(): Promise<boolean|void> {
+
+      const loginPromise = this.getLoginPluginToken();
 
       return loginPromise
         .then(async (token) => this.login(token!))
@@ -153,6 +190,7 @@ export const AuthStore = signalStore(
       try {
         loader.present();
         const url = `${PUBLIC_API}/login`
+        console.log('zeeshan_debug: login url:', url);
         const { token: apiKey } = await firstValueFrom(
           http.post<{ token: string  }>(url, {
             idToken: `Bearer ${idToken}`

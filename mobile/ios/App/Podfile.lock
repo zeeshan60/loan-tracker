@@ -90,7 +90,7 @@ DEPENDENCIES:
   - "CapacitorHaptics (from `../../node_modules/@capacitor/haptics`)"
   - "CapacitorKeyboard (from `../../node_modules/@capacitor/keyboard`)"
   - "CapacitorStatusBar (from `../../node_modules/@capacitor/status-bar`)"
-  - ZeenomCapacitorSocialLogin (from `../../node_modules/zeenom-capacitor-social-login`)
+  - ZeenomCapacitorSocialLogin (from `../../../../zeenom-capacitor-social-login`)
 
 SPEC REPOS:
   trunk:
@@ -125,7 +125,7 @@ EXTERNAL SOURCES:
   CapacitorStatusBar:
     :path: "../../node_modules/@capacitor/status-bar"
   ZeenomCapacitorSocialLogin:
-    :path: "../../node_modules/zeenom-capacitor-social-login"
+    :path: "../../../../zeenom-capacitor-social-login"
 
 SPEC CHECKSUMS:
   AppAuth: d4f13a8fe0baf391b2108511793e4b479691fb73
@@ -151,6 +151,6 @@ SPEC CHECKSUMS:
   RecaptchaInterop: 11e0b637842dfb48308d242afc3f448062325aba
   ZeenomCapacitorSocialLogin: 850e768bc0597ff7dd6e22fe5263e795614b055f
 
-PODFILE CHECKSUM: 27fb345da583643bc59d92e8f118b6cf9ff1138b
+PODFILE CHECKSUM: 8876feba87854cf8be9f9ee8486163d7ab7fd07a
 
 COCOAPODS: 1.16.2

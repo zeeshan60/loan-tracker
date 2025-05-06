@@ -1,12 +1,12 @@
 export const environment = {
   production: true,
   firebaseConfig: {
-    apiKey: "AIzaSyAK6bRQklnplFz2Uy2RueMW_ZporAtQTwc",
-    authDomain: "loan-tracker-9b25d.firebaseapp.com",
-    projectId: "loan-tracker-9b25d",
-    storageBucket: "loan-tracker-9b25d.firebasestorage.app",
-    messagingSenderId: "336545645239",
-    appId: "1:336545645239:web:42d70da2cdcc91d1220332"
+    apiKey: "AIzaSyAXabT3rtcr7bo55JZM1yoE2VOnhsIVv0Y",
+    authDomain: "login-plugin-cc824.firebaseapp.com",
+    projectId: "login-plugin-cc824",
+    storageBucket: "login-plugin-cc824.firebasestorage.app",
+    messagingSenderId: "394556941374",
+    appId: "1:394556941374:web:996e09945f6ca26b129d6f"
   },
-  apiBaseUrl: "https://loanapi-prod.codewithzeeshan.com",
+  apiBaseUrl: "http://localhost:8080",
 };
