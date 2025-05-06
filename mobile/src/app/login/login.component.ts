@@ -32,7 +32,7 @@ type ActiveUi = 'login' | 'signup' | 'forgotPassword';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
   standalone: true,
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonIcon, IonIcon, IonItem, IonLabel, IonInput, FormsModule, RouterLink, ReactiveFormsModule],
+  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonIcon, IonIcon, IonItem, IonLabel, IonInput, FormsModule, ReactiveFormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent {
