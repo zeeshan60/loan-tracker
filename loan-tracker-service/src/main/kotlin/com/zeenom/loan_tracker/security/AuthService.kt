@@ -4,6 +4,7 @@ import com.zeenom.loan_tracker.events.LoginUserCommand
 import com.zeenom.loan_tracker.events.CommandDto
 import com.zeenom.loan_tracker.events.CommandType
 import com.zeenom.loan_tracker.firebase.FirebaseService
+import com.zeenom.loan_tracker.users.UserService
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import org.slf4j.Logger
@@ -16,7 +17,8 @@ import javax.crypto.spec.SecretKeySpec
 class AuthService(
     private val firebaseService: FirebaseService,
     private val authProperties: AuthProperties,
-    private val loginUserCommand: LoginUserCommand
+    private val loginUserCommand: LoginUserCommand,
+    private val userService: UserService
 ) {
     val logger: Logger = LoggerFactory.getLogger(AuthService::class.java)
     suspend fun generateJwtUsingIdToken(idToken: String): String {
@@ -33,8 +35,16 @@ class AuthService(
                 userId = user.uid
             )
         )
-        logger.info("User logged in: {}", user)
-        return user.uid
+        //Do not use the user object from Firebase, it doesnt necessarily have the same uid
+        val existing = userService.findByUserEmailOrPhoneNumber(
+            email = user.email,
+            phoneNumber = user.phoneNumber
+        ) ?: run {
+            logger.error("User not found in the database: {}", user)
+            throw IllegalStateException("User not found")
+        }
+        logger.info("User logged in: {}", existing)
+        return existing.uid
     }
 
     fun generateJwt(uid: String): String {

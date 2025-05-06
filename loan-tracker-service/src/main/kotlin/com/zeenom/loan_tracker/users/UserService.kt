@@ -95,4 +95,12 @@ class UserService(
     suspend fun findUserById(uid: String): UserDto? {
         return userEventHandler.findUserById(uid)
     }
+
+    suspend fun findByUserEmailOrPhoneNumber(email: String?, phoneNumber: String?): UserDto? {
+        return email?.let {
+            userEventHandler.findUsersByEmails(listOf(it)).firstOrNull()
+        } ?: phoneNumber?.let {
+            userEventHandler.findUsersByPhoneNumbers(listOf(it)).firstOrNull()
+        }
+    }
 }
