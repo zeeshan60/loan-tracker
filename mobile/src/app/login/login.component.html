@@ -17,7 +17,7 @@
 <ion-content class="ion-padding">
   @if (activeUi() === 'login') {
     @if (invalidCreds()) {
-      <ion-label color="danger">Invalid Email/Password</ion-label>
+      <ion-label color="danger">{{invalidCreds()}}</ion-label>
     }
     <form (submit)="onLoginWithCreds()" [formGroup]="loginForm">
       <ion-item>
@@ -54,7 +54,7 @@
     </ion-label>
   } @else if (activeUi() === 'signup') {
     @if (invalidCreds()) {
-      <ion-label color="danger">Email already exists</ion-label>
+      <ion-label color="danger">{{invalidCreds()}}</ion-label>
     }
     <form (submit)="onSignUpWithCreds()" [formGroup]="signUpForm">
       <ion-item>
@@ -74,7 +74,7 @@
           formControlName="password"
           name="password"
           required
-          errorText="Password is required"
+          [errorText]="passwordErrorMessage(signUpForm)"
         ></ion-input>
       </ion-item>
 
@@ -89,7 +89,7 @@
     </ion-label>
   } @else if (activeUi() === 'forgotPassword') {
     @if (invalidCreds()) {
-      <ion-label color="danger">Email doesn't exist</ion-label>
+      <ion-label color="danger">{{invalidCreds()}}</ion-label>
     }
     <form (submit)="onPasswordRecovery()" [formGroup]="forgotPasswordForm">
       <ion-item>

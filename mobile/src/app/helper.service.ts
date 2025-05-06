@@ -3,6 +3,7 @@ import { LoadingController, ToastController } from '@ionic/angular/standalone';
 import { DEFAULT_TOAST_DURATION } from './constants';
 import { getAuth } from '@angular/fire/auth';
 import { AlertController } from '@ionic/angular/standalone';
+import { ToastOptions } from '@ionic/angular';
 
 @Injectable({
   providedIn: 'root'
@@ -11,16 +12,17 @@ export class HelperService {
   readonly toastCtrl = inject(ToastController);
   readonly alertCtrl = inject(AlertController);
   readonly loadingCtrl = inject(LoadingController);
-  readonly _activeModals: [] = []
   constructor() { }
 
-  async showToast(message: string, duration = DEFAULT_TOAST_DURATION) {
+  async showToast(message: string, duration = DEFAULT_TOAST_DURATION, options?: ToastOptions) {
     const toast = await this.toastCtrl.create({
       message,
       duration,
-      swipeGesture: 'vertical'
+      swipeGesture: 'vertical',
+      ...options
     });
-    return toast.present();
+    await toast.present();
+    return toast;
   }
 
   async getFirebaseAccessToken() {

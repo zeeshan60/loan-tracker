@@ -129,24 +129,12 @@ export const AuthStore = signalStore(
         .then(({value: token}) => token);
 
       return loginPromise
-        .then(async (token) => {
-          const loader = await loadingCtrl.create({ duration: 2000 });
-          loader.present();
-          await this.login(token!)
-          await Promise.all([
-            this.fetchAndSaveUserData(),
-            friendsStore.loadFriends({ showLoader: false })
-          ]);
-          await loader.dismiss();
-        })
-        .then(() => router.navigate(['/']))
+        .then(async (token) => this.login(token!))
         .catch(async (err: Error) => {
           this.signOut();
-          const toast = await toastCtrl.create({
-            message: 'Unable to login at the moment',
-            duration: DEFAULT_TOAST_DURATION
+          await helperService.showToast('Unable to login at the moment', 2000, {
+            color: 'danger'
           });
-          toast.present();
         });
     },
 
@@ -161,7 +149,9 @@ export const AuthStore = signalStore(
     },
 
     async login(idToken: string) {
+      const loader = await loadingCtrl.create({ duration: 2000 });
       try {
+        loader.present();
         const url = `${PUBLIC_API}/login`
         const { token: apiKey } = await firstValueFrom(
           http.post<{ token: string  }>(url, {
@@ -170,8 +160,18 @@ export const AuthStore = signalStore(
         );
         await storageService.set('api_key', apiKey);
         patchState(store, { apiKey: apiKey })
+        await Promise.all([
+          this.fetchAndSaveUserData(),
+          friendsStore.loadFriends({ showLoader: false })
+        ]);
+        router.navigate(['/']);
       } catch (e) {
-        throw e;
+        this.signOut();
+        await helperService.showToast('Unable to login at the moment', 2000, {
+          color: 'danger'
+        });
+      } finally {
+        loader.dismiss();
       }
     },
     async setApiKey() {
