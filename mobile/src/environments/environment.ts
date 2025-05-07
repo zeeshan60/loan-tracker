@@ -21,12 +21,7 @@ export const environment = {
     bundleId: "com.zeenomlabs.loantracker",
     projectId: "login-plugin-cc824",
     storageBucket: "login-plugin-cc824.firebasestorage.app",
-    IS_ADS_ENABLED: false,
-    IS_ANALYTICS_ENABLED: false,
-    IS_APPINVITE_ENABLED: true,
-    IS_GCM_ENABLED: true,
-    IS_SIGNIN_ENABLED: true,
     appId: "1:336545645239:ios:90e69a58265af386220332"
   },
-  apiBaseUrl: "https://e93d-103-252-202-39.ngrok-free.app",
+  apiBaseUrl: "https://loanapi.codewithzeeshan.com",
 };
