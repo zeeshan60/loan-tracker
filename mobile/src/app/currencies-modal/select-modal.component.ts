@@ -31,7 +31,7 @@ type Item = {
 export class SelectModalComponent {
   modalIndex = input.required<ModalIndex>()
   items = input.required<Item[]>();
-  selectedItem = input.required<Item>();
+  selectedItem = input<Item|null>();
   mostlyUsedItems = input<Item[]>();
   filter = model<string>('');
   private filteredItems = computed(() => {

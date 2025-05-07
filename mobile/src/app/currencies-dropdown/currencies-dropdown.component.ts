@@ -32,10 +32,10 @@ export class CurrenciesDropdownComponent {
       component: SelectModalComponent,
       componentProps: {
         items: CURRENCIES.map((currency) => ({...currency, optionLabel: optionLabel(currency)})),
-        selectedItem: {
+        selectedItem: this.selectedCurrency() ? {
           ...this.selectedCurrency(),
           optionLabel: optionLabel(this.selectedCurrency())
-        },
+        } : null,
         mostlyUsedItems: (() => {
           const defaultCurrencyCode = this.authStore.user().currency;
           return CURRENCIES.filter(currency => [
