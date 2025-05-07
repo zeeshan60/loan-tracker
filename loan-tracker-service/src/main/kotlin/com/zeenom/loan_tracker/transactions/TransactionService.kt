@@ -8,7 +8,6 @@ import com.zeenom.loan_tracker.users.UserModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.time.Instant
@@ -26,7 +25,7 @@ class TransactionService(
     suspend fun addTransaction(
         userUid: String,
         transactionDto: TransactionDto,
-    ): Unit = withContext(Dispatchers.IO) {
+    ) {
 
         val existingUser = userEventHandler.findUserModelByUid(userUid)
             ?: throw IllegalArgumentException("User with id $userUid does not exist")
@@ -83,7 +82,7 @@ class TransactionService(
     suspend fun updateTransaction(
         userUid: String,
         transactionDto: TransactionDto,
-    ): Unit = withContext(Dispatchers.IO) {
+    ) {
 
         val existing =
             transactionEventHandler.read(userUid, transactionDto.transactionStreamId) ?: throw IllegalArgumentException(
