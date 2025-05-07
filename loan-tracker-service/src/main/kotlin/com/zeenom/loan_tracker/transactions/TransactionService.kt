@@ -50,7 +50,7 @@ class TransactionService(
             version = 1
         )
         transactionEventHandler.addEvent(event)
-        addDefaultCurrencyIfNotSet(existingUser, userUid, transactionDto)
+        addDefaultCurrencyIfNotSet(existingUser, userUid, transactionDto.currency)
         if (friendUser != null && userStreamId != null) transactionEventHandler.addEvent(
             event.crossTransaction(
                 friendUser.uid,
@@ -62,14 +62,14 @@ class TransactionService(
     private fun addDefaultCurrencyIfNotSet(
         existingUser: UserModel,
         userUid: String,
-        transactionDto: TransactionDto
+        currency: Currency
     ) {
         if (existingUser.currency == null) {
             CoroutineScope(Dispatchers.IO).launch {
                 userEventHandler.addEvent(
                     UserCurrencyChanged(
                         userId = existingUser.uid,
-                        currency = transactionDto.currency.toString(),
+                        currency = currency.toString(),
                         createdAt = Instant.now(),
                         streamId = existingUser.streamId,
                         version = existingUser.version + 1,
