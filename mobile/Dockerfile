@@ -23,7 +23,7 @@ RUN npm install @angular/material@latest --force
 COPY . .
 
 # Define a build argument for the build configuration
-ARG BUILD_CONFIG=prod
+ARG BUILD_CONFIG=dev
 
 # Build the Ionic app for production.  Use the appropriate command for your project.
 RUN npm run build-$BUILD_CONFIG
