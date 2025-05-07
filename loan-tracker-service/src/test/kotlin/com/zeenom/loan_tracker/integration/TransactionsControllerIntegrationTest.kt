@@ -2,16 +2,13 @@ package com.zeenom.loan_tracker.integration
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.zeenom.loan_tracker.common.Paginated
-import com.zeenom.loan_tracker.friends.FriendEventRepository
-import com.zeenom.loan_tracker.friends.FriendModelRepository
-import com.zeenom.loan_tracker.friends.FriendsResponse
-import com.zeenom.loan_tracker.friends.UpdateUserRequest
-import com.zeenom.loan_tracker.friends.UserResponse
+import com.zeenom.loan_tracker.friends.*
 import com.zeenom.loan_tracker.prettyAndPrint
 import com.zeenom.loan_tracker.transactions.*
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventRepository
 import com.zeenom.loan_tracker.users.UserModelRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.AutoCloseableSoftAssertions
@@ -92,25 +89,30 @@ class TransactionsControllerIntegrationTest :
 
     @Order(1)
     @Test
-    fun `add a transaction`() {
+    fun `add a transaction adds transaction and also sets the currency successfully when user didnt have any currency`(): Unit =
+        runBlocking {
 
-        webTestClient.post()
-            .uri("/api/v1/transactions/add")
-            .header("Authorization", "Bearer $zeeToken")
-            .bodyValue(
-                TransactionCreateRequest(
-                    amount = 100.0.toBigDecimal(),
-                    currency = "USD",
-                    type = SplitType.YouPaidSplitEqually,
-                    recipientId = johnFriendId,
-                    description = "Sample transaction",
-                    transactionDate = Instant.parse("2025-02-26T00:00:00Z")
+            webTestClient.post()
+                .uri("/api/v1/transactions/add")
+                .header("Authorization", "Bearer $zeeToken")
+                .bodyValue(
+                    TransactionCreateRequest(
+                        amount = 100.0.toBigDecimal(),
+                        currency = "USD",
+                        type = SplitType.YouPaidSplitEqually,
+                        recipientId = johnFriendId,
+                        description = "Sample transaction",
+                        transactionDate = Instant.parse("2025-02-26T00:00:00Z")
+                    )
                 )
-            )
-            .exchange()
-            .expectStatus().isOk
-            .expectBody().jsonPath("$.description").isEqualTo("Sample transaction")
-    }
+                .exchange()
+                .expectStatus().isOk
+                .expectBody().jsonPath("$.description").isEqualTo("Sample transaction")
+
+            delay(100)
+            val existing = userModelRepository.findByUid(zeeDto.uid)
+            assertThat(existing!!.currency.toString()).isEqualTo("USD")
+        }
 
     private lateinit var transaction: TransactionResponse
 
