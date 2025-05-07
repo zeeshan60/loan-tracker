@@ -58,6 +58,10 @@ class TransactionService(
         )
     }
 
+    /**
+     * We are using transaction to set default currency for user if user does not have it set.
+     * User can still change it later using update user apis
+     */
     private fun addDefaultCurrencyIfNotSet(
         existingUser: UserModel,
         userUid: String,
