@@ -67,7 +67,7 @@ class FirebaseAdapter {
         return UserDto(
             uid = token.uid,
             email = token.email,
-            displayName = token.name,
+            displayName = token.name?: "",
             photoUrl = token.picture,
             emailVerified = token.isEmailVerified,
             currency = null,
