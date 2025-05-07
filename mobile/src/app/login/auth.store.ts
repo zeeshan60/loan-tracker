@@ -1,28 +1,29 @@
-import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
-import { inject } from '@angular/core';
-import { HelperService } from '../helper.service';
-import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
-import { ToastController } from '@ionic/angular/standalone';
-import { StorageService } from '../services/storage.service';
-import { MethodsDictionary } from '@ngrx/signals/src/signal-store-models';
-import { DEFAULT_TOAST_DURATION, PRIVATE_API, PUBLIC_API } from '../constants';
-import { LoadingController } from '@ionic/angular/standalone';
-import { FriendsStore } from '../friends/friends.store';
-import { firstValueFrom } from 'rxjs';
-import { Auth, signInWithPopup } from '@angular/fire/auth';
-import { GoogleAuthProvider } from 'firebase/auth';
-import { AskForPhoneComponent } from '../ask-for-phone/ask-for-phone.component';
-import { Capacitor } from '@capacitor/core';
-import { LoginPlugin } from 'zeenom-capacitor-social-login';
-import { ModalService } from '../modal.service';
+import {patchState, signalStore, withMethods, withState} from '@ngrx/signals';
+import {inject} from '@angular/core';
+import {HelperService} from '../helper.service';
+import {HttpClient} from '@angular/common/http';
+import {Router} from '@angular/router';
+import {ToastController} from '@ionic/angular/standalone';
+import {StorageService} from '../services/storage.service';
+import {MethodsDictionary} from '@ngrx/signals/src/signal-store-models';
+import {DEFAULT_TOAST_DURATION, PRIVATE_API, PUBLIC_API} from '../constants';
+import {LoadingController} from '@ionic/angular/standalone';
+import {FriendsStore} from '../friends/friends.store';
+import {firstValueFrom} from 'rxjs';
+import {Auth, signInWithPopup} from '@angular/fire/auth';
+import {GoogleAuthProvider} from 'firebase/auth';
+import {AskForPhoneComponent} from '../ask-for-phone/ask-for-phone.component';
+import {Capacitor} from '@capacitor/core';
+import {LoginPlugin} from 'zeenom-capacitor-social-login';
+import {ModalService} from '../modal.service';
+import {environment} from "../../environments/environment";
 
 export interface User {
   uid: string,
   email: string,
-  phoneNumber: string|null,
+  phoneNumber: string | null,
   displayName: string,
-  currency: string|null,
+  currency: string | null,
   photoUrl: string,
   emailVerified: boolean
 }
@@ -44,8 +45,8 @@ export interface Region {
 
 type AuthState = {
   apiKey: string,
-  user: User|null,
-  region: Region|null,
+  user: User | null,
+  region: Region | null,
 }
 
 const initialState: AuthState = {
@@ -55,20 +56,29 @@ const initialState: AuthState = {
 }
 
 interface Methods extends MethodsDictionary {
-  loginWithGoogle(): Promise<boolean|void>;
+  loginWithGoogle(): Promise<boolean | void>;
+
   setApiKey(): Promise<void>;
+
   signOut(): Promise<void>;
+
   login(idToken?: string): Promise<void>;
+
   loadUserData(userData?: User): Promise<void>;
+
   loadUserRegion(): Promise<void>;
+
   fetchAndSaveUserData(): Promise<void>;
+
   updateUserData(data: Partial<User>): Promise<void>;
+
   askForPhoneNumber(): Promise<void>;
+
   getLoginPluginToken(): Promise<string>;
 }
 
 export const AuthStore = signalStore(
-  { providedIn: 'root' },
+  {providedIn: 'root'},
   withState(initialState),
   withMethods((
     store,
@@ -83,10 +93,10 @@ export const AuthStore = signalStore(
     friendsStore = inject(FriendsStore),
   ): Methods => ({
     async loadUserData(userData?: User): Promise<void> {
-      patchState(store, { user: userData || await storageService.get('user_data') })
+      patchState(store, {user: userData || await storageService.get('user_data')})
     },
     async loadUserRegion(): Promise<void> {
-      patchState(store, { region: await firstValueFrom(http.get<Region>('https://ipapi.co/json')) })
+      patchState(store, {region: await firstValueFrom(http.get<Region>('https://ipapi.co/json'))})
     },
     async fetchAndSaveUserData(): Promise<void> {
       const userData = await firstValueFrom(http.get<User>(`${PRIVATE_API}/users`));
@@ -109,59 +119,20 @@ export const AuthStore = signalStore(
     },
 
     async getLoginPluginToken(): Promise<string> {
-
-      const inputValueIOS = JSON.stringify({
-        CLIENT_ID: "336545645239-ppcpb0k5hc8303p9ek0793f8lkbbqbku.apps.googleusercontent.com",
-        REVERSED_CLIENT_ID: "com.googleusercontent.apps.336545645239-ppcpb0k5hc8303p9ek0793f8lkbbqbku",
-        API_KEY: "AIzaSyB1qt9hOwlzyBWGIe-grrg0Vgp53tcwoLE",
-        GCM_SENDER_ID: "336545645239",
-        PLIST_VERSION: "1",
-        BUNDLE_ID: "com.zeenomlabs.loantracker",
-        PROJECT_ID: "loan-tracker-9b25d",
-        STORAGE_BUCKET: "loan-tracker-9b25d.firebasestorage.app",
-        IS_ADS_ENABLED: false,
-        IS_ANALYTICS_ENABLED: false,
-        IS_APPINVITE_ENABLED: true,
-        IS_GCM_ENABLED: true,
-        IS_SIGNIN_ENABLED: true,
-        GOOGLE_APP_ID: "1:336545645239:ios:90e69a58265af386220332"
-      });
-
-      const inputValueAndroid = JSON.stringify({
-        CLIENT_ID: "336545645239-ppcpb0k5hc8303p9ek0793f8lkbbqbku.apps.googleusercontent.com",
-        REVERSED_CLIENT_ID: "com.googleusercontent.apps.336545645239-ppcpb0k5hc8303p9ek0793f8lkbbqbku",
-        API_KEY: "AIzaSyB1qt9hOwlzyBWGIe-grrg0Vgp53tcwoLE",
-        GCM_SENDER_ID: "336545645239",
-        PLIST_VERSION: "1",
-        BUNDLE_ID: "com.zeenomlabs.loantracker",
-        PROJECT_ID: "loan-tracker-9b25d",
-        STORAGE_BUCKET: "loan-tracker-9b25d.firebasestorage.app",
-        IS_ADS_ENABLED: false,
-        IS_ANALYTICS_ENABLED: false,
-        IS_APPINVITE_ENABLED: true,
-        IS_GCM_ENABLED: true,
-        IS_SIGNIN_ENABLED: true,
-        GOOGLE_APP_ID: "1:336545645239:ios:90e69a58265af386220332"
-      });
-
       switch (Capacitor.getPlatform()) {
         case 'ios':
-          return LoginPlugin.echo({value: inputValueIOS})
+          return LoginPlugin.echo({value: JSON.stringify(environment.firebaseIOS)})
             .then(({value: token}) => token);
         case 'android':
-          console.log('zeeshan_debug: Android calling echo');
-          return LoginPlugin.echo({value: inputValueAndroid})
-            .then(({value: token}) => {
-              console.log('zeeshan_debug: Android token:', token);
-              return token;
-            });
+          return LoginPlugin.echo({value: JSON.stringify(environment.firebaseAndroid)})
+            .then(({value: token}) => token);
         default:
           return signInWithPopup(auth, new GoogleAuthProvider())
             .then(() => helperService.getFirebaseAccessToken());
       }
     },
 
-    async loginWithGoogle(): Promise<boolean|void> {
+    async loginWithGoogle(): Promise<boolean | void> {
 
       const loginPromise = this.getLoginPluginToken();
 
@@ -186,21 +157,21 @@ export const AuthStore = signalStore(
     },
 
     async login(idToken: string) {
-      const loader = await loadingCtrl.create({ duration: 2000 });
+      const loader = await loadingCtrl.create({duration: 2000});
       try {
         loader.present();
         const url = `${PUBLIC_API}/login`
         console.log('zeeshan_debug: login url:', url);
-        const { token: apiKey } = await firstValueFrom(
-          http.post<{ token: string  }>(url, {
+        const {token: apiKey} = await firstValueFrom(
+          http.post<{ token: string }>(url, {
             idToken: `Bearer ${idToken}`
           })
         );
         await storageService.set('api_key', apiKey);
-        patchState(store, { apiKey: apiKey })
+        patchState(store, {apiKey: apiKey})
         await Promise.all([
           this.fetchAndSaveUserData(),
-          friendsStore.loadFriends({ showLoader: false })
+          friendsStore.loadFriends({showLoader: false})
         ]);
         router.navigate(['/']);
       } catch (e) {
@@ -213,7 +184,7 @@ export const AuthStore = signalStore(
       }
     },
     async setApiKey() {
-      patchState(store, { apiKey: await storageService.get('api_key') })
+      patchState(store, {apiKey: await storageService.get('api_key')})
     },
 
     async signOut(): Promise<void> {
