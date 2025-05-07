@@ -16,14 +16,10 @@ import { PRIVATE_API } from '../../constants';
 import {
   BehaviorSubject,
   catchError,
-  filter,
   finalize,
   map,
-  Observable,
   of, ReplaySubject,
-  Subject,
   switchMap, takeUntil,
-  tap,
   throwError,
 } from 'rxjs';
 import { TransactionDetailsComponent } from '../../friends/transaction-details/transaction-details.component';
