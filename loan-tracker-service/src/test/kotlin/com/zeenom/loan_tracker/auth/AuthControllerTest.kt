@@ -56,6 +56,10 @@ class AuthControllerTest(
         ).whenever(firebaseService).userByVerifyingIdToken(idToken)
 
         Mockito.doReturn(Unit).whenever(userService).createUser(userDto)
+        Mockito.doReturn(userDto).whenever(userService).findByUserEmailOrPhoneNumber(
+            email = userDto.email,
+            phoneNumber = userDto.phoneNumber
+        )
         Mockito.doReturn(Unit).whenever(friendService).searchUsersImFriendOfAndAddThemAsMyFriends("123")
         whenever(friendService.findAllByUserId("123")).thenReturn(
             FriendsWithAllTimeBalancesDto(
