@@ -1,9 +1,13 @@
 package com.zeenom.loan_tracker.transactions
 
 import com.zeenom.loan_tracker.friends.*
+import com.zeenom.loan_tracker.users.UserCurrencyChanged
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventHandler
+import com.zeenom.loan_tracker.users.UserModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
@@ -24,8 +28,10 @@ class TransactionService(
         transactionDto: TransactionDto,
     ): Unit = withContext(Dispatchers.IO) {
 
+        val existingUser = userEventHandler.findUserModelByUid(userUid)
+            ?: throw IllegalArgumentException("User with id $userUid does not exist")
         val (friendUser, userStreamId) = friendUserAndMyStreamId(
-            userUid = userUid,
+            me = existingUser,
             recipientId = transactionDto.friendSummaryDto.friendId
                 ?: throw IllegalArgumentException("Recipient id is required to add new transaction")
         )
@@ -44,12 +50,34 @@ class TransactionService(
             version = 1
         )
         transactionEventHandler.addEvent(event)
+        addDefaultCurrencyIfNotSet(existingUser, userUid, transactionDto)
         if (friendUser != null && userStreamId != null) transactionEventHandler.addEvent(
             event.crossTransaction(
                 friendUser.uid,
                 userStreamId
             )
         )
+    }
+
+    private fun addDefaultCurrencyIfNotSet(
+        existingUser: UserModel,
+        userUid: String,
+        transactionDto: TransactionDto
+    ) {
+        if (existingUser.currency == null) {
+            CoroutineScope(Dispatchers.IO).launch {
+                userEventHandler.addEvent(
+                    UserCurrencyChanged(
+                        userId = existingUser.uid,
+                        currency = transactionDto.currency.toString(),
+                        createdAt = Instant.now(),
+                        streamId = existingUser.streamId,
+                        version = existingUser.version + 1,
+                        createdBy = userUid
+                    )
+                )
+            }
+        }
     }
 
     suspend fun updateTransaction(
@@ -67,8 +95,10 @@ class TransactionService(
         }
 
         val recipientId = existing.recipientId
+        val existingUser = userEventHandler.findUserModelByUid(userUid)
+            ?: throw IllegalArgumentException("User with id $userUid does not exist")
         val (friendUser, userStreamId) = friendUserAndMyStreamId(
-            userUid = userUid, recipientId = recipientId
+            me = existingUser, recipientId = recipientId
         )
         var eventVersion = existing.version
         val createdAt = Instant.now()
@@ -178,11 +208,9 @@ class TransactionService(
         }
     }
 
-    suspend fun friendUserAndMyStreamId(userUid: String, recipientId: UUID): Pair<UserDto?, UUID?> {
-        val me = userEventHandler.findUserById(userUid)
-            ?: throw IllegalArgumentException("User with id $userUid does not exist")
-        val friend = friendsEventHandler.findFriendByUserIdAndFriendId(userUid, recipientId)
-            ?: throw IllegalArgumentException("User with id $userUid does not have friend with id $recipientId")
+    suspend fun friendUserAndMyStreamId(me: UserModel, recipientId: UUID): Pair<UserDto?, UUID?> {
+        val friend = friendsEventHandler.findFriendByUserIdAndFriendId(me.uid, recipientId)
+            ?: throw IllegalArgumentException("User with id ${me.uid} does not have friend with id $recipientId")
         val friendUser = userEventHandler.findUserByEmailOrPhoneNumber(friend.email, friend.phoneNumber)
         val userStreamId = friendUser?.let {
             friendsEventHandler.findFriendStreamIdByEmailOrPhoneNumber(friendUser.uid, me.email, me.phoneNumber)
@@ -226,8 +254,10 @@ class TransactionService(
             ?: throw IllegalArgumentException("Transaction with id $transactionStreamId does not exist")
 
         val recipientId = existing.recipientId
+        val existingUser = userEventHandler.findUserModelByUid(userUid)
+            ?: throw IllegalArgumentException("User with id $userUid does not exist")
         val (friendUser, userStreamId) = friendUserAndMyStreamId(
-            userUid = userUid, recipientId = recipientId
+            me = existingUser, recipientId = recipientId
         )
         val event = TransactionDeleted(
             id = null,

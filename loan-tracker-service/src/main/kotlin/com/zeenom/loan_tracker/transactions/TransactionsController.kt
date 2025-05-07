@@ -288,12 +288,6 @@ data class ChangeSummaryResponse(
     val changes: List<ChangeSummaryDto>,
 )
 
-data class ChangeSummaryByUserResponse(
-    val oldValue: String,
-    val newValue: String,
-    val type: TransactionChangeType,
-)
-
 data class AmountResponse(
     val amount: BigDecimal,
     val currency: String,
