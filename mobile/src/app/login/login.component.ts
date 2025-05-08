@@ -99,8 +99,17 @@ export class LoginComponent {
       this.loading.set(true);
       signInWithEmailAndPassword(auth, this.loginForm.get('email').value, this.loginForm.get('password').value)
         .then(async () => this.authStore.login(await getAuth().currentUser?.getIdToken()))
+        .then(() => {
+          if (!this.authStore.user()?.phoneNumber) {
+            this.authStore.askForPhoneNumber();
+          }
+        })
         .catch((error: FirebaseAuthError) => {
-          this.invalidCreds.set(FirebaseErrorCodeMessageEnum[error.code] || extractFirebaseErrorMessage(error.message));
+          let errorMessage = FirebaseErrorCodeMessageEnum[error.code] || extractFirebaseErrorMessage(error.message);
+          if (!errorMessage) {
+            errorMessage = 'Something went wrong. Please try again'
+          }
+          this.invalidCreds.set(errorMessage);
         })
         .finally(() => {
           this.loading.set(false);
