@@ -138,6 +138,11 @@ export const AuthStore = signalStore(
 
       return loginPromise
         .then(async (token) => this.login(token!))
+        .then(() => {
+          if (!store.user()?.phoneNumber) {
+            this.askForPhoneNumber();
+          }
+        })
         .catch(async (err: Error) => {
           this.signOut();
           await helperService.showToast('Unable to login at the moment', 2000, {

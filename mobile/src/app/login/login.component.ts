@@ -169,11 +169,6 @@ export class LoginComponent {
 
   loginWithGoogle() {
     this.authStore.loginWithGoogle()
-      .then(() => {
-        if (!this.authStore.user()?.phoneNumber) {
-          this.authStore.askForPhoneNumber();
-        }
-      });
   }
 
   activateUi(ui: ActiveUi) {
