@@ -104,7 +104,7 @@ export class AddFriendComponent implements OnInit {
         const mappedValue = {
           name: this.addFriendForm.get('name')!.value,
           email: this.addFriendForm.get('email')!.value || null,
-          phoneNumber: toInternationalPhone(this.addFriendForm.get('phone.phoneNumber')!.value, this.addFriendForm.get('phone.country')!.value),
+          phoneNumber: toInternationalPhone(this.addFriendForm.get('phone.phoneNumber')!.value, this.addFriendForm.get('phone.country')!.value) || null,
         }
         const friend = this.isUpdating() ?
           await this.friendsStore.updateFriend(this.friend()!.friendId, mappedValue) :

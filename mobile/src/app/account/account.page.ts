@@ -90,4 +90,10 @@ export class AccountPage {
     });
     this.friendsStore.loadFriends();
   }
+
+  ionViewWillEnter() {
+    if (!this.user()?.currency) {
+      this.authStore.fetchAndSaveUserData();
+    }
+  }
 }
