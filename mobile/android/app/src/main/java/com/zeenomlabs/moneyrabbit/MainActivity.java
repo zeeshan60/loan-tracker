@@ -1,4 +1,4 @@
-package com.zeenomlabs.loantracker;
+package com.zeenomlabs.moneyrabbit;
 
 import com.getcapacitor.BridgeActivity;
 

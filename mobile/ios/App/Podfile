@@ -16,7 +16,7 @@ def capacitor_pods
   pod 'CapacitorHaptics', :path => '../../node_modules/@capacitor/haptics'
   pod 'CapacitorKeyboard', :path => '../../node_modules/@capacitor/keyboard'
   pod 'CapacitorStatusBar', :path => '../../node_modules/@capacitor/status-bar'
-  pod 'ZeenomCapacitorSocialLogin', :path => '../../../../zeenom-capacitor-social-login'
+  pod 'ZeenomCapacitorSocialLogin', :path => '../../node_modules/zeenom-capacitor-social-login'
 end
 
 target 'App' do

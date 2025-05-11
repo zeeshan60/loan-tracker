@@ -19,8 +19,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: Update submodules
-        run: git submodule update --init
+      - name: Create environment.prod.ts
+        run: echo '${{ secrets.UI_ENVIRONMENT_PROD }}' > $GITHUB_WORKSPACE/mobile/src/environments/environment.prod.ts
 
       #Build and push docker image
       - name: Login to DockerHub

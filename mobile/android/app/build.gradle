@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace "com.zeenomlabs.loantracker"
+    namespace "com.zeenomlabs.moneyrabbit"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.zeenomlabs.loantracker"
+        applicationId "com.zeenomlabs.moneyrabbit"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
