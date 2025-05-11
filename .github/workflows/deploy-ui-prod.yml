@@ -28,7 +28,7 @@ jobs:
       - name: Build and Push Docker Image
         run: |
           cd mobile
-          docker buildx build --platform linux/amd64 -t zeeshan60/loan-tracker-ui-repo:prod --push .
+          docker buildx build --build-arg BUILD_CONFIG=prod --platform linux/amd64 -t zeeshan60/loan-tracker-ui-repo:prod --push .
 
       # 🔥 Deploy using Flask REST API instead of CodeDeploy
       - name: Deploy via Flask API
