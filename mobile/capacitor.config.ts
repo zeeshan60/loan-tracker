@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'io.ionic.starter',
-  appName: 'loanTracker',
+  appId: 'com.zeenomlabs.moneyrabbit',
+  appName: 'MoneyRabbit',
   webDir: 'www',
   ios: {
     scheme: "App",

@@ -19,6 +19,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+      - name: Create environment.ts
+        run: echo '${{ secrets.UI_ENVIRONMENT }}' > $GITHUB_WORKSPACE/mobile/src/environments/environment.ts
 
       #Build and push docker image
       - name: Login to DockerHub

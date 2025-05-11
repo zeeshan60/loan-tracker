@@ -195,5 +195,3 @@ curl --location --request POST 'https://loandeploy.codewithzeeshan.com/deploy' \
 --header 'Content-Type: application/json' \
 --header 'Authorization: Bearer 49cf14928048efa5569abb0b6330251d'
 ```
-
-We are now using dev firebase managed by zeeshan
