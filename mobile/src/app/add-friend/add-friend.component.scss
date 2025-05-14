@@ -1,6 +1,109 @@
+ion-header{
+  box-shadow: none;
+
+  ion-toolbar {
+    padding: 0 16px;
+    --color: #2D2F35;
+    --border-width: 0;
+
+    ion-title{
+      padding:0;
+      text-transform: capitalize;
+      text-align: left;
+    }
+  }
+}
+
+
+
 ion-item {
+  position: relative;
+
   &::part(native) {
     padding-left: 0;
     --inner-border-width: 0;
+    background-color: transparent;
+  }
+
+  ion-input {
+    --border-width: 0;
+    --box-shadow: none;
+    padding-left: 36px;
+    padding-right: 36px;
+  }
+
+  img {
+    position: absolute;
+    top: 36px;
+    z-index: 9;
+    left: 10px;
   }
 }
+
+
+.input-label {
+  font-size: 14px;
+  color: #2D2F35;
+  font-weight: 600;
+}
+.input-field{
+  ::ng-deep .input-wrapper{
+    background-color: #F7F7F7;
+    padding: 8px 40px 8px 40px;
+    font-size: 14px;
+    margin-top: 8px;
+    border-radius: 10px;
+
+  }
+}
+
+app-phone-with-country{
+    background: #f7f7f7;
+    border-radius: 10px;
+    align-items: center;
+    margin-top: 8px;
+    padding: 0 10px;
+    ::ng-deep ion-input{
+      min-width: auto !important;
+      min-height: 40px !important;
+    }
+
+    ::ng-deep .country {
+      margin-top: 0;
+    }
+    ::ng-deep .country .selected-wrapper{
+      margin-top: 0 !important;
+    }
+    ::ng-deep .country .label{
+      display: none;
+    }
+    ::ng-deep .input-wrapper .label-text-wrapper{
+      display: none;
+    }
+}
+
+.btn-group{
+    display: flex;
+    margin: 24px 0;
+    gap: 8px;
+  .btn-ghost{
+    text-align: center;
+    flex: 1;
+    border: 1px solid #ccc;
+    border-radius: 40px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #ccc;
+  }
+  .button-filled{
+      text-align: center;
+      flex: 1;
+      background-color: #21CE99;
+      border: 1px solid #21CE99;
+      border-radius: 40px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #fff;
+  }
+}
+

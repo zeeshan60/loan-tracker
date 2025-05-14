@@ -1,3 +1,44 @@
+<div class="overall-balance-wrapper">
+  <div class="summary-banlance">
+    <div>
+      <ion-label>Overall Balance in your local currency</ion-label>
+      <h1 class="success">SGD 140.00 <img class="arrow" src="assets/images/arrow-green-downward.svg" alt="wallet" /></h1>
+    </div>
+    <img src="assets/images/wallet-icon.svg" alt="wallet" />
+  </div>
+
+  <div class="other-details">
+    <ion-list>
+      <ion-item>
+        <div slot="start">
+          <p>Total THB : <span class="danger">100 <img class="arrow" src="assets/images/arrow-red-upword.svg" alt="wallet" /></span></p>
+        </div>
+
+        <ion-label>Converted to</ion-label>
+
+        <div slot="end">
+          <p><span class="danger">SGD5.00 <img class="arrow" src="assets/images/arrow-red-upword.svg" alt="wallet" /></span></p>
+        </div>
+      </ion-item>
+
+      <ion-item>
+        <div slot="start">
+          <p>Total USD : <span class="success">300 <img class="arrow" src="assets/images/arrow-green-downward.svg" alt="wallet" /></span></p>
+        </div>
+
+        <ion-label>Converted to</ion-label>
+
+        <div slot="end">
+          <p><span class="success">SGD135.00 <img class="arrow" src="assets/images/arrow-green-downward.svg" alt="wallet" /></span></p>
+        </div>
+      </ion-item>
+
+    </ion-list>
+  </div>
+
+</div>
+
+<!--
 @if (overallBalance?.main) {
   <ion-item class="overall-balance-wrapper">
     <ion-label>
@@ -39,3 +80,4 @@
     }
   </ion-item>
 }
+ -->
