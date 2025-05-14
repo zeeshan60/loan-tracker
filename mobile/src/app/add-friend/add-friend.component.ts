@@ -15,6 +15,7 @@ import {
   IonSpinner,
   IonTitle,
   IonToolbar,
+  IonLabel,
 } from '@ionic/angular/standalone';
 import {
   FormBuilder, FormControl, FormGroup,
@@ -43,11 +44,12 @@ import { ModalIndex, ModalService } from '../modal.service';
     IonHeader,
     IonButton,
     IonButtons,
+    IonLabel,
     IonTitle,
     IonContent,
     IonSpinner,
     ReactiveFormsModule,
-    IonItem, IonList, PhoneWithCountryComponent,
+    IonItem, IonList, PhoneWithCountryComponent, 
   ],
 })
 export class AddFriendComponent implements OnInit {

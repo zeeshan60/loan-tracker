@@ -82,7 +82,6 @@ ion-item {
 // }
 
 
-
 ion-content {
   position: relative;
   height: 100vh;
@@ -112,8 +111,6 @@ ion-content {
   }
 }
 
-
-
 .form-card{
     background-color: #fff;
     border: 1px solid #E8E9EB;
@@ -122,13 +119,6 @@ ion-content {
     box-shadow: 0 0 5px #00000024;
     margin-top: 54px;
 }
-
-.input-label {
-  font-size: 14px;
-  color: #2D2F35;
-  font-weight: 600;
-}
-
 .button-filled{
   &::part(native) {
     background-color: #21CE99;
@@ -142,7 +132,6 @@ ion-content {
     margin-top: 24px;
   }
 }
-
 .button-text{
   color:#3063E3;
   font-size: 14px;
@@ -151,6 +140,11 @@ ion-content {
   padding: 0 8px;
 }
 
+.input-label {
+  font-size: 14px;
+  color: #2D2F35;
+  font-weight: 600;
+}
 .input-field{
   ::ng-deep .input-wrapper{
     background-color: #F7F7F7;
@@ -175,13 +169,6 @@ ion-content {
     }
 }
 
-.invalid-cred{
-    text-align: center;
-    display: block;
-    margin-top: 12px;
-    font-size: 14px;
-}
-
 .divider {
   display: flex;
   align-items: center;
@@ -201,7 +188,6 @@ ion-content {
     white-space: nowrap;
   }
 }
-
 
 app-phone-with-country{
     background: #f7f7f7;
@@ -226,4 +212,11 @@ app-phone-with-country{
     ::ng-deep .input-wrapper .label-text-wrapper{
       display: none;
     }
+}
+
+.invalid-cred{
+    text-align: center;
+    display: block;
+    margin-top: 12px;
+    font-size: 14px;
 }
