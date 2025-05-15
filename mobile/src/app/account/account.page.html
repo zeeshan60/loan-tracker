@@ -46,7 +46,7 @@
           <ion-icon name="call-outline"></ion-icon>
       <ion-label>{{user()?.phoneNumber | phone }}</ion-label>
 
-      <ion-icon (click)="phoneInEditMode.set(true)" slot="end" name="create-outline"></ion-icon>
+      <img (click)="phoneInEditMode.set(true)" slot="end" src="assets/images/edit.svg" alt="icon" />
 
         } @else {
           <form [formGroup]="phoneForm" (ngSubmit)="savePhoneNumber()" id="save-phone-form">

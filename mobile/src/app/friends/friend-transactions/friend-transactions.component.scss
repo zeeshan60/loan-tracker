@@ -12,6 +12,7 @@ ion-item {
 .description-wrapper {
   h2 {
     font-size: 14px;
+    text-transform: capitalize;
   }
 }
 .amount-wrapper {
@@ -33,20 +34,21 @@ ion-header{
   ion-toolbar {
     padding: 0 16px;
     // background-color: transparent;
-    background: linear-gradient(to right, #21CE99 0%, #007BFF 100%);
+    background: linear-gradient(to right, $color-green 0%, $color-blue 100%);
     --background: transparent;  
-    --color: #ffffff;   
+    --color: $color-white;   
     --border-width: 0;
     ion-title{
       font-size: 20px;
       font-weight: 600;
       padding-left: 0;
+      color: $color-white;
     }
     ion-buttons{
       margin: 0;
       ion-button{ 
         &::part(native){
-          background-color: #3063E3;
+          background-color: $color-blue;
           padding-right: 11px;
           border-radius: 40px;
         }
@@ -57,7 +59,7 @@ ion-header{
         display:none !important;
       }
       &::part(native){
-        color:#fff;
+        color:$color-white;
       }
     }  
   }
@@ -75,8 +77,8 @@ ion-content {
     height: 280px;
     background: linear-gradient(
       to right,
-      #21CE99 0%,
-      #007BFF 100%,
+      $color-green 0%,
+      $color-blue 100%,
     );
     z-index: -1;
   }
@@ -87,7 +89,7 @@ ion-content {
     left: 0;
     width: 100%;
     bottom: 0; /* Automatically fills remaining space */
-    background-color: #fff;
+    background-color: $color-white;
     z-index: -1;
   }
 }
@@ -109,16 +111,16 @@ ion-list{
   
   h3{
     font-size: 18px;
-    color: #2D2F35;
+    color: $color-dark;
   }
 
   ion-item{
     margin: 4px 0;
-    border: 1px solid #E8E9EB;
+    border: 1px solid $color-lightGrey;
     --border-color: transparent !important;
     --inner-padding-end: 0px;
     border-radius: 10px;
-    background: #fff;
+    background: $color-white;
 
     &::part(native) {
       padding: 12px;
@@ -127,7 +129,7 @@ ion-list{
         display:none !important;
     }
     ion-avatar{
-      background: #F7F7F7;
+      background: $color-mediumGrey;
       width: 50px;
       height: 50px;
       object-fit: cover;
@@ -164,7 +166,7 @@ ion-list{
 }
 .transactions-list{
   h6{
-    color: #757A86;
+    color: $color-grey;
     font-weight: 600;
     margin-top: 32px;
     font-size: 14px;  
@@ -172,22 +174,18 @@ ion-list{
 }
 
 .friend-trans-list{
-  margin: 4px 0;
-  border: 1px solid #E8E9EB;
+  margin: 6px 0;
+  border: 1px solid $color-lightGrey;
   --border-color: transparent !important;
   // --inner-padding-end: 0px;
   border-radius: 10px;
-  background: #fff;
-
-  // &::part(native) {
-  //   padding: 12px;
-  // }
+  background: $color-white;
   &::part(detail-icon){
       display:none !important;
   }
 
   ion-avatar{
-    background: #F7F7F7;
+    background: $color-mediumGrey;
     width: 40px;
     height: 40px;
     display: flex;
@@ -221,7 +219,7 @@ ion-list{
     max-width: 150px;
     margin: 0 auto;
     &::part(native){
-        background-color: #21CE99;
+        background-color: $color-green;
         border-radius: 40px;
         margin-bottom: 40px;
         min-height: 0;
@@ -232,23 +230,29 @@ ion-list{
     display: flex;
     margin: 24px 16px;
     gap: 8px;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    left: 0;
   .btn-ghost{
     text-align: center;
     flex: 1;
-    border: 1px solid #3063E3;
+    border: 1px solid $color-blue;
     border-radius: 40px;
     font-size: 14px;
     font-weight: 500;
-    color: #3063E3;
+    color: $color-blue;
+    background-color: $color-white;
   }
   .btn-filled.red{
     text-align: center;
     flex: 1;
-    border: 1px solid #FF5D5D;
+    border: 1px solid $color-red;
     border-radius: 40px;
     font-size: 14px;
     font-weight: 500;
-    color: #FF5D5D;
+    color: $color-red;
+    background-color: $color-white;
   }
 }
 

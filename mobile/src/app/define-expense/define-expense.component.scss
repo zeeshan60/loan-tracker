@@ -1,32 +1,143 @@
-.choose-friend-item {
-  ion-label.selected-friend-label {
-    display: inline;
-    border-bottom: 2px dashed;
-    cursor: pointer;
-  }
-}
+@import "variables.scss";
 
-ion-select.split-option-select {
-  &::part(text) {
-    color: red;
-  }
-  &.is-owed::part(text) {
-    color: green;
+ion-header{
+  box-shadow: none;
+
+  ion-toolbar {
+    padding: 0 16px;
+    background-color: $color-mediumGrey;
+    --background: $color-mediumGrey;
+    --color: $color-dark;
+    --border-width: 0;
+
+    ion-title{
+      padding:0;
+      text-transform: capitalize;
+      text-align: left;
+      font-size: 20px;
+      color: $color-dark;
+    }
   }
 }
 
 ion-item {
+  position: relative;
+
   &::part(native) {
-    padding-left: 0;
+    --inner-border-width: 0;
+    background-color: transparent;
+     padding-left: 0;
     --inner-border-width: 0;
   }
 
-  .currency-dropdown {
-    min-width: 25%;
-    margin-right: 15px;
+  ion-input {
+    --border-width: 0;
+    --box-shadow: none;
+    padding-left: 36px;
+    padding-right: 36px;
   }
 
+  .currency-dropdown {
+    width: 100%;
+    background-color: $color-mediumGrey;
+    padding: 8px 16px;
+    font-size: 14px;
+    margin: 4px 0;
+    border-radius: 10px;
+  }
   &.currency-expense ion-input.ion-invalid {
     margin-top: 10px
   }
+  ion-select{
+      width: 100%;
+      background-color: $color-mediumGrey;
+      padding: 0px 16px;
+      font-size: 14px;
+      margin: 4px 0;
+      border-radius: 10px;
+      &.split-option-select {
+        &::part(text) {
+          color: $color-red;
+        }
+        &.is-owed::part(text) {
+          color: $color-green;
+        }
+      }
+  }
+  ion-datetime-button{
+      border-radius: 10px;
+      margin: 4px 0;
+      border-radius: 10px;
+      width: 100%;
+      &::part(native){
+        width: 100%;
+        background-color: $color-mediumGrey;
+        text-align: left;
+        font-size: 14px;
+        padding: 12px 16px;
+      }
+  }
+
 }
+
+.choose-friend-item{
+  h2{
+    color: $color-dark;
+    margin: 0;
+    text-transform: capitalize;
+  }
+  p {
+    color: $color-grey;
+    margin: 4px 0 28px;
+    font-size: 18px;
+    span{
+      display: inline;
+      border-bottom: 2px dashed $color-blue;
+      cursor: pointer;
+      color: $color-blue;
+      font-weight: 600;
+    }
+  }
+}
+
+.input-label {
+  font-size: 14px;
+  color: $color-dark;
+  font-weight: 600;
+}
+.input-field{
+  ::ng-deep .input-wrapper{
+    background-color: $color-mediumGrey;
+    padding: 8px 16px;
+    font-size: 14px;
+    margin-top: 4px;
+    border-radius: 10px;
+
+  }
+}
+
+.btn-group{
+    display: flex;
+    margin: 24px 0;
+    gap: 8px;
+  .btn-ghost{
+    text-align: center;
+    flex: 1;
+    border: 1px solid #ccc;
+    border-radius: 40px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #000;
+  }
+  .button-filled{
+      text-align: center;
+      flex: 1;
+      background-color: $color-green;
+      border: 1px solid $color-green;
+      border-radius: 40px;
+      font-size: 14px;
+      font-weight: 500;
+      color: $color-white;
+  }
+}
+

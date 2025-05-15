@@ -1,36 +1,26 @@
 <ion-header>
   <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-button color="medium" (click)="closePopup()">Cancel</ion-button>
-    </ion-buttons>
     <ion-title>
       Settle up with {{this.friend().name | shortenName}}
     </ion-title>
-    <ion-buttons slot="end">
-      @if (loading()) {
-        <ion-spinner></ion-spinner>
-      } @else {
-        <ion-button type="submit" form="settle-up-form" [strong]="true">Submit</ion-button>
-      }
-    </ion-buttons>
   </ion-toolbar>
 </ion-header>
+
 <ion-content class="ion-padding">
   @if (settleUpForm.get('balance')?.value?.isOwed) {
-    <h1>{{this.friend().name | shortenName}} paid you.</h1>
+    <h2>{{this.friend().name | shortenName}} paid you.</h2>
   } @else {
-    <h1>You paid to {{this.friend().name | shortenName}}</h1>
+    <h2>You paid to {{this.friend().name | shortenName}}</h2>
   }
   <form [formGroup]="settleUpForm" (ngSubmit)="submit()" id="settle-up-form">
     <ion-list>
       <ion-item class="currency-expense">
+        <ion-label position="stacked" class="input-label">Choose a balance</ion-label>
         <ion-select
           formControlName="balance"
           class="balance-select"
           [class.is-owed]="settleUpForm.get('balance')!.value.isOwed"
           placeholder="Select currency"
-          label="Choose a balance"
-          label-placement="stacked"
           interface="action-sheet"
         >
           @for (balance of friend().otherBalances; track balance) {
@@ -39,14 +29,24 @@
         </ion-select>
       </ion-item>
       <ion-item>
+        <ion-label position="stacked" class="input-label">Amount</ion-label>
         <ion-input
+          class="input-field"
           type="number"
-          labelPlacement="stacked"
-          label="Amount"
           formControlName="amount"
           errorText="Expense is required"
         ></ion-input>
       </ion-item>
     </ion-list>
   </form>
+
+  <ion-buttons class="btn-group">
+    <ion-button class="btn-ghost" (click)="closePopup">Cancel</ion-button>
+    @if (loading()) {
+        <ion-spinner></ion-spinner>
+      } @else {
+        <ion-button class="button-filled" type="submit" form="settle-up-form" [strong]="true">Settle Now</ion-button>
+      }
+  </ion-buttons>
+
 </ion-content>

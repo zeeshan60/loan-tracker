@@ -1,23 +1,27 @@
+@import "variables.scss";
+
 ion-header{
   box-shadow: none;
 
   ion-toolbar {
     padding: 0 16px;
-    background-color: #F7F7F7;
-    --background: #F7F7F7;
-    --color: #2D2F35;
+    background-color: $color-mediumGrey;
+    --background: $color-mediumGrey;
+    --color: $color-dark;
     --border-width: 0;
 
     ion-title{
       padding:0;
       text-transform: capitalize;
       text-align: left;
+      font-size: 20px;
+      color: $color-dark;
     }
   }
 }
 
 ion-content::part(background) {
-  background-color: #F7F7F7;
+  background-color: $color-mediumGrey;
 }
 
 ion-list{
@@ -26,11 +30,11 @@ ion-list{
 }
 
 ion-item {
-    --background: #ffffff;
+    // --background: $color-white;
     --border-color: transparent !important;
-    margin: 10px 0;
+    margin: 6px 0;
     border-radius: 10px;
-    border: 1px solid #E8E9EB;
+    border: 1px solid $color-lightGrey;
 
    &::part(detail-icon){
         display:none !important;
@@ -59,6 +63,6 @@ ion-item {
     text-align: right;
     width: 54px;
     margin: 12px 0;
-    color: #757A86;
+    color: $color-grey;
     line-height: 1.8;
 }

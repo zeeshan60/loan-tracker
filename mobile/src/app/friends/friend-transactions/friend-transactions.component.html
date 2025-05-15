@@ -3,9 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button></ion-back-button>
     </ion-buttons>
-
     <ion-title>With you and {{friend()['name'] | shortenName}}</ion-title>
-
     @if(transactions().length) {
       <ion-buttons slot="primary">
       <ion-button size="small" fill="solid" (click)="settleUp()">
@@ -22,26 +20,9 @@
 
   <div class="top-section"></div>
   <div class="bottom-section"></div>
-
   <app-overall-balance
       [overallBalance]="friendsStore['selectedFriendBalance']()"
     ></app-overall-balance>
-
-  <!-- 
-  <ion-button
-    (click)="editFriendInfo()"
-    size="small"
-  >
-    <ion-icon slot="start" name="create-outline"></ion-icon> Edit
-  </ion-button>
-  <ion-button
-    (click)="deleteFriend()"
-    size="small"
-    color="danger"
-  >
-    <ion-icon slot="start" name="trash-outline"></ion-icon> Delete
-  </ion-button>
--->
 
   @for(transactionsByMonth of transactions(); track transactionsByMonth.date) {
   <hr>
@@ -56,19 +37,17 @@
       <ion-label class="description-wrapper">
         <h2>{{ transaction.description }}</h2>
         <p>
-                  @if (transaction.amount.isOwed) {
-                    You paid:
-                  } @else {
-                    {{friend().name | shortenName}} paid:
-                  }
-                  {{ transaction.totalAmount | currency: transaction.amount.currency: 'symbol' }}
+          @if (transaction.amount.isOwed) {
+            You paid:
+          } @else {
+            {{friend().name | shortenName}} paid:
+          }
+          {{ transaction.totalAmount | currency: transaction.amount.currency: 'symbol' }}
         </p>
-
         <p class="date-wrapper">
           {{transaction.date | dateFormat: 'day'}}
           {{transaction.date | dateFormat: 'month'}}
         </p>
-
       </ion-label>
       <p class="amount-wrapper">
         <ion-label class="type" [color]="transaction.amount.isOwed ? 'success': 'danger'">
@@ -93,12 +72,12 @@
   } @empty {
     @if(!isLoading()) {
       <div class="empty-transactions-wrapper">
-         <p>No transactions yet.</p>
-        <ion-button (click)="addExpense()">
+    <p>No transactions yet.</p>
+    <ion-button (click)="addExpense()">
                 Add New
         </ion-button>
-        
-      </div>
+
+  </div>
     }
   }
 

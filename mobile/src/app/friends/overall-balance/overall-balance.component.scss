@@ -1,6 +1,8 @@
+@import "variables.scss";
+
 .overall-balance-wrapper{
     margin: 16px 16px 0;
-    background-color: #fff;
+    background-color: $color-white;
     border-radius: 20px;
     padding: 16px;
    
@@ -10,7 +12,7 @@
         align-items: center;
         ion-label{
             font-size: 12px;
-            color: #757A86;
+            color: $color-grey;
         }
         h1{
             font-size: 24px;
@@ -23,7 +25,7 @@
         }
     }
     .other-details{
-        background-color: #F7F7F7;
+        background-color: $color-mediumGrey;
         padding: 0 12px;
         border-radius: 10px;
         margin-top: 16px;
@@ -32,8 +34,8 @@
             ion-item{
                 --border-color: transparent !important;
                 --inner-padding-end: 0px;
-                border-bottom: 1px solid #E8E9EB;
-                background: #f7f7f7;
+                border-bottom: 1px solid $color-lightGrey;
+                background: $color-mediumGrey;
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
@@ -53,7 +55,7 @@
                 }
                 ion-label{
                     font-size:10px;
-                    color:#757A86;
+                    color:$color-grey;
                     text-align: center;
                 }
                
@@ -62,8 +64,8 @@
     }
 }
 .success{
-    color: #2dd55b;
+    color: $color-green;
 }
 .danger{
-    color: #FF5D5D;
+    color: $color-red;
 }
