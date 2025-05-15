@@ -1,3 +1,25 @@
+@import "variables.scss";
+
+ion-header{
+  box-shadow: none;
+
+  ion-toolbar {
+    padding: 0 16px;
+    background-color: $color-mediumGrey;
+    --background: $color-mediumGrey;
+    --color: $color-dark;
+    --border-width: 0;
+
+    ion-title{
+      padding:0;
+      text-transform: capitalize;
+      text-align: left;
+      font-size: 20px;
+      color: $color-dark;
+    }
+  }
+}
+
 ion-toolbar ion-chip {
   ion-icon {
     width: 20px;
@@ -7,3 +29,109 @@ ion-toolbar ion-chip {
     border: 1px solid gray;
   }
 }
+
+
+ion-content{
+  --background-color:$color-mediumGrey;
+  margin: 0 16px;
+  ion-searchbar{
+    --box-shadow: 0;
+    padding: 0;
+
+    &::ng-deep input{
+      background-color: $color-mediumGrey;
+      border-radius: 10px;
+      border: 1px solid $color-lightGrey;
+      font-weight: 500;
+      height: 50px;
+    }
+  }
+
+  ion-chip {
+    height: 30px;
+    ion-avatar{
+      margin: 0;
+      display: flex;
+      align-items: center;
+    }
+  }
+  ion-list{
+      background: transparent;
+
+    ion-item{
+
+        &::part(native){
+          padding: 0;
+        }
+        --background: $color-mediumGrey;
+        --border-color: transparent !important;
+        --inner-padding-end: 0px;
+        background-color: $color-mediumGrey;
+        margin: 6px 0;
+        border-radius: 10px;
+        border: 1px solid $color-lightGrey;
+        padding: 10px;
+
+        ion-avatar{
+          background-color: $color-white;
+          width: 40px;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-right: 12px;
+          ion-icon{
+            width: 24px;
+          }
+          img{
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+        }
+        ion-label{
+          h2{
+            color: $color-dark;
+            font-size: 14px;
+            font-weight: 600;
+          }
+        }
+    }
+  }
+  .button-with-icon{
+    display: flex;
+    align-items: center;
+    ion-avatar{
+        display: flex;
+        align-items: center;
+    }
+  }
+  
+}
+
+
+.btn-group{
+    display: flex;
+    margin: 24px 0;
+    gap: 8px;
+  .btn-ghost{
+    text-align: center;
+    flex: 1;
+    border: 1px solid #ccc;
+    border-radius: 40px;
+    font-size: 14px;
+    font-weight: 500;
+    color: $color-black;
+  }
+  .button-filled{
+      text-align: center;
+      flex: 1;
+      background-color: $color-green;
+      border: 1px solid $color-green;
+      border-radius: 40px;
+      font-size: 14px;
+      font-weight: 500;
+      color: $color-white;
+  }
+}
+

@@ -1,3 +1,5 @@
+@import "variables.scss";
+
 ion-card-content {
   ion-icon {
     margin-right: 5px;
@@ -12,22 +14,21 @@ ion-card-content {
   }
 }
 
-
 ion-header{
   box-shadow: none;
-
   ion-toolbar {
-    padding: 0 16px;
+    padding: 0 4px 0 16px;
     // background-color: transparent;
-    background: linear-gradient(to right, #21CE99 0%, #007BFF 100%);
+    background: linear-gradient(to right, $color-green 0%, $color-blue 100%);
     --background: transparent;  
-    --color: #ffffff;   
+    --color: $color-white;   
     --border-width: 0;
-
     ion-title{
       padding:0;
       text-transform: capitalize;
       text-align: left;
+      font-size: 20px;
+      color: $color-white;
     }
     ion-buttons{
       margin: 0;
@@ -38,7 +39,6 @@ ion-header{
 ion-content {
   position: relative;
   height: 100vh;
-
   .top-section {
     position: absolute;
     top: 0;
@@ -47,36 +47,33 @@ ion-content {
     height: 200px;
     background: linear-gradient(
       to right,
-      #21CE99 0%,
-      #007BFF 100%,
+      $color-green 0%,
+      $color-blue 100%,
     );
     z-index: -1;
   }
-
   .bottom-section {
     position: absolute;
     top: 200px;
     left: 0;
     width: 100%;
     bottom: 0; /* Automatically fills remaining space */
-    background-color: #ffffff;
+    background-color: $color-white;
     z-index: -1;
   }
 }
-
-
 .profile-wrapper{
     display: flex;
     flex-direction: column;
     align-items: center;
     margin-top: 80px;
   h2{
-    color: #2D2F35;
+    color: $color-dark;
     margin-bottom: 0;
   }
   p{
     margin: 0;
-    color: #757A86;
+    color: $color-grey;
     font-size: 14px;
     font-weight: 500;
   }
@@ -84,22 +81,23 @@ ion-content {
     width: 125px;
     height: 125px;
     border-radius: 100%;
-    border: 3px solid #fff;
+    border: 3px solid $color-white;
     object-fit: cover;
+    background-color: $color-mediumGrey;
   }
 }
 
 ion-item {
-    --background: #f9f9f9;
+    --background: $color-mediumGrey;
     --border-color: transparent !important;
-    margin: 10px 0;
+    margin: 6px 0;
     border-radius: 10px;
-    border: 1px solid #E8E9EB;
+    border: 1px solid $color-lightGrey;
     text-transform: capitalize;
     font-weight: 500;
     ion-button{
       &::part(native){
-        background-color: #21CE99;
+        background-color: $color-green;
         border-radius: 40px;
       }
     }

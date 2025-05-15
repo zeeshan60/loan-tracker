@@ -1,19 +1,22 @@
+@import "variables.scss";
+
 .social-login-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   p{
-    color: #2D2F35;
+    color: $color-dark;
     font-size: 12px;
     margin-top: 6px;
   }
   ion-button{
       &::part(native) {
-        background-color: #fff;
+        background-color: $color-white;
         height: 60px;
         width: 60px;
         border-radius: 100%;
+        box-shadow: 0 0 8px #ccc;
       }
   }
 }
@@ -42,7 +45,7 @@ ion-item {
 
   img {
     position: absolute;
-    top: 36px;
+    top: 50px;
     z-index: 9;
   }
 
@@ -58,29 +61,17 @@ ion-item {
 
 .card-heading{
   h1{
-    color: #2D2F35;
+    color: $color-dark;
     font-size: 24px;
     font-weight: 600;
     margin: 0 0 4px;
   }
   p{
-    color: #757A86;
+    color: $color-grey;
     font-size: 15px;
     margin: 0;
   }
 }
-
-// ion-content::part(background) {
-//   height: 100vh;
-//   background: linear-gradient(
-//     to bottom,
-//     #21CE99 0px,
-//     #007BFF 200px,
-//     #ffffff 200px,
-//     #ffffff 100%
-//   );
-// }
-
 
 ion-content {
   position: relative;
@@ -94,8 +85,8 @@ ion-content {
     height: 200px;
     background: linear-gradient(
       to right,
-      #21CE99 0%,
-      #007BFF 100%,
+      $color-green 0%,
+      $color-blue 100%,
     );
     z-index: -1;
   }
@@ -106,14 +97,14 @@ ion-content {
     left: 0;
     width: 100%;
     bottom: 0; /* Automatically fills remaining space */
-    background-color: #ffffff;
+    background-color: $color-white;
     z-index: -1;
   }
 }
 
 .form-card{
-    background-color: #fff;
-    border: 1px solid #E8E9EB;
+    background-color: $color-white;
+    border: 1px solid $color-lightGrey;
     border-radius: 10px;
     padding: 0 0 8px;
     box-shadow: 0 0 5px #00000024;
@@ -121,8 +112,8 @@ ion-content {
 }
 .button-filled{
   &::part(native) {
-    background-color: #21CE99;
-    color: #fff;
+    background-color: $color-green;
+    color: $color-white;
     border-radius: 46px;
     padding: 12px 20px;
     font-size: 16px;
@@ -133,7 +124,7 @@ ion-content {
   }
 }
 .button-text{
-  color:#3063E3;
+  color:$color-blue;
   font-size: 14px;
   font-weight: 600;
   text-transform: capitalize;  
@@ -142,12 +133,12 @@ ion-content {
 
 .input-label {
   font-size: 14px;
-  color: #2D2F35;
+  color: $color-dark;
   font-weight: 600;
 }
 .input-field{
   ::ng-deep .input-wrapper{
-    background-color: #F7F7F7;
+    background-color: $color-mediumGrey;
     padding: 8px 40px 8px 40px;
     font-size: 14px;
     margin-top: 8px;
@@ -178,19 +169,19 @@ ion-content {
   .line {
     flex: 1;
     height: 1px;
-    background-color: #E8E9EB;
+    background-color: $color-lightGrey;
   }
 
   .text {
     padding: 0 12px;
     font-size: 14px;
-    color: #757A86;
+    color: $color-grey;
     white-space: nowrap;
   }
 }
 
 app-phone-with-country{
-    background: #f7f7f7;
+    background: $color-mediumGrey;
     border-radius: 10px;
     align-items: center;
     margin-top: 8px;
@@ -199,7 +190,6 @@ app-phone-with-country{
       min-width: auto !important;
       min-height: 40px !important;
     }
-
     ::ng-deep .country {
       margin-top: 0;
     }

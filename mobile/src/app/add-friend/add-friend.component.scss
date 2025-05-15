@@ -1,15 +1,19 @@
+@import "variables.scss";
+
 ion-header{
   box-shadow: none;
 
   ion-toolbar {
     padding: 0 16px;
-    --color: #2D2F35;
+    --color: $color-dark;
     --border-width: 0;
 
     ion-title{
       padding:0;
       text-transform: capitalize;
       text-align: left;
+      font-size: 20px;
+      color: $color-dark;
     }
   }
 }
@@ -28,37 +32,31 @@ ion-item {
   ion-input {
     --border-width: 0;
     --box-shadow: none;
-    padding-left: 36px;
-    padding-right: 36px;
+    padding-left: 12px;
+    padding-right: 12px;
   }
 
-  img {
-    position: absolute;
-    top: 36px;
-    z-index: 9;
-    left: 10px;
-  }
 }
 
 
 .input-label {
   font-size: 14px;
-  color: #2D2F35;
+  color: $color-dark;
   font-weight: 600;
 }
 .input-field{
   ::ng-deep .input-wrapper{
-    background-color: #F7F7F7;
-    padding: 8px 40px 8px 40px;
+    background-color: $color-mediumGrey;
+    padding: 8px 16px;
     font-size: 14px;
-    margin-top: 8px;
+    margin-top: 4px;
     border-radius: 10px;
 
   }
 }
 
 app-phone-with-country{
-    background: #f7f7f7;
+    background: $color-mediumGrey;
     border-radius: 10px;
     align-items: center;
     margin-top: 8px;
@@ -93,17 +91,17 @@ app-phone-with-country{
     border-radius: 40px;
     font-size: 14px;
     font-weight: 500;
-    color: #ccc;
+    color: #000;
   }
   .button-filled{
       text-align: center;
       flex: 1;
-      background-color: #21CE99;
-      border: 1px solid #21CE99;
+      background-color: $color-green;
+      border: 1px solid $color-green;
       border-radius: 40px;
       font-size: 14px;
       font-weight: 500;
-      color: #fff;
+      color: $color-white;
   }
 }
 
