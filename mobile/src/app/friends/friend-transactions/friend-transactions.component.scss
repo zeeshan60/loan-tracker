@@ -12,6 +12,7 @@ ion-item {
 .description-wrapper {
   h2 {
     font-size: 14px;
+    text-transform: capitalize;
   }
 }
 .amount-wrapper {
@@ -20,3 +21,238 @@ ion-item {
     font-size: 12px;
   }
 }
+
+// -----------------------
+.other-balances-list {
+  margin: 0;
+  font-size: 12px;
+  padding-left: 0;
+}
+
+ion-header{
+  box-shadow: none;
+  ion-toolbar {
+    padding: 0 16px;
+    // background-color: transparent;
+    background: linear-gradient(to right, $color-green 0%, $color-blue 100%);
+    --background: transparent;  
+    --color: $color-white;   
+    --border-width: 0;
+    ion-title{
+      font-size: 20px;
+      font-weight: 600;
+      padding-left: 0;
+      color: $color-white;
+    }
+    ion-buttons{
+      margin: 0;
+      ion-button{ 
+        &::part(native){
+          background-color: $color-blue;
+          padding-right: 11px;
+          border-radius: 40px;
+        }
+      }
+    }   
+    ion-back-button{
+      &::part(text){
+        display:none !important;
+      }
+      &::part(native){
+        color:$color-white;
+      }
+    }  
+  }
+}
+
+ion-content {
+  position: relative;
+  height: 100vh;
+
+  .top-section {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 280px;
+    background: linear-gradient(
+      to right,
+      $color-green 0%,
+      $color-blue 100%,
+    );
+    z-index: -1;
+  }
+
+  .bottom-section {
+    position: absolute;
+    top: 280px;
+    left: 0;
+    width: 100%;
+    bottom: 0; /* Automatically fills remaining space */
+    background-color: $color-white;
+    z-index: -1;
+  }
+}
+
+ion-list{
+    background-color: transparent;
+    margin: 0 16px;
+}
+
+
+
+.summary-list{
+  margin: 32px 16px 0;
+  background: transparent;
+
+  ion-list{
+    padding: 0;
+  }
+  
+  h3{
+    font-size: 18px;
+    color: $color-dark;
+  }
+
+  ion-item{
+    margin: 4px 0;
+    border: 1px solid $color-lightGrey;
+    --border-color: transparent !important;
+    --inner-padding-end: 0px;
+    border-radius: 10px;
+    background: $color-white;
+
+    &::part(native) {
+      padding: 12px;
+    }
+    &::part(detail-icon){
+        display:none !important;
+    }
+    ion-avatar{
+      background: $color-mediumGrey;
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      ion-icon{
+        width: 24px;
+      }
+      img{
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+    p{
+      font-size: 14px;
+    }
+    ion-label{
+      margin: 0;
+      h4{
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+      ul ion-label{
+        font-size: 12px;
+        margin: 4px 0;
+      }
+    }
+  }
+
+}
+.transactions-list{
+  h6{
+    color: $color-grey;
+    font-weight: 600;
+    margin-top: 32px;
+    font-size: 14px;  
+  }
+}
+
+.friend-trans-list{
+  margin: 6px 0;
+  border: 1px solid $color-lightGrey;
+  --border-color: transparent !important;
+  // --inner-padding-end: 0px;
+  border-radius: 10px;
+  background: $color-white;
+  &::part(detail-icon){
+      display:none !important;
+  }
+
+  ion-avatar{
+    background: $color-mediumGrey;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+      ion-icon{
+          margin-top: 3px;
+          width: 18px;
+          height: 18px;
+        }
+  }
+  .description-wrapper p, .amount-wrapper ion-label{
+    font-size: 12px;
+    &:last-of-type{
+      margin-top: 8px;
+    }
+  }
+
+}
+
+.empty-transactions-wrapper{
+  margin:64px 16px 32px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  p{
+    text-align: center;
+  }
+  ion-button{
+    max-width: 150px;
+    margin: 0 auto;
+    &::part(native){
+        background-color: $color-green;
+        border-radius: 40px;
+        margin-bottom: 40px;
+        min-height: 0;
+    }
+  }
+}
+.btn-group{
+    display: flex;
+    margin: 24px 16px;
+    gap: 8px;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    left: 0;
+  .btn-ghost{
+    text-align: center;
+    flex: 1;
+    border: 1px solid $color-blue;
+    border-radius: 40px;
+    font-size: 14px;
+    font-weight: 500;
+    color: $color-blue;
+    background-color: $color-white;
+  }
+  .btn-filled.red{
+    text-align: center;
+    flex: 1;
+    border: 1px solid $color-red;
+    border-radius: 40px;
+    font-size: 14px;
+    font-weight: 500;
+    color: $color-red;
+    background-color: $color-white;
+  }
+}
+

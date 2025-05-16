@@ -35,20 +35,27 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import "@ionic/angular/css/palettes/dark.system.css";
+@import url('https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap');
+
+
+*, body, ion-app, ion-content {
+  font-family: 'Onest', sans-serif;
+}
 
 .strike {
   text-decoration: line-through;
 }
 
-.overall-balance-wrapper {
-  font-size: 1.3rem;
-  .other-balance-amount {
-    font-weight: bold;
-    font-size: 14px;
-    padding-left: 15px;
-    padding-right: 15px;
-  }
-}
+// .overall-balance-wrapper {
+//   font-size: 1.3rem;
+//   .other-balance-amount {
+//     font-weight: bold;
+//     font-size: 14px;
+//     padding-left: 15px;
+//     padding-right: 15px;
+//   }
+// }
+
 .action-sheet-button {
   &.red, &.green {
     font-size: 1.2rem;
@@ -66,6 +73,7 @@ this rule used to style the heading of the ion-list
  */
 ion-item.group-label-item {
   height: 30px;
+  --background: transparent;
   ion-label {
     margin: 0;
     font-size: 12px !important;

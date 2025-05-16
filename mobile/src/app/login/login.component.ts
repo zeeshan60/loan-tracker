@@ -24,6 +24,8 @@ import {
   FirebaseErrorCodeMessageEnum,
 } from './types';
 import { extractFirebaseErrorMessage } from '../utility-functions';
+import { COUNTRIES_WITH_CALLING_CODES } from '../constants';
+import { PhoneWithCountryComponent } from '../phone-with-country/phone-with-country.component';
 
 type ActiveUi = 'login' | 'signup' | 'forgotPassword';
 
@@ -32,7 +34,7 @@ type ActiveUi = 'login' | 'signup' | 'forgotPassword';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
   standalone: true,
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonIcon, IonIcon, IonItem, IonLabel, IonInput, FormsModule, ReactiveFormsModule],
+  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonIcon, IonIcon, IonItem, IonLabel, IonInput, FormsModule, ReactiveFormsModule, PhoneWithCountryComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent {
@@ -48,6 +50,11 @@ export class LoginComponent {
     email: this.fb.nonNullable.control('', [Validators.required, Validators.email]),
     password: this.fb.nonNullable.control('', [Validators.required]),
   });
+
+  public phoneForm = this.fb.group({
+    phoneNumber: this.fb.nonNullable.control('', [Validators.required]),
+    country: this.fb.nonNullable.control(COUNTRIES_WITH_CALLING_CODES[0].code),
+  })
   readonly signUpForm = this.fb.group({
     email: this.fb.nonNullable.control('', [Validators.required, Validators.email]),
     password: this.fb.nonNullable.control('', [

@@ -1,89 +1,103 @@
 <ion-header>
   <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-button color="medium" (click)="closePopup()">Cancel</ion-button>
-    </ion-buttons>
     <ion-title>
       @if (isUpdating()) {
-        Edit expense
+        Edit Expense
       } @else {
-        Create expense
+        Create Expense
       }
     </ion-title>
-    <ion-buttons slot="end">
-      @if (loading()) {
-        <ion-spinner></ion-spinner>
-      } @else {
-        <ion-button type="submit" form="define-expense-form" [strong]="true">Save</ion-button>
-      }
-    </ion-buttons>
   </ion-toolbar>
 </ion-header>
+
 <ion-content class="ion-padding">
-  <h1>Define expense details</h1>
+  
   <form [formGroup]="defineExpenseForm" (ngSubmit)="onSubmit()" id="define-expense-form">
-  <ion-list>
-    <ion-item class="choose-friend-item">
-      <ion-label>
-        <h1>
-          With you and&nbsp;
-          <ion-label
+
+    <div class="choose-friend-item">
+        <h2>Enter expense details</h2>
+        <p>
+          with You and&nbsp;
+          <span
             class="selected-friend-label"
             color="primary"
             (click)="chooseFriend()"
           >
             {{friend()?.['name'] || ''}}
-          </ion-label>
-        </h1>
-      </ion-label>
+          </span>
+        </p>
       @if (!friend()) {
         <ion-button (click)="chooseFriend()">Choose friend</ion-button>
       }
-    </ion-item>
-    <ion-item>
-      <ion-input
+    </div>
+
+    <ion-list>
+      <ion-item>
+        <ion-label position="stacked" class="input-label">Expense description</ion-label>
+        <ion-input
+        class="input-field"
         type="text"
-        labelPlacement="stacked"
-        label="Description"
         formControlName="description"
-        placeholder="Description"
+        placeholder="Enter expense description"
         errorText="Description is required"
       ></ion-input>
-    </ion-item>
-    <ion-item class="currency-expense">
-      <app-currencies-dropdown
+      </ion-item>
+      <ion-item class="currency-expense">
+        <ion-label position="stacked" class="input-label">Select currency</ion-label>
+
+        <app-currencies-dropdown
         class="currency-dropdown"
-        [label]="'Currency'"
         [selectedCurrency]="selectedCurrencyCode()"
         (selected)="currencySelected($event)"
       ></app-currencies-dropdown>
-      <ion-input
+
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked" class="input-label">Expense amount</ion-label>
+        <ion-input
+        class="input-field"
         type="number"
-        labelPlacement="stacked"
-        label="Expense"
         formControlName="amount"
         errorText="Expense is required"
+        placeholder="Enter Expense Amount"
       ></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-select formControlName="type" class="split-option-select" [class.is-owed]="isOwed()" color="green" placeholder="place holder .." label="Who owes who" label-placement="stacked" interface="action-sheet">
-        <ion-select-option class="green" [value]="SplitOption.YouPaidSplitEqually">Paid by you and split equally</ion-select-option>
-        <ion-select-option  class="green" [value]="SplitOption.TheyOweYouAll">{{friend()?.['name'] | shortenName}} owes you the full amount</ion-select-option>
-        <ion-select-option  class="red" [value]="SplitOption.TheyPaidSplitEqually">Paid by {{friend()?.['name'] | shortenName}} and split equally</ion-select-option>
-        <ion-select-option  class="red" [value]="SplitOption.YouOweThemAll">You owe {{friend()?.['name'] | shortenName}} the full amount</ion-select-option>
-      </ion-select>
-    </ion-item>
-    <ion-item>
-      <ion-label>
-        Expense date:
-      </ion-label>
-      <ion-datetime-button datetime="datetime"></ion-datetime-button>
-      <ion-modal [keepContentsMounted]="true">
-        <ng-template>
-          <ion-datetime formControlName="transactionDate" presentation="date" id="datetime"></ion-datetime>
-        </ng-template>
-      </ion-modal>
-    </ion-item>
-  </ion-list>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked" class="input-label">Who owes who</ion-label>
+
+        <ion-select formControlName="type" class="split-option-select" [class.is-owed]="isOwed()" color="green" interface="action-sheet">
+          <ion-select-option class="green" [value]="SplitOption.YouPaidSplitEqually">Paid by you and split equally</ion-select-option>
+          <ion-select-option  class="green" [value]="SplitOption.TheyOweYouAll">{{friend()?.['name'] | shortenName}} owes you the full amount</ion-select-option>
+          <ion-select-option  class="red" [value]="SplitOption.TheyPaidSplitEqually">Paid by {{friend()?.['name'] | shortenName}} and split equally</ion-select-option>
+          <ion-select-option  class="red" [value]="SplitOption.YouOweThemAll">You owe {{friend()?.['name'] | shortenName}} the full amount</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked" class="input-label">Expense date</ion-label>
+
+        <ion-datetime-button datetime="datetime"></ion-datetime-button>
+
+        <ion-modal [keepContentsMounted]="true">
+          <ng-template>
+            <ion-datetime formControlName="transactionDate" presentation="date" id="datetime"></ion-datetime>
+          </ng-template>
+        </ion-modal>
+
+      </ion-item>
+    </ion-list>
+
+    <ion-buttons class="btn-group">
+      <ion-button class="btn-ghost" (click)="closePopup()">Cancel</ion-button>
+
+          @if (loading()) {
+            <ion-spinner></ion-spinner>
+          } @else {
+            <ion-button type="submit" class="button-filled" form="define-expense-form" [strong]="true">Create Now</ion-button>
+          }
+      </ion-buttons>
+
   </form>
 </ion-content>

@@ -1,0 +1,71 @@
+@import "variables.scss";
+
+.overall-balance-wrapper{
+    margin: 16px 16px 0;
+    background-color: $color-white;
+    border-radius: 20px;
+    padding: 16px;
+   
+    .summary-banlance{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        ion-label{
+            font-size: 12px;
+            color: $color-grey;
+        }
+        h1{
+            font-size: 24px;
+            font-weight: 700;
+            margin: 6px 0 0;
+
+            img{
+                height: 18px;
+            }
+        }
+    }
+    .other-details{
+        background-color: $color-mediumGrey;
+        padding: 0 12px;
+        border-radius: 10px;
+        margin-top: 16px;
+        ion-list{
+            padding: 0;
+            ion-item{
+                --border-color: transparent !important;
+                --inner-padding-end: 0px;
+                border-bottom: 1px solid $color-lightGrey;
+                background: $color-mediumGrey;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+
+                &:last-of-type{
+                    border-bottom: 0;
+                }
+                &::part(native) {
+                    padding: 0;
+                    --background-color: transparent;
+                    background-color: transparent;
+                }
+                p{
+                    font-size: 12px;
+                    font-weight: 500;
+                    margin: 0;
+                }
+                ion-label{
+                    font-size:10px;
+                    color:$color-grey;
+                    text-align: center;
+                }
+               
+            }
+        }
+    }
+}
+.success{
+    color: $color-green;
+}
+.danger{
+    color: $color-red;
+}

@@ -1,1 +1,119 @@
 
+// ion-tab-button{
+//     label{
+//         margin-top: 4px;
+//     }
+//     .tab{
+//          background-color: #ccc;
+//         display: flex;
+//         flex-direction: column;
+//         align-items: center;
+//         width: 48px;
+//     }
+//     ::part(native){
+//         height: 100%;
+//     }
+// }
+
+
+// ion-tab-button .button-inner {
+//   justify-content: flex-start !important;
+//   padding-top: 10px !important;
+//   height: 1000%;
+// }
+
+// ion-tab-button {
+//   .tab {
+//     display: flex;
+//     flex-direction: column;
+//     align-items: center;
+//     justify-content: center;
+//     padding: 12px 0;
+//   }
+
+//   .tab svg {
+//     margin-bottom: 5px;  // Adjust spacing between icon and label (if needed)
+//   }
+
+//   .tab label {
+//     text-align: center;
+//     text-align: center;
+//     font-size: 14px;
+//     font-weight: 500;
+//   }
+// }
+
+
+.acb{
+    border-top: 3px solid #3063E3;
+}
+
+
+// ion-tab-button {
+//   display: flex;
+//   flex-direction: column; 
+//   height: 100%; 
+// }
+
+// ion-tab-button .tab {
+//     display: flex;
+//     flex-direction: column;
+//     justify-content: center;
+//     height: 100%;
+//     align-items: center;
+// }
+
+// ion-tab-button .tab svg {
+//     text-align: center;
+// }
+
+// ion-tab-button .tab label {
+//     margin: 5px 0
+// }
+.tab{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    align-items: center;
+    padding: 0;
+    border-top: 4px solid transparent;
+    width: 36px;
+}
+
+ion-tab-button {
+    .tab{
+        svg{
+            flex-grow: 1; 
+            display: flex;
+            justify-content: center;  
+            align-items: center;  
+            margin-top: 6px;
+        }
+        label {
+            flex-grow: 1; 
+            display: flex;
+            justify-content: center;  
+            align-items: center;
+            margin: 4px 0;
+            color:#2D2F35;
+            font-size: 14px;
+            font-weight: 500;
+        }
+    }
+
+    &.tab-selected .tab label{
+        color:#3063E3;
+    }
+    &.tab-selected .tab svg{
+        fill: #3063E3;
+        path{
+              stroke: #3063E3;
+        }
+    }
+    &.tab-selected .tab{
+        border-top: 4px solid #3063E3;
+    }
+
+}
+

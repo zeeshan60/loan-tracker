@@ -6,6 +6,7 @@ import {
   IonSpinner,
   IonTitle,
   IonToolbar,
+  IonLabel,
 } from '@ionic/angular/standalone';
 import { FriendsStore } from '../../friends.store';
 import { FriendWithBalance } from '../../model';
@@ -42,6 +43,8 @@ import { ModalIndex, ModalService } from '../../../modal.service';
     ReactiveFormsModule,
     NgClass,
     DecimalPipe,
+    IonLabel,
+
   ],
 })
 export class SettleUpComponent extends ComponentDestroyedMixin() implements OnInit {
