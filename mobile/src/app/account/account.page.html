@@ -26,13 +26,13 @@
       </ion-item>
       <ion-item>
         <ion-label>Default currency</ion-label>
-        <app-currencies-dropdown
+        <mr-currencies-dropdown
           slot="end"
           class="currency-dropdown"
           [selectedCurrency]="userCurrency()"
           [label]="''"
           (selected)="updateDefaultCurrency($event)"
-        ></app-currencies-dropdown>
+        ></mr-currencies-dropdown>
       </ion-item>
       <ion-item>
         @if (!phoneInEditMode()) {

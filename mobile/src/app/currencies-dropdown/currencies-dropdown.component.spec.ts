@@ -9,9 +9,8 @@ describe('FakeDropdownComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ CurrenciesDropdownComponent ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), CurrenciesDropdownComponent]
+}).compileComponents();
 
     fixture = TestBed.createComponent(CurrenciesDropdownComponent);
     component = fixture.componentInstance;

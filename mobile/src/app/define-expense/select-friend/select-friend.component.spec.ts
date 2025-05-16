@@ -9,9 +9,8 @@ describe('SelectFriendComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ SelectFriendComponent ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), SelectFriendComponent]
+}).compileComponents();
 
     fixture = TestBed.createComponent(SelectFriendComponent);
     component = fixture.componentInstance;

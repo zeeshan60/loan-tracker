@@ -29,7 +29,7 @@ import { StorageService } from './services/storage.service';
 import { Capacitor } from '@capacitor/core';
 
 @Component({
-  selector: 'app-root',
+  selector: 'mr-root',
   templateUrl: 'app.component.html',
   standalone: true,
   imports: [

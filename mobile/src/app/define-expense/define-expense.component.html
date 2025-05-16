@@ -51,12 +51,12 @@
       ></ion-input>
     </ion-item>
     <ion-item class="currency-expense">
-      <app-currencies-dropdown
+      <mr-currencies-dropdown
         class="currency-dropdown"
         [label]="'Currency'"
         [selectedCurrency]="selectedCurrencyCode()"
         (selected)="currencySelected($event)"
-      ></app-currencies-dropdown>
+      ></mr-currencies-dropdown>
       <ion-input
         type="number"
         labelPlacement="stacked"

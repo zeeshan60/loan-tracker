@@ -9,9 +9,8 @@ describe('OverallBalanceComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ OverallBalanceComponent ],
-      imports: [IonicModule.forRoot()]
-    }).compileComponents();
+    imports: [IonicModule.forRoot(), OverallBalanceComponent]
+}).compileComponents();
 
     fixture = TestBed.createComponent(OverallBalanceComponent);
     component = fixture.componentInstance;
