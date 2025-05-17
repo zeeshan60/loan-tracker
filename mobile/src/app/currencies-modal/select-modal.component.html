@@ -1,0 +1,37 @@
+<ion-content class="ion-padding">
+  <ion-searchbar [(ngModel)]="filter" placeholder="Search" (click)="modalService.setCurrentBreakpoint(this.modalIndex(), 0.75)"></ion-searchbar>
+  @if (filteredMostlyUsedItems().length) {
+    <ion-list>
+      <ion-item class="group-label-item">
+        <ion-label color="medium">Mostly used</ion-label>
+      </ion-item>
+      @for (item of filteredMostlyUsedItems(); track item) {
+        <ion-item [class.selected]="selectedItem()?.optionLabel === item.optionLabel" (click)="selectItem(item)">
+          <ion-label>
+            {{item.optionLabel}}
+          </ion-label>
+          @if (selectedItem()?.optionLabel === item.optionLabel) {
+            <ion-icon slot="end" name="checkmark-outline"></ion-icon>
+          }
+        </ion-item>
+      }
+    </ion-list>
+  }
+  <ion-list>
+    @if (filteredMostlyUsedItems().length) {
+      <ion-item class="group-label-item">
+        <ion-label color="medium">Other currencies</ion-label>
+      </ion-item>
+    }
+    @for (item of unUsedCurrencies(); track item) {
+      <ion-item [class.selected]="selectedItem()?.optionLabel === item.optionLabel" (click)="selectItem(item)">
+        <ion-label>
+          {{item.optionLabel}}
+        </ion-label>
+        @if (selectedItem()?.optionLabel === item.optionLabel) {
+          <ion-icon slot="end" name="checkmark-outline"></ion-icon>
+        }
+      </ion-item>
+    }
+  </ion-list>
+</ion-content>

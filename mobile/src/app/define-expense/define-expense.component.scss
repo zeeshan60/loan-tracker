@@ -1,0 +1,32 @@
+.choose-friend-item {
+  ion-label.selected-friend-label {
+    display: inline;
+    border-bottom: 2px dashed;
+    cursor: pointer;
+  }
+}
+
+ion-select.split-option-select {
+  &::part(text) {
+    color: red;
+  }
+  &.is-owed::part(text) {
+    color: green;
+  }
+}
+
+ion-item {
+  &::part(native) {
+    padding-left: 0;
+    --inner-border-width: 0;
+  }
+
+  .currency-dropdown {
+    min-width: 25%;
+    margin-right: 15px;
+  }
+
+  &.currency-expense ion-input.ion-invalid {
+    margin-top: 10px
+  }
+}

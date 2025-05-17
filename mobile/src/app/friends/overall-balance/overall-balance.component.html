@@ -1,0 +1,41 @@
+@if (overallBalance?.main) {
+  <ion-item class="overall-balance-wrapper">
+    <ion-label>
+      Overall balance:
+    </ion-label>
+    @if (overallBalance) {
+      @if (hasDifferentCurrencies()) {
+        <p>
+          <ion-accordion-group>
+            <ion-accordion value="first">
+              <ion-item slot="header" color="light">
+                <ion-label
+                  [color]="overallBalance.main.isOwed ? 'success' : 'danger'"
+                >
+                  <strong>{{ overallBalance.main.amount | currency: overallBalance.main.currency: 'symbol' }}</strong>
+                </ion-label>
+              </ion-item>
+              @for (otherBalance of sortedOtherBalance(); track otherBalance.currency) {
+                <ion-label
+                  class="other-balance-amount"
+                  slot="content"
+                  [color]="otherBalance.isOwed ? 'success': 'danger'"
+                >
+                  {{ otherBalance.amount | currency: otherBalance.currency: 'symbol' }}
+                </ion-label>
+              }
+            </ion-accordion>
+          </ion-accordion-group>
+        </p>
+      } @else {
+        <p>
+          <ion-label
+            [color]="overallBalance.main.isOwed ? 'success' : 'danger'"
+          >
+            <strong>{{ overallBalance.main.amount | currency: overallBalance.main.currency: 'symbol' }}</strong>
+          </ion-label>
+        </p>
+      }
+    }
+  </ion-item>
+}

@@ -1,0 +1,53 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button color="medium" (click)="cancel()">Cancel</ion-button>
+    </ion-buttons>
+    <ion-title>
+      @if (isUpdating()) {
+        Update friend info
+      } @else {
+        Add friend
+      }
+    </ion-title>
+    <ion-buttons slot="end">
+      @if (loading()) {
+        <ion-spinner></ion-spinner>
+      } @else {
+        <ion-button type="submit" form="add-friend-form" [strong]="true">Confirm</ion-button>
+      }
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+    <form [formGroup]="addFriendForm" (ngSubmit)="onSubmit()" id="add-friend-form">
+      <ion-list>
+        <ion-item>
+          <ion-input
+            type="text"
+            labelPlacement="stacked"
+            label="Name"
+            formControlName="name"
+            placeholder="Friend name"
+            errorText="Name is required"
+          ></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input
+            type="email"
+            labelPlacement="stacked"
+            label="Email"
+            errorText="Invalid email"
+            formControlName="email"
+            placeholder="John@gmail.com"
+            email
+          ></ion-input>
+        </ion-item>
+        <ion-item>
+          <app-phone-with-country
+            [group]="phoneFormGroup()"
+          ></app-phone-with-country>
+        </ion-item>
+      </ion-list>
+    </form>
+</ion-content>
