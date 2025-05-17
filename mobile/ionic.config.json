@@ -1,8 +1,0 @@
-{
-  "name": "MoneyRabbit",
-  "integrations": {
-    "capacitor": {}
-  },
-  "type": "angular",
-  "id": "db972309"
-}
