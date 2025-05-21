@@ -50,14 +50,14 @@
 
         } @else {
           <form [formGroup]="phoneForm" (ngSubmit)="savePhoneNumber()" id="save-phone-form">
-        <app-phone-with-country
-            [group]="phoneForm"
-          ></app-phone-with-country>
-      </form>
+            <app-phone-with-country
+                [group]="phoneForm"
+              ></app-phone-with-country>
+          </form>
           @if (loading()) {
             <ion-spinner slot="end"></ion-spinner>
           } @else {
-            <ion-button slot="end" type="submit" form="save-phone-form" [strong]="true">Save</ion-button>
+            <ion-button class="btn-save" slot="end" type="submit" form="save-phone-form" > <img src="assets/images/save-icon.svg" alt="icon"/></ion-button>
           }
         }
       </ion-item>

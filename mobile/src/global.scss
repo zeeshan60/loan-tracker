@@ -38,8 +38,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap');
 
 
-*, body, ion-app, ion-content {
-  font-family: 'Onest', sans-serif;
+*, body, ion-app, ion-content, h1, h2, h3, h4, h5, h6, label, p, ion-input, ion-label, ion-button, button {
+  font-family: "Onest", sans-serif !important;
+}
+ion-select,
+ion-select::part(text),
+ion-select::part(placeholder),
+ion-action-sheet::part(title),
+ion-action-sheet::part(sub-title),
+ion-action-sheet::part(button),
+ion-action-sheet::part(button-text) {
+  font-family: 'Onest', sans-serif !important;
 }
 
 .strike {

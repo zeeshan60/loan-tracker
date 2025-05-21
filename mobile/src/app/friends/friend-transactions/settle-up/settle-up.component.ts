@@ -7,6 +7,7 @@ import {
   IonTitle,
   IonToolbar,
   IonLabel,
+  IonIcon,
 } from '@ionic/angular/standalone';
 import { FriendsStore } from '../../friends.store';
 import { FriendWithBalance } from '../../model';
@@ -44,7 +45,7 @@ import { ModalIndex, ModalService } from '../../../modal.service';
     NgClass,
     DecimalPipe,
     IonLabel,
-
+    IonIcon,
   ],
 })
 export class SettleUpComponent extends ComponentDestroyedMixin() implements OnInit {

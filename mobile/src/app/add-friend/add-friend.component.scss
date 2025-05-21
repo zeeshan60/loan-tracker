@@ -2,26 +2,26 @@
 
 ion-header{
   box-shadow: none;
-
   ion-toolbar {
-    padding: 0 16px;
+    // padding: 0 16px;
     --color: $color-dark;
-    --border-width: 0;
-
+    --border-width: 0;  
+    ion-buttons ion-icon{
+      font-size: 26px;
+    }
     ion-title{
-      padding:0;
-      text-transform: capitalize;
+      padding: 0 40px;
       text-align: left;
+      text-transform: capitalize;
       font-size: 20px;
       color: $color-dark;
     }
   }
 }
 
-
-
 ion-item {
   position: relative;
+  --inner-padding-end: 0px;
 
   &::part(native) {
     padding-left: 0;
@@ -37,7 +37,6 @@ ion-item {
   }
 
 }
-
 
 .input-label {
   font-size: 14px;
@@ -78,30 +77,30 @@ app-phone-with-country{
     ::ng-deep .input-wrapper .label-text-wrapper{
       display: none;
     }
+    ::ng-deep .input-bottom {
+      border-top: 0 !important;
+    }
 }
 
 .btn-group{
     display: flex;
     margin: 24px 0;
     gap: 8px;
-  .btn-ghost{
+  .btn-ghost.green{
     text-align: center;
     flex: 1;
-    border: 1px solid #ccc;
+    border: 1px solid  $color-green;
     border-radius: 40px;
     font-size: 14px;
     font-weight: 500;
-    color: #000;
-  }
-  .button-filled{
-      text-align: center;
-      flex: 1;
+    color:  $color-green;
+    opacity: 1;
+    text-transform: capitalize;
+    &:hover, &:active{
       background-color: $color-green;
-      border: 1px solid $color-green;
-      border-radius: 40px;
-      font-size: 14px;
-      font-weight: 500;
-      color: $color-white;
+      color:  $color-white;
+      opacity: 1;
+    }
   }
 }
 

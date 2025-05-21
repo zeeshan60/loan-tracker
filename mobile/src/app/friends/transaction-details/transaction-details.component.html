@@ -21,9 +21,10 @@
 
   <div class="details-wrapper">
 
-    <h6>{{ latestTransaction().description }}</h6>
+    <h5>{{ latestTransaction().description }}</h5>
 
     <div class="details-card">
+
       <div class="summary-banlance">
         <div>
           <ion-label>Bal. in SGD</ion-label>
@@ -40,8 +41,8 @@
         </div>
           }
 
-
       </div>
+
       <div class="other-details">
         <ion-list>
           <ion-item>
@@ -96,53 +97,70 @@
       <div class="vertical-wrapper">
 
         <div class="history-title">
+
           <ion-avatar slot="start">
-                  @if (history.changedByPhoto) {
-                    <img [src]="history.changedByPhoto" alt="Friend's photo"/>
-                  } @else {
-                    <ion-icon size="large" color="medium" name="person"></ion-icon>
-                  }
-                </ion-avatar>
+            @if (history.changedByPhoto) {
+              <img [src]="history.changedByPhoto" alt="Friend's photo"/>
+            } @else {
+              <ion-icon size="large" color="medium" name="person"></ion-icon>
+            }
+          </ion-avatar>
 
-          <ion-label>
-            {{history.changedByName|shortenName}}
-                @if (history.changes[0].type === HistoryChangeType.DELETED) {
-                  deleted this transaction
-                } @else {
-                  updated this transaction
-
-                }
-              </ion-label>
+          <h5>
+              Suleman N.
+          </h5>
+          <ion-label class="date-and-time" slot="end">15 May at 5:54PM</ion-label>
+          <!--{{history.changedByName|shortenName}}
+              @if (history.changes[0].type === HistoryChangeType.DELETED) {
+                deleted this transaction
+              } @else {
+                updated this transaction
+             }-->
         </div>
 
         <div class="track-history">
-                
-                @for (change of history.changes; track change.type) {
-                  <p>
-            {{historyChangeType[change.type]}} changed from
-                    @switch (change.type) {
-                      @case (HistoryChangeType.TOTAL_AMOUNT) {
-                        {{change.oldValue|currency: latestTransaction().amount.currency: 'symbol-narrow'}} to {{change.newValue|currency: latestTransaction().amount.currency: 'symbol-narrow'}}
-                      }
-                      @case (HistoryChangeType.TRANSACTION_DATE) {
-                        {{change.oldValue|date}} to {{change.newValue|date}}
-                      }
-                      @case (HistoryChangeType.DESCRIPTION) {
-                        "{{change.oldValue}}" to "{{change.newValue}}"
-                      }
-                      @case (HistoryChangeType.DELETED) {
-                        "{{change.oldValue}}" to "{{change.newValue}}"
-                      }
-                      @case (HistoryChangeType.SPLIT_TYPE) {
-                        "{{splitOptionsText[change.oldValue]}}" to "{{splitOptionsText[change.newValue]}}"
-                      }
-                      @default {
-                        {{change.oldValue}} to {{change.newValue}}
-                      }
-                    }
-                  </p>
+          <h6>Transaction changes from Apr 20 to Apr 22, 2025</h6>
+
+          <div class="history-detail">
+            <p>Amount <strong>
+                <span>₹1,234.00</span>
+                <ion-icon name="arrow-forward-outline"></ion-icon>
+                <span>₹1,234,000.00</span></strong>
+            </p>
+            <p>Currency <strong>
+                <span>SGD</span>
+                <ion-icon name="arrow-forward-outline"></ion-icon>
+                <span>PKR</span></strong>
+            </p>
+          </div>
+
+          <!-- @for (change of history.changes; track change.type) {
+            <p>
+              {{historyChangeType[change.type]}} changed from
+              @switch (change.type) {
+                @case (HistoryChangeType.TOTAL_AMOUNT) {
+                  {{change.oldValue|currency: latestTransaction().amount.currency: 'symbol-narrow'}} to {{change.newValue|currency: latestTransaction().amount.currency: 'symbol-narrow'}}
                 }
-            </div>
+                @case (HistoryChangeType.TRANSACTION_DATE) {
+                  {{change.oldValue|date}} to {{change.newValue|date}}
+                }
+                @case (HistoryChangeType.DESCRIPTION) {
+                  "{{change.oldValue}}" to "{{change.newValue}}"
+                }
+                @case (HistoryChangeType.DELETED) {
+                  "{{change.oldValue}}" to "{{change.newValue}}"
+                }
+                @case (HistoryChangeType.SPLIT_TYPE) {
+                  "{{splitOptionsText[change.oldValue]}}" to "{{splitOptionsText[change.newValue]}}"
+                }
+                @default {
+                  {{change.oldValue}} to {{change.newValue}}
+                }
+              }
+            </p>
+          }-->
+
+        </div>
 
       </div>
 

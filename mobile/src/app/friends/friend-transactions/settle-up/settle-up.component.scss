@@ -35,9 +35,12 @@ ion-header{
     --background: $color-mediumGrey;
     --color: $color-dark;
     --border-width: 0;
-
+    
+    ion-buttons ion-icon{
+      font-size: 26px;
+    }
     ion-title{
-      padding:0;
+      padding: 0 40px;
       text-transform: capitalize;
       text-align: left;
       font-size: 20px;
@@ -91,24 +94,21 @@ ion-content{
     display: flex;
     margin: 24px 0;
     gap: 8px;
-  .btn-ghost{
+  .btn-ghost.green{
     text-align: center;
     flex: 1;
-    border: 1px solid #ccc;
+    border: 1px solid  $color-green;
     border-radius: 40px;
     font-size: 14px;
     font-weight: 500;
-    color: $color-black;
-  }
-  .button-filled{
-      text-align: center;
-      flex: 1;
+    color:  $color-green;
+    opacity: 1;
+    text-transform: capitalize;
+    &:hover, &:active{
       background-color: $color-green;
-      border: 1px solid $color-green;
-      border-radius: 40px;
-      font-size: 14px;
-      font-weight: 500;
-      color: $color-white;
+      color:  $color-white;
+      opacity: 1;
+    }
   }
 }
 
