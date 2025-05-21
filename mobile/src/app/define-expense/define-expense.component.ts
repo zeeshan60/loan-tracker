@@ -16,6 +16,8 @@ import {
   IonInput, IonItem, IonLabel, IonList, IonModal, IonSelect, IonSelectOption, IonSpinner,
   IonTitle,
   IonToolbar,
+  IonBackButton,
+  IonIcon,
 } from '@ionic/angular/standalone';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { map, startWith, takeUntil } from 'rxjs';
@@ -69,6 +71,8 @@ export const SplitOptionsEnum = {
     IonDatetimeButton,
     IonDatetime,
     CurrenciesDropdownComponent,
+    IonBackButton,
+    IonIcon,
   ],
 })
 export class DefineExpenseComponent extends ComponentDestroyedMixin() implements OnInit {

@@ -1,7 +1,8 @@
 import { Transaction } from '../../friends/model';
 import { ChangeDetectionStrategy, Component, inject, input, OnInit, signal } from '@angular/core';
 import {
-  IonAvatar, IonBackButton,
+  IonAvatar, 
+  IonBackButton,
   IonButtons,
   IonContent,
   IonHeader,
