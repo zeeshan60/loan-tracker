@@ -6,11 +6,12 @@
     <ion-title>With you and {{friend()['name'] | shortenName}}</ion-title>
     @if(transactions().length) {
       <ion-buttons slot="primary">
-      <ion-button size="small" fill="solid" (click)="settleUp()">
-        <ion-icon name="checkmark-outline" slot="start"></ion-icon>
-          Settle 
+        
+          <ion-button class="add-btn" size="small" fill="solid" (click)="settleUp()">
+                 <img src="assets/images/three-dots.svg" alt="icon"/>
         </ion-button>
-    </ion-buttons>
+      </ion-buttons>
+
     }
 
   </ion-toolbar>

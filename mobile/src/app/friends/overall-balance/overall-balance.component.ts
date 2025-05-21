@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, Input, OnInit } from '@angular/core';
 import { Balance } from '../friends.store';
-import { IonAccordion, IonAccordionGroup, IonItem, IonLabel, IonList } from '@ionic/angular/standalone';
+import { IonAccordion, IonAccordionGroup, IonItem, IonLabel, IonList, IonButton, IonButtons, IonIcon } from '@ionic/angular/standalone';
 import { CurrencyPipe } from '@angular/common';
 
 @Component({
@@ -15,7 +15,10 @@ import { CurrencyPipe } from '@angular/common';
     IonAccordionGroup,
     IonAccordion,
     CurrencyPipe,
-    IonList
+    IonList,
+    IonButton,
+    IonButtons,
+    IonIcon,
   ],
 })
 export class OverallBalanceComponent implements OnInit {

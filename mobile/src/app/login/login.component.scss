@@ -83,11 +83,7 @@ ion-content {
     left: 0;
     width: 100%;
     height: 200px;
-    background: linear-gradient(
-      to right,
-      $color-green 0%,
-      $color-blue 100%,
-    );
+    background: linear-gradient(to right, $color-blue 0%, $color-green 100%);
     z-index: -1;
   }
 
@@ -97,8 +93,11 @@ ion-content {
     left: 0;
     width: 100%;
     bottom: 0; /* Automatically fills remaining space */
-    background-color: $color-white;
+    background-color: $color-mediumGrey;
     z-index: -1;
+  }
+  &::part(background) {
+    background: $color-mediumGrey;
   }
 }
 
@@ -201,6 +200,9 @@ app-phone-with-country{
     }
     ::ng-deep .input-wrapper .label-text-wrapper{
       display: none;
+    }   
+    ::ng-deep .input-bottom {
+      border-top: 0 !important;
     }
 }
 
@@ -210,3 +212,4 @@ app-phone-with-country{
     margin-top: 12px;
     font-size: 14px;
 }
+
