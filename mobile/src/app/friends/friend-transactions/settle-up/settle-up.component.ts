@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, input, OnInit, signal } from '@angular/core';
 import {
   IonButton,
   IonButtons, IonContent,
@@ -16,13 +16,12 @@ import { SplitOptionsEnum } from '../../../define-expense/define-expense.compone
 import { HttpClient } from '@angular/common/http';
 import { HelperService } from '../../../helper.service';
 import { Router } from '@angular/router';
-import { ComponentDestroyedMixin } from '../../../component-destroyed.mixin';
-import { takeUntil } from 'rxjs';
 import { DecimalPipe, NgClass } from '@angular/common';
 import { ModalIndex, ModalService } from '../../../modal.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
-  selector: 'app-settle-up',
+  selector: 'mr-settle-up',
   templateUrl: './settle-up.component.html',
   styleUrls: ['./settle-up.component.scss'],
   standalone: true,
@@ -47,7 +46,8 @@ import { ModalIndex, ModalService } from '../../../modal.service';
 
   ],
 })
-export class SettleUpComponent extends ComponentDestroyedMixin() implements OnInit {
+export class SettleUpComponent implements OnInit {
+  destroyRef = inject(DestroyRef);
   modalIndex = input.required<ModalIndex>();
   modalService = inject(ModalService);
   friendsStore = inject(FriendsStore);
@@ -69,14 +69,10 @@ export class SettleUpComponent extends ComponentDestroyedMixin() implements OnIn
     amount: this.formBuilder.nonNullable.control<number|null>(null, [Validators.required, Validators.min(1), Validators.max(100000000)]),
   });
 
-  constructor() {
-    super();
-  }
-
   ngOnInit() {
     this.settleUpForm.get('balance')?.valueChanges
       .pipe(
-        takeUntil(this.componentDestroyed)
+        takeUntilDestroyed(this.destroyRef)
       )
       .subscribe((currency) => {
         this.settleUpForm.get('amount')?.setValue(this.otherBalances()[currency.currency].amount)
