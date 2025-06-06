@@ -32,24 +32,25 @@ ion-item {
 ion-header{
   box-shadow: none;
   ion-toolbar {
-    padding: 0 16px;
+    padding: 16px;
     // background-color: transparent;
-    background: linear-gradient(to right, $color-green 0%, $color-blue 100%);
+    background: linear-gradient(to right, $color-blue 0%, $color-green 100%);
     --background: transparent;  
     --color: $color-white;   
     --border-width: 0;
     ion-title{
       font-size: 20px;
       font-weight: 600;
-      padding-left: 0;
+      padding-left: 40px;
       color: $color-white;
+      text-align: left;
     }
     ion-buttons{
       margin: 0;
       ion-button{ 
         &::part(native){
           background-color: $color-blue;
-          padding-right: 11px;
+          // padding-right: 11px;
           border-radius: 40px;
         }
       }
@@ -61,7 +62,14 @@ ion-header{
       &::part(native){
         color:$color-white;
       }
-    }  
+    } 
+    .add-btn{
+        background: $color-blue;
+        border-radius: 100%;
+        height: 36px;
+        width: 36px;
+        text-align: center;
+    } 
   }
 }
 
@@ -74,29 +82,29 @@ ion-content {
     top: 0;
     left: 0;
     width: 100%;
-    height: 280px;
-    background: linear-gradient(
-      to right,
-      $color-green 0%,
-      $color-blue 100%,
-    );
+    height: 290px;
+    background: linear-gradient(to right, $color-blue 0%, $color-green 100%);
     z-index: -1;
   }
 
   .bottom-section {
     position: absolute;
-    top: 280px;
+    top: 290px;
     left: 0;
     width: 100%;
     bottom: 0; /* Automatically fills remaining space */
-    background-color: $color-white;
+    background-color: $color-mediumGrey;
     z-index: -1;
+  }
+  &::part(background) {
+    background: $color-mediumGrey;
   }
 }
 
 ion-list{
     background-color: transparent;
     margin: 0 16px;
+    padding-bottom: 80px;
 }
 
 
@@ -228,12 +236,13 @@ ion-list{
 }
 .btn-group{
     display: flex;
-    margin: 24px 16px;
+    padding: 16px;
     gap: 8px;
     position: fixed;
     bottom: 0;
     right: 0;
     left: 0;
+    background-color: $color-mediumGrey;
   .btn-ghost{
     text-align: center;
     flex: 1;

@@ -2,16 +2,18 @@
 
 ion-header{
   box-shadow: none;
-
   ion-toolbar {
     padding: 0 16px;
     background-color: $color-mediumGrey;
     --background: $color-mediumGrey;
     --color: $color-dark;
     --border-width: 0;
-
+    
+    ion-buttons ion-icon{
+      font-size: 26px;
+    }
     ion-title{
-      padding:0;
+      padding: 0 40px;
       text-transform: capitalize;
       text-align: left;
       font-size: 20px;
@@ -43,7 +45,8 @@ ion-content{
       border-radius: 10px;
       border: 1px solid $color-lightGrey;
       font-weight: 500;
-      height: 50px;
+      height: 40px;
+      font-size: 14px;
     }
   }
 
@@ -108,30 +111,3 @@ ion-content{
   }
   
 }
-
-
-.btn-group{
-    display: flex;
-    margin: 24px 0;
-    gap: 8px;
-  .btn-ghost{
-    text-align: center;
-    flex: 1;
-    border: 1px solid #ccc;
-    border-radius: 40px;
-    font-size: 14px;
-    font-weight: 500;
-    color: $color-black;
-  }
-  .button-filled{
-      text-align: center;
-      flex: 1;
-      background-color: $color-green;
-      border: 1px solid $color-green;
-      border-radius: 40px;
-      font-size: 14px;
-      font-weight: 500;
-      color: $color-white;
-  }
-}
-

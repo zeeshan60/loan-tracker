@@ -1,5 +1,8 @@
 <ion-header>
   <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-icon name="close-outline" (click)="closePopup()"></ion-icon>
+    </ion-buttons>
     <ion-title>
       @if (isUpdating()) {
         Edit Expense
@@ -11,21 +14,21 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  
+
   <form [formGroup]="defineExpenseForm" (ngSubmit)="onSubmit()" id="define-expense-form">
 
     <div class="choose-friend-item">
-        <h2>Enter expense details</h2>
-        <p>
+      <h2>Enter expense details</h2>
+      <p>
           with You and&nbsp;
           <span
             class="selected-friend-label"
             color="primary"
             (click)="chooseFriend()"
           >
-            {{friend()?.['name'] || ''}}
-          </span>
-        </p>
+          {{friend()?.['name'] || ''}}
+        </span>
+      </p>
       @if (!friend()) {
         <ion-button (click)="chooseFriend()">Choose friend</ion-button>
       }
@@ -42,26 +45,28 @@
         errorText="Description is required"
       ></ion-input>
       </ion-item>
-      <ion-item class="currency-expense">
-        <ion-label position="stacked" class="input-label">Select currency</ion-label>
 
-        <app-currencies-dropdown
-        class="currency-dropdown"
-        [selectedCurrency]="selectedCurrencyCode()"
-        (selected)="currencySelected($event)"
-      ></app-currencies-dropdown>
+      <ion-item lines="none">
+        <div class="two-column-wrapper">
+          <div class="column">
+            <ion-label position="stacked">Currency</ion-label>
+            <app-currencies-dropdown
+              [selectedCurrency]="selectedCurrencyCode()"
+              (selected)="currencySelected($event)"
+            ></app-currencies-dropdown>
+          </div>
 
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="stacked" class="input-label">Expense amount</ion-label>
-        <ion-input
-        class="input-field"
-        type="number"
-        formControlName="amount"
-        errorText="Expense is required"
-        placeholder="Enter Expense Amount"
-      ></ion-input>
+          <div class="column">
+            <ion-label position="stacked">Expense amount</ion-label>
+            <ion-input
+              class="input-field"
+              type="number"
+              formControlName="amount"
+              errorText="Expense is required"
+              placeholder="Enter Expense Amount"
+            ></ion-input>
+          </div>
+        </div>
       </ion-item>
 
       <ion-item>
@@ -90,12 +95,10 @@
     </ion-list>
 
     <ion-buttons class="btn-group">
-      <ion-button class="btn-ghost" (click)="closePopup()">Cancel</ion-button>
-
           @if (loading()) {
             <ion-spinner></ion-spinner>
           } @else {
-            <ion-button type="submit" class="button-filled" form="define-expense-form" [strong]="true">Create Now</ion-button>
+            <ion-button type="submit" class="btn-ghost green" form="define-expense-form" [strong]="true">Create Now</ion-button>
           }
       </ion-buttons>
 
