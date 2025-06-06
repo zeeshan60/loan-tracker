@@ -3,7 +3,6 @@ import { computed, inject } from '@angular/core';
 import { FriendsService } from './friends.service';
 import { firstValueFrom } from 'rxjs';
 import { HelperService } from '../helper.service';
-import { MethodsDictionary } from '@ngrx/signals/src/signal-store-models';
 import { FriendWithBalance, Transaction, TransactionsByMonth } from './model'
 import { HttpClient } from '@angular/common/http';
 import { PRIVATE_API } from '../constants';
@@ -55,20 +54,6 @@ const initialState: FriendsState = {
   mostlyUsedCurrencies: [],
 }
 
-interface Methods extends MethodsDictionary {
-  loadFriends(config?: { showLoader: boolean }): Promise<void>;
-  addFriend(friend: AddFriend): Promise<FriendWithBalance>;
-  updateFriend(friendId: string, friend: AddFriend): Promise<FriendWithBalance>;
-  deleteFriend(friend: FriendWithBalance): Promise<void>;
-  setSelectedFriend(friendId: string|null): Promise<void>;
-  loadSelectedTransactions(): Promise<void>;
-  deleteTransaction(transactionId: string): Promise<void>;
-  settleUp(friend: FriendWithBalance, formValue: AddUpdateExpenseFormValue): Promise<void>;
-  addUpdateExpense(friend: FriendWithBalance, formValue: AddUpdateExpenseFormValue, updatingTransaction?: Transaction): Promise<Transaction>;
-  saveUsedCurrency(currency: string): Promise<void>;
-  loadMostlyUsedCurrencies(): Promise<void>;
-}
-
 export const FriendsStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
@@ -91,7 +76,7 @@ export const FriendsStore = signalStore(
     storageService = inject(StorageService),
     http = inject(HttpClient),
     loadingCtrl = inject(LoadingController),
-  ): Methods => ({
+  ) => ({
     async loadFriends(config = { showLoader: true }): Promise<void> {
       try {
         const loadAllFriends = async () => {

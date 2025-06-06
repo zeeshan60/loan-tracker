@@ -5,7 +5,6 @@ import {HttpClient} from '@angular/common/http';
 import {Router} from '@angular/router';
 import {ToastController} from '@ionic/angular/standalone';
 import {StorageService} from '../services/storage.service';
-import {MethodsDictionary} from '@ngrx/signals/src/signal-store-models';
 import {DEFAULT_TOAST_DURATION, PRIVATE_API, PUBLIC_API} from '../constants';
 import {LoadingController} from '@ionic/angular/standalone';
 import {FriendsStore} from '../friends/friends.store';
@@ -55,28 +54,6 @@ const initialState: AuthState = {
   region: null
 }
 
-interface Methods extends MethodsDictionary {
-  loginWithGoogle(): Promise<boolean | void>;
-
-  setApiKey(): Promise<void>;
-
-  signOut(): Promise<void>;
-
-  login(idToken?: string): Promise<void>;
-
-  loadUserData(userData?: User): Promise<void>;
-
-  loadUserRegion(): Promise<void>;
-
-  fetchAndSaveUserData(): Promise<void>;
-
-  updateUserData(data: Partial<User>): Promise<void>;
-
-  askForPhoneNumber(): Promise<void>;
-
-  getLoginPluginToken(): Promise<string>;
-}
-
 export const AuthStore = signalStore(
   {providedIn: 'root'},
   withState(initialState),
@@ -91,7 +68,7 @@ export const AuthStore = signalStore(
     storageService = inject(StorageService),
     loadingCtrl = inject(LoadingController),
     friendsStore = inject(FriendsStore),
-  ): Methods => ({
+  ) => ({
     async loadUserData(userData?: User): Promise<void> {
       patchState(store, {user: userData || await storageService.get('user_data')})
     },
