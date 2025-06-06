@@ -17,9 +17,9 @@ ion-card-content {
 ion-header{
   box-shadow: none;
   ion-toolbar {
-    padding: 0 4px 0 16px;
+    padding: 16px 4px 16px 16px;
     // background-color: transparent;
-    background: linear-gradient(to right, $color-green 0%, $color-blue 100%);
+    background: linear-gradient(to right, $color-blue 0%, $color-green 100%);
     --background: transparent;  
     --color: $color-white;   
     --border-width: 0;
@@ -45,11 +45,7 @@ ion-content {
     left: 0;
     width: 100%;
     height: 200px;
-    background: linear-gradient(
-      to right,
-      $color-green 0%,
-      $color-blue 100%,
-    );
+    background: linear-gradient(to right, $color-blue 0%, $color-green 100%);
     z-index: -1;
   }
   .bottom-section {
@@ -58,8 +54,11 @@ ion-content {
     left: 0;
     width: 100%;
     bottom: 0; /* Automatically fills remaining space */
-    background-color: $color-white;
+    background-color: $color-mediumGrey;
     z-index: -1;
+  }
+  &::part(background) {
+    background: $color-mediumGrey;
   }
 }
 .profile-wrapper{
@@ -87,14 +86,24 @@ ion-content {
   }
 }
 
-ion-item {
-    --background: $color-mediumGrey;
+ion-list{
+  background-color: transparent;
+  ion-item {
+    // --background: $color-mediumGrey;
     --border-color: transparent !important;
     margin: 6px 0;
     border-radius: 10px;
     border: 1px solid $color-lightGrey;
     text-transform: capitalize;
     font-weight: 500;
+    padding: 8px 12px;
+    background: $color-white;
+    --inner-padding-end: 0px; 
+
+    &::part(native){
+      padding: 0;
+    }
+
     ion-button{
       &::part(native){
         background-color: $color-green;
@@ -104,13 +113,21 @@ ion-item {
     app-currencies-dropdown{
         ::ng-deep app-fake-dropdown{
           margin-top: 0;
-          background: var(--ion-color-light-shade);
+          background: $color-mediumGrey;
           padding: 4px 13px;
           border-radius: 4px;
           display: flex;
           align-items: center;
+          border: 1px solid $color-lightGrey;
         }
     }
+  
+  }
+}
+.btn-save{
+  background-color: transparent;
+  &::part(native){
+    background-color: transparent !important;
+  }
 
 }
-

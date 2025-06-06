@@ -2,18 +2,18 @@
 
 ion-header{
   box-shadow: none;
-
   ion-toolbar {
-    padding: 0 16px;
-    background-color: $color-mediumGrey;
+      background-color: $color-mediumGrey;
     --background: $color-mediumGrey;
     --color: $color-dark;
     --border-width: 0;
-
+    ion-buttons ion-icon{
+      font-size: 26px;
+    }
     ion-title{
-      padding:0;
-      text-transform: capitalize;
+      padding: 0 40px;
       text-align: left;
+      text-transform: capitalize;
       font-size: 20px;
       color: $color-dark;
     }
@@ -37,17 +37,36 @@ ion-item {
     padding-right: 36px;
   }
 
-  .currency-dropdown {
+  .two-column-wrapper {
+    display: flex;
+    flex-direction: row;
     width: 100%;
-    background-color: $color-mediumGrey;
-    padding: 8px 16px;
-    font-size: 14px;
-    margin: 4px 0;
-    border-radius: 10px;
+    gap: 16px;
+    margin-top: 10px;
+    
+    .column:first-child {
+      width: 30%;
+    }
+    .column:last-child {
+      width: 70%;
+    }
+
+    app-currencies-dropdown{
+      ::ng-deep .fake-dropdown{
+        height: 44px;
+        background: $color-mediumGrey;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+      }
+      ::ng-deep .selected-wrapper{
+        margin-top: 0;
+        font-size: 14px;
+      }
+    }
   }
-  &.currency-expense ion-input.ion-invalid {
-    margin-top: 10px
-  }
+
   ion-select{
       width: 100%;
       background-color: $color-mediumGrey;
@@ -64,6 +83,7 @@ ion-item {
         }
       }
   }
+
   ion-datetime-button{
       border-radius: 10px;
       margin: 4px 0;
@@ -105,6 +125,7 @@ ion-item {
   color: $color-dark;
   font-weight: 600;
 }
+
 .input-field{
   ::ng-deep .input-wrapper{
     background-color: $color-mediumGrey;
@@ -120,24 +141,21 @@ ion-item {
     display: flex;
     margin: 24px 0;
     gap: 8px;
-  .btn-ghost{
+  .btn-ghost.green{
     text-align: center;
     flex: 1;
-    border: 1px solid #ccc;
+    border: 1px solid  $color-green;
     border-radius: 40px;
     font-size: 14px;
     font-weight: 500;
-    color: #000;
-  }
-  .button-filled{
-      text-align: center;
-      flex: 1;
+    color:  $color-green;
+    opacity: 1;
+    text-transform: capitalize;
+    &:hover, &:active{
       background-color: $color-green;
-      border: 1px solid $color-green;
-      border-radius: 40px;
-      font-size: 14px;
-      font-weight: 500;
-      color: $color-white;
+      color:  $color-white;
+      opacity: 1;
+    }
   }
 }
 

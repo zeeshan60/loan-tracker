@@ -7,6 +7,7 @@ import {
   IonTitle,
   IonToolbar,
   IonLabel,
+  IonIcon,
 } from '@ionic/angular/standalone';
 import { FriendsStore } from '../../friends.store';
 import { FriendWithBalance } from '../../model';
@@ -43,7 +44,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     NgClass,
     DecimalPipe,
     IonLabel,
-
+    IonIcon,
   ],
 })
 export class SettleUpComponent implements OnInit {
