@@ -139,7 +139,7 @@ export const AuthStore = signalStore(
     },
 
     async login(idToken: string) {
-      const loader = await loadingCtrl.create({duration: 2000});
+      const loader = await loadingCtrl.create();
       try {
         loader.present();
         const url = `${PUBLIC_API}/login`
@@ -158,9 +158,7 @@ export const AuthStore = signalStore(
         router.navigate(['/']);
       } catch (e) {
         this.signOut();
-        await helperService.showToast('Unable to login at the moment', 2000, {
-          color: 'danger'
-        });
+        throw new Error('login failed.');
       } finally {
         loader.dismiss();
       }
