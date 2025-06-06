@@ -12,9 +12,8 @@
     "noFallthroughCasesInSwitch": true,
     "sourceMap": true,
     "declaration": false,
-    "downlevelIteration": true,
     "experimentalDecorators": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "importHelpers": true,
     "target": "es2022",
     "module": "es2020",
@@ -26,7 +25,7 @@
       "dom"
     ],
     "useDefineForClassFields": false,
-    "erasableSyntaxOnly": true,
+    "erasableSyntaxOnly": true
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
