@@ -1,7 +1,7 @@
 import {patchState, signalStore, withMethods, withState} from '@ngrx/signals';
 import {inject} from '@angular/core';
 import {HelperService} from '../helper.service';
-import {HttpClient} from '@angular/common/http';
+import { HttpClient, HttpContext, HttpContextToken } from '@angular/common/http';
 import {Router} from '@angular/router';
 import {ToastController} from '@ionic/angular/standalone';
 import {StorageService} from '../services/storage.service';
@@ -16,7 +16,7 @@ import {Capacitor} from '@capacitor/core';
 import {LoginPlugin} from 'zeenom-capacitor-social-login';
 import {ModalService} from '../modal.service';
 import {environment} from "../../environments/environment";
-
+export const IS_PUBLIC_API = new HttpContextToken<boolean>(() => false);
 export interface User {
   uid: string,
   email: string,
@@ -147,7 +147,7 @@ export const AuthStore = signalStore(
         const {token: apiKey} = await firstValueFrom(
           http.post<{ token: string }>(url, {
             idToken: `Bearer ${idToken}`
-          })
+          }, { context: new HttpContext().set(IS_PUBLIC_API, true)})
         );
         await storageService.set('api_key', apiKey);
         patchState(store, {apiKey: apiKey})
