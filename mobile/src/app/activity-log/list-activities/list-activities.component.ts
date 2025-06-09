@@ -1,7 +1,7 @@
 import { Transaction } from '../../friends/model';
 import { ChangeDetectionStrategy, Component, inject, input, OnInit, signal } from '@angular/core';
 import {
-  IonAvatar, 
+  IonAvatar,
   IonBackButton,
   IonButtons,
   IonContent,
@@ -53,7 +53,7 @@ const ActivityTypeLabel = {
 }
 
 @Component({
-  selector: 'app-list-activities',
+  selector: 'mr-list-activities',
   templateUrl: './list-activities.component.html',
   styleUrls: ['./list-activities.component.scss'],
   standalone: true,

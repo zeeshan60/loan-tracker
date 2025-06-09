@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { IonIcon } from '@ionic/angular/standalone';
 
 @Component({
-  selector: 'app-fake-dropdown',
+  selector: 'mr-fake-dropdown',
   templateUrl: './fake-dropdown.component.html',
   styleUrls: ['./fake-dropdown.component.scss'],
   standalone: true,

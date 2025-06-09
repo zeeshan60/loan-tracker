@@ -4,7 +4,7 @@ import { IonAccordion, IonAccordionGroup, IonItem, IonLabel, IonList, IonButton,
 import { CurrencyPipe } from '@angular/common';
 
 @Component({
-  selector: 'app-overall-balance',
+  selector: 'mr-overall-balance',
   templateUrl: './overall-balance.component.html',
   styleUrls: ['./overall-balance.component.scss'],
   standalone: true,

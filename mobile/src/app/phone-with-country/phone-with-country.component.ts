@@ -17,7 +17,7 @@ import { FakeDropdownComponent } from '../fake-dropdown/fake-dropdown.component'
 import { ModalService } from '../modal.service';
 
 @Component({
-  selector: 'app-phone-with-country',
+  selector: 'mr-phone-with-country',
   templateUrl: './phone-with-country.component.html',
   styleUrls: ['./phone-with-country.component.scss'],
   standalone: true,

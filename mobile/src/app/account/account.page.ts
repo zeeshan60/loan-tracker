@@ -26,7 +26,7 @@ import { ModalService } from '../modal.service';
 import { CurrenciesDropdownComponent } from '../currencies-dropdown/currencies-dropdown.component';
 
 @Component({
-  selector: 'app-account',
+  selector: 'mr-account',
   templateUrl: 'account.page.html',
   styleUrls: ['account.page.scss'],
   standalone: true,

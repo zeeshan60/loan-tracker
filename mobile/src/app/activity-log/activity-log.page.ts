@@ -4,7 +4,7 @@ import { ListActivitiesComponent } from './list-activities/list-activities.compo
 import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs';
 
 @Component({
-  selector: 'app-activity-log',
+  selector: 'mr-activity-log',
   templateUrl: 'activity-log.page.html',
   styleUrls: ['activity-log.page.scss'],
   standalone: true,

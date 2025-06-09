@@ -34,7 +34,7 @@ import { COUNTRIES_WITH_CALLING_CODES } from '../constants';
 import { ModalIndex, ModalService } from '../modal.service';
 
 @Component({
-  selector: 'app-add-friend',
+  selector: 'mr-add-friend',
   templateUrl: './add-friend.component.html',
   styleUrls: ['./add-friend.component.scss'],
   standalone: true,

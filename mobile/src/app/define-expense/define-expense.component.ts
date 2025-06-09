@@ -47,7 +47,7 @@ export const SplitOptionsEnum = {
 } as const satisfies Record<string, string>;
 
 @Component({
-  selector: 'app-define-expense',
+  selector: 'mr-define-expense',
   templateUrl: './define-expense.component.html',
   styleUrls: ['./define-expense.component.scss'],
   standalone: true,

@@ -19,7 +19,7 @@ import { Contacts } from '@capacitor-community/contacts';
 import { ModalIndex, ModalService } from '../../modal.service';
 
 @Component({
-  selector: 'app-select-friend',
+  selector: 'mr-select-friend',
   templateUrl: './select-friend.component.html',
   styleUrls: ['./select-friend.component.scss'],
   standalone: true,

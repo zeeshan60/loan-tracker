@@ -17,7 +17,7 @@ import { COUNTRIES_WITH_CALLING_CODES, DEFAULT_TOAST_DURATION } from '../constan
 import { ModalIndex, ModalService } from '../modal.service';
 
 @Component({
-  selector: 'app-ask-for-phone',
+  selector: 'mr-ask-for-phone',
   templateUrl: './ask-for-phone.component.html',
   styleUrls: ['./ask-for-phone.component.scss'],
   standalone: true,
