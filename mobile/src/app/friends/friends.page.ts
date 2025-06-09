@@ -3,7 +3,7 @@ import { ListFriendsComponent } from './list-friends/list-friends.component';
 import { IonNav } from '@ionic/angular/standalone';
 
 @Component({
-  selector: 'app-friends',
+  selector: 'mr-friends',
   templateUrl: 'friends.page.html',
   styleUrls: ['friends.page.scss'],
   standalone: true,

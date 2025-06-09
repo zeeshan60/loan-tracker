@@ -30,7 +30,7 @@ import { PhoneWithCountryComponent } from '../phone-with-country/phone-with-coun
 type ActiveUi = 'login' | 'signup' | 'forgotPassword';
 
 @Component({
-  selector: 'app-login',
+  selector: 'mr-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
   standalone: true,

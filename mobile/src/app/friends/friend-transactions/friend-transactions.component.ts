@@ -26,7 +26,7 @@ import { OverallBalanceComponent } from '../overall-balance/overall-balance.comp
 import { ModalService } from '../../modal.service';
 
 @Component({
-  selector: 'app-friend-transactions',
+  selector: 'mr-friend-transactions',
   templateUrl: './friend-transactions.component.html',
   styleUrls: ['./friend-transactions.component.scss'],
   standalone: true,

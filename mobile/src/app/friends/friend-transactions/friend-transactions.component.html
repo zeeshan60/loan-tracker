@@ -6,7 +6,7 @@
     <ion-title>With you and {{friend()['name'] | shortenName}}</ion-title>
     @if(transactions().length) {
       <ion-buttons slot="primary">
-        
+
           <ion-button class="add-btn" size="small" fill="solid" (click)="settleUp()">
                  <img src="assets/images/three-dots.svg" alt="icon"/>
         </ion-button>
@@ -21,14 +21,14 @@
 
   <div class="top-section"></div>
   <div class="bottom-section"></div>
-  <app-overall-balance
+  <mr-overall-balance
       [overallBalance]="friendsStore['selectedFriendBalance']()"
-    ></app-overall-balance>
+    ></mr-overall-balance>
 
   @for(transactionsByMonth of transactions(); track transactionsByMonth.date) {
   <hr>
   <ion-list class="transactions-list">
-    <h6 class="color-grey">{{transactionsByMonth.date | dateFormat:'month': 'year'}}</h6>  
+    <h6 class="color-grey">{{transactionsByMonth.date | dateFormat:'month': 'year'}}</h6>
       @for(transaction of transactionsByMonth.transactions; track transaction.transactionId) {
         <ion-item class="friend-trans-list" (click)="openTransactionDetails(transaction)" button>
 

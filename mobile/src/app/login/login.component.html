@@ -2,7 +2,7 @@
 
   <div class="top-section"></div>
   <div class="bottom-section"></div>
-  @if (activeUi() === 'login') {  
+  @if (activeUi() === 'login') {
     <form (submit)="onLoginWithCreds()" [formGroup]="loginForm">
     <div class="form-card">
       <div class="ion-margin card-heading">
@@ -48,7 +48,7 @@
     <ion-button expand="full" type="submit" [disabled]="loading()" class="button-inner button-filled">
       {{ loading() ? 'Logging in...' : 'Sign In' }}
     </ion-button>
-    
+
     @if (invalidCreds()) {
       <ion-label class="invalid-cred" color="danger">{{invalidCreds()}}</ion-label>
     }
@@ -60,10 +60,10 @@
         Sign Up
       </ion-button>
   </div>
-    
+
   } @else if (activeUi() === 'signup') {
-   
-   
+
+
     <form (submit)="onSignUpWithCreds()" [formGroup]="signUpForm">
 
     <div class="form-card">
@@ -136,7 +136,7 @@
 
       <ion-item>
         <ion-label position="stacked" class="input-label">Phone Number</ion-label>
-        <app-phone-with-country [group]="phoneForm"></app-phone-with-country>
+        <mr-phone-with-country [group]="phoneForm"></mr-phone-with-country>
       </ion-item>
 
     </div>
@@ -161,7 +161,7 @@
 
 
   } @else if (activeUi() === 'forgotPassword') {
-    
+
     <form (submit)="onPasswordRecovery()" [formGroup]="forgotPasswordForm">
     <div class="form-card">
       <div class="ion-margin card-heading">
@@ -188,7 +188,7 @@
     <ion-button expand="full" type="submit" [disabled]="loading()" class="button-filled">
         Submit
     </ion-button>
-    
+
     @if (invalidCreds()) {
       <ion-label class="invalid-cred" color="danger">{{invalidCreds()}}</ion-label>
     }

@@ -27,7 +27,7 @@ const historyChangeType = {
 }
 
 @Component({
-    selector: 'app-transaction-details',
+    selector: 'mr-transaction-details',
     templateUrl: './transaction-details.component.html',
     styleUrls: ['./transaction-details.component.scss'],
     standalone: true,

@@ -32,13 +32,13 @@
 
     <ion-item>
       <ion-label>Default currency</ion-label>
-      <app-currencies-dropdown
+      <mr-currencies-dropdown
           slot="end"
           class="currency-dropdown"
           [selectedCurrency]="userCurrency()"
           [label]="''"
           (selected)="updateDefaultCurrency($event)"
-        ></app-currencies-dropdown>
+        ></mr-currencies-dropdown>
     </ion-item>
 
     <ion-item>
@@ -50,9 +50,9 @@
 
         } @else {
           <form [formGroup]="phoneForm" (ngSubmit)="savePhoneNumber()" id="save-phone-form">
-            <app-phone-with-country
+            <mr-phone-with-country
                 [group]="phoneForm"
-              ></app-phone-with-country>
+              ></mr-phone-with-country>
           </form>
           @if (loading()) {
             <ion-spinner slot="end"></ion-spinner>
