@@ -3,6 +3,7 @@ package com.zeenom.loan_tracker.friends
 import com.zeenom.loan_tracker.events.CommandPayloadDto
 import com.zeenom.loan_tracker.transactions.AmountDto
 import com.zeenom.loan_tracker.transactions.AmountResponse
+import com.zeenom.loan_tracker.transactions.OtherBalanceResponse
 import java.util.*
 
 data class FriendDto(
@@ -30,12 +31,12 @@ data class FriendsWithAllTimeBalancesDto(
 
 data class AllTimeBalanceDto(
     val main: AmountDto?,
-    val other: List<AmountDto>,
+    val other: List<OtherBalanceDto>,
 ) : CommandPayloadDto
 
 data class BalanceResponse(
     val main: AmountResponse?,
-    val other: List<AmountResponse>,
+    val other: List<OtherBalanceResponse>,
 )
 
 fun AllTimeBalanceDto.toResponse(): BalanceResponse {
@@ -51,3 +52,15 @@ fun AmountDto.toResponse() =
         currency = currency.currencyCode,
         isOwed = isOwed
     )
+
+data class OtherBalanceDto(
+    val amount: AmountDto,
+    val convertedAmount: AmountDto,
+)
+
+fun OtherBalanceDto.toResponse(): OtherBalanceResponse {
+    return OtherBalanceResponse(
+        amount = amount.toResponse(),
+        convertedAmount = convertedAmount.toResponse()
+    )
+}

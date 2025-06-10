@@ -45,7 +45,12 @@ class FriendsControllerTest(
                     phoneNumber = "+923001234567",
                     balances = AllTimeBalanceDto(
                         AmountDto(1000.0.toBigDecimal(), Currency.getInstance("USD"), true),
-                        listOf(AmountDto(1000.0.toBigDecimal(), Currency.getInstance("USD"), true))
+                        listOf(
+                            OtherBalanceDto(
+                                AmountDto(1000.0.toBigDecimal(), Currency.getInstance("USD"), true),
+                                AmountDto(1000.0.toBigDecimal(), Currency.getInstance("USD"), true)
+                            )
+                        )
                     ),
                     mainCurrency = Currency.getInstance("USD"),
                     photoUrl = "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl2",
