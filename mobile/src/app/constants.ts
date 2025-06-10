@@ -1198,7 +1198,7 @@ export const COUNTRIES_WITH_CALLING_CODES: Country[] = [
     "name": "Pakistan",
     "code": "PK",
     "flag": "🇵🇰",
-    "placeholder": "",
+    "placeholder": "03XX 4379768",
     "dialCode": "+92",
   },
   {

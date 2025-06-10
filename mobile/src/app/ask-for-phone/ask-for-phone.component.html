@@ -23,7 +23,7 @@
   <form [formGroup]="phoneForm" (ngSubmit)="onSubmit()" id="get-phone-form">
     <ion-list>
       <ion-item>
-        <mr-phone-with-country [group]="phoneForm"></mr-phone-with-country>
+        <mr-phone-with-country [selectedValue]="selectedPhone()"></mr-phone-with-country>
       </ion-item>
     </ion-list>
   </form>

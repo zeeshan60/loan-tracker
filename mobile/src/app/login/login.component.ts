@@ -6,14 +6,11 @@ import {
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
 } from '@angular/fire/auth';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import {
   IonButton,
   IonContent,
-  IonHeader,
-  IonIcon, IonInput, IonItem, IonLabel,
-  IonTitle,
-  IonToolbar,
+  IonInput, IonItem, IonLabel,
 } from '@ionic/angular/standalone';
 import {AuthStore} from './auth.store';
 import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -34,7 +31,7 @@ type ActiveUi = 'login' | 'signup' | 'forgotPassword';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
   standalone: true,
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonIcon, IonIcon, IonItem, IonLabel, IonInput, FormsModule, ReactiveFormsModule, PhoneWithCountryComponent],
+  imports: [IonContent, IonButton, IonItem, IonLabel, IonInput, FormsModule, ReactiveFormsModule, PhoneWithCountryComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent {
@@ -51,11 +48,12 @@ export class LoginComponent {
     password: this.fb.nonNullable.control('', [Validators.required]),
   });
 
-  public phoneForm = this.fb.group({
-    phoneNumber: this.fb.nonNullable.control('', [Validators.required]),
-    country: this.fb.nonNullable.control(COUNTRIES_WITH_CALLING_CODES[0].code),
-  })
   readonly signUpForm = this.fb.group({
+    name: this.fb.nonNullable.control('', [
+      Validators.required,
+      Validators.minLength(3),
+      Validators.maxLength(100)
+    ]),
     email: this.fb.nonNullable.control('', [Validators.required, Validators.email]),
     password: this.fb.nonNullable.control('', [
       Validators.minLength(6),

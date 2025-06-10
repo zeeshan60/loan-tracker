@@ -89,7 +89,6 @@ export class FriendTransactionsComponent {
   }
 
   async settleUp() {
-    console.log(this.friend());
     this.modalService.showModal({
       component: SettleUpComponent,
       componentProps: {
