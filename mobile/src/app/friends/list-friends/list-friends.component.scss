@@ -7,31 +7,31 @@
 }
 
 
-ion-header{
+ion-header {
   box-shadow: none;
   ion-toolbar {
     padding: 16px;
     // background-color: transparent;
     background: linear-gradient(to right, $color-blue 0%, $color-green 100%);
-    --background: transparent;  
-    --color: $color-white;   
+    --background: transparent;
+    --color: $color-white;
     --border-width: 0;
-    ion-title{
+    ion-title {
       padding:0;
       text-transform: capitalize;
       text-align: left;
       font-size: 20px;
       color:$color-white;
     }
-    ion-buttons{
+    ion-buttons {
       margin: 0;
-    }     
-    .add-btn{
-        background: $color-blue;
-        border-radius: 100%;
-        height: 36px;
-        width: 36px;
-        text-align: center;
+    }
+    .add-btn {
+      background: $color-blue;
+      border-radius: 100%;
+      height: 36px;
+      width: 36px;
+      text-align: center;
     }
   }
 }
@@ -41,18 +41,18 @@ ion-content {
   height: 100vh;
 
   .top-section {
-    position: absolute;
-    top: 0;
+    position: relative;
+    top: -1px;
     left: 0;
     width: 100%;
-    height: 290px;
+    padding-top: 10px;
+    padding-bottom: 20px;
     background: linear-gradient(to right, $color-blue 0%, $color-green 100%);
     z-index: -1;
   }
 
   .bottom-section {
     position: absolute;
-    top: 290px;
     left: 0;
     width: 100%;
     bottom: 0; /* Automatically fills remaining space */
@@ -65,13 +65,13 @@ ion-content {
 }
 
 .summary-list{
-  margin: 32px 16px 0;
+  margin: 20px 16px 0;
   background: transparent;
 
   ion-list{
     padding: 0;
   }
-  
+
   h3{
     font-size: 18px;
     color: #2D2F35;

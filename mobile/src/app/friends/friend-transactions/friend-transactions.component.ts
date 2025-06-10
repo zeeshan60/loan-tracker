@@ -51,11 +51,11 @@ import { ModalService } from '../../modal.service';
 })
 export class FriendTransactionsComponent {
   readonly friend = computed(() => this.friendsStore.selectedFriend());
-  readonly isLoading = signal(false);
   readonly nav = inject(IonNav);
   readonly friendsStore = inject(FriendsStore);
   readonly transactions = this.friendsStore.selectedTransactions;
   readonly modalService = inject(ModalService);
+  readonly isLoading = computed(() => this.friendsStore.loadingFriends);
 
   constructor() {}
 

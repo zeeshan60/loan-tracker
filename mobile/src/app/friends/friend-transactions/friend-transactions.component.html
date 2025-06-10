@@ -4,83 +4,89 @@
       <ion-back-button></ion-back-button>
     </ion-buttons>
     <ion-title>With you and {{friend()['name'] | shortenName}}</ion-title>
-    @if(transactions().length) {
-      <ion-buttons slot="primary">
-
-          <ion-button class="add-btn" size="small" fill="solid" (click)="settleUp()">
-                 <img src="assets/images/three-dots.svg" alt="icon"/>
-        </ion-button>
-      </ion-buttons>
-
-    }
+    <ion-buttons slot="primary">
+      <ion-button class="add-btn" size="small" fill="solid">
+        <img src="assets/images/three-dots.svg" alt="icon"/>
+      </ion-button>
+    </ion-buttons>
 
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
 
-  <div class="top-section"></div>
-  <div class="bottom-section"></div>
-  <mr-overall-balance
-      [overallBalance]="friendsStore['selectedFriendBalance']()"
-    ></mr-overall-balance>
-
-  @for(transactionsByMonth of transactions(); track transactionsByMonth.date) {
-  <hr>
-  <ion-list class="transactions-list">
-    <h6 class="color-grey">{{transactionsByMonth.date | dateFormat:'month': 'year'}}</h6>
-      @for(transaction of transactionsByMonth.transactions; track transaction.transactionId) {
-        <ion-item class="friend-trans-list" (click)="openTransactionDetails(transaction)" button>
-
-      <ion-avatar>
-        <ion-icon color="medium" size="large" name="receipt-outline"></ion-icon>
-      </ion-avatar>
-      <ion-label class="description-wrapper">
-        <h2>{{ transaction.description }}</h2>
-        <p>
-          @if (transaction.amount.isOwed) {
-            You paid:
-          } @else {
-            {{friend().name | shortenName}} paid:
-          }
-          {{ transaction.totalAmount | currency: transaction.amount.currency: 'symbol' }}
-        </p>
-        <p class="date-wrapper">
-          {{transaction.date | dateFormat: 'day'}}
-          {{transaction.date | dateFormat: 'month'}}
-        </p>
-      </ion-label>
-      <p class="amount-wrapper">
-        <ion-label class="type" [color]="transaction.amount.isOwed ? 'success': 'danger'">
-                  @if (transaction.amount.isOwed) {
-                    You lent
-                  } @else {
-                    You borrowed
-                  }
-                </ion-label>
-        <ion-label [color]="transaction.defaultCurrencyAmount.isOwed ? 'success': 'danger'">
-          {{ transaction.defaultCurrencyAmount.amount | currency: transaction.defaultCurrencyAmount.currency: 'symbol' }}
-        </ion-label>
-                @if (transaction.defaultCurrencyAmount.currency !== transaction.amount.currency) {
-                  <ion-label color="medium" class="actual-amount-label">
-          {{ transaction.amount.amount | currency: transaction.amount.currency: 'symbol' }}
-        </ion-label>
-                }
-          </p>
-    </ion-item>
-      }
-    </ion-list>
-  } @empty {
-    @if(!isLoading()) {
-      <div class="empty-transactions-wrapper">
-    <p>No transactions yet.</p>
-    <ion-button (click)="addExpense()">
-                Add New
+  <div class="top-section">
+    <mr-overall-balance
+      [overallBalance]="friendsStore.selectedFriendBalance()"
+      (settleUp)="settleUp()"
+    >
+      <ion-buttons slot="primary" class="settle-button">
+        <ion-button size="small" fill="solid" (click)="settleUp()">
+          <ion-icon name="checkmark-outline" slot="start"></ion-icon>
+          Settle
         </ion-button>
-
+      </ion-buttons>
+    </mr-overall-balance>
   </div>
+  <div class="bottom-section"></div>
+
+  <div class="lists-container">
+    @for(transactionsByMonth of transactions(); track transactionsByMonth.date) {
+      <ion-list class="transactions-list">
+        <h6 class="color-grey">{{transactionsByMonth.date | dateFormat:'month': 'year'}}</h6>
+        @for(transaction of transactionsByMonth.transactions; track transaction.transactionId) {
+          <ion-item class="friend-trans-list" (click)="openTransactionDetails(transaction)" button>
+
+            <ion-avatar>
+              <ion-icon color="medium" size="large" name="receipt-outline"></ion-icon>
+            </ion-avatar>
+            <ion-label class="description-wrapper">
+              <h2>{{ transaction.description }}</h2>
+              <p>
+                @if (transaction.amount.isOwed) {
+                  You paid:
+                } @else {
+                  {{friend().name | shortenName}} paid:
+                }
+                {{ transaction.totalAmount | currency: transaction.amount.currency: 'symbol' }}
+              </p>
+              <p class="date-wrapper">
+                {{transaction.date | dateFormat: 'day'}}
+                {{transaction.date | dateFormat: 'month'}}
+              </p>
+            </ion-label>
+            <p class="amount-wrapper">
+              <ion-label class="type" [color]="transaction.amount.isOwed ? 'success': 'danger'">
+                @if (transaction.amount.isOwed) {
+                  You lent
+                } @else {
+                  You borrowed
+                }
+              </ion-label>
+              <ion-label [color]="transaction.defaultCurrencyAmount.isOwed ? 'success': 'danger'">
+                {{ transaction.defaultCurrencyAmount.amount | currency: transaction.defaultCurrencyAmount.currency: 'symbol' }}
+              </ion-label>
+              @if (transaction.defaultCurrencyAmount.currency !== transaction.amount.currency) {
+                <ion-label color="medium" class="actual-amount-label">
+                  {{ transaction.amount.amount | currency: transaction.amount.currency: 'symbol' }}
+                </ion-label>
+              }
+            </p>
+          </ion-item>
+        }
+      </ion-list>
+    } @empty {
+      @if(!isLoading()) {
+        <div class="empty-transactions-wrapper">
+          <p>No transactions yet.</p>
+          <ion-button (click)="addExpense()">
+            Add New
+          </ion-button>
+
+        </div>
+      }
     }
-  }
+  </div>
 
   <ion-buttons class="btn-group">
     <ion-button class="btn-ghost" (click)="editFriendInfo()">Edit</ion-button>

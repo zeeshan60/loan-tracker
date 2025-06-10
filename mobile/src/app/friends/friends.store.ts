@@ -24,6 +24,7 @@ export type Balance = {
 
 type FriendsState = {
   friends: FriendWithBalance[],
+  loadingFriends: boolean,
   overallBalance: {
     main: Balance,
     other: Balance[]
@@ -47,6 +48,7 @@ type AddUpdateExpenseFormValue = {
 
 const initialState: FriendsState = {
   friends: [],
+  loadingFriends: false,
   overallBalance: null,
   selectedFriendId: null,
   selectedTransactions: [],
@@ -84,12 +86,15 @@ export const FriendsStore = signalStore(
           patchState(store, { friends: data.friends, overallBalance: data.balance })
         };
         if (config.showLoader) {
+          patchState(store, { loadingFriends: true });
           await helperService.withLoader(loadAllFriends);
+          patchState(store, { loadingFriends: false });
         } else {
           await loadAllFriends();
         }
       } catch (e) {
         await helperService.showToast('Unable to load friends at the moment');
+        patchState(store, { loadingFriends: false });
       }
     },
     async addFriend(friend: AddFriend): Promise<FriendWithBalance> {
@@ -147,6 +152,7 @@ export const FriendsStore = signalStore(
         return;
       }
       try {
+        patchState(store, { loadingFriends: true });
         await helperService.withLoader(async () => {
           const transactions = await firstValueFrom(http.get<{
             perMonth: TransactionsByMonth[],
@@ -170,6 +176,8 @@ export const FriendsStore = signalStore(
         })
       } catch (e: any) {
         await helperService.showToast(e.toString())
+      } finally {
+        patchState(store, { loadingFriends: false });
       }
     },
     async deleteTransaction(transactionId: string): Promise<void> {
@@ -188,16 +196,13 @@ export const FriendsStore = signalStore(
       }
     },
     async settleUp(friend: FriendWithBalance, formValue: AddUpdateExpenseFormValue) {
-      const confirmation = await helperService.showConfirmAlert(
-        `You are going to settle up everything with ${friend.name}.`, 'Let\'s do it'
-      )
-      if (confirmation.role !== 'confirm') return;
       try {
         await helperService.withLoader(async () => {
           await this.addUpdateExpense(friend, formValue)
         })
       } catch (e) {
         helperService.showToast('Unable to settle up at the moment. Please try later');
+        throw new Error('unable to settle at the moment');
       }
       await this.loadSelectedTransactions();
     },

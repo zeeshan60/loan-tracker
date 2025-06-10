@@ -21,7 +21,6 @@ import {
   FirebaseErrorCodeMessageEnum,
 } from './types';
 import { extractFirebaseErrorMessage } from '../utility-functions';
-import { COUNTRIES_WITH_CALLING_CODES } from '../constants';
 import { PhoneWithCountryComponent } from '../phone-with-country/phone-with-country.component';
 
 type ActiveUi = 'login' | 'signup' | 'forgotPassword';
