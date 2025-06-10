@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { CurrencyPipe } from '@angular/common';
+import { CurrencyPipe, NgOptimizedImage } from '@angular/common';
 import {
   IonAvatar,
   IonButton,

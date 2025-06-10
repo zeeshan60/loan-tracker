@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, Input, OnInit, output, Signal } from '@angular/core';
 import { Balance } from '../friends.store';
 import { IonAccordion, IonAccordionGroup, IonItem, IonLabel, IonList, IonButton, IonButtons, IonIcon } from '@ionic/angular/standalone';
-import { CurrencyPipe } from '@angular/common';
+import { CurrencyPipe, NgClass } from '@angular/common';
 
 @Component({
   selector: 'mr-overall-balance',
@@ -12,27 +12,29 @@ import { CurrencyPipe } from '@angular/common';
   imports: [
     IonItem,
     IonLabel,
-    IonAccordionGroup,
-    IonAccordion,
     CurrencyPipe,
     IonList,
     IonButton,
     IonButtons,
     IonIcon,
+    NgClass,
   ],
 })
 export class OverallBalanceComponent implements OnInit {
 
-  @Input() overallBalance?: {
+  overallBalance = input<{
     main: Balance,
     other: Balance[]
-  } | null = null;
+  } | null>();
 
-  readonly sortedOtherBalance = computed(() => this.overallBalance?.other
+  settleUp = output();
+
+  readonly sortedOtherBalance = computed(() => this.overallBalance()?.other
     .sort((a, b) => b.amount - a.amount) || []);
+
   readonly hasDifferentCurrencies = computed(() => {
     return this.sortedOtherBalance()
-      .some((balance) => balance.currency !== this.overallBalance?.main.currency);
+      .some((balance) => balance.currency !== this.overallBalance().main.currency);
   });
 
   constructor() {

@@ -1,85 +1,73 @@
-<div class="overall-balance-wrapper">
-  <div class="summary-banlance">
-    <div>
-      <ion-label>Overall Balance in your local currency</ion-label>
-      <h1 class="success">SGD 140.00 <img class="arrow" src="assets/images/arrow-green-downward.svg" alt="wallet" /></h1>
-    </div>
-   
-    <!--
-    <img src="assets/images/wallet-icon.svg" alt="wallet" />
-    -->
-    <ion-buttons slot="primary">
-      <ion-button size="small" fill="solid">
-        <ion-icon name="checkmark-outline" slot="start"></ion-icon>
-          Settle 
-        </ion-button>
-    </ion-buttons>
-  
-  </div>
-  <div class="other-details">
-    <ion-list>
-      <ion-item>
-        <div slot="start">
-          <p>Total THB : <span class="danger">100 <img class="arrow" src="assets/images/arrow-red-upword.svg" alt="wallet" /></span></p>
-        </div>
-        <ion-label>Converted to</ion-label>
-        <div slot="end">
-          <p><span class="danger">SGD5.00 <img class="arrow" src="assets/images/arrow-red-upword.svg" alt="wallet" /></span></p>
-        </div>
-      </ion-item>
-      <ion-item>
-        <div slot="start">
-          <p>Total USD : <span class="success">300 <img class="arrow" src="assets/images/arrow-green-downward.svg" alt="wallet" /></span></p>
-        </div>
-        <ion-label>Converted to</ion-label>
-        <div slot="end">
-          <p><span class="success">SGD135.00 <img class="arrow" src="assets/images/arrow-green-downward.svg" alt="wallet" /></span></p>
-        </div>
-      </ion-item>
-    </ion-list>
-  </div>
-</div>
+@if (overallBalance()) {
+  <div class="overall-balance-wrapper">
+    <div class="summary-banlance">
+      <div>
+        <ion-label>Overall Balance in your local currency</ion-label>
+        <h1 [ngClass]="overallBalance().main.isOwed ? 'success': 'danger'">
+          {{ overallBalance().main.amount | currency: overallBalance().main.currency: 'symbol' }}
+          @if (overallBalance().main.isOwed) {
+            <img class="arrow" src="assets/images/arrow-green-downward.svg" alt="wallet" />
+          } @else {
+            <img class="arrow" src="assets/images/arrow-red-upword.svg" alt="wallet" />
+          }
+        </h1>
+      </div>
 
-<!--
-@if (overallBalance?.main) {
-  <ion-item class="overall-balance-wrapper">
-    <ion-label>
-      Overall balance:
-    </ion-label>
-    @if (overallBalance) {
-      @if (hasDifferentCurrencies()) {
-        <p>
-          <ion-accordion-group>
-            <ion-accordion value="first">
-              <ion-item slot="header" color="light">
-                <ion-label
-                  [color]="overallBalance.main.isOwed ? 'success' : 'danger'"
-                >
-                  <strong>{{ overallBalance.main.amount | currency: overallBalance.main.currency: 'symbol' }}</strong>
-                </ion-label>
-              </ion-item>
-              @for (otherBalance of sortedOtherBalance(); track otherBalance.currency) {
-                <ion-label
-                  class="other-balance-amount"
-                  slot="content"
-                  [color]="otherBalance.isOwed ? 'success': 'danger'"
-                >
+      <ng-content>
+        <img src="assets/images/wallet-icon.svg" alt="wallet" />
+      </ng-content>
+    </div>
+
+    @if (hasDifferentCurrencies()) {
+      <div class="other-details">
+        <ion-list>
+          @for (otherBalance of sortedOtherBalance(); track otherBalance.currency) {
+            <ion-item>
+              <div slot="start">
+                <p>Total :
+                  <span
+                    [ngClass]="otherBalance.isOwed ? 'success': 'danger'"
+                  >
                   {{ otherBalance.amount | currency: otherBalance.currency: 'symbol' }}
-                </ion-label>
-              }
-            </ion-accordion>
-          </ion-accordion-group>
-        </p>
-      } @else {
-        <p>
-          <ion-label
-            [color]="overallBalance.main.isOwed ? 'success' : 'danger'"
-          >
-            <strong>{{ overallBalance.main.amount | currency: overallBalance.main.currency: 'symbol' }}</strong>
-          </ion-label>
-        </p>
-      }
+                    @if (otherBalance.isOwed) {
+                      <img
+                        class="arrow"
+                        src="assets/images/arrow-green-downward.svg" alt="wallet"
+                      />
+                    } @else () {
+                      <img
+                        class="arrow"
+                        src="assets/images/arrow-red-upword.svg" alt="wallet"
+                      />
+                    }
+                </span>
+                </p>
+              </div>
+              <ion-label>Converted to</ion-label>
+              <div slot="end">
+                <p>
+                <span
+                  [ngClass]="otherBalance.isOwed ? 'success': 'danger'"
+                >
+                  {{ otherBalance.amount | currency: overallBalance().main.currency: 'symbol' }}
+                  @if (otherBalance.isOwed) {
+                    <img
+                      class="arrow"
+                      src="assets/images/arrow-green-downward.svg" alt="wallet"
+                    />
+                  } @else () {
+                    <img
+                      class="arrow"
+                      src="assets/images/arrow-red-upword.svg" alt="wallet"
+                    />
+                  }
+                </span>
+                </p>
+              </div>
+            </ion-item>
+          }
+        </ion-list>
+      </div>
     }
-  </ion-item>
+  </div>
 }
- -->
