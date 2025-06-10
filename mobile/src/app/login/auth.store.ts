@@ -132,7 +132,6 @@ export const AuthStore = signalStore(
       await modalService.showModal({
         component: AskForPhoneComponent,
         componentProps: {
-          user: store.user(),
           region: store.region()
         }
       })
@@ -143,7 +142,6 @@ export const AuthStore = signalStore(
       try {
         loader.present();
         const url = `${PUBLIC_API}/login`
-        console.log('zeeshan_debug: login url:', url);
         const {token: apiKey} = await firstValueFrom(
           http.post<{ token: string }>(url, {
             idToken: `Bearer ${idToken}`

@@ -1,20 +1,19 @@
 import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
-import { COUNTRIES_WITH_CALLING_CODES, Country, PHONE_MASKS } from '../constants';
+import { COUNTRIES_WITH_CALLING_CODES, PHONE_MASKS } from '../constants';
 import {
-  AbstractControl,
+  AbstractControl, ControlContainer, FormBuilder,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
   ValidationErrors,
-  ValidatorFn,
+  ValidatorFn, Validators,
 } from '@angular/forms';
 import { IonInput } from '@ionic/angular/standalone';
 import { isPhoneNumberValid, toInternationalPhone } from '../utility-functions';
 import { MaskitoElementPredicate } from '@maskito/core';
 import { MaskitoDirective } from '@maskito/angular';
-import { SelectModalComponent } from '../currencies-modal/select-modal.component';
-import { FakeDropdownComponent } from '../fake-dropdown/fake-dropdown.component';
 import { ModalService } from '../modal.service';
+import { CountriesDropdownComponent } from '../countries-dropdown/countries-dropdown.component';
 
 @Component({
   selector: 'mr-phone-with-country',
@@ -26,19 +25,28 @@ import { ModalService } from '../modal.service';
     IonInput,
     ReactiveFormsModule,
     MaskitoDirective,
-    FakeDropdownComponent,
+    CountriesDropdownComponent,
   ],
+  viewProviders: [
+    { provide: ControlContainer, useFactory: () => inject(ControlContainer, { skipSelf: true })}
+  ]
 })
 export class PhoneWithCountryComponent  implements OnInit {
+  readonly selectedValue = input<{phoneNumber?: string, country?: string}>()
+  readonly fb = inject(FormBuilder);
+  readonly parentGroupContainer = inject(ControlContainer);
+  get parentFormGroup() {
+    return this.parentGroupContainer.control as FormGroup;
+  }
   readonly group = input<FormGroup>();
   readonly phoneNumberValidator = (): ValidatorFn => {
     return (control: AbstractControl): ValidationErrors | null => {
       const value = control.value;
-      if (!value || !this.group()) {
+      if (!value || !this.parentFormGroup) {
         return null;
       }
 
-      return isPhoneNumberValid(toInternationalPhone(value, this.group()!.get('country')!.value))
+      return isPhoneNumberValid(toInternationalPhone(value, this.parentFormGroup!.get('phone.country')!.value))
         ? null
         : { invalidPhone: true };
     };
@@ -46,18 +54,10 @@ export class PhoneWithCountryComponent  implements OnInit {
   readonly phoneMasks = PHONE_MASKS;
   readonly maskPredicate: MaskitoElementPredicate = async (el) => (el as HTMLIonInputElement).getInputElement();
   countries = COUNTRIES_WITH_CALLING_CODES;
-  selectedCountryCodeChanges = signal('');
-  selectedCountryCode = computed(() =>
-    this.selectedCountryCodeChanges()
-    || this.group()?.get('country')!.value
-    || this.countries[0].code);
+  selectedCountryCode = signal<string>(this.parentFormGroup?.get('phone.country')!.value)
   selectedCountry = computed(() => this.countries.find(
     country => country.code === this.selectedCountryCode()
   ));
-  selectedCountryText = computed(() => this.selectedCountry() ?
-    `${this.selectedCountry()!.flag} ${this.selectedCountry()!.dialCode}` :
-    ''
-  );
   phoneMask = computed(() => this.selectedCountryCode() ? this.phoneMasks[this.selectedCountryCode()] : {});
   selectedCountryPlaceholder = computed(() => this.selectedCountry()?.placeholder || '');
 
@@ -66,9 +66,9 @@ export class PhoneWithCountryComponent  implements OnInit {
   constructor() { }
 
   getErrorTextForPhone() {
-    if (this.group()?.controls['phoneNumber'].hasError('invalidPhone')) {
+    if (this.parentFormGroup?.get('phone.phoneNumber').hasError('invalidPhone')) {
       return 'Invalid phone number.'
-    } else if (this.group()?.controls['phoneNumber'].hasError('required')) {
+    } else if (this.parentFormGroup?.get('phone.phoneNumber').hasError('required')) {
       return 'Phone is required'
     } else {
       return 'Invalid';
@@ -76,13 +76,19 @@ export class PhoneWithCountryComponent  implements OnInit {
   }
 
   ngOnInit() {
-    this.group()!.get('country')!.valueChanges.subscribe((value) => {
-      this.selectedCountryCodeChanges.set(value);
-      this.group()!.get('phoneNumber')?.setValue('');
-      this.group()!.get('phoneNumber')?.updateValueAndValidity();
+    this.parentFormGroup.addControl('phone', this.fb.group({
+      phoneNumber: this.fb.nonNullable.control(this.selectedValue()?.phoneNumber || '', [Validators.required]),
+      country: this.fb.nonNullable.control(this.selectedValue()?.country || COUNTRIES_WITH_CALLING_CODES[0].code),
+    }));
+
+    this.parentFormGroup!.get('phone.country')!.valueChanges.subscribe((value: string) => {
+      console.log(this.parentFormGroup!.get('phone.country').value);
+      this.selectedCountryCode.set(value);
+      this.parentFormGroup!.get('phone.phoneNumber')?.setValue('');
+      this.parentFormGroup!.get('phone.phoneNumber')?.updateValueAndValidity();
     });
 
-    const phoneNumberControl = this.group()!.get('phoneNumber');
+    const phoneNumberControl = this.parentFormGroup!.get('phone.phoneNumber');
     if (phoneNumberControl) {
       phoneNumberControl.addValidators([
         this.phoneNumberValidator()
@@ -91,28 +97,7 @@ export class PhoneWithCountryComponent  implements OnInit {
     }
   }
 
-  async chooseCountry() {
-    const optionLabel = (country: Country) => `${country.flag} ${country.name} (${country.dialCode})`;
-    const modalIndex = await this.modalService.showModal({
-      component: SelectModalComponent,
-      componentProps: {
-        items: COUNTRIES_WITH_CALLING_CODES.map((currency) => ({...currency, optionLabel: optionLabel(currency)})),
-        selectedItem: {
-          ...this.selectedCountry(),
-          optionLabel: optionLabel(this.selectedCountry())
-        },
-        mostlyUsedItems: []
-      },
-      handleBehavior: 'cycle',
-      initialBreakpoint: 0.5,
-      breakpoints: [0.25, 0.5, 0.75]
-    })
-    await this.modalService.onWillDismiss<Country>(modalIndex)
-      .then((value) => {
-        if (value.role === 'confirm') {
-          this.group()!.get('country').setValue(value.data.code)
-        }
-      })
-
+  ngOnDestroy() {
+    this.parentFormGroup.removeControl('phone');
   }
 }

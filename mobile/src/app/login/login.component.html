@@ -65,90 +65,88 @@
 
 
     <form (submit)="onSignUpWithCreds()" [formGroup]="signUpForm">
-
-    <div class="form-card">
-      <div class="ion-margin card-heading">
-        <h1>Sign Up</h1>
-        <p>
+      <div class="form-card">
+        <div class="ion-margin card-heading">
+          <h1>Sign Up</h1>
+          <p>
             Join us and get started today
           </p>
+        </div>
+
+        <ion-item>
+          <ion-label position="stacked" class="input-label">Name</ion-label>
+          <ion-input
+            class="input-field"
+            type="text"
+            formControlName="name"
+            name="name"
+            placeholder="Enter your name"
+          ></ion-input>
+          <img src="assets/images/user-icon.svg" alt="icon"/>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked" class="input-label">Email ID</ion-label>
+          <ion-input
+            class="input-field"
+            [errorText]="emailErrorMessage(signUpForm)"
+            type="email"
+            formControlName="email"
+            name="email"
+            placeholder="Write your email"
+          ></ion-input>
+          <img src="assets/images/email-icon.svg" alt="icon"/>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked" class="input-label">Password</ion-label>
+          <ion-input
+            class="input-field"
+            type="password"
+            formControlName="password"
+            name="password"
+            required
+            [errorText]="passwordErrorMessage(signUpForm)"
+            placeholder="Enter your password"
+          ></ion-input>
+          <!-- Left icon -->
+          <img src="assets/images/lock-icon.svg" alt="Lock icon"/>
+          <!-- Right icon (eye toggle) -->
+          <img class="eye-icon" src="assets/images/eye-icon.svg" alt="Toggle password"/>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked" class="input-label">Confirm Password</ion-label>
+          <ion-input
+            class="input-field"
+            type="password"
+            formControlName="password"
+            name="password"
+            required
+            [errorText]="passwordErrorMessage(signUpForm)"
+            placeholder="Re-enter your password"
+          ></ion-input>
+          <!-- Left icon -->
+          <img src="assets/images/lock-icon.svg" alt="Lock icon"/>
+          <!-- Right icon (eye toggle) -->
+          <img class="eye-icon" src="assets/images/eye-icon.svg" alt="Toggle password"/>
+        </ion-item>
+
+
+        <ion-item>
+          <ion-label position="stacked" class="input-label">Phone Number</ion-label>
+          <mr-phone-with-country></mr-phone-with-country>
+        </ion-item>
+
       </div>
 
-      <ion-item>
-        <ion-label position="stacked" class="input-label">Name</ion-label>
-        <ion-input
-              class="input-field"
-              type="text"
-              formControlName="name"
-              name="name"
-              placeholder="Enter your name"
-            ></ion-input>
-        <img src="assets/images/user-icon.svg" alt="icon"/>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="stacked" class="input-label">Email ID</ion-label>
-        <ion-input
-              class="input-field"
-              [errorText]="emailErrorMessage(signUpForm)"
-              type="email"
-              formControlName="email"
-              name="email"
-              placeholder="Write your email"
-            ></ion-input>
-        <img src="assets/images/email-icon.svg" alt="icon"/>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="stacked" class="input-label">Password</ion-label>
-        <ion-input
-              class="input-field"
-              type="password"
-              formControlName="password"
-              name="password"
-              required
-              [errorText]="passwordErrorMessage(signUpForm)"
-              placeholder="Enter your password"
-            ></ion-input>
-        <!-- Left icon -->
-        <img src="assets/images/lock-icon.svg" alt="Lock icon"/>
-        <!-- Right icon (eye toggle) -->
-        <img class="eye-icon" src="assets/images/eye-icon.svg" alt="Toggle password"/>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="stacked" class="input-label">Confirm Password</ion-label>
-        <ion-input
-              class="input-field"
-              type="password"
-              formControlName="password"
-              name="password"
-              required
-              [errorText]="passwordErrorMessage(signUpForm)"
-              placeholder="Re-enter your password"
-            ></ion-input>
-        <!-- Left icon -->
-        <img src="assets/images/lock-icon.svg" alt="Lock icon"/>
-        <!-- Right icon (eye toggle) -->
-        <img class="eye-icon" src="assets/images/eye-icon.svg" alt="Toggle password"/>
-      </ion-item>
-
-
-      <ion-item>
-        <ion-label position="stacked" class="input-label">Phone Number</ion-label>
-        <mr-phone-with-country [group]="phoneForm"></mr-phone-with-country>
-      </ion-item>
-
-    </div>
-
-    <ion-button expand="full" type="submit" [disabled]="loading()" class="button-filled">
-      {{ loading() ? 'Signing up...' : 'Sign Up' }}
-    </ion-button>
+      <ion-button expand="full" type="submit" [disabled]="loading()" class="button-filled">
+        {{ loading() ? 'Signing up...' : 'Sign Up' }}
+      </ion-button>
       @if (invalidCreds()) {
         <ion-label class="invalid-cred" color="danger">{{invalidCreds()}}</ion-label>
       }
-
-  </form>
+    </form>
 
   <div class="signup-row">
     <span class="left-text">Already have an account?</span>
