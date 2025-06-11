@@ -59,7 +59,7 @@ export class SettleUpComponent implements OnInit {
   readonly formBuilder = inject(FormBuilder);
   readonly otherBalances = computed(() => {
     const obj: { [key: string]: { isOwed: boolean, amount: number } } = {};
-    this.friend().otherBalances?.forEach(balance => {
+    this.friend().otherBalances?.forEach(({amount: balance}) => {
       obj[balance.currency] = { isOwed: balance.isOwed, amount: balance.amount }
     })
     return obj;
@@ -81,7 +81,7 @@ export class SettleUpComponent implements OnInit {
         this.settleUpForm.get('amount').addValidators([Validators.required, Validators.min(1), Validators.max(balance.amount)])
         this.settleUpForm.get('amount').updateValueAndValidity();
       });
-    this.settleUpForm.get('balance')?.setValue(this.friend().otherBalances?.[0] || { currency: 'PKR', isOwed: true, amount: 0})
+    this.settleUpForm.get('balance')?.setValue(this.friend().otherBalances?.[0]?.amount || { currency: 'PKR', isOwed: true, amount: 0})
   }
 
   async closePopup() {

@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar>
-      <ion-title>Activity Log</ion-title>
+    <ion-title>Activity Log</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -32,7 +32,11 @@
           {{activity.amount | currency: activity.currency : 'symbol-narrow'}}
         </ion-label>
       </div>
-      <p class="date-and-time"  slot="end">{{ activity.date | date: 'd MMM \'at\' h:mma': 'en-US' }}</p>
+      <p class="date-and-time"  slot="end">
+        {{ activity.date | date: 'd MMM': 'en-US' }}
+        <br>
+        {{ activity.date | date: '\'at\' h:mma': 'en-US' }}
+      </p>
 
     </ion-item>
       } @empty {

@@ -40,7 +40,6 @@ import { ModalService } from '../../modal.service';
     IonAvatar,
     IonLabel,
     CurrencyPipe,
-    ShortenNamePipe,
     OverallBalanceComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush

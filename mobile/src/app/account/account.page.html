@@ -14,39 +14,39 @@
 @if (user()) {
   <ion-content [fullscreen]="true">
 
-  <div class="top-section"></div>
-  <div class="bottom-section"></div>
+    <div class="top-section"></div>
+    <div class="bottom-section"></div>
 
-  <div class="profile-wrapper">
+    <div class="profile-wrapper">
       @if (user()?.photoUrl) {
-      <img [alt]="user()?.displayName + ' picture'" [src]="user()?.photoUrl" />
-    } @else {
-      <img alt="Silhouette of a person's head" src="https://ionicframework.com/docs/img/demos/avatar.svg"/>
-    }
-    <h2>{{user()?.displayName}}</h2>
-    <p>{{user()?.email || 'N/A'}}</p>
+        <img [alt]="user()?.displayName + ' picture'" [src]="user()?.photoUrl"/>
+      } @else {
+        <img alt="Silhouette of a person's head" src="https://ionicframework.com/docs/img/demos/avatar.svg"/>
+      }
+      <h2>{{ user()?.displayName }}</h2>
+      <p>{{ user()?.email || 'N/A' }}</p>
 
-  </div>
+    </div>
 
-  <ion-list class="ion-margin">
+    <ion-list class="ion-margin">
 
-    <ion-item>
-      <ion-label>Default currency</ion-label>
-      <mr-currencies-dropdown
+      <ion-item>
+        <ion-label>Default currency</ion-label>
+        <mr-currencies-dropdown
           slot="end"
           class="currency-dropdown"
           [selectedCurrency]="userCurrency()"
           [label]="''"
           (selected)="updateDefaultCurrency($event)"
         ></mr-currencies-dropdown>
-    </ion-item>
+      </ion-item>
 
-    <ion-item>
+      <ion-item>
         @if (!phoneInEditMode()) {
           <ion-icon name="call-outline"></ion-icon>
-      <ion-label>{{user()?.phoneNumber | phone }}</ion-label>
+          <ion-label>{{ user()?.phoneNumber | phone }}</ion-label>
 
-      <img (click)="phoneInEditMode.set(true)" slot="end" src="assets/images/edit.svg" alt="icon" />
+          <img (click)="phoneInEditMode.set(true)" slot="end" src="assets/images/edit.svg" alt="icon"/>
 
         } @else {
           <form [formGroup]="phoneForm" (ngSubmit)="savePhoneNumber()" id="save-phone-form">
@@ -55,10 +55,11 @@
           @if (loading()) {
             <ion-spinner slot="end"></ion-spinner>
           } @else {
-            <ion-button class="btn-save" slot="end" type="submit" form="save-phone-form" > <img src="assets/images/save-icon.svg" alt="icon"/></ion-button>
+            <ion-button class="btn-save" slot="end" type="submit" form="save-phone-form"><img
+              src="assets/images/save-icon.svg" alt="icon"/></ion-button>
           }
         }
       </ion-item>
-  </ion-list>
-</ion-content>
+    </ion-list>
+  </ion-content>
 }

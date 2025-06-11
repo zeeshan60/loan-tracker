@@ -1,23 +1,21 @@
 @import "variables.scss";
 
-ion-header{
+ion-header {
   box-shadow: none;
+
   ion-toolbar {
     padding: 16px;
-      background-color: $color-mediumGrey;
-    --background: $color-mediumGrey;
-    --color: $color-dark;
+    background: linear-gradient(to right, $color-blue 0%, $color-green 100%);
+    --background: transparent;
+    --color: $color-white;
     --border-width: 0;
 
-    ion-buttons ion-icon{
-      font-size: 26px;
-    }
-    ion-title{
-      padding: 0;
-      text-transform: capitalize;
-      text-align: left;
+    ion-title {
       font-size: 20px;
-      color: $color-dark;
+      font-weight: 600;
+      color: $color-white;
+      padding: 0 40px;
+      text-align: left;
     }
   }
 }
@@ -26,45 +24,46 @@ ion-content::part(background) {
   background-color: $color-mediumGrey;
 }
 
-ion-list{
-    background: transparent;
-    margin: 0 16px;
+ion-list {
+  background: transparent;
+  margin: 0 16px;
 }
 
 ion-item {
-    // --background: $color-white;
-    --border-color: transparent !important;
-    margin: 6px 0;
-    border-radius: 10px;
-    border: 1px solid $color-lightGrey;
+  --border-color: transparent !important;
+  margin: 6px 0;
+  border-radius: 10px;
+  border: 1px solid $color-lightGrey;
 
-   &::part(detail-icon){
-        display:none !important;
-    }
+  &::part(detail-icon) {
+    display: none !important;
+  }
+}
 
-  
+.activity-details {
+  p {
+    margin: 0 0 4px;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 175px;
+  }
+
+  strong {
+    font-weight: 600;
+  }
+
+  ion-label {
+    font-size: 12px;
+  }
 }
-.activity-details{
-    p{
-        margin: 0 0 4px;
-        font-size: 14px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 175px;
-    }
-    strong{
-        font-weight: 600;
-    }
-    ion-label{
-     font-size: 12px;
-    }
-}
-.date-and-time{
-    font-size: 11px;
-    text-align: right;
-    width: 54px;
-    margin: 12px 0;
-    color: $color-grey;
-    line-height: 1.8;
+
+.date-and-time {
+  font-size: 11px;
+  text-align: right;
+  width: 60px;
+  margin: 12px 0;
+  color: $color-grey;
+  line-height: 1.8;
 }

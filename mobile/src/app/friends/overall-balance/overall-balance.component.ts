@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input, Input, OnInit, output, Signal } from '@angular/core';
-import { Balance } from '../friends.store';
+import { Balance, OverallBalance } from '../friends.store';
 import { IonAccordion, IonAccordionGroup, IonItem, IonLabel, IonList, IonButton, IonButtons, IonIcon } from '@ionic/angular/standalone';
 import { CurrencyPipe, NgClass } from '@angular/common';
 
@@ -14,27 +14,22 @@ import { CurrencyPipe, NgClass } from '@angular/common';
     IonLabel,
     CurrencyPipe,
     IonList,
-    IonButton,
-    IonButtons,
-    IonIcon,
     NgClass,
+    IonIcon,
   ],
 })
 export class OverallBalanceComponent implements OnInit {
 
-  overallBalance = input<{
-    main: Balance,
-    other: Balance[]
-  } | null>();
+  overallBalance = input<OverallBalance>();
 
   settleUp = output();
 
   readonly sortedOtherBalance = computed(() => this.overallBalance()?.other
-    .sort((a, b) => b.amount - a.amount) || []);
+    .sort((a, b) => b.amount.amount - a.amount.amount) || []);
 
   readonly hasDifferentCurrencies = computed(() => {
     return this.sortedOtherBalance()
-      .some((balance) => balance.currency !== this.overallBalance().main.currency);
+      .some((balance) => balance.amount.currency !== this.overallBalance().main.currency);
   });
 
   constructor() {
