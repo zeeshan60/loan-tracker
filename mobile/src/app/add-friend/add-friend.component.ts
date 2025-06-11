@@ -20,9 +20,10 @@ import {
   IonIcon,
 } from '@ionic/angular/standalone';
 import {
+  AbstractControl,
   FormBuilder, FormControl, FormGroup,
   FormsModule,
-  ReactiveFormsModule,
+  ReactiveFormsModule, ValidationErrors,
   Validators,
 } from '@angular/forms';
 import { HelperService } from '../helper.service';
@@ -69,6 +70,20 @@ export class AddFriendComponent implements OnInit {
   public addFriendForm = this.formBuilder.group({
     name: this.formBuilder.nonNullable.control('', [Validators.required]),
     email: new FormControl<string|null>(null, [Validators.email]),
+  }, {
+    validators: [(control: AbstractControl): ValidationErrors | null => {
+      const email = control.get('email') as AbstractControl;
+      const phone = control.get('phone') as FormGroup;
+      console.log(email.value, phone?.getRawValue())
+
+      if (!email.value && !phone?.get('phoneNumber').value) {
+        console.log('nothing provided');
+        return { noContactInformation: true };
+      }
+
+      console.log('something provided.')
+      return null;
+    }]
   })
 
   constructor() {

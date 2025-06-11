@@ -17,7 +17,7 @@ ion-header {
       padding: 0 40px;
       text-align: left;
       text-transform: capitalize;
-      font-size: 20px;
+      font-size: 15px;
       color: $color-dark;
     }
   }
@@ -151,8 +151,5 @@ ion-item {
   display: flex;
   margin: 24px 0;
   gap: 8px;
-
-  .btn-ghost.green {
-  }
 }
 
