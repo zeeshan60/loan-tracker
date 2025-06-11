@@ -50,7 +50,7 @@
 
         } @else {
           <form [formGroup]="phoneForm" (ngSubmit)="savePhoneNumber()" id="save-phone-form">
-            <mr-phone-with-country [selectedValue]="selectedPhone()"></mr-phone-with-country>
+            <mr-phone-with-country [selectedValue]="selectedPhone()" [isRequired]="true"></mr-phone-with-country>
           </form>
           @if (loading()) {
             <ion-spinner slot="end"></ion-spinner>

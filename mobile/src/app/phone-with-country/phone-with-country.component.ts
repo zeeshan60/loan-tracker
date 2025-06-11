@@ -9,7 +9,7 @@ import {
   ValidatorFn, Validators,
 } from '@angular/forms';
 import { IonInput } from '@ionic/angular/standalone';
-import { isPhoneNumberValid, toInternationalPhone } from '../utility-functions';
+import { isPhoneNumberValid, toInternationalPhone, toNationalPhone } from '../utility-functions';
 import { MaskitoElementPredicate } from '@maskito/core';
 import { MaskitoDirective } from '@maskito/angular';
 import { ModalService } from '../modal.service';
@@ -32,6 +32,7 @@ import { CountriesDropdownComponent } from '../countries-dropdown/countries-drop
   ]
 })
 export class PhoneWithCountryComponent  implements OnInit {
+  readonly isRequired = input<boolean>(false);
   readonly selectedValue = input<{phoneNumber?: string, country?: string}>()
   readonly fb = inject(FormBuilder);
   readonly parentGroupContainer = inject(ControlContainer);
@@ -77,8 +78,8 @@ export class PhoneWithCountryComponent  implements OnInit {
 
   ngOnInit() {
     this.parentFormGroup.addControl('phone', this.fb.group({
-      phoneNumber: this.fb.nonNullable.control(this.selectedValue()?.phoneNumber || ''),
-      country: this.fb.nonNullable.control(this.selectedValue()?.country || COUNTRIES_WITH_CALLING_CODES[0].code),
+      phoneNumber: this.fb.nonNullable.control(toNationalPhone(this.selectedValue()?.phoneNumber) || '', this.isRequired() ? [Validators.required] : []),
+      country: this.fb.nonNullable.control(this.selectedValue()?.country || COUNTRIES_WITH_CALLING_CODES[0].code)
     }));
 
     this.parentFormGroup!.get('phone.country')!.valueChanges.subscribe((value: string) => {
