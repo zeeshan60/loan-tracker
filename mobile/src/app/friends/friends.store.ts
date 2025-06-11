@@ -161,12 +161,21 @@ export const FriendsStore = signalStore(
       }
     },
     async setSelectedFriend(friendId: string|null) {
-      if (friendId && store.selectedFriendId() !== friendId) {
-        patchState(store, {
-          selectedFriendId: friendId,
-          selectedFriendBalance: null,
-          selectedTransactions: []
-        })
+      function newFriendSelected() {
+        return store.selectedFriendId() !== friendId
+      }
+
+      if (store.selectedFriendId() == friendId) {
+        return;
+      }
+
+      patchState(store, {
+        selectedFriendId: friendId,
+        selectedFriendBalance: null,
+        selectedTransactions: []
+      })
+
+      if (newFriendSelected()) {
         await this.loadSelectedTransactions()
       }
     },
