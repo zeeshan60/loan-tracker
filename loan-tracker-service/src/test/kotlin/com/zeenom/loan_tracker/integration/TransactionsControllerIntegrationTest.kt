@@ -556,9 +556,9 @@ class TransactionsControllerIntegrationTest :
         assertThat(result.balance.main!!.isOwed).isTrue()
         assertThat(result.balance.main!!.currency).isEqualTo("USD")
         assertThat(result.balance.other).hasSize(1)
-        assertThat(result.balance.other[0].amount).isEqualTo(50.0.toBigDecimal())
-        assertThat(result.balance.other[0].isOwed).isTrue()
-        assertThat(result.balance.other[0].currency).isEqualTo("USD")
+        assertThat(result.balance.other[0].amount.amount).isEqualTo(50.0.toBigDecimal())
+        assertThat(result.balance.other[0].amount.isOwed).isTrue()
+        assertThat(result.balance.other[0].amount.currency).isEqualTo("USD")
     }
 
     @Order(16)
@@ -664,9 +664,9 @@ class TransactionsControllerIntegrationTest :
             soft.assertThat(friends[0].mainBalance!!.isOwed).isTrue()
             soft.assertThat(friends[0].mainBalance!!.currency).isEqualTo("PKR")
             soft.assertThat(friends[0].otherBalances).hasSize(1)
-            soft.assertThat(friends[0].otherBalances[0].amount).isEqualTo(50.0.toBigDecimal())
-            soft.assertThat(friends[0].otherBalances[0].isOwed).isTrue()
-            soft.assertThat(friends[0].otherBalances[0].currency).isEqualTo("USD")
+            soft.assertThat(friends[0].otherBalances[0].amount.amount).isEqualTo(50.0.toBigDecimal())
+            soft.assertThat(friends[0].otherBalances[0].amount.isOwed).isTrue()
+            soft.assertThat(friends[0].otherBalances[0].amount.currency).isEqualTo("USD")
         }
     }
 

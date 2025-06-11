@@ -1,6 +1,7 @@
 package com.zeenom.loan_tracker.friends
 
 import com.zeenom.loan_tracker.transactions.AmountResponse
+import com.zeenom.loan_tracker.transactions.OtherBalanceResponse
 import java.util.*
 
 data class FriendsResponse(
@@ -16,5 +17,5 @@ data class FriendResponse(
     val email: String?,
     val phone: String?,
     val mainBalance: AmountResponse?,
-    val otherBalances: List<AmountResponse>,
+    val otherBalances: List<OtherBalanceResponse>,
 )
