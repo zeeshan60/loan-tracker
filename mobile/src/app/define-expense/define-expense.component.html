@@ -95,11 +95,15 @@
     </ion-list>
 
     <ion-buttons class="btn-group">
-          @if (loading()) {
-            <ion-spinner></ion-spinner>
-          } @else {
-            <ion-button type="submit" class="btn-ghost green" form="define-expense-form" [strong]="true">Create Now</ion-button>
-          }
+            <ion-button type="submit" class="btn-ghost green" form="define-expense-form" [strong]="true">
+              @if (loading()) {
+                <ion-spinner></ion-spinner>
+              } @else if (isUpdating()) {
+                Update now
+              } @else {
+                Create expense
+              }
+            </ion-button>
       </ion-buttons>
 
   </form>

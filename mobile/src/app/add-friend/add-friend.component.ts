@@ -53,8 +53,8 @@ import { ModalIndex, ModalService } from '../modal.service';
     ReactiveFormsModule,
     IonItem, IonList, PhoneWithCountryComponent,
     IonBackButton,
-    IonIcon
-  ],
+    IonIcon,
+  ]
 })
 export class AddFriendComponent implements OnInit {
   @Input() name: string = '';

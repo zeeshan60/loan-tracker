@@ -1,16 +1,19 @@
 @import "variables.scss";
 
-ion-header{
+ion-header {
   box-shadow: none;
+
   ion-toolbar {
-      background-color: $color-mediumGrey;
+    background-color: $color-mediumGrey;
     --background: $color-mediumGrey;
     --color: $color-dark;
     --border-width: 0;
-    ion-buttons ion-icon{
+
+    ion-buttons ion-icon {
       font-size: 26px;
     }
-    ion-title{
+
+    ion-title {
       padding: 0 40px;
       text-align: left;
       text-transform: capitalize;
@@ -26,7 +29,7 @@ ion-item {
   &::part(native) {
     --inner-border-width: 0;
     background-color: transparent;
-     padding-left: 0;
+    padding-left: 0;
     --inner-border-width: 0;
   }
 
@@ -43,16 +46,17 @@ ion-item {
     width: 100%;
     gap: 16px;
     margin-top: 10px;
-    
+
     .column:first-child {
       width: 30%;
     }
+
     .column:last-child {
       width: 70%;
     }
 
-    app-currencies-dropdown{
-      ::ng-deep .fake-dropdown{
+    app-currencies-dropdown {
+      ::ng-deep .fake-dropdown {
         height: 44px;
         background: $color-mediumGrey;
         display: flex;
@@ -60,57 +64,63 @@ ion-item {
         justify-content: center;
         border-radius: 10px;
       }
-      ::ng-deep .selected-wrapper{
+
+      ::ng-deep .selected-wrapper {
         margin-top: 0;
         font-size: 14px;
       }
     }
   }
 
-  ion-select{
-      width: 100%;
-      background-color: $color-mediumGrey;
-      padding: 0px 16px;
-      font-size: 14px;
-      margin: 4px 0;
-      border-radius: 10px;
-      &.split-option-select {
-        &::part(text) {
-          color: $color-red;
-        }
-        &.is-owed::part(text) {
-          color: $color-green;
-        }
+  ion-select {
+    width: 100%;
+    background-color: $color-mediumGrey;
+    padding: 0px 16px;
+    font-size: 14px;
+    margin: 4px 0;
+    border-radius: 10px;
+
+    &.split-option-select {
+      &::part(text) {
+        color: $color-red;
       }
+
+      &.is-owed::part(text) {
+        color: $color-green;
+      }
+    }
   }
 
-  ion-datetime-button{
-      border-radius: 10px;
-      margin: 4px 0;
-      border-radius: 10px;
+  ion-datetime-button {
+    border-radius: 10px;
+    margin: 4px 0;
+    border-radius: 10px;
+    width: 100%;
+
+    &::part(native) {
       width: 100%;
-      &::part(native){
-        width: 100%;
-        background-color: $color-mediumGrey;
-        text-align: left;
-        font-size: 14px;
-        padding: 12px 16px;
-      }
+      background-color: $color-mediumGrey;
+      text-align: left;
+      font-size: 14px;
+      padding: 12px 16px;
+    }
   }
 
 }
 
-.choose-friend-item{
-  h2{
+.choose-friend-item {
+  h2 {
     color: $color-dark;
     margin: 0;
     text-transform: capitalize;
   }
+
   p {
     color: $color-grey;
     margin: 4px 0 28px;
     font-size: 18px;
-    span{
+
+    span {
       display: inline;
       border-bottom: 2px dashed $color-blue;
       cursor: pointer;
@@ -126,8 +136,8 @@ ion-item {
   font-weight: 600;
 }
 
-.input-field{
-  ::ng-deep .input-wrapper{
+.input-field {
+  ::ng-deep .input-wrapper {
     background-color: $color-mediumGrey;
     padding: 8px 16px;
     font-size: 14px;
@@ -137,25 +147,12 @@ ion-item {
   }
 }
 
-.btn-group{
-    display: flex;
-    margin: 24px 0;
-    gap: 8px;
-  .btn-ghost.green{
-    text-align: center;
-    flex: 1;
-    border: 1px solid  $color-green;
-    border-radius: 40px;
-    font-size: 14px;
-    font-weight: 500;
-    color:  $color-green;
-    opacity: 1;
-    text-transform: capitalize;
-    &:hover, &:active{
-      background-color: $color-green;
-      color:  $color-white;
-      opacity: 1;
-    }
+.btn-group {
+  display: flex;
+  margin: 24px 0;
+  gap: 8px;
+
+  .btn-ghost.green {
   }
 }
 
