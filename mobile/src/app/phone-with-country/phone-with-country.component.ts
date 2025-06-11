@@ -77,7 +77,7 @@ export class PhoneWithCountryComponent  implements OnInit {
 
   ngOnInit() {
     this.parentFormGroup.addControl('phone', this.fb.group({
-      phoneNumber: this.fb.nonNullable.control(this.selectedValue()?.phoneNumber || '', [Validators.required]),
+      phoneNumber: this.fb.nonNullable.control(this.selectedValue()?.phoneNumber || ''),
       country: this.fb.nonNullable.control(this.selectedValue()?.country || COUNTRIES_WITH_CALLING_CODES[0].code),
     }));
 
