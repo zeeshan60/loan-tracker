@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { map, Observable, timer } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { AddFriend } from './friends.store';
+import { AddFriend, OtherBalance, OverallBalance } from './friends.store';
 import { FriendWithBalance } from './model';
 import { PRIVATE_API } from '../constants';
 
@@ -21,19 +21,13 @@ export class FriendsService {
 
   loadAllFriends(): Observable<{
     data: {
-      balance: {
-        "main": Balance,
-        "other": Balance[]
-      }
+      balance: OverallBalance
       friends: FriendWithBalance[]
     },
   }> {
     return this.http.get<{
       data: {
-        balance: {
-          "main": Balance,
-          "other": Balance[]
-        }
+        balance: OverallBalance
         friends: FriendWithBalance[]
       }
     }>(PRIVATE_API + '/friends')

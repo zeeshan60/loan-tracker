@@ -33,7 +33,7 @@
   <div class="lists-container">
     @for(transactionsByMonth of transactions(); track transactionsByMonth.date) {
       <ion-list class="transactions-list">
-        <h6 class="color-grey">{{transactionsByMonth.date | dateFormat:'month': 'year'}}</h6>
+        <h6 class="color-grey">{{transactionsByMonth.date | date :'MMM y': 'en-US'}}</h6>
         @for(transaction of transactionsByMonth.transactions; track transaction.transactionId) {
           <ion-item class="friend-trans-list" (click)="openTransactionDetails(transaction)" button>
 
@@ -51,8 +51,7 @@
                 {{ transaction.totalAmount | currency: transaction.amount.currency: 'symbol' }}
               </p>
               <p class="date-wrapper">
-                {{transaction.date | dateFormat: 'day'}}
-                {{transaction.date | dateFormat: 'month'}}
+                {{transaction.date | date :'dd MMM': 'en-US' }}
               </p>
             </ion-label>
             <p class="amount-wrapper">

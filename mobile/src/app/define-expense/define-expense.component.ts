@@ -156,8 +156,8 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
     let currency = CURRENCIES[0].code;
     if (this.authStore.user()?.currency) {
       currency = this.authStore.user()?.currency!;
-    } else if (this.friend()?.otherBalances?.[0].currency) {
-      currency = this.friend()?.otherBalances?.[0].currency!;
+    } else if (this.friend()?.otherBalances?.[0]?.amount.currency) {
+      currency = this.friend()?.otherBalances?.[0]?.amount.currency!;
     } else if (CURRENCIES_CODES.includes(this.authStore.region()?.currency || '')) {
       currency = this.authStore.region()?.currency!;
     }

@@ -20,43 +20,38 @@
       <ion-item>
         <ion-label position="stacked" class="input-label">Friend's Name</ion-label>
         <ion-input
-            class="input-field"
-            type="text"
-            formControlName="name"
-            placeholder="Friend name"
-            errorText="Name is required"
-             placeholder="Enter your friend's name"
-          ></ion-input>
+          class="input-field"
+          type="text"
+          formControlName="name"
+          placeholder="Friend name"
+          errorText="Name is required"
+        ></ion-input>
 
       </ion-item>
       <ion-item>
         <ion-label position="stacked" class="input-label">Friend's Email ID</ion-label>
         <ion-input
-            class="input-field"
-            type="email"
-            errorText="Invalid email"
-            formControlName="email"
-            placeholder="John@gmail.com"
-            email
-          ></ion-input>
+          class="input-field"
+          type="email"
+          errorText="Invalid email"
+          formControlName="email"
+          placeholder="John@gmail.com"
+          email
+        ></ion-input>
       </ion-item>
 
       <ion-item>
         <ion-label position="stacked" class="input-label">Phone Number</ion-label>
-<!--        <mr-phone-with-country-->
-<!--            [group]="phoneFormGroup()"-->
-<!--          ></mr-phone-with-country>-->
+        <mr-phone-with-country [selectedValue]="getSelectedPhoneValue()"></mr-phone-with-country>
       </ion-item>
 
     </ion-list>
   </form>
 
   <ion-buttons class="btn-group">
-      @if (loading()) {
-        <ion-spinner></ion-spinner>
-      } @else {
-        <ion-button class="btn-ghost green" type="submit" form="add-friend-form" [strong]="true">Add Friend</ion-button>
-      }
+    <ion-button class="btn-ghost green" type="submit" form="add-friend-form" [strong]="true">
+      {{isUpdating() ? 'Update' : 'Add'}} Friend
+    </ion-button>
   </ion-buttons>
 
 </ion-content>

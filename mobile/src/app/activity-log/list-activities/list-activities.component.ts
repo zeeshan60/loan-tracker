@@ -20,7 +20,7 @@ import {
   finalize,
   map,
   of, ReplaySubject,
-  switchMap, takeUntil,
+  switchMap, takeUntil, tap,
   throwError,
 } from 'rxjs';
 import { TransactionDetailsComponent } from '../../friends/transaction-details/transaction-details.component';
@@ -46,6 +46,7 @@ interface Activity {
   date: string,
   transactionResponse: Transaction
 }
+
 const ActivityTypeLabel = {
   [ActivityTypeEnum.CREATED]: 'Added',
   [ActivityTypeEnum.UPDATED]: 'Updated',
@@ -69,6 +70,7 @@ export class ListActivitiesComponent extends ComponentDestroyedMixin() implement
   readonly helperService = inject(HelperService);
   readonly refreshActivities$ = input.required<ReplaySubject<boolean>>();
   activities$: BehaviorSubject<Activity[]> = new BehaviorSubject([] as Activity[]);
+
   constructor() {
     super()
   }
@@ -84,7 +86,7 @@ export class ListActivitiesComponent extends ComponentDestroyedMixin() implement
           return of(value)
         }),
         switchMap(() => this.http
-          .get<{ data: Activity[]}>(`${PRIVATE_API}/transactions/activityLogs`)
+          .get<{ data: Activity[] }>(`${PRIVATE_API}/transactions/activityLogs`),
         ),
         map(response => response.data),
         finalize(async () => {
@@ -94,7 +96,7 @@ export class ListActivitiesComponent extends ComponentDestroyedMixin() implement
           this.helperService.showToast('Unable to fetch activities at the moment.');
           return throwError(() => new Error());
         }),
-        takeUntil(this.componentDestroyed)
+        takeUntil(this.componentDestroyed),
       )
       .subscribe((activities) => {
         loader.dismiss()
@@ -105,12 +107,11 @@ export class ListActivitiesComponent extends ComponentDestroyedMixin() implement
   openTransaction(activity: any) {
     this.nav.push(TransactionDetailsComponent, {
       transaction: activity.transactionResponse,
-      friend: activity.transactionResponse.friend
+      friend: activity.transactionResponse.friend,
     })
   }
 
   ionViewWillEnter() {
     this.refreshActivities$().next(true);
   }
-
 }

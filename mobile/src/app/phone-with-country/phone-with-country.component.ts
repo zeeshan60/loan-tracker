@@ -82,7 +82,6 @@ export class PhoneWithCountryComponent  implements OnInit {
     }));
 
     this.parentFormGroup!.get('phone.country')!.valueChanges.subscribe((value: string) => {
-      console.log(this.parentFormGroup!.get('phone.country').value);
       this.selectedCountryCode.set(value);
       this.parentFormGroup!.get('phone.phoneNumber')?.setValue('');
       this.parentFormGroup!.get('phone.phoneNumber')?.updateValueAndValidity();

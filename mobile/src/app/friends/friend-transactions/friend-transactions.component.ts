@@ -1,5 +1,5 @@
 import { Component, computed, inject, input, Signal, signal } from '@angular/core';
-import { CurrencyPipe } from '@angular/common';
+import { CurrencyPipe, DatePipe } from '@angular/common';
 import {
   IonAvatar,
   IonBackButton,
@@ -47,6 +47,7 @@ import { ModalService } from '../../modal.service';
     ShortenNamePipe,
     DateFormatPipe,
     OverallBalanceComponent,
+    DatePipe,
   ],
 })
 export class FriendTransactionsComponent {

@@ -16,22 +16,29 @@ export type AddFriend = {
   phoneNumber: string
 }
 
+export type OverallBalance = {
+  main: Balance|null,
+  other: OtherBalance[]
+} | null;
+
 export type Balance = {
   currency: string,
   amount: number,
   isOwed: boolean
 }
 
+export type OtherBalance = {
+  convertedAmount: Balance,
+  amount: Balance,
+}
+
 type FriendsState = {
   friends: FriendWithBalance[],
   loadingFriends: boolean,
-  overallBalance: {
-    main: Balance,
-    other: Balance[]
-  } | null,
+  overallBalance: OverallBalance,
   selectedFriendBalance: {
     main: Balance,
-    other: Balance[]
+    other: OtherBalance[]
   } | null,
   selectedFriendId: string | null,
   selectedTransactions: TransactionsByMonth[],
@@ -156,10 +163,7 @@ export const FriendsStore = signalStore(
         await helperService.withLoader(async () => {
           const transactions = await firstValueFrom(http.get<{
             perMonth: TransactionsByMonth[],
-            balance: {
-              "main": Balance,
-              "other": Balance[]
-            }
+            balance: OverallBalance
           }>(
             `${PRIVATE_API}/transactions/friend/byMonth`,
             {

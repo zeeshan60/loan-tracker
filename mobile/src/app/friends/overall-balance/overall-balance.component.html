@@ -1,4 +1,4 @@
-@if (overallBalance()) {
+@if (overallBalance()?.main) {
   <div class="overall-balance-wrapper">
     <div class="summary-banlance">
       <div>
@@ -21,15 +21,15 @@
     @if (hasDifferentCurrencies()) {
       <div class="other-details">
         <ion-list>
-          @for (otherBalance of sortedOtherBalance(); track otherBalance.currency) {
+          @for (otherBalance of sortedOtherBalance(); track otherBalance.amount.currency) {
             <ion-item>
               <div slot="start">
                 <p>Total :
                   <span
-                    [ngClass]="otherBalance.isOwed ? 'success': 'danger'"
+                    [ngClass]="otherBalance.amount.isOwed ? 'success': 'danger'"
                   >
-                  {{ otherBalance.amount | currency: otherBalance.currency: 'symbol' }}
-                    @if (otherBalance.isOwed) {
+                  {{ otherBalance.amount.amount | currency: otherBalance.amount.currency: 'symbol' }}
+                    @if (otherBalance.amount.isOwed) {
                       <img
                         class="arrow"
                         src="assets/images/arrow-green-downward.svg" alt="wallet"
@@ -47,10 +47,10 @@
               <div slot="end">
                 <p>
                 <span
-                  [ngClass]="otherBalance.isOwed ? 'success': 'danger'"
+                  [ngClass]="otherBalance.amount.isOwed ? 'success': 'danger'"
                 >
-                  {{ otherBalance.amount | currency: overallBalance().main.currency: 'symbol' }}
-                  @if (otherBalance.isOwed) {
+                  {{ otherBalance.convertedAmount.amount | currency: otherBalance.convertedAmount.currency: 'symbol' }}
+                  @if (otherBalance.convertedAmount.isOwed) {
                     <img
                       class="arrow"
                       src="assets/images/arrow-green-downward.svg" alt="wallet"

@@ -69,17 +69,16 @@ export class AddFriendComponent implements OnInit {
   public addFriendForm = this.formBuilder.group({
     name: this.formBuilder.nonNullable.control('', [Validators.required]),
     email: new FormControl<string|null>(null, [Validators.email]),
-    phone: this.formBuilder.group({
-      phoneNumber: this.formBuilder.nonNullable.control(''),
-      country: this.formBuilder.nonNullable.control(COUNTRIES_WITH_CALLING_CODES[0].code),
-    }),
   })
 
   constructor() {
   }
 
-  phoneFormGroup() {
-    return this.addFriendForm.get('phone') as FormGroup;
+  getSelectedPhoneValue() {
+    return {
+      phoneNumber: toNationalPhone(this.friend()?.phone!),
+      country: extractCountryCode(this.friend()?.phone!) || COUNTRIES_WITH_CALLING_CODES[0].code
+    }
   }
 
   ngOnInit() {
@@ -87,10 +86,6 @@ export class AddFriendComponent implements OnInit {
       this.addFriendForm.patchValue({
         name: this.friend()?.name,
         email: this.friend()?.email,
-        phone: {
-          phoneNumber: toNationalPhone(this.friend()?.phone!),
-          country: extractCountryCode(this.friend()?.phone!) || COUNTRIES_WITH_CALLING_CODES[0].code
-        }
       })
     } else {
       this.addFriendForm.patchValue({
