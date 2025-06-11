@@ -95,7 +95,13 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
     description: this.formBuilder.nonNullable.control('', [Validators.required, Validators.maxLength(1000)]),
     currency: this.formBuilder.nonNullable.control(CURRENCIES[0].code, [Validators.required]),
     amount: this.formBuilder.nonNullable.control<number|null>(null, [Validators.required, Validators.min(1), Validators.max(99999999999)]),
-    type: this.formBuilder.nonNullable.control<SplitOption>({ value: SplitOptionsEnum.YouPaidSplitEqually, disabled: !this.friend() }, [Validators.required]),
+    type: this.formBuilder.nonNullable.control<SplitOption>(
+      {
+        value: this.friendsStore.mostlyUsedSplitType() || SplitOptionsEnum.YouPaidSplitEqually,
+        disabled: !this.friend()
+      },
+      [Validators.required]
+    ),
     transactionDate: this.formBuilder.nonNullable.control((new Date()).toISOString(), [Validators.required]),
   });
   isOwed = () => {

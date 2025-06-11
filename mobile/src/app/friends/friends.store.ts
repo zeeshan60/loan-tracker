@@ -7,7 +7,7 @@ import { FriendWithBalance, Transaction, TransactionsByMonth } from './model'
 import { HttpClient } from '@angular/common/http';
 import { PRIVATE_API } from '../constants';
 import { LoadingController } from '@ionic/angular/standalone';
-import { SplitOption } from '../define-expense/define-expense.component';
+import { SplitOption, SplitOptionsEnum } from '../define-expense/define-expense.component';
 import { StorageService } from '../services/storage.service';
 
 export type AddFriend = {
@@ -66,16 +66,32 @@ const initialState: FriendsState = {
 export const FriendsStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
-  withComputed(({ friends, selectedFriendId }) => {
+  withComputed(({ friends, selectedFriendId, selectedTransactions }) => {
     const unSettledFriends = computed(() => friends().filter(friend => friend.mainBalance?.amount));
     const inActiveFriends = computed(() => friends().filter(friend => !friend.mainBalance?.amount)
       .sort((a, b) => a.name.localeCompare(b.name)));
     const selectedFriend = computed(() => friends().find(friend => friend.friendId === selectedFriendId()));
+    const mostlyUsedSplitType = computed(() => {
+      const map = new Map<SplitOption, number>();
+      Object.keys(SplitOptionsEnum).forEach((splitType: string) => {
+        map.set(splitType as SplitOption, 0);
+      })
+
+      selectedTransactions().forEach((byDate: TransactionsByMonth) => {
+        byDate.transactions.forEach((transaction) => {
+          map.set(transaction.splitType, map.get(transaction.splitType) + 1)
+        })
+      })
+      return Array.from(map.entries()).sort((a, b) => {
+        return a[1] > b[1] ? -1 : 1
+      })[0][0] as SplitOption;
+    })
 
     return {
       unSettledFriends,
       inActiveFriends,
-      selectedFriend
+      selectedFriend,
+      mostlyUsedSplitType
     }
   }),
   withMethods((
