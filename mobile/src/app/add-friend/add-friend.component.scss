@@ -1,15 +1,18 @@
 @import "variables.scss";
 
-ion-header{
+ion-header {
   box-shadow: none;
+
   ion-toolbar {
     // padding: 0 16px;
     --color: $color-dark;
-    --border-width: 0;  
-    ion-buttons ion-icon{
+    --border-width: 0;
+
+    ion-buttons ion-icon {
       font-size: 26px;
     }
-    ion-title{
+
+    ion-title {
       padding: 0 40px;
       text-align: left;
       text-transform: capitalize;
@@ -43,64 +46,53 @@ ion-item {
   color: $color-dark;
   font-weight: 600;
 }
-.input-field{
-  ::ng-deep .input-wrapper{
+
+.input-field {
+  ::ng-deep .input-wrapper {
     background-color: $color-mediumGrey;
     padding: 8px 16px;
     font-size: 14px;
     margin-top: 4px;
     border-radius: 10px;
-
   }
 }
 
-app-phone-with-country{
-    background: $color-mediumGrey;
-    border-radius: 10px;
-    align-items: center;
-    margin-top: 8px;
-    padding: 0 10px;
-    ::ng-deep ion-input{
-      min-width: auto !important;
-      min-height: 40px !important;
-    }
+app-phone-with-country {
+  background: $color-mediumGrey;
+  border-radius: 10px;
+  align-items: center;
+  margin-top: 8px;
+  padding: 0 10px;
 
-    ::ng-deep .country {
-      margin-top: 0;
-    }
-    ::ng-deep .country .selected-wrapper{
-      margin-top: 0 !important;
-    }
-    ::ng-deep .country .label{
-      display: none;
-    }
-    ::ng-deep .input-wrapper .label-text-wrapper{
-      display: none;
-    }
-    ::ng-deep .input-bottom {
-      border-top: 0 !important;
-    }
+  ::ng-deep ion-input {
+    min-width: auto !important;
+    min-height: 40px !important;
+  }
+
+  ::ng-deep .country {
+    margin-top: 0;
+  }
+
+  ::ng-deep .country .selected-wrapper {
+    margin-top: 0 !important;
+  }
+
+  ::ng-deep .country .label {
+    display: none;
+  }
+
+  ::ng-deep .input-wrapper .label-text-wrapper {
+    display: none;
+  }
+
+  ::ng-deep .input-bottom {
+    border-top: 0 !important;
+  }
 }
 
-.btn-group{
-    display: flex;
-    margin: 24px 0;
-    gap: 8px;
-  .btn-ghost.green{
-    text-align: center;
-    flex: 1;
-    border: 1px solid  $color-green;
-    border-radius: 40px;
-    font-size: 14px;
-    font-weight: 500;
-    color:  $color-green;
-    opacity: 1;
-    text-transform: capitalize;
-    &:hover, &:active{
-      background-color: $color-green;
-      color:  $color-white;
-      opacity: 1;
-    }
-  }
+.btn-group {
+  display: flex;
+  margin: 24px 0;
+  gap: 8px;
 }
 

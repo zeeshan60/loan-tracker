@@ -197,6 +197,7 @@ export const FriendsStore = signalStore(
       }
       if (transactionAdded) {
         this.loadSelectedTransactions()
+        this.loadFriends()
       }
     },
     async settleUp(friend: FriendWithBalance, formValue: AddUpdateExpenseFormValue) {

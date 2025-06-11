@@ -50,7 +50,11 @@
 
   <ion-buttons class="btn-group">
     <ion-button class="btn-ghost green" type="submit" form="add-friend-form" [strong]="true">
-      {{isUpdating() ? 'Update' : 'Add'}} Friend
+      @if (loading()) {
+        <ion-spinner></ion-spinner>
+      } @else {
+        {{isUpdating() ? 'Update' : 'Add'}} Friend
+      }
     </ion-button>
   </ion-buttons>
 

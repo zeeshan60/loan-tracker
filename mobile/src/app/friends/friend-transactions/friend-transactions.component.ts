@@ -56,7 +56,7 @@ export class FriendTransactionsComponent {
   readonly friendsStore = inject(FriendsStore);
   readonly transactions = this.friendsStore.selectedTransactions;
   readonly modalService = inject(ModalService);
-  readonly isLoading = computed(() => this.friendsStore.loadingFriends);
+  readonly isLoading = computed(() => this.friendsStore.loadingFriends());
 
   constructor() {}
 
