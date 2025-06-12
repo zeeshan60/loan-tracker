@@ -14,6 +14,8 @@ import { MaskitoElementPredicate } from '@maskito/core';
 import { MaskitoDirective } from '@maskito/angular';
 import { ModalService } from '../modal.service';
 import { CountriesDropdownComponent } from '../countries-dropdown/countries-dropdown.component';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { of, startWith } from 'rxjs';
 
 @Component({
   selector: 'mr-phone-with-country',
@@ -55,7 +57,7 @@ export class PhoneWithCountryComponent  implements OnInit {
   readonly phoneMasks = PHONE_MASKS;
   readonly maskPredicate: MaskitoElementPredicate = async (el) => (el as HTMLIonInputElement).getInputElement();
   countries = COUNTRIES_WITH_CALLING_CODES;
-  selectedCountryCode = signal<string>(this.parentFormGroup?.get('phone.country')!.value)
+  selectedCountryCode = signal<string>(this.parentFormGroup?.get('phone.country')?.value)
   selectedCountry = computed(() => this.countries.find(
     country => country.code === this.selectedCountryCode()
   ));
@@ -77,16 +79,19 @@ export class PhoneWithCountryComponent  implements OnInit {
   }
 
   ngOnInit() {
+    const initialSelectedCountry = this.selectedValue()?.country || COUNTRIES_WITH_CALLING_CODES[0].code;
+    this.selectedCountryCode.set(initialSelectedCountry);
     this.parentFormGroup.addControl('phone', this.fb.group({
       phoneNumber: this.fb.nonNullable.control(toNationalPhone(this.selectedValue()?.phoneNumber) || '', this.isRequired() ? [Validators.required] : []),
-      country: this.fb.nonNullable.control(this.selectedValue()?.country || COUNTRIES_WITH_CALLING_CODES[0].code)
+      country: this.fb.nonNullable.control(initialSelectedCountry)
     }));
 
-    this.parentFormGroup!.get('phone.country')!.valueChanges.subscribe((value: string) => {
-      this.selectedCountryCode.set(value);
-      this.parentFormGroup!.get('phone.phoneNumber')?.setValue('');
-      this.parentFormGroup!.get('phone.phoneNumber')?.updateValueAndValidity();
-    });
+    this.parentFormGroup!.get('phone.country')!.valueChanges
+      .subscribe((value: string) => {
+        this.selectedCountryCode.set(value);
+        this.parentFormGroup!.get('phone.phoneNumber')?.setValue('');
+        this.parentFormGroup!.get('phone.phoneNumber')?.updateValueAndValidity();
+      });
 
     const phoneNumberControl = this.parentFormGroup!.get('phone.phoneNumber');
     if (phoneNumberControl) {
