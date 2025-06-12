@@ -41,13 +41,13 @@ ion-item {
 }
 
 .activity-details {
+  width: calc(100%);
   p {
     margin: 0 0 4px;
     font-size: 14px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 175px;
   }
 
   strong {
