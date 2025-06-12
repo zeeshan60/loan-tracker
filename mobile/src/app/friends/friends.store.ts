@@ -165,7 +165,7 @@ export const FriendsStore = signalStore(
         return store.selectedFriendId() !== friendId
       }
 
-      if (store.selectedFriendId() == friendId) {
+      if (!newFriendSelected()) {
         return;
       }
 
@@ -175,7 +175,7 @@ export const FriendsStore = signalStore(
         selectedTransactions: []
       })
 
-      if (newFriendSelected()) {
+      if (friendId) {
         await this.loadSelectedTransactions()
       }
     },
