@@ -1,4 +1,4 @@
-@import "variables.scss";
+@use "variables.scss" as *;
 
 .social-login-container {
   display: flex;
@@ -126,7 +126,7 @@ ion-content {
   color:$color-blue;
   font-size: 14px;
   font-weight: 600;
-  text-transform: capitalize;  
+  text-transform: capitalize;
   padding: 0 8px;
 }
 
@@ -200,7 +200,7 @@ app-phone-with-country{
     }
     ::ng-deep .input-wrapper .label-text-wrapper{
       display: none;
-    }   
+    }
     ::ng-deep .input-bottom {
       border-top: 0 !important;
     }

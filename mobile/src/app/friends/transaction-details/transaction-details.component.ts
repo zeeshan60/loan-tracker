@@ -16,7 +16,6 @@ import { DefineExpenseComponent, SplitOptionsEnum } from '../../define-expense/d
 import { FriendsStore } from '../friends.store';
 import { HelperService } from '../../helper.service';
 import { ModalService } from '../../modal.service';
-import { DateFormatPipe } from '../../pipes/date-format.pipe';
 
 const historyChangeType = {
   [HistoryChangeTypeEnum.DESCRIPTION]: "description",
@@ -49,7 +48,6 @@ const historyChangeType = {
     IonButton,
     DatePipe,
     NgClass,
-    DateFormatPipe,
   ],
 })
 export class TransactionDetailsComponent {

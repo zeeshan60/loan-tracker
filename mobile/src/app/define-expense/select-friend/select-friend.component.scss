@@ -1,4 +1,4 @@
-@import "variables.scss";
+@use "variables.scss" as *;
 
 ion-header{
   box-shadow: none;
@@ -8,7 +8,7 @@ ion-header{
     --background: $color-mediumGrey;
     --color: $color-dark;
     --border-width: 0;
-    
+
     ion-buttons ion-icon{
       font-size: 26px;
     }
@@ -109,5 +109,5 @@ ion-content{
         align-items: center;
     }
   }
-  
+
 }

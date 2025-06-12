@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, model, OnInit, signal } from '@angular/core';
 import {
-  IonAvatar, IonButton, IonButtons, IonChip, IonContent,
+  IonAvatar, IonButtons, IonChip, IonContent,
   IonHeader,
   IonIcon,
   IonItem,
@@ -31,7 +31,7 @@ import { ModalIndex, ModalService } from '../../modal.service';
     IonItem,
     IonLabel,
     IonList,
-    IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, FormsModule, IonList, IonItem, IonAvatar, IonLabel, CurrencyPipe, IonSearchbar, IonButton, IonButtons, IonChip, IonListHeader,
+    IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, FormsModule, IonList, IonItem, IonAvatar, IonLabel, CurrencyPipe, IonSearchbar, IonButtons, IonChip, IonListHeader,
   ],
 })
 export class SelectFriendComponent {
@@ -41,12 +41,12 @@ export class SelectFriendComponent {
   modalService = inject(ModalService);
   loadingCtrl = inject(LoadingController);
   friend = input<FriendWithBalance>();
-  context = input<'ChooseFriend'|'AddFriend'>('ChooseFriend');
+  context = input<'ChooseFriend' | 'AddFriend'>('ChooseFriend');
   filter = model<string>('');
   readonly friends = computed(() => this.friendsStore.friends().filter(friend =>
-    friend.name.toLowerCase().includes(this.filter().toLowerCase())
+    friend.name.toLowerCase().includes(this.filter().toLowerCase()),
   ))
-  contacts = signal<{name: string, phoneNumber: string}[]>([]);
+  contacts = signal<{ name: string, phoneNumber: string }[]>([]);
   readonly filteredContacts = computed(() => {
     return this.contacts().filter((contact) => {
       return contact.name.toLowerCase().includes(this.filter().toLowerCase()) || contact.phoneNumber.includes(this.filter().toLowerCase())
@@ -66,7 +66,7 @@ export class SelectFriendComponent {
         for (const contact of result.contacts) {
           const number = contact.phones?.[0]?.number;
           if (number) {
-            mappedContacts.push({ name: contact.name?.display || '', phoneNumber: number })
+            mappedContacts.push({name: contact.name?.display || '', phoneNumber: number})
           }
         }
         this.contacts.set(mappedContacts);
@@ -83,20 +83,21 @@ export class SelectFriendComponent {
   }
 
   async chooseFriend(friend: FriendWithBalance) {
-      this.modalService.dismiss(this.modalIndex(), friend, 'confirm');
+    this.modalService.dismiss(this.modalIndex(), friend, 'confirm');
   }
 
-  async chooseContact(contact: { name: string, phoneNumber: string}) {
+  async chooseContact(contact: { name: string, phoneNumber: string }) {
     const loader = await this.loadingCtrl.create();
     await loader.present();
     try {
       const friend = await this.friendsStore.addFriend({
         name: contact.name,
         phoneNumber: contact.phoneNumber,
-        email: null
+        email: null,
       });
       this.chooseFriend(friend);
-    } catch (e) {} finally {
+    } catch (e) {
+    } finally {
       await loader.dismiss()
     }
   }
@@ -108,9 +109,9 @@ export class SelectFriendComponent {
   async createNewFriend() {
     const modalIndex = await this.modalService.showModal({
       component: AddFriendComponent,
-      componentProps: { name: this.filter()}
+      componentProps: {name: this.filter()},
     })
-    const { data: friend, role } = await this.modalService.onWillDismiss<FriendWithBalance>(modalIndex);
+    const {data: friend, role} = await this.modalService.onWillDismiss<FriendWithBalance>(modalIndex);
     if (role === 'confirm') {
       this.chooseFriend(friend);
     }

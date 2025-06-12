@@ -16,7 +16,6 @@ import {
   IonInput, IonItem, IonLabel, IonList, IonModal, IonSelect, IonSelectOption, IonSpinner,
   IonTitle,
   IonToolbar,
-  IonBackButton,
   IonIcon,
 } from '@ionic/angular/standalone';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -71,12 +70,11 @@ export const SplitOptionsEnum = {
     IonDatetimeButton,
     IonDatetime,
     CurrenciesDropdownComponent,
-    IonBackButton,
     IonIcon,
   ],
 })
 export class DefineExpenseComponent extends ComponentDestroyedMixin() implements OnInit {
-  readonly friend = model<FriendWithBalance|null>(null);
+  readonly friend = model<FriendWithBalance | null>(null);
   readonly loading = signal(false);
   readonly isUpdating = input(false);
   readonly modalIndex = input.required<ModalIndex>();
@@ -94,13 +92,13 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
   readonly defineExpenseForm = this.formBuilder.group({
     description: this.formBuilder.nonNullable.control('', [Validators.required, Validators.maxLength(1000)]),
     currency: this.formBuilder.nonNullable.control(CURRENCIES[0].code, [Validators.required]),
-    amount: this.formBuilder.nonNullable.control<number|null>(null, [Validators.required, Validators.min(1), Validators.max(99999999999)]),
+    amount: this.formBuilder.nonNullable.control<number | null>(null, [Validators.required, Validators.min(1), Validators.max(99999999999)]),
     type: this.formBuilder.nonNullable.control<SplitOption>(
       {
         value: this.friendsStore.mostlyUsedSplitType() || SplitOptionsEnum.YouPaidSplitEqually,
-        disabled: !this.friend()
+        disabled: !this.friend(),
       },
-      [Validators.required]
+      [Validators.required],
     ),
     transactionDate: this.formBuilder.nonNullable.control((new Date()).toISOString(), [Validators.required]),
   });
@@ -121,7 +119,7 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
 
     toObservable(this.friend)
       .pipe(
-        takeUntil(this.componentDestroyed)
+        takeUntil(this.componentDestroyed),
       )
       .subscribe(value => {
         if (!value) {
@@ -185,7 +183,7 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
       ],
     });
     actionSheet.present();
-    const { role } = await actionSheet.onWillDismiss();
+    const {role} = await actionSheet.onWillDismiss();
     return role === 'confirm';
   };
 
@@ -206,10 +204,11 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
         const updatedExpense = await this.friendsStore.addUpdateExpense(
           this.friend()!,
           this.defineExpenseForm.getRawValue(),
-          this.isUpdating() ? this.transaction() : undefined
+          this.isUpdating() ? this.transaction() : undefined,
         );
         this.modalService.dismiss(this.modalIndex(), updatedExpense, 'confirm');
-      } catch (e) {} finally {
+      } catch (e) {
+      } finally {
         this.loading.set(false);
       }
     } else {
@@ -226,11 +225,11 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
     const modalIndex = await this.modalService.showModal({
       component: SelectFriendComponent,
       componentProps: {
-        friend: this.friend()
-      }
+        friend: this.friend(),
+      },
     })
 
-    const { data: friend, role } = await this.modalService.onWillDismiss<FriendWithBalance>(modalIndex);
+    const {data: friend, role} = await this.modalService.onWillDismiss<FriendWithBalance>(modalIndex);
     if (role === 'confirm') {
       this.friend.set(friend);
     }

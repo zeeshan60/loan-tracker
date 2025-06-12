@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { IonTabs, IonTabBar, IonTabButton, IonIcon } from '@ionic/angular/standalone';
+import { IonTabs, IonTabBar, IonTabButton, IonIcon, IonFab, IonFabButton } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { FriendsStore } from '../friends/friends.store';
 import { DefineExpenseService } from '../define-expense/define-expense.service';
@@ -9,7 +9,7 @@ import { DefineExpenseService } from '../define-expense/define-expense.service';
   templateUrl: 'tabs.page.html',
   styleUrls: ['tabs.page.scss'],
   standalone: true,
-  imports: [IonTabs, IonTabBar, IonTabButton],
+  imports: [IonTabs, IonTabBar, IonTabButton, IonFab, IonFabButton, IonIcon],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TabsPage {

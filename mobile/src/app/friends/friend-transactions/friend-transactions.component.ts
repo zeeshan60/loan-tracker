@@ -18,7 +18,6 @@ import {
 import { TransactionDetailsComponent } from '../transaction-details/transaction-details.component';
 import { FriendsStore } from '../friends.store';
 import { ShortenNamePipe } from '../../pipes/shorten-name.pipe';
-import { DateFormatPipe } from '../../pipes/date-format.pipe';
 import { DefineExpenseComponent } from '../../define-expense/define-expense.component';
 import { SettleUpComponent } from './settle-up/settle-up.component';
 import { AddFriendComponent } from '../../add-friend/add-friend.component';
@@ -45,7 +44,6 @@ import { ModalService } from '../../modal.service';
     IonToolbar,
     IonBackButton,
     ShortenNamePipe,
-    DateFormatPipe,
     OverallBalanceComponent,
     DatePipe,
   ],

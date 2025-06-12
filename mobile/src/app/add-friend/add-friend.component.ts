@@ -16,7 +16,6 @@ import {
   IonTitle,
   IonToolbar,
   IonLabel,
-  IonBackButton,
   IonIcon,
 } from '@ionic/angular/standalone';
 import {
@@ -53,13 +52,12 @@ import { ModalIndex, ModalService } from '../modal.service';
     IonSpinner,
     ReactiveFormsModule,
     IonItem, IonList, PhoneWithCountryComponent,
-    IonBackButton,
     IonIcon,
-  ]
+  ],
 })
 export class AddFriendComponent implements OnInit {
   @Input() name: string = '';
-  readonly friend = input<FriendWithBalance|null>(null);
+  readonly friend = input<FriendWithBalance | null>(null);
   readonly isUpdating = input(false);
   readonly modalIndex = input.required<ModalIndex>();
   readonly friendsStore = inject(FriendsStore);
@@ -69,18 +67,18 @@ export class AddFriendComponent implements OnInit {
   readonly loading = signal(false);
   public addFriendForm = this.formBuilder.group({
     name: this.formBuilder.nonNullable.control('', [Validators.required]),
-    email: new FormControl<string|null>(null, [Validators.email]),
+    email: new FormControl<string | null>(null, [Validators.email]),
   }, {
     validators: [(control: AbstractControl): ValidationErrors | null => {
       const email = control.get('email') as AbstractControl;
       const phone = control.get('phone') as FormGroup;
 
       if (!email.value && !phone?.get('phoneNumber').value) {
-        return { noContactInformation: true };
+        return {noContactInformation: true};
       }
 
       return null;
-    }]
+    }],
   })
 
   constructor() {
@@ -89,7 +87,7 @@ export class AddFriendComponent implements OnInit {
   getSelectedPhoneValue() {
     return {
       phoneNumber: toNationalPhone(this.friend()?.phone!),
-      country: extractCountryCode(this.friend()?.phone!) || COUNTRIES_WITH_CALLING_CODES[0].code
+      country: extractCountryCode(this.friend()?.phone!) || COUNTRIES_WITH_CALLING_CODES[0].code,
     }
   }
 

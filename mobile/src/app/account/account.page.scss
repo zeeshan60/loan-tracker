@@ -1,4 +1,4 @@
-@import "variables.scss";
+@use "variables.scss" as *;
 
 ion-card-content {
   ion-icon {
@@ -20,8 +20,8 @@ ion-header{
     padding: 16px 4px 16px 16px;
     // background-color: transparent;
     background: linear-gradient(to right, $color-blue 0%, $color-green 100%);
-    --background: transparent;  
-    --color: $color-white;   
+    --background: transparent;
+    --color: $color-white;
     --border-width: 0;
     ion-title{
       padding:0;
@@ -98,7 +98,7 @@ ion-list{
     font-weight: 500;
     padding: 8px 12px;
     background: $color-white;
-    --inner-padding-end: 0px; 
+    --inner-padding-end: 0px;
 
     &::part(native){
       padding: 0;
@@ -121,7 +121,7 @@ ion-list{
           border: 1px solid $color-lightGrey;
         }
     }
-  
+
   }
 }
 .btn-save{
