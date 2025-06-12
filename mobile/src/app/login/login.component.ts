@@ -6,14 +6,11 @@ import {
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
 } from '@angular/fire/auth';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import {
   IonButton,
   IonContent,
-  IonHeader,
-  IonIcon, IonInput, IonItem, IonLabel,
-  IonTitle,
-  IonToolbar,
+  IonInput, IonItem, IonLabel,
 } from '@ionic/angular/standalone';
 import {AuthStore} from './auth.store';
 import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -24,15 +21,16 @@ import {
   FirebaseErrorCodeMessageEnum,
 } from './types';
 import { extractFirebaseErrorMessage } from '../utility-functions';
+import { PhoneWithCountryComponent } from '../phone-with-country/phone-with-country.component';
 
 type ActiveUi = 'login' | 'signup' | 'forgotPassword';
 
 @Component({
-  selector: 'app-login',
+  selector: 'mr-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
   standalone: true,
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonIcon, IonIcon, IonItem, IonLabel, IonInput, FormsModule, ReactiveFormsModule],
+  imports: [IonContent, IonButton, IonItem, IonLabel, IonInput, FormsModule, ReactiveFormsModule, PhoneWithCountryComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent {
@@ -48,7 +46,13 @@ export class LoginComponent {
     email: this.fb.nonNullable.control('', [Validators.required, Validators.email]),
     password: this.fb.nonNullable.control('', [Validators.required]),
   });
+
   readonly signUpForm = this.fb.group({
+    name: this.fb.nonNullable.control('', [
+      Validators.required,
+      Validators.minLength(3),
+      Validators.maxLength(100)
+    ]),
     email: this.fb.nonNullable.control('', [Validators.required, Validators.email]),
     password: this.fb.nonNullable.control('', [
       Validators.minLength(6),

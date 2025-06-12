@@ -16,6 +16,8 @@ import {
   IonInput, IonItem, IonLabel, IonList, IonModal, IonSelect, IonSelectOption, IonSpinner,
   IonTitle,
   IonToolbar,
+  IonBackButton,
+  IonIcon,
 } from '@ionic/angular/standalone';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { map, startWith, takeUntil } from 'rxjs';
@@ -45,10 +47,9 @@ export const SplitOptionsEnum = {
 } as const satisfies Record<string, string>;
 
 @Component({
-  selector: 'app-define-expense',
+  selector: 'mr-define-expense',
   templateUrl: './define-expense.component.html',
   styleUrls: ['./define-expense.component.scss'],
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     IonInput,
@@ -70,6 +71,8 @@ export const SplitOptionsEnum = {
     IonDatetimeButton,
     IonDatetime,
     CurrenciesDropdownComponent,
+    IonBackButton,
+    IonIcon,
   ],
 })
 export class DefineExpenseComponent extends ComponentDestroyedMixin() implements OnInit {
@@ -92,7 +95,13 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
     description: this.formBuilder.nonNullable.control('', [Validators.required, Validators.maxLength(1000)]),
     currency: this.formBuilder.nonNullable.control(CURRENCIES[0].code, [Validators.required]),
     amount: this.formBuilder.nonNullable.control<number|null>(null, [Validators.required, Validators.min(1), Validators.max(99999999999)]),
-    type: this.formBuilder.nonNullable.control<SplitOption>({ value: SplitOptionsEnum.YouPaidSplitEqually, disabled: !this.friend() }, [Validators.required]),
+    type: this.formBuilder.nonNullable.control<SplitOption>(
+      {
+        value: this.friendsStore.mostlyUsedSplitType() || SplitOptionsEnum.YouPaidSplitEqually,
+        disabled: !this.friend()
+      },
+      [Validators.required]
+    ),
     transactionDate: this.formBuilder.nonNullable.control((new Date()).toISOString(), [Validators.required]),
   });
   isOwed = () => {
@@ -153,8 +162,8 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
     let currency = CURRENCIES[0].code;
     if (this.authStore.user()?.currency) {
       currency = this.authStore.user()?.currency!;
-    } else if (this.friend()?.otherBalances?.[0].currency) {
-      currency = this.friend()?.otherBalances?.[0].currency!;
+    } else if (this.friend()?.otherBalances?.[0]?.amount.currency) {
+      currency = this.friend()?.otherBalances?.[0]?.amount.currency!;
     } else if (CURRENCIES_CODES.includes(this.authStore.region()?.currency || '')) {
       currency = this.authStore.region()?.currency!;
     }

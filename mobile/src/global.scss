@@ -35,20 +35,28 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import "@ionic/angular/css/palettes/dark.system.css";
+@import url('https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap');
+
+@import "variables";
+
+
+*, body, ion-app, ion-content, h1, h2, h3, h4, h5, h6, label, p, ion-input, ion-label, ion-button, button {
+  font-family: "Onest", sans-serif !important;
+}
+ion-select,
+ion-select::part(text),
+ion-select::part(placeholder),
+ion-action-sheet::part(title),
+ion-action-sheet::part(sub-title),
+ion-action-sheet::part(button),
+ion-action-sheet::part(button-text) {
+  font-family: 'Onest', sans-serif !important;
+}
 
 .strike {
   text-decoration: line-through;
 }
 
-.overall-balance-wrapper {
-  font-size: 1.3rem;
-  .other-balance-amount {
-    font-weight: bold;
-    font-size: 14px;
-    padding-left: 15px;
-    padding-right: 15px;
-  }
-}
 .action-sheet-button {
   &.red, &.green {
     font-size: 1.2rem;
@@ -66,9 +74,54 @@ this rule used to style the heading of the ion-list
  */
 ion-item.group-label-item {
   height: 30px;
+  --background: transparent;
   ion-label {
     margin: 0;
     font-size: 12px !important;
   }
+}
+
+ion-label.small {
+  font-size: 0.9em;
+}
+
+.success {
+  color: $color-green;
+}
+
+.danger {
+  color: $color-red;
+}
+
+.btn-ghost.green {
+  text-align: center;
+  flex: 1;
+  border: 1px solid $color-green;
+  border-radius: 40px;
+  font-size: 14px;
+  font-weight: 500;
+  color: $color-green;
+  opacity: 1;
+  text-transform: capitalize;
+
+  &:hover, &:active {
+    background-color: $color-green;
+    color: $color-white;
+    opacity: 1;
+  }
+  ion-spinner {
+    color: $color-white;
+  }
+}
+
+.btn-filled.red {
+  text-align: center;
+  flex: 1;
+  border: 1px solid $color-red;
+  border-radius: 40px;
+  font-size: 14px;
+  font-weight: 500;
+  color: $color-red;
+  background-color: $color-white;
 }
 

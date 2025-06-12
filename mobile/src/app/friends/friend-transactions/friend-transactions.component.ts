@@ -1,5 +1,5 @@
 import { Component, computed, inject, input, Signal, signal } from '@angular/core';
-import { CurrencyPipe } from '@angular/common';
+import { CurrencyPipe, DatePipe } from '@angular/common';
 import {
   IonAvatar,
   IonBackButton,
@@ -26,7 +26,7 @@ import { OverallBalanceComponent } from '../overall-balance/overall-balance.comp
 import { ModalService } from '../../modal.service';
 
 @Component({
-  selector: 'app-friend-transactions',
+  selector: 'mr-friend-transactions',
   templateUrl: './friend-transactions.component.html',
   styleUrls: ['./friend-transactions.component.scss'],
   standalone: true,
@@ -47,15 +47,16 @@ import { ModalService } from '../../modal.service';
     ShortenNamePipe,
     DateFormatPipe,
     OverallBalanceComponent,
+    DatePipe,
   ],
 })
 export class FriendTransactionsComponent {
   readonly friend = computed(() => this.friendsStore.selectedFriend());
-  readonly isLoading = signal(false);
   readonly nav = inject(IonNav);
   readonly friendsStore = inject(FriendsStore);
   readonly transactions = this.friendsStore.selectedTransactions;
   readonly modalService = inject(ModalService);
+  readonly isLoading = computed(() => this.friendsStore.loadingFriends());
 
   constructor() {}
 
@@ -89,7 +90,6 @@ export class FriendTransactionsComponent {
   }
 
   async settleUp() {
-    console.log(this.friend());
     this.modalService.showModal({
       component: SettleUpComponent,
       componentProps: {

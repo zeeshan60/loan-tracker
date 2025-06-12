@@ -13,7 +13,7 @@ type Item = {
   optionLabel: string, [key: string]: any
 };
 @Component({
-  selector: 'app-select-modal',
+  selector: 'mr-select-modal',
   templateUrl: './select-modal.component.html',
   styleUrls: ['./select-modal.component.scss'],
   standalone: true,

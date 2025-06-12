@@ -7,7 +7,7 @@ import { AuthStore } from '../login/auth.store';
 import { FriendsStore } from '../friends/friends.store';
 
 @Component({
-  selector: 'app-currencies-dropdown',
+  selector: 'mr-currencies-dropdown',
   templateUrl: './currencies-dropdown.component.html',
   styleUrls: ['./currencies-dropdown.component.scss'],
   standalone: true,

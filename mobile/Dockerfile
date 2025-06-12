@@ -33,7 +33,7 @@ RUN npm run build-$BUILD_CONFIG
 FROM nginx:alpine
 
 # Copy the built Ionic app from the build stage to the Nginx HTML directory.
-COPY --from=build-stage /app/www /usr/share/nginx/html
+COPY --from=build-stage /app/www/browser /usr/share/nginx/html
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 

@@ -1,19 +1,48 @@
 <ion-tabs>
   <ion-tab-bar slot="bottom">
     <ion-tab-button tab="friends" href="/tabs/friends">
-      <ion-icon name="people-outline"></ion-icon>
+      <div class="tab">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9.02 2.84004L3.63 7.04004C2.73 7.74004 2 9.23004 2 10.36V17.77C2 20.09 3.89 21.99 6.21 21.99H17.79C20.11 21.99 22 20.09 22 17.78V10.5C22 9.29004 21.19 7.74004 20.2 7.05004L14.02 2.72004C12.62 1.74004 10.37 1.79004 9.02 2.84004Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 17.99V14.99" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <label>Home</label>
+      </div>
     </ion-tab-button>
 
     <ion-tab-button (click)="addNewExpense()">
-      <ion-icon name="add-circle-outline"></ion-icon>
+      <div class="tab">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 22C17.5 22 22 17.5 22 12C22 6.5 17.5 2 12 2C6.5 2 2 6.5 2 12C2 17.5 6.5 22 12 22Z" stroke="#2D2F35" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M8 12H16" stroke="#2D2F35" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 16V8" stroke="#2D2F35" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <label>Add</label>
+      </div>
     </ion-tab-button>
 
     <ion-tab-button tab="activity-log" href="/tabs/activity-log">
-      <ion-icon name="list-outline"></ion-icon>
+      <div class="tab">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12.37 8.88H17.62" stroke="#2D2F35" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M6.38 8.88L7.13 9.63L9.38 7.38" stroke="#2D2F35" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12.37 15.88H17.62" stroke="#2D2F35" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M6.38 15.88L7.13 16.63L9.38 14.38" stroke="#2D2F35" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M9 22H15C20 22 22 20 22 15V9C22 4 20 2 15 2H9C4 2 2 4 2 9V15C2 20 4 22 9 22Z" stroke="#2D2F35" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <label>Activity</label>
+      </div>
     </ion-tab-button>
 
     <ion-tab-button tab="account" href="/tabs/account">
-      <ion-icon name="settings-outline"></ion-icon>
+      <div class="tab">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 9.10998V14.88C3 17 3 17 5 18.35L10.5 21.53C11.33 22.01 12.68 22.01 13.5 21.53L19 18.35C21 17 21 17 21 14.89V9.10998C21 6.99998 21 6.99999 19 5.64999L13.5 2.46999C12.68 1.98999 11.33 1.98999 10.5 2.46999L5 5.64999C3 6.99999 3 6.99998 3 9.10998Z" stroke="#2D2F35" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="#2D2F35" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <label>Setting</label>
+      </div>
     </ion-tab-button>
+
   </ion-tab-bar>
 </ion-tabs>

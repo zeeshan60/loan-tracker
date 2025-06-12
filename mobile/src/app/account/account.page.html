@@ -1,54 +1,62 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
     <ion-title>
       Account settings
     </ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="authStore.signOut()">
-        Sign Out
+        <img src="assets/images/logout-icon.svg" alt="icon"/>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 @if (user()) {
-  <ion-content class="ion-padding">
-    @if (user()?.photoUrl) {
-      <img [alt]="user()?.displayName + ' picture'" [src]="user()?.photoUrl" />
-    } @else {
-      <img alt="Silhouette of a person's head" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
-    }
-    <ion-label>{{user()?.displayName}}</ion-label>
-    <ion-list>
-      <ion-item>
-        <ion-icon name="mail-outline"></ion-icon>
-        <ion-label>{{user()?.email || 'N/A'}}</ion-label>
-      </ion-item>
+  <ion-content [fullscreen]="true">
+
+    <div class="top-section"></div>
+    <div class="bottom-section"></div>
+
+    <div class="profile-wrapper">
+      @if (user()?.photoUrl) {
+        <img [alt]="user()?.displayName + ' picture'" [src]="user()?.photoUrl"/>
+      } @else {
+        <img alt="Silhouette of a person's head" src="https://ionicframework.com/docs/img/demos/avatar.svg"/>
+      }
+      <h2>{{ user()?.displayName }}</h2>
+      <p>{{ user()?.email || 'N/A' }}</p>
+
+    </div>
+
+    <ion-list class="ion-margin">
+
       <ion-item>
         <ion-label>Default currency</ion-label>
-        <app-currencies-dropdown
+        <mr-currencies-dropdown
           slot="end"
           class="currency-dropdown"
           [selectedCurrency]="userCurrency()"
           [label]="''"
           (selected)="updateDefaultCurrency($event)"
-        ></app-currencies-dropdown>
+        ></mr-currencies-dropdown>
       </ion-item>
+
       <ion-item>
         @if (!phoneInEditMode()) {
           <ion-icon name="call-outline"></ion-icon>
-          <ion-label>{{user()?.phoneNumber | phone }}</ion-label>
-          <ion-icon (click)="phoneInEditMode.set(true)" slot="end" name="create-outline"></ion-icon>
+          <ion-label>{{ user()?.phoneNumber | phone }}</ion-label>
+
+          <img (click)="phoneInEditMode.set(true)" slot="end" src="assets/images/edit.svg" alt="icon"/>
+
         } @else {
           <form [formGroup]="phoneForm" (ngSubmit)="savePhoneNumber()" id="save-phone-form">
-          <app-phone-with-country
-            [group]="phoneForm"
-          ></app-phone-with-country>
+            <mr-phone-with-country [selectedValue]="selectedPhone()" [isRequired]="true"></mr-phone-with-country>
           </form>
           @if (loading()) {
             <ion-spinner slot="end"></ion-spinner>
           } @else {
-            <ion-button slot="end" type="submit" form="save-phone-form" [strong]="true">Save</ion-button>
+            <ion-button class="btn-save" slot="end" type="submit" form="save-phone-form"><img
+              src="assets/images/save-icon.svg" alt="icon"/></ion-button>
           }
         }
       </ion-item>

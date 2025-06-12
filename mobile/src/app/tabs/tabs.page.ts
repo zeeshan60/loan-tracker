@@ -5,11 +5,11 @@ import { FriendsStore } from '../friends/friends.store';
 import { DefineExpenseService } from '../define-expense/define-expense.service';
 
 @Component({
-  selector: 'app-tabs',
+  selector: 'mr-tabs',
   templateUrl: 'tabs.page.html',
   styleUrls: ['tabs.page.scss'],
   standalone: true,
-  imports: [IonTabs, IonTabBar, IonTabButton, IonIcon],
+  imports: [IonTabs, IonTabBar, IonTabButton],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TabsPage {

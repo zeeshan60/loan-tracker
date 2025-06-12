@@ -1,8 +1,5 @@
 <ion-header>
   <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button></ion-back-button>
-    </ion-buttons>
     <ion-title>Activity Log</ion-title>
   </ion-toolbar>
 </ion-header>
@@ -11,31 +8,43 @@
   <ion-list>
     @if (activities$) {
       @for( activity of activities$ | async; track activity.date) {
-        <ion-item (click)="openTransaction(activity)" button>
-          <ion-avatar slot="start">
+    <ion-item (click)="openTransaction(activity)" button>
+      <ion-avatar slot="start">
             @if (activity.activityByPhoto) {
-              <img [src]="activity.activityByPhoto" alt="photo" />
+              <img [src]="activity.activityByPhoto" alt="photo"/>
             } @else {
               <ion-icon color="medium" size="large" name="receipt-outline"></ion-icon>
             }
-          </ion-avatar>
-          <ion-label>
-            <strong>{{activity.activityByName | shortenName}}</strong> {{ActivityTypeLabel[activity.activityType].toLowerCase()}} <strong>{{activity.description}}</strong>
-            <ion-label
+      </ion-avatar>
+      <div class="activity-details">
+
+        <p>
+          <strong>{{activity.activityByName | shortenName}}</strong>
+          {{ActivityTypeLabel[activity.activityType].toLowerCase()}}
+          <strong>{{activity.description}}</strong>
+        </p>
+
+        <ion-label
               [class.strike]="activity.activityType === ActivityType.DELETED"
               [color]="activity.isOwed ? 'success' : 'danger'"
             >
-              You {{activity.isOwed ? 'get back' : 'owe'}} {{activity.amount | currency: activity.currency : 'symbol-narrow'}}
-            </ion-label>
-            <p>{{ activity.date | date: 'd MMM \'at\' h:mma': 'en-US' }}</p>
-          </ion-label>
-        </ion-item>
+              You {{activity.isOwed ? 'get back' : 'owe'}}
+          {{activity.amount | currency: activity.currency : 'symbol-narrow'}}
+        </ion-label>
+      </div>
+      <p class="date-and-time"  slot="end">
+        {{ activity.date | date: 'd MMM': 'en-US' }}
+        <br>
+        {{ activity.date | date: '\'at\' h:mma': 'en-US' }}
+      </p>
+
+    </ion-item>
       } @empty {
         <ion-item disabled="true">
-          <ion-label>
-            <h2>No activities yet.</h2>
-          </ion-label>
-        </ion-item>
+      <ion-label>
+        <h2>No activities yet.</h2>
+      </ion-label>
+    </ion-item>
       }
     }
   </ion-list>

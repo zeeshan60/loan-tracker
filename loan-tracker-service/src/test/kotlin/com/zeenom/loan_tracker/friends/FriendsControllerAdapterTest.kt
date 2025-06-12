@@ -23,15 +23,27 @@ class FriendsControllerAdapterTest {
                     currency = Currency.getInstance("USD"),
                     isOwed = false
                 ), listOf(
-                    AmountDto(
-                        amount = 100.0.toBigDecimal(),
-                        currency = Currency.getInstance("SGD"),
-                        isOwed = true
+                    OtherBalanceDto(
+                        AmountDto(
+                            amount = 100.0.toBigDecimal(),
+                            currency = Currency.getInstance("SGD"),
+                            isOwed = true
+                        ), AmountDto(
+                            amount = 100.0.toBigDecimal(),
+                            currency = Currency.getInstance("SGD"),
+                            isOwed = true
+                        )
                     ),
-                    AmountDto(
-                        amount = 200.0.toBigDecimal(),
-                        currency = Currency.getInstance("USD"),
-                        isOwed = false
+                    OtherBalanceDto(
+                        AmountDto(
+                            amount = 200.0.toBigDecimal(),
+                            currency = Currency.getInstance("USD"),
+                            isOwed = false
+                        ), AmountDto(
+                            amount = 200.0.toBigDecimal(),
+                            currency = Currency.getInstance("USD"),
+                            isOwed = false
+                        )
                     )
                 )
             )
@@ -54,9 +66,9 @@ class FriendsControllerAdapterTest {
         assertThat(result.mainBalance?.currency).isEqualTo("USD")
         assertThat(result.mainBalance?.isOwed).isFalse()
         assertThat(result.otherBalances.size).isEqualTo(2)
-        assertThat(result.otherBalances[0].amount).isEqualTo(100.0.toBigDecimal())
-        assertThat(result.otherBalances[0].currency).isEqualTo("SGD")
-        assertThat(result.otherBalances[0].isOwed).isTrue()
+        assertThat(result.otherBalances[0].amount.amount).isEqualTo(100.0.toBigDecimal())
+        assertThat(result.otherBalances[0].amount.currency).isEqualTo("SGD")
+        assertThat(result.otherBalances[0].amount.isOwed).isTrue()
     }
 
     @Test

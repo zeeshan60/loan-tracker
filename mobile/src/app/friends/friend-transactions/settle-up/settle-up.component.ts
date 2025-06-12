@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, input, OnInit, signal } from '@angular/core';
 import {
   IonButton,
   IonButtons, IonContent,
@@ -6,6 +6,8 @@ import {
   IonSpinner,
   IonTitle,
   IonToolbar,
+  IonLabel,
+  IonIcon,
 } from '@ionic/angular/standalone';
 import { FriendsStore } from '../../friends.store';
 import { FriendWithBalance } from '../../model';
@@ -15,13 +17,12 @@ import { SplitOptionsEnum } from '../../../define-expense/define-expense.compone
 import { HttpClient } from '@angular/common/http';
 import { HelperService } from '../../../helper.service';
 import { Router } from '@angular/router';
-import { ComponentDestroyedMixin } from '../../../component-destroyed.mixin';
-import { takeUntil } from 'rxjs';
 import { DecimalPipe, NgClass } from '@angular/common';
 import { ModalIndex, ModalService } from '../../../modal.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
-  selector: 'app-settle-up',
+  selector: 'mr-settle-up',
   templateUrl: './settle-up.component.html',
   styleUrls: ['./settle-up.component.scss'],
   standalone: true,
@@ -42,9 +43,12 @@ import { ModalIndex, ModalService } from '../../../modal.service';
     ReactiveFormsModule,
     NgClass,
     DecimalPipe,
+    IonLabel,
+    IonIcon,
   ],
 })
-export class SettleUpComponent extends ComponentDestroyedMixin() implements OnInit {
+export class SettleUpComponent implements OnInit {
+  destroyRef = inject(DestroyRef);
   modalIndex = input.required<ModalIndex>();
   modalService = inject(ModalService);
   friendsStore = inject(FriendsStore);
@@ -55,7 +59,7 @@ export class SettleUpComponent extends ComponentDestroyedMixin() implements OnIn
   readonly formBuilder = inject(FormBuilder);
   readonly otherBalances = computed(() => {
     const obj: { [key: string]: { isOwed: boolean, amount: number } } = {};
-    this.friend().otherBalances?.forEach(balance => {
+    this.friend().otherBalances?.forEach(({amount: balance}) => {
       obj[balance.currency] = { isOwed: balance.isOwed, amount: balance.amount }
     })
     return obj;
@@ -63,22 +67,21 @@ export class SettleUpComponent extends ComponentDestroyedMixin() implements OnIn
   readonly router = inject(Router);
   readonly settleUpForm = this.formBuilder.group({
     balance: this.formBuilder.nonNullable.control({ currency: 'PKR', isOwed: true, amount: 0}, [Validators.required]),
-    amount: this.formBuilder.nonNullable.control<number|null>(null, [Validators.required, Validators.min(1), Validators.max(100000000)]),
+    amount: this.formBuilder.nonNullable.control<number|null>(null, [Validators.required, Validators.min(1)]),
   });
-
-  constructor() {
-    super();
-  }
 
   ngOnInit() {
     this.settleUpForm.get('balance')?.valueChanges
       .pipe(
-        takeUntil(this.componentDestroyed)
+        takeUntilDestroyed(this.destroyRef)
       )
-      .subscribe((currency) => {
-        this.settleUpForm.get('amount')?.setValue(this.otherBalances()[currency.currency].amount)
+      .subscribe((balance) => {
+        this.settleUpForm.get('amount')?.setValue(this.otherBalances()[balance.currency].amount)
+        this.settleUpForm.get('amount').clearValidators()
+        this.settleUpForm.get('amount').addValidators([Validators.required, Validators.min(1), Validators.max(balance.amount)])
+        this.settleUpForm.get('amount').updateValueAndValidity();
       });
-    this.settleUpForm.get('balance')?.setValue(this.friend().otherBalances?.[0] || { currency: 'PKR', isOwed: true, amount: 0})
+    this.settleUpForm.get('balance')?.setValue(this.friend().otherBalances?.[0]?.amount || { currency: 'PKR', isOwed: true, amount: 0})
   }
 
   async closePopup() {
@@ -86,24 +89,25 @@ export class SettleUpComponent extends ComponentDestroyedMixin() implements OnIn
   }
 
   async submit() {
-    if (this.settleUpForm.valid) {
-      try {
-        this.loading.set(true);
-        const transaction = {
-          currency: this.settleUpForm.get('balance')!.value.currency,
-          amount: this.settleUpForm.get('amount')!.value,
-          type: this.settleUpForm.get('balance')!.value.isOwed ? SplitOptionsEnum.TheyPaidToSettle : SplitOptionsEnum.YouPaidToSettle,
-          transactionDate: (new Date()).toISOString(),
-          description: 'settlement'
-        }
-        await this.friendsStore.settleUp(this.friend(), transaction);
-        this.modalService.dismiss(this.modalIndex(), 'done', 'confirm');
-      } catch (e) {} finally {
-        this.loading.set(false);
-      }
-    } else {
+    if (!this.settleUpForm.valid) {
       this.settleUpForm.markAllAsTouched();
       await this.helperService.showToast('Please fill in the correct values');
+      return;
+    }
+
+    const confirmation = await this.helperService.showConfirmAlert(
+      `You are going to settle up everything with ${this.friend().name}.`, 'Yes'
+    )
+    if (confirmation.role == 'confirm') {
+      const transaction = {
+        currency: this.settleUpForm.get('balance')!.value.currency,
+        amount: this.settleUpForm.get('amount')!.value,
+        type: this.settleUpForm.get('balance')!.value.isOwed ? SplitOptionsEnum.TheyPaidToSettle : SplitOptionsEnum.YouPaidToSettle,
+        transactionDate: (new Date()).toISOString(),
+        description: 'settlement'
+      }
+      await this.friendsStore.settleUp(this.friend(), transaction);
+      this.modalService.dismiss(this.modalIndex(), 'done', 'confirm');
     }
   }
 }

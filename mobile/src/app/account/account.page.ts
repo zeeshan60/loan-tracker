@@ -26,7 +26,7 @@ import { ModalService } from '../modal.service';
 import { CurrenciesDropdownComponent } from '../currencies-dropdown/currencies-dropdown.component';
 
 @Component({
-  selector: 'app-account',
+  selector: 'mr-account',
   templateUrl: 'account.page.html',
   styleUrls: ['account.page.scss'],
   standalone: true,
@@ -47,10 +47,11 @@ export class AccountPage {
   private helperService = inject(HelperService);
   private toastCtrl = inject(ToastController);
   readonly loading = signal(false);
-  public phoneForm = this.formBuilder.group({
-    phoneNumber: this.formBuilder.nonNullable.control(toNationalPhone(this.user()?.phoneNumber || ''), [Validators.required]),
-    country: this.formBuilder.nonNullable.control(extractCountryCode(this.user()?.phoneNumber || COUNTRIES_WITH_CALLING_CODES[0].code)),
-  })
+  public phoneForm = this.formBuilder.group({})
+  readonly selectedPhone = computed(() => ({
+    phoneNumber: this.user()?.phoneNumber,
+    country: extractCountryCode(this.user()?.phoneNumber)
+  }))
 
   constructor() {
     this.authStore.loadUserData();
@@ -61,8 +62,8 @@ export class AccountPage {
       try {
         this.loading.set(true);
         const phoneNumber = toInternationalPhone(
-          this.phoneForm.get('phoneNumber')?.value!,
-          this.phoneForm.get('country')?.value!
+          this.phoneForm.get('phone.phoneNumber')?.value!,
+          this.phoneForm.get('phone.country')?.value!
         );
         await this.authStore.updateUserData({
           phoneNumber,

@@ -1,0 +1,69 @@
+@import "variables.scss";
+
+ion-header {
+  box-shadow: none;
+
+  ion-toolbar {
+    padding: 16px;
+    background: linear-gradient(to right, $color-blue 0%, $color-green 100%);
+    --background: transparent;
+    --color: $color-white;
+    --border-width: 0;
+
+    ion-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: $color-white;
+      padding: 0 40px;
+      text-align: left;
+    }
+  }
+}
+
+ion-content::part(background) {
+  background-color: $color-mediumGrey;
+}
+
+ion-list {
+  background: transparent;
+  margin: 0 16px;
+}
+
+ion-item {
+  --border-color: transparent !important;
+  margin: 6px 0;
+  border-radius: 10px;
+  border: 1px solid $color-lightGrey;
+
+  &::part(detail-icon) {
+    display: none !important;
+  }
+}
+
+.activity-details {
+  p {
+    margin: 0 0 4px;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 175px;
+  }
+
+  strong {
+    font-weight: 600;
+  }
+
+  ion-label {
+    font-size: 12px;
+  }
+}
+
+.date-and-time {
+  font-size: 11px;
+  text-align: right;
+  width: 60px;
+  margin: 12px 0;
+  color: $color-grey;
+  line-height: 1.8;
+}

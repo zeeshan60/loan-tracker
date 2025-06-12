@@ -293,3 +293,8 @@ data class AmountResponse(
     val currency: String,
     val isOwed: Boolean,
 )
+
+data class OtherBalanceResponse(
+    val amount: AmountResponse,
+    val convertedAmount: AmountResponse,
+)

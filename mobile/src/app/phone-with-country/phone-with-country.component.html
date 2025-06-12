@@ -1,11 +1,8 @@
-<ng-container  [formGroup]="group()!">
-  <app-fake-dropdown
+<ng-container  formGroupName="phone">
+  <mr-countries-dropdown
     class="country"
-    [class.has-error]="!!getErrorTextForPhone() && group()?.touched"
-    [label]="'Country'"
-    [selectedText]="selectedCountryText()"
-    (click)="chooseCountry()"
-  ></app-fake-dropdown>
+    formControlName="country"
+  ></mr-countries-dropdown>
   <ion-input
     type="tel"
     labelPlacement="stacked"

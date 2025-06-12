@@ -1,11 +1,10 @@
 import {patchState, signalStore, withMethods, withState} from '@ngrx/signals';
 import {inject} from '@angular/core';
 import {HelperService} from '../helper.service';
-import {HttpClient} from '@angular/common/http';
+import { HttpClient, HttpContext, HttpContextToken } from '@angular/common/http';
 import {Router} from '@angular/router';
 import {ToastController} from '@ionic/angular/standalone';
 import {StorageService} from '../services/storage.service';
-import {MethodsDictionary} from '@ngrx/signals/src/signal-store-models';
 import {DEFAULT_TOAST_DURATION, PRIVATE_API, PUBLIC_API} from '../constants';
 import {LoadingController} from '@ionic/angular/standalone';
 import {FriendsStore} from '../friends/friends.store';
@@ -17,7 +16,7 @@ import {Capacitor} from '@capacitor/core';
 import {LoginPlugin} from 'zeenom-capacitor-social-login';
 import {ModalService} from '../modal.service';
 import {environment} from "../../environments/environment";
-
+export const IS_PUBLIC_API = new HttpContextToken<boolean>(() => false);
 export interface User {
   uid: string,
   email: string,
@@ -55,28 +54,6 @@ const initialState: AuthState = {
   region: null
 }
 
-interface Methods extends MethodsDictionary {
-  loginWithGoogle(): Promise<boolean | void>;
-
-  setApiKey(): Promise<void>;
-
-  signOut(): Promise<void>;
-
-  login(idToken?: string): Promise<void>;
-
-  loadUserData(userData?: User): Promise<void>;
-
-  loadUserRegion(): Promise<void>;
-
-  fetchAndSaveUserData(): Promise<void>;
-
-  updateUserData(data: Partial<User>): Promise<void>;
-
-  askForPhoneNumber(): Promise<void>;
-
-  getLoginPluginToken(): Promise<string>;
-}
-
 export const AuthStore = signalStore(
   {providedIn: 'root'},
   withState(initialState),
@@ -91,7 +68,7 @@ export const AuthStore = signalStore(
     storageService = inject(StorageService),
     loadingCtrl = inject(LoadingController),
     friendsStore = inject(FriendsStore),
-  ): Methods => ({
+  ) => ({
     async loadUserData(userData?: User): Promise<void> {
       patchState(store, {user: userData || await storageService.get('user_data')})
     },
@@ -155,22 +132,20 @@ export const AuthStore = signalStore(
       await modalService.showModal({
         component: AskForPhoneComponent,
         componentProps: {
-          user: store.user(),
           region: store.region()
         }
       })
     },
 
     async login(idToken: string) {
-      const loader = await loadingCtrl.create({duration: 2000});
+      const loader = await loadingCtrl.create();
       try {
         loader.present();
         const url = `${PUBLIC_API}/login`
-        console.log('zeeshan_debug: login url:', url);
         const {token: apiKey} = await firstValueFrom(
           http.post<{ token: string }>(url, {
             idToken: `Bearer ${idToken}`
-          })
+          }, { context: new HttpContext().set(IS_PUBLIC_API, true)})
         );
         await storageService.set('api_key', apiKey);
         patchState(store, {apiKey: apiKey})
@@ -181,9 +156,7 @@ export const AuthStore = signalStore(
         router.navigate(['/']);
       } catch (e) {
         this.signOut();
-        await helperService.showToast('Unable to login at the moment', 2000, {
-          color: 'danger'
-        });
+        throw new Error('login failed.');
       } finally {
         loader.dismiss();
       }

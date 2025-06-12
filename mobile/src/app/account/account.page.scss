@@ -1,3 +1,5 @@
+@import "variables.scss";
+
 ion-card-content {
   ion-icon {
     margin-right: 5px;
@@ -10,4 +12,122 @@ ion-card-content {
   ::ng-deep .input-bottom {
     border: none;
   }
+}
+
+ion-header{
+  box-shadow: none;
+  ion-toolbar {
+    padding: 16px 4px 16px 16px;
+    // background-color: transparent;
+    background: linear-gradient(to right, $color-blue 0%, $color-green 100%);
+    --background: transparent;  
+    --color: $color-white;   
+    --border-width: 0;
+    ion-title{
+      padding:0;
+      text-transform: capitalize;
+      text-align: left;
+      font-size: 20px;
+      color: $color-white;
+    }
+    ion-buttons{
+      margin: 0;
+    }
+  }
+}
+
+ion-content {
+  position: relative;
+  height: 100vh;
+  .top-section {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 200px;
+    background: linear-gradient(to right, $color-blue 0%, $color-green 100%);
+    z-index: -1;
+  }
+  .bottom-section {
+    position: absolute;
+    top: 200px;
+    left: 0;
+    width: 100%;
+    bottom: 0; /* Automatically fills remaining space */
+    background-color: $color-mediumGrey;
+    z-index: -1;
+  }
+  &::part(background) {
+    background: $color-mediumGrey;
+  }
+}
+.profile-wrapper{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 80px;
+  h2{
+    color: $color-dark;
+    margin-bottom: 0;
+  }
+  p{
+    margin: 0;
+    color: $color-grey;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  img{
+    width: 125px;
+    height: 125px;
+    border-radius: 100%;
+    border: 3px solid $color-white;
+    object-fit: cover;
+    background-color: $color-mediumGrey;
+  }
+}
+
+ion-list{
+  background-color: transparent;
+  ion-item {
+    // --background: $color-mediumGrey;
+    --border-color: transparent !important;
+    margin: 6px 0;
+    border-radius: 10px;
+    border: 1px solid $color-lightGrey;
+    text-transform: capitalize;
+    font-weight: 500;
+    padding: 8px 12px;
+    background: $color-white;
+    --inner-padding-end: 0px; 
+
+    &::part(native){
+      padding: 0;
+    }
+
+    ion-button{
+      &::part(native){
+        background-color: $color-green;
+        border-radius: 40px;
+      }
+    }
+    app-currencies-dropdown{
+        ::ng-deep app-fake-dropdown{
+          margin-top: 0;
+          background: $color-mediumGrey;
+          padding: 4px 13px;
+          border-radius: 4px;
+          display: flex;
+          align-items: center;
+          border: 1px solid $color-lightGrey;
+        }
+    }
+  
+  }
+}
+.btn-save{
+  background-color: transparent;
+  &::part(native){
+    background-color: transparent !important;
+  }
+
 }

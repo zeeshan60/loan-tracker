@@ -1,53 +1,64 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-button color="medium" (click)="cancel()">Cancel</ion-button>
+      <ion-icon name="close-outline" (click)="cancel()"></ion-icon>
     </ion-buttons>
     <ion-title>
       @if (isUpdating()) {
         Update friend info
       } @else {
-        Add friend
+        Add New Friend
       }
     </ion-title>
-    <ion-buttons slot="end">
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  @if (addFriendForm.dirty && addFriendForm.hasError('noContactInformation')) {
+    <ion-label class="small" color="danger">Please provide at-least one of these (Email, Phone)</ion-label>
+  }
+  <form [formGroup]="addFriendForm" (ngSubmit)="onSubmit()" id="add-friend-form">
+
+    <ion-list>
+      <ion-item>
+        <ion-label position="stacked" class="input-label">Friend's Name</ion-label>
+        <ion-input
+          class="input-field"
+          type="text"
+          formControlName="name"
+          placeholder="Friend name"
+          errorText="Name is invalid"
+        ></ion-input>
+
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked" class="input-label">Friend's Email ID</ion-label>
+        <ion-input
+          class="input-field"
+          type="email"
+          errorText="Invalid email"
+          formControlName="email"
+          placeholder="John@gmail.com"
+          email
+        ></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked" class="input-label">Phone Number</ion-label>
+        <mr-phone-with-country [selectedValue]="getSelectedPhoneValue()"></mr-phone-with-country>
+      </ion-item>
+
+    </ion-list>
+  </form>
+
+  <ion-buttons class="btn-group">
+    <ion-button class="btn-ghost green" type="submit" form="add-friend-form" [strong]="true">
       @if (loading()) {
         <ion-spinner></ion-spinner>
       } @else {
-        <ion-button type="submit" form="add-friend-form" [strong]="true">Confirm</ion-button>
+        {{isUpdating() ? 'Update' : 'Add'}} Friend
       }
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
-<ion-content class="ion-padding">
-    <form [formGroup]="addFriendForm" (ngSubmit)="onSubmit()" id="add-friend-form">
-      <ion-list>
-        <ion-item>
-          <ion-input
-            type="text"
-            labelPlacement="stacked"
-            label="Name"
-            formControlName="name"
-            placeholder="Friend name"
-            errorText="Name is required"
-          ></ion-input>
-        </ion-item>
-        <ion-item>
-          <ion-input
-            type="email"
-            labelPlacement="stacked"
-            label="Email"
-            errorText="Invalid email"
-            formControlName="email"
-            placeholder="John@gmail.com"
-            email
-          ></ion-input>
-        </ion-item>
-        <ion-item>
-          <app-phone-with-country
-            [group]="phoneFormGroup()"
-          ></app-phone-with-country>
-        </ion-item>
-      </ion-list>
-    </form>
+    </ion-button>
+  </ion-buttons>
+
 </ion-content>

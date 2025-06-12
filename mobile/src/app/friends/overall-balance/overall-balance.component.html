@@ -1,41 +1,73 @@
-@if (overallBalance?.main) {
-  <ion-item class="overall-balance-wrapper">
-    <ion-label>
-      Overall balance:
-    </ion-label>
-    @if (overallBalance) {
-      @if (hasDifferentCurrencies()) {
-        <p>
-          <ion-accordion-group>
-            <ion-accordion value="first">
-              <ion-item slot="header" color="light">
-                <ion-label
-                  [color]="overallBalance.main.isOwed ? 'success' : 'danger'"
+@if (overallBalance()?.main) {
+  <div class="overall-balance-wrapper">
+    <div class="summary-banlance">
+      <div>
+        <ion-label>Overall Balance in your local currency</ion-label>
+        <h1 [ngClass]="overallBalance().main.isOwed ? 'success': 'danger'">
+          {{ overallBalance().main.amount | currency: overallBalance().main.currency: 'symbol' }}
+          @if (overallBalance().main.isOwed) {
+            <img class="arrow" src="assets/images/arrow-green-downward.svg" alt="wallet" />
+          } @else {
+            <img class="arrow" src="assets/images/arrow-red-upword.svg" alt="wallet" />
+          }
+        </h1>
+      </div>
+
+      <ng-content>
+        <img src="assets/images/wallet-icon.svg" alt="wallet" />
+      </ng-content>
+    </div>
+
+    @if (hasDifferentCurrencies()) {
+      <div class="other-details">
+        <ion-list>
+          @for (otherBalance of sortedOtherBalance(); track otherBalance.amount.currency) {
+            <ion-item>
+              <div slot="start">
+                <p>Total :
+                  <span
+                    [ngClass]="otherBalance.amount.isOwed ? 'success': 'danger'"
+                  >
+                  {{ otherBalance.amount.amount | currency: otherBalance.amount.currency: 'symbol' }}
+                    @if (otherBalance.amount.isOwed) {
+                      <img
+                        class="arrow"
+                        src="assets/images/arrow-green-downward.svg" alt="wallet"
+                      />
+                    } @else () {
+                      <img
+                        class="arrow"
+                        src="assets/images/arrow-red-upword.svg" alt="wallet"
+                      />
+                    }
+                </span>
+                </p>
+              </div>
+              <ion-label>Converted to</ion-label>
+              <div slot="end">
+                <p>
+                <span
+                  [ngClass]="otherBalance.amount.isOwed ? 'success': 'danger'"
                 >
-                  <strong>{{ overallBalance.main.amount | currency: overallBalance.main.currency: 'symbol' }}</strong>
-                </ion-label>
-              </ion-item>
-              @for (otherBalance of sortedOtherBalance(); track otherBalance.currency) {
-                <ion-label
-                  class="other-balance-amount"
-                  slot="content"
-                  [color]="otherBalance.isOwed ? 'success': 'danger'"
-                >
-                  {{ otherBalance.amount | currency: otherBalance.currency: 'symbol' }}
-                </ion-label>
-              }
-            </ion-accordion>
-          </ion-accordion-group>
-        </p>
-      } @else {
-        <p>
-          <ion-label
-            [color]="overallBalance.main.isOwed ? 'success' : 'danger'"
-          >
-            <strong>{{ overallBalance.main.amount | currency: overallBalance.main.currency: 'symbol' }}</strong>
-          </ion-label>
-        </p>
-      }
+                  {{ otherBalance.convertedAmount.amount | currency: otherBalance.convertedAmount.currency: 'symbol' }}
+                  @if (otherBalance.convertedAmount.isOwed) {
+                    <img
+                      class="arrow"
+                      src="assets/images/arrow-green-downward.svg" alt="wallet"
+                    />
+                  } @else () {
+                    <img
+                      class="arrow"
+                      src="assets/images/arrow-red-upword.svg" alt="wallet"
+                    />
+                  }
+                </span>
+                </p>
+              </div>
+            </ion-item>
+          }
+        </ion-list>
+      </div>
     }
-  </ion-item>
+  </div>
 }

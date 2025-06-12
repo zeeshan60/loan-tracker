@@ -15,11 +15,15 @@ import {
   IonSpinner,
   IonTitle,
   IonToolbar,
+  IonLabel,
+  IonBackButton,
+  IonIcon,
 } from '@ionic/angular/standalone';
 import {
+  AbstractControl,
   FormBuilder, FormControl, FormGroup,
   FormsModule,
-  ReactiveFormsModule,
+  ReactiveFormsModule, ValidationErrors,
   Validators,
 } from '@angular/forms';
 import { HelperService } from '../helper.service';
@@ -31,7 +35,7 @@ import { COUNTRIES_WITH_CALLING_CODES } from '../constants';
 import { ModalIndex, ModalService } from '../modal.service';
 
 @Component({
-  selector: 'app-add-friend',
+  selector: 'mr-add-friend',
   templateUrl: './add-friend.component.html',
   styleUrls: ['./add-friend.component.scss'],
   standalone: true,
@@ -43,12 +47,15 @@ import { ModalIndex, ModalService } from '../modal.service';
     IonHeader,
     IonButton,
     IonButtons,
+    IonLabel,
     IonTitle,
     IonContent,
     IonSpinner,
     ReactiveFormsModule,
     IonItem, IonList, PhoneWithCountryComponent,
-  ],
+    IonBackButton,
+    IonIcon,
+  ]
 })
 export class AddFriendComponent implements OnInit {
   @Input() name: string = '';
@@ -63,17 +70,30 @@ export class AddFriendComponent implements OnInit {
   public addFriendForm = this.formBuilder.group({
     name: this.formBuilder.nonNullable.control('', [Validators.required]),
     email: new FormControl<string|null>(null, [Validators.email]),
-    phone: this.formBuilder.group({
-      phoneNumber: this.formBuilder.nonNullable.control(''),
-      country: this.formBuilder.nonNullable.control(COUNTRIES_WITH_CALLING_CODES[0].code),
-    }),
+  }, {
+    validators: [(control: AbstractControl): ValidationErrors | null => {
+      const email = control.get('email') as AbstractControl;
+      const phone = control.get('phone') as FormGroup;
+      console.log(email.value, phone?.getRawValue())
+
+      if (!email.value && !phone?.get('phoneNumber').value) {
+        console.log('nothing provided');
+        return { noContactInformation: true };
+      }
+
+      console.log('something provided.')
+      return null;
+    }]
   })
 
   constructor() {
   }
 
-  phoneFormGroup() {
-    return this.addFriendForm.get('phone') as FormGroup;
+  getSelectedPhoneValue() {
+    return {
+      phoneNumber: toNationalPhone(this.friend()?.phone!),
+      country: extractCountryCode(this.friend()?.phone!) || COUNTRIES_WITH_CALLING_CODES[0].code
+    }
   }
 
   ngOnInit() {
@@ -81,10 +101,6 @@ export class AddFriendComponent implements OnInit {
       this.addFriendForm.patchValue({
         name: this.friend()?.name,
         email: this.friend()?.email,
-        phone: {
-          phoneNumber: toNationalPhone(this.friend()?.phone!),
-          country: extractCountryCode(this.friend()?.phone!) || COUNTRIES_WITH_CALLING_CODES[0].code
-        }
       })
     } else {
       this.addFriendForm.patchValue({

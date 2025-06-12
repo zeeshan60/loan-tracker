@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, input, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
   IonButton,
@@ -17,7 +17,7 @@ import { COUNTRIES_WITH_CALLING_CODES, DEFAULT_TOAST_DURATION } from '../constan
 import { ModalIndex, ModalService } from '../modal.service';
 
 @Component({
-  selector: 'app-ask-for-phone',
+  selector: 'mr-ask-for-phone',
   templateUrl: './ask-for-phone.component.html',
   styleUrls: ['./ask-for-phone.component.scss'],
   standalone: true,
@@ -36,7 +36,7 @@ import { ModalIndex, ModalService } from '../modal.service';
     ReactiveFormsModule,
   ],
 })
-export class AskForPhoneComponent  implements OnInit {
+export class AskForPhoneComponent {
   readonly region = input.required<Region>();
   readonly modalIndex = input.required<ModalIndex>();
   readonly authStore = inject(AuthStore);
@@ -45,22 +45,15 @@ export class AskForPhoneComponent  implements OnInit {
   private modalService = inject(ModalService);
   private toastCtrl = inject(ToastController);
   readonly loading = signal(false);
-  public phoneForm = this.formBuilder.group({
-    phoneNumber: this.formBuilder.nonNullable.control('', [Validators.required]),
-    country: this.formBuilder.nonNullable.control(COUNTRIES_WITH_CALLING_CODES[0].code),
-  })
+  public phoneForm = this.formBuilder.group({});
+  readonly defaultCountryCode = computed(() => COUNTRIES_WITH_CALLING_CODES.map(country => country.code)
+    .includes(this.region()?.country_code) ?
+    this.region()?.country_code :
+    COUNTRIES_WITH_CALLING_CODES[0].code
+  );
+  readonly selectedPhone = computed(() => ({ country: this.defaultCountryCode()}))
+
   constructor() { }
-
-  ngOnInit() {
-    this.preSetCountryCode();
-  }
-
-  private preSetCountryCode() {
-    const availableCountries = COUNTRIES_WITH_CALLING_CODES.map(country => country.code);
-    if (availableCountries.includes(this.region()?.country_code)) {
-      this.phoneForm.get('country')?.setValue(this.region()?.country_code);
-    }
-  }
 
   cancel() {
     this.modalService.dismiss(this.modalIndex());
@@ -71,12 +64,10 @@ export class AskForPhoneComponent  implements OnInit {
       try {
         this.loading.set(true);
         const phoneNumber = toInternationalPhone(
-          this.phoneForm.get('phoneNumber')!.value,
-          this.phoneForm.get('country')!.value
+          this.phoneForm.get('phone.phoneNumber')!.value,
+          this.phoneForm.get('phone.country')!.value
         );
-        await this.authStore.updateUserData({
-          phoneNumber,
-        })
+        await this.authStore.updateUserData({ phoneNumber })
         await this.modalService.dismiss(this.modalIndex(), phoneNumber, 'confirm')
       } catch (e) {
         await this.toastCtrl.create({

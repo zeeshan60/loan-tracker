@@ -26,9 +26,9 @@ class AllTimeBalanceStrategyTest {
         assertThat(balance.main!!.currency).isEqualTo(Currency.getInstance("USD"))
         assertThat(balance.main!!.isOwed).isTrue()
 
-        assertThat(balance.other[0].amount).isEqualTo(100.0.toBigDecimal())
-        assertThat(balance.other[0].currency).isEqualTo(Currency.getInstance("USD"))
-        assertThat(balance.other[0].isOwed).isTrue()
+        assertThat(balance.other[0].amount.amount).isEqualTo(100.0.toBigDecimal())
+        assertThat(balance.other[0].amount.currency).isEqualTo(Currency.getInstance("USD"))
+        assertThat(balance.other[0].amount.isOwed).isTrue()
     }
 
     @Test
@@ -58,12 +58,12 @@ class AllTimeBalanceStrategyTest {
 
         assertThat(balance.other).hasSize(2)
 
-        assertThat(balance.other[0].amount).isEqualTo(100.0.toBigDecimal())
-        assertThat(balance.other[0].currency).isEqualTo(Currency.getInstance("USD"))
-        assertThat(balance.other[0].isOwed).isTrue()
-        assertThat(balance.other[1].amount).isEqualTo(100.0.toBigDecimal())
-        assertThat(balance.other[1].currency).isEqualTo(Currency.getInstance("PKR"))
-        assertThat(balance.other[1].isOwed).isTrue()
+        assertThat(balance.other[0].amount.amount).isEqualTo(100.0.toBigDecimal())
+        assertThat(balance.other[0].amount.currency).isEqualTo(Currency.getInstance("USD"))
+        assertThat(balance.other[0].amount.isOwed).isTrue()
+        assertThat(balance.other[1].amount.amount).isEqualTo(100.0.toBigDecimal())
+        assertThat(balance.other[1].amount.currency).isEqualTo(Currency.getInstance("PKR"))
+        assertThat(balance.other[1].amount.isOwed).isTrue()
     }
 
     @Test
@@ -99,13 +99,13 @@ class AllTimeBalanceStrategyTest {
 
         assertThat(balance.other).hasSize(2)
 
-        assertThat(balance.other[0].amount).isEqualTo(300.0.toBigDecimal())
-        assertThat(balance.other[0].currency).isEqualTo(Currency.getInstance("PKR"))
-        assertThat(balance.other[0].isOwed).isTrue()
+        assertThat(balance.other[0].amount.amount).isEqualTo(300.0.toBigDecimal())
+        assertThat(balance.other[0].amount.currency).isEqualTo(Currency.getInstance("PKR"))
+        assertThat(balance.other[0].amount.isOwed).isTrue()
 
-        assertThat(balance.other[1].amount).isEqualTo(100.0.toBigDecimal())
-        assertThat(balance.other[1].currency).isEqualTo(Currency.getInstance("USD"))
-        assertThat(balance.other[1].isOwed).isTrue()
+        assertThat(balance.other[1].amount.amount).isEqualTo(100.0.toBigDecimal())
+        assertThat(balance.other[1].amount.currency).isEqualTo(Currency.getInstance("USD"))
+        assertThat(balance.other[1].amount.isOwed).isTrue()
     }
 
     @Test
@@ -140,11 +140,11 @@ class AllTimeBalanceStrategyTest {
         assertThat(balance.main!!.isOwed).isFalse()
 
         assertThat(balance.other).hasSize(2)
-        assertThat(balance.other[0].amount).isEqualTo(200.0.toBigDecimal())
-        assertThat(balance.other[0].currency).isEqualTo(Currency.getInstance("USD"))
-        assertThat(balance.other[0].isOwed).isFalse()
-        assertThat(balance.other[1].amount).isEqualTo(200.0.toBigDecimal())
-        assertThat(balance.other[1].currency).isEqualTo(Currency.getInstance("PKR"))
-        assertThat(balance.other[1].isOwed).isTrue()
+        assertThat(balance.other[0].amount.amount).isEqualTo(200.0.toBigDecimal())
+        assertThat(balance.other[0].amount.currency).isEqualTo(Currency.getInstance("USD"))
+        assertThat(balance.other[0].amount.isOwed).isFalse()
+        assertThat(balance.other[1].amount.amount).isEqualTo(200.0.toBigDecimal())
+        assertThat(balance.other[1].amount.currency).isEqualTo(Currency.getInstance("PKR"))
+        assertThat(balance.other[1].amount.isOwed).isTrue()
     }
 }

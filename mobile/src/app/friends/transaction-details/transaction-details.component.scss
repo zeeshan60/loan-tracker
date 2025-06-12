@@ -1,0 +1,352 @@
+@import "variables.scss";
+
+
+ion-header {
+  box-shadow: none;
+
+  ion-toolbar {
+    padding: 16px;
+    background: linear-gradient(to right, $color-blue 0%, $color-green 100%);
+    --background: transparent;
+    --color: $color-white;
+    --border-width: 0;
+
+    ion-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: $color-white;
+      padding: 0 40px;
+      text-align: left;
+    }
+
+    ion-buttons {
+      margin: 0;
+
+      ion-button {
+        &::part(native) {
+          background-color: $color-blue;
+          padding-right: 11px;
+          border-radius: 40px;
+        }
+      }
+    }
+
+    ion-back-button {
+      &::part(text) {
+        display: none !important;
+      }
+
+      &::part(native) {
+        color: $color-white;
+      }
+    }
+
+    .add-btn {
+      background: red;
+      border-radius: 100%;
+      height: 36px;
+      width: 36px;
+      text-align: center;
+    }
+  }
+}
+
+
+.details-wrapper {
+  margin: 0 16px 0;
+
+  h5 {
+    font-size: 14px;
+    color: $color-white;
+    text-transform: capitalize;
+    margin-top: 0;
+  }
+
+  .details-card {
+    background-color: $color-white;
+    border-radius: 20px;
+    padding: 16px;
+
+    .summary-banlance {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      ion-label {
+        font-size: 12px;
+        color: $color-grey;
+      }
+
+      h3 {
+        font-size: 18px;
+        margin: 4px 0 0;
+
+        img {
+          height: 16px;
+        }
+      }
+
+      h4 {
+        font-size: 14px;
+        margin: 4px 0 0;
+
+        img {
+          height: 14px;
+        }
+      }
+    }
+
+    .other-details {
+      background-color: $color-mediumGrey;
+      padding: 0 12px;
+      border-radius: 10px;
+      margin-top: 16px;
+
+      ion-list {
+        padding: 0;
+
+        ion-item {
+          --border-color: transparent !important;
+          --inner-padding-end: 0px;
+          border-bottom: 1px solid $color-lightGrey;
+          background: $color-mediumGrey;
+          display: flex;
+          justify-content: space-between;
+
+          &:last-of-type {
+            border-bottom: 0;
+          }
+
+          &::part(native) {
+            padding: 0;
+            --background-color: transparent;
+            background-color: transparent;
+          }
+
+          h6 {
+            font-size: 14px;
+            font-weight: 600;
+            color: $color-dark;
+          }
+
+          p {
+            font-size: 12px;
+            color: $color-grey;
+            margin: 4px 0;
+          }
+
+          ion-label {
+            font-size: 10px;
+            color: $color-grey;
+            text-align: center;
+          }
+
+        }
+      }
+    }
+  }
+
+}
+
+
+ion-content {
+  position: relative;
+  height: 100vh;
+
+  .top-section {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 280px;
+    background: linear-gradient(to right, $color-blue 0%, $color-green 100%);
+    z-index: -1;
+  }
+
+  .bottom-section {
+    position: absolute;
+    top: 280px;
+    left: 0;
+    width: 100%;
+    bottom: 0; /* Automatically fills remaining space */
+    background-color: $color-mediumGrey;
+    z-index: -1;
+  }
+
+  &::part(background) {
+    background: $color-mediumGrey;
+  }
+}
+
+.success {
+  color: $color-green;
+}
+
+.danger {
+  color: $color-red;
+}
+
+.text-right {
+  ion-label {
+    text-align: right;
+    display: block;
+  }
+
+  h1, h2, h3, h4, h5, h6, p {
+    text-align: right;
+  }
+}
+
+.btn-group {
+  display: flex;
+  padding: 16px;
+  gap: 8px;
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  background-color: $color-mediumGrey;
+
+  .btn-ghost {
+    text-align: center;
+    flex: 1;
+    border: 1px solid $color-red;
+    border-radius: 40px;
+    font-size: 14px;
+    font-weight: 500;
+    color: $color-red;
+    background: $color-white;
+  }
+
+}
+
+.summary-list {
+  margin: 32px 16px 0;
+  background: transparent;
+  padding-bottom: 80px;
+
+  ion-list {
+    padding: 0;
+  }
+
+  h3 {
+    font-size: 18px;
+    color: $color-dark;
+  }
+
+  ion-item {
+    margin: 6px 0;
+    border: 1px solid $color-lightGrey;
+    --border-color: transparent !important;
+    --inner-padding-end: 0px;
+    border-radius: 10px;
+    background: $color-white;
+
+    &::part(native) {
+      padding: 12px;
+    }
+
+    &::part(detail-icon) {
+      display: none !important;
+    }
+
+    .history-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    ion-avatar {
+      background: $color-mediumGrey;
+      width: 32px;
+      height: 32px;
+      object-fit: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      ion-icon {
+        width: 24px;
+      }
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    h5 {
+      flex: 1;
+      font-size: 14px;
+      font-weight: 500;
+      color: #2D2F35;
+    }
+
+    .date-and-time {
+      font-size: 11px;
+      text-align: right;
+      width: 60px;
+      color: $color-grey;
+      line-height: 1.8;
+    }
+
+    p {
+      font-size: 12px;
+      display: block;
+      // border-bottom: 1px solid $color-lightGrey;
+      margin: 0;
+      color: $color-grey;
+      padding: 8px 10px;
+
+      &::first-letter {
+        text-transform: uppercase;
+      }
+
+      &:last-of-type {
+        border: 0;
+      }
+    }
+  }
+
+}
+
+.vertical-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  .track-history {
+    background-color: $color-mediumGrey;
+    border-radius: 10px;
+    margin-top: 10px;
+
+    .history-detail {
+      p {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        strong {
+          display: flex;
+          align-items: center;
+          color: $color-dark;
+          font-weight: 500;
+          gap: 4px;
+        }
+        .split-type-container {
+          display: block;
+          text-align: right;
+        }
+      }
+    }
+
+    h6 {
+      font-size: 12px;
+      border-bottom: 1px solid $color-lightGrey;
+      padding: 10px;
+      margin: 0;
+      color: $color-dark;
+    }
+  }
+}

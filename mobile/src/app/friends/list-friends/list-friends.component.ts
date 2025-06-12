@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { CurrencyPipe } from '@angular/common';
+import { CurrencyPipe, NgOptimizedImage } from '@angular/common';
 import {
   IonAvatar,
   IonButton,
@@ -22,7 +22,7 @@ import { OverallBalanceComponent } from '../overall-balance/overall-balance.comp
 import { ModalService } from '../../modal.service';
 
 @Component({
-  selector: 'app-list-friends',
+  selector: 'mr-list-friends',
   templateUrl: './list-friends.component.html',
   styleUrls: ['./list-friends.component.scss'],
   standalone: true,
@@ -40,7 +40,6 @@ import { ModalService } from '../../modal.service';
     IonAvatar,
     IonLabel,
     CurrencyPipe,
-    ShortenNamePipe,
     OverallBalanceComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush

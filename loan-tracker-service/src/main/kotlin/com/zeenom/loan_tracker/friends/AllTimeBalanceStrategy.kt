@@ -18,12 +18,24 @@ class AllTimeBalanceStrategy {
                 .groupBy { it.currency }.entries.sortedByDescending { it.value.size }
         val other = sortedByDescendingEntries.associate { it.key to it.value }
 
-        val otherBalances = other.map {
+        val otherAmounts = other.map {
             val total = it.value.sumOf { amount -> if (amount.isOwed) amount.amount else -amount.amount }
             AmountDto(total.abs(), it.key, total >= 0.toBigDecimal())
         }
 
-        val main = if (otherBalances.isEmpty()) null else otherBalances.map {
+        val otherBalances = otherAmounts.map {
+            if (it.currency.currencyCode != baseCurrency) {
+                val total = convertCurrency(it.amount, it.currency.currencyCode, baseCurrency, currencyRateMap)
+                OtherBalanceDto(
+                    amount = it,
+                    convertedAmount = AmountDto(total, Currency.getInstance(baseCurrency), it.isOwed)
+                )
+            } else {
+                OtherBalanceDto(amount = it, convertedAmount = it)
+            }
+        }
+
+        val main = if (otherAmounts.isEmpty()) null else otherAmounts.map {
             if (it.currency.currencyCode != baseCurrency) {
                 val total = convertCurrency(it.amount, it.currency.currencyCode, baseCurrency, currencyRateMap)
                 AmountDto(total, Currency.getInstance(baseCurrency), it.isOwed)

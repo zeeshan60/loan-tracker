@@ -1,8 +1,24 @@
+@import "variables.scss";
+
 .social-login-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  p{
+    color: $color-dark;
+    font-size: 12px;
+    margin-top: 6px;
+  }
+  ion-button{
+      &::part(native) {
+        background-color: $color-white;
+        height: 60px;
+        width: 60px;
+        border-radius: 100%;
+        box-shadow: 0 0 8px #ccc;
+      }
+  }
 }
 
 .app-name {
@@ -13,7 +29,187 @@
 }
 
 ion-item {
+  position: relative;
+
   &::part(native) {
     --inner-border-width: 0;
+    background-color: transparent;
+  }
+
+  ion-input {
+    --border-width: 0;
+    --box-shadow: none;
+    padding-left: 36px;
+    padding-right: 36px;
+  }
+
+  img {
+    position: absolute;
+    top: 50px;
+    z-index: 9;
+  }
+
+  img:first-of-type {
+    left: 12px;
+  }
+
+  .eye-icon {
+    right: 28px;
+    cursor: pointer;
   }
 }
+
+.card-heading{
+  h1{
+    color: $color-dark;
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0 0 4px;
+  }
+  p{
+    color: $color-grey;
+    font-size: 15px;
+    margin: 0;
+  }
+}
+
+ion-content {
+  position: relative;
+  height: 100vh;
+
+  .top-section {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 200px;
+    background: linear-gradient(to right, $color-blue 0%, $color-green 100%);
+    z-index: -1;
+  }
+
+  .bottom-section {
+    position: absolute;
+    top: 200px;
+    left: 0;
+    width: 100%;
+    bottom: 0; /* Automatically fills remaining space */
+    background-color: $color-mediumGrey;
+    z-index: -1;
+  }
+  &::part(background) {
+    background: $color-mediumGrey;
+  }
+}
+
+.form-card{
+    background-color: $color-white;
+    border: 1px solid $color-lightGrey;
+    border-radius: 10px;
+    padding: 0 0 8px;
+    box-shadow: 0 0 5px #00000024;
+    margin-top: 54px;
+}
+.button-filled{
+  &::part(native) {
+    background-color: $color-green;
+    color: $color-white;
+    border-radius: 46px;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    text-transform: capitalize;
+    margin-top: 24px;
+  }
+}
+.button-text{
+  color:$color-blue;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: capitalize;  
+  padding: 0 8px;
+}
+
+.input-label {
+  font-size: 14px;
+  color: $color-dark;
+  font-weight: 600;
+}
+.input-field{
+  ::ng-deep .input-wrapper{
+    background-color: $color-mediumGrey;
+    padding: 8px 40px 8px 40px;
+    font-size: 14px;
+    margin-top: 8px;
+    border-radius: 10px;
+
+  }
+}
+
+.signup-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    font-size: 14px;
+    ion-button::part(native) {
+        text-transform: capitalize;
+        padding: 0;
+        margin-left: 4px;
+    }
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 20px 0;
+
+  .line {
+    flex: 1;
+    height: 1px;
+    background-color: $color-lightGrey;
+  }
+
+  .text {
+    padding: 0 12px;
+    font-size: 14px;
+    color: $color-grey;
+    white-space: nowrap;
+  }
+}
+
+app-phone-with-country{
+    background: $color-mediumGrey;
+    border-radius: 10px;
+    align-items: center;
+    margin-top: 8px;
+    padding: 0 10px;
+    ::ng-deep ion-input{
+      min-width: auto !important;
+      min-height: 40px !important;
+    }
+    ::ng-deep .country {
+      margin-top: 0;
+    }
+    ::ng-deep .country .selected-wrapper{
+      margin-top: 0 !important;
+    }
+    ::ng-deep .country .label{
+      display: none;
+    }
+    ::ng-deep .input-wrapper .label-text-wrapper{
+      display: none;
+    }   
+    ::ng-deep .input-bottom {
+      border-top: 0 !important;
+    }
+}
+
+.invalid-cred{
+    text-align: center;
+    display: block;
+    margin-top: 12px;
+    font-size: 14px;
+}
+

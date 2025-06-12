@@ -14,13 +14,16 @@
 </ion-header>
 <ion-content class="ion-padding">
   <div class="text-center">
-    <h2>Let’s Get You Started</h2>
-    <p>Enter your phone number so we can help you connect with people you know.</p>
+    <div class="card-heading">
+      <h1>Let’s Get You Started</h1>
+      <p>Enter your phone number so we can help you connect with people you know.</p>
+    </div>
+
   </div>
   <form [formGroup]="phoneForm" (ngSubmit)="onSubmit()" id="get-phone-form">
     <ion-list>
       <ion-item>
-        <app-phone-with-country [group]="phoneForm"></app-phone-with-country>
+        <mr-phone-with-country [selectedValue]="selectedPhone()"></mr-phone-with-country>
       </ion-item>
     </ion-list>
   </form>

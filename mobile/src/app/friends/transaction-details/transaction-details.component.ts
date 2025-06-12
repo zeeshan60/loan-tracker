@@ -10,12 +10,13 @@ import {
   IonToolbar,
 } from '@ionic/angular/standalone';
 import { FriendWithBalance, HistoryChangeTypeEnum, Transaction } from '../model';
-import { CurrencyPipe, DatePipe } from '@angular/common';
+import { CurrencyPipe, DatePipe, NgClass } from '@angular/common';
 import { ShortenNamePipe } from '../../pipes/shorten-name.pipe';
 import { DefineExpenseComponent, SplitOptionsEnum } from '../../define-expense/define-expense.component';
 import { FriendsStore } from '../friends.store';
 import { HelperService } from '../../helper.service';
 import { ModalService } from '../../modal.service';
+import { DateFormatPipe } from '../../pipes/date-format.pipe';
 
 const historyChangeType = {
   [HistoryChangeTypeEnum.DESCRIPTION]: "description",
@@ -27,7 +28,7 @@ const historyChangeType = {
 }
 
 @Component({
-    selector: 'app-transaction-details',
+    selector: 'mr-transaction-details',
     templateUrl: './transaction-details.component.html',
     styleUrls: ['./transaction-details.component.scss'],
     standalone: true,
@@ -47,6 +48,8 @@ const historyChangeType = {
     ShortenNamePipe,
     IonButton,
     DatePipe,
+    NgClass,
+    DateFormatPipe,
   ],
 })
 export class TransactionDetailsComponent {

@@ -1,3 +1,5 @@
+@import "variables.scss";
+
 ion-item {
   &::part(native) {
     padding-left: 0;
@@ -18,3 +20,18 @@ ion-item {
     font-size: 1rem;
   }
 }
+
+.card-heading{
+  h1{
+    color: $color-dark;
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0 0 4px;
+  }
+  p{
+    color: $color-grey;
+    font-size: 15px;
+    margin: 0;
+  }
+}
+

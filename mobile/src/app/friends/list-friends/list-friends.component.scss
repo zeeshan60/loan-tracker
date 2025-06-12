@@ -1,5 +1,130 @@
+@import "variables.scss";
+
 .other-balances-list {
   margin: 0;
   font-size: 12px;
   padding-left: 0;
 }
+
+
+ion-header {
+  box-shadow: none;
+  ion-toolbar {
+    padding: 16px;
+    // background-color: transparent;
+    background: linear-gradient(to right, $color-blue 0%, $color-green 100%);
+    --background: transparent;
+    --color: $color-white;
+    --border-width: 0;
+    ion-title {
+      padding:0;
+      text-transform: capitalize;
+      text-align: left;
+      font-size: 20px;
+      color:$color-white;
+    }
+    ion-buttons {
+      margin: 0;
+    }
+    .add-btn {
+      background: $color-blue;
+      border-radius: 100%;
+      height: 36px;
+      width: 36px;
+      text-align: center;
+    }
+  }
+}
+
+ion-content {
+  position: relative;
+  height: 100vh;
+
+  .top-section {
+    position: relative;
+    top: -1px;
+    left: 0;
+    width: 100%;
+    padding-top: 10px;
+    padding-bottom: 20px;
+    background: linear-gradient(to right, $color-blue 0%, $color-green 100%);
+    z-index: -1;
+  }
+
+  .bottom-section {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    bottom: 0; /* Automatically fills remaining space */
+    background-color: $color-mediumGrey;
+    z-index: -1;
+  }
+  &::part(background) {
+    background: $color-mediumGrey;
+  }
+}
+
+.summary-list{
+  margin: 20px 16px 0;
+  background: transparent;
+
+  ion-list{
+    padding: 0;
+  }
+
+  h3{
+    font-size: 18px;
+    color: #2D2F35;
+  }
+
+  ion-item{
+    margin: 6px 0;
+    border: 1px solid $color-lightGrey;
+    --border-color: transparent !important;
+    --inner-padding-end: 0px;
+    border-radius: 10px;
+    background: $color-white;
+
+    &::part(native) {
+      padding: 12px;
+    }
+    &::part(detail-icon){
+        display:none !important;
+    }
+    ion-avatar{
+      background: $color-mediumGrey;
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      ion-icon{
+        width: 24px;
+      }
+      img{
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+    p{
+      font-size: 14px;
+    }
+    ion-label{
+      margin: 0;
+      h4{
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+      ul ion-label{
+        font-size: 12px;
+        margin: 4px 0;
+      }
+    }
+  }
+
+}
+
