@@ -14,8 +14,6 @@ import { MaskitoElementPredicate } from '@maskito/core';
 import { MaskitoDirective } from '@maskito/angular';
 import { ModalService } from '../modal.service';
 import { CountriesDropdownComponent } from '../countries-dropdown/countries-dropdown.component';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { of, startWith } from 'rxjs';
 
 @Component({
   selector: 'mr-phone-with-country',
