@@ -74,14 +74,11 @@ export class AddFriendComponent implements OnInit {
     validators: [(control: AbstractControl): ValidationErrors | null => {
       const email = control.get('email') as AbstractControl;
       const phone = control.get('phone') as FormGroup;
-      console.log(email.value, phone?.getRawValue())
 
       if (!email.value && !phone?.get('phoneNumber').value) {
-        console.log('nothing provided');
         return { noContactInformation: true };
       }
 
-      console.log('something provided.')
       return null;
     }]
   })
