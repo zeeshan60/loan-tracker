@@ -93,4 +93,36 @@ sudo systemctl restart nginx
 sudo systemctl stop nginx
 sudo certbot renew
 sudo systemctl start nginx
+
+#script to cron certs renewal
+nano renew_cert.sh
+#!/bin/bash
+sudo systemctl stop nginx
+sudo certbot renew
+sudo systemctl start nginx
+
+cat <<'EOF' > renew_cert.sh
+#!/bin/bash
+sudo systemctl stop nginx
+sudo certbot renew
+sudo systemctl start nginx
+EOF
+
+chmod +x renew_cert.sh
+
+sudo crontab -e
+0 2 1 * * /home/ec2-user/renew_cert.sh
+
+#install crontab if not available
+sudo yum install -y cronie
+sudo systemctl enable crond
+sudo systemctl start crond
+
+#check expiry
+sudo openssl x509 -enddate -noout -in /etc/letsencrypt/live/loanapi.codewithzeeshan.com/fullchain.pem
+
+#check existing crons
+sudo crontab -l
+#check cron schedule using given format
+https://crontab.guru/
 ```
