@@ -156,7 +156,7 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
     if (!this.isUpdating()) {
       setTimeout(() => {
         this.descriptionInput()?.setFocus();
-      }, 50)
+      }, 150)
     }
   }
 
