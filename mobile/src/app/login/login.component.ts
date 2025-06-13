@@ -101,8 +101,12 @@ export class LoginComponent {
     if (this.loginForm.valid) {
       const auth = getAuth();
       this.loading.set(true);
+      console.log(this.loginForm.get('email').value, this.loginForm.get('password').value);
       signInWithEmailAndPassword(auth, this.loginForm.get('email').value, this.loginForm.get('password').value)
-        .then(async () => this.authStore.login(await getAuth().currentUser?.getIdToken()))
+        .then(async () => {
+          console.log('hre.......');
+          return this.authStore.login(await getAuth().currentUser?.getIdToken())
+        })
         .then(() => {
           if (!this.authStore.user()?.phoneNumber) {
             this.authStore.askForPhoneNumber();
