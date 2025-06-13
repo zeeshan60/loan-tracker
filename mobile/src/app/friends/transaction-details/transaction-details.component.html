@@ -5,7 +5,11 @@
     </ion-buttons>
     <ion-title>Details</ion-title>
     @if (!latestTransaction()?.deleted) {
-      <img slot="primary" (click)="updateTransaction()" src="assets/images/edit-icon.svg" alt="icon"/>
+      <ion-buttons slot="end">
+        <ion-button class="add-btn" (click)="updateTransaction()">
+          <img src="assets/images/edit-icon.svg" alt="icon"/>
+        </ion-button>
+      </ion-buttons>
     }
   </ion-toolbar>
 </ion-header>

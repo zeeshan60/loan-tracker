@@ -1,20 +1,25 @@
 @use "variables.scss" as *;
 
 ion-toolbar {
+  .add-btn {
+    $btn-size: 32px;
+    background: $color-blue;
+    border-radius: 100%;
+    height: $btn-size;
+    width: $btn-size;
+    text-align: center;
+
+    img {
+      height: $btn-size;
+      width: $btn-size;
+      max-width: none;
+    }
+  }
+}
+
+ion-toolbar {
   ion-title {
     padding-left: 40px;
-  }
-
-  ion-buttons {
-    margin: 0;
-
-    ion-button {
-      &::part(native) {
-        background-color: $color-blue;
-        padding-right: 11px;
-        border-radius: 40px;
-      }
-    }
   }
 }
 
