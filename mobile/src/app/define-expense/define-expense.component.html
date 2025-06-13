@@ -20,13 +20,13 @@
     <div class="choose-friend-item">
       <h2>Enter expense details</h2>
       <p>
-          with You and&nbsp;
-          <span
-            class="selected-friend-label"
-            color="primary"
-            (click)="chooseFriend()"
-          >
-          {{friend()?.['name'] || ''}}
+        with You and&nbsp;
+        <span
+          class="selected-friend-label"
+          color="primary"
+          (click)="chooseFriend()"
+        >
+          {{ friend()?.['name'] || '' }}
         </span>
       </p>
       @if (!friend()) {
@@ -38,12 +38,13 @@
       <ion-item>
         <ion-label position="stacked" class="input-label">Expense description</ion-label>
         <ion-input
-        class="input-field"
-        type="text"
-        formControlName="description"
-        placeholder="Enter expense description"
-        errorText="Description is required"
-      ></ion-input>
+          #descriptionInput
+          class="input-field"
+          type="text"
+          formControlName="description"
+          placeholder="Enter expense description"
+          errorText="Description is required"
+        ></ion-input>
       </ion-item>
 
       <ion-item lines="none">
@@ -72,11 +73,19 @@
       <ion-item>
         <ion-label position="stacked" class="input-label">Who owes who</ion-label>
 
-        <ion-select formControlName="type" class="split-option-select" [class.is-owed]="isOwed()" color="green" interface="action-sheet">
-          <ion-select-option class="green" [value]="SplitOption.YouPaidSplitEqually">Paid by you and split equally</ion-select-option>
-          <ion-select-option  class="green" [value]="SplitOption.TheyOweYouAll">{{friend()?.['name'] | shortenName}} owes you the full amount</ion-select-option>
-          <ion-select-option  class="red" [value]="SplitOption.TheyPaidSplitEqually">Paid by {{friend()?.['name'] | shortenName}} and split equally</ion-select-option>
-          <ion-select-option  class="red" [value]="SplitOption.YouOweThemAll">You owe {{friend()?.['name'] | shortenName}} the full amount</ion-select-option>
+        <ion-select formControlName="type" class="split-option-select" [class.is-owed]="isOwed()" color="green"
+                    interface="action-sheet">
+          <ion-select-option class="green" [value]="SplitOption.YouPaidSplitEqually">Paid by you and split equally
+          </ion-select-option>
+          <ion-select-option class="green" [value]="SplitOption.TheyOweYouAll">{{ friend()?.['name'] | shortenName }}
+            owes you the full amount
+          </ion-select-option>
+          <ion-select-option class="red" [value]="SplitOption.TheyPaidSplitEqually">Paid
+            by {{ friend()?.['name'] | shortenName }} and split equally
+          </ion-select-option>
+          <ion-select-option class="red" [value]="SplitOption.YouOweThemAll">You
+            owe {{ friend()?.['name'] | shortenName }} the full amount
+          </ion-select-option>
         </ion-select>
       </ion-item>
 
@@ -95,16 +104,16 @@
     </ion-list>
 
     <ion-buttons class="btn-group">
-            <ion-button type="submit" class="btn-ghost green" form="define-expense-form" [strong]="true">
-              @if (loading()) {
-                <ion-spinner></ion-spinner>
-              } @else if (isUpdating()) {
-                Update now
-              } @else {
-                Create expense
-              }
-            </ion-button>
-      </ion-buttons>
+      <ion-button type="submit" class="btn-ghost green" form="define-expense-form" [strong]="true">
+        @if (loading()) {
+          <ion-spinner></ion-spinner>
+        } @else if (isUpdating()) {
+          Update now
+        } @else {
+          Create expense
+        }
+      </ion-button>
+    </ion-buttons>
 
   </form>
 </ion-content>

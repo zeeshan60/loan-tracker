@@ -1,11 +1,11 @@
 import {
   ChangeDetectionStrategy,
-  Component,
+  Component, ElementRef,
   inject,
   input,
   model,
   OnInit,
-  signal,
+  signal, viewChild, AfterViewInit,
 } from '@angular/core';
 import {
   ActionSheetController,
@@ -73,7 +73,8 @@ export const SplitOptionsEnum = {
     IonIcon,
   ],
 })
-export class DefineExpenseComponent extends ComponentDestroyedMixin() implements OnInit {
+export class DefineExpenseComponent extends ComponentDestroyedMixin() implements OnInit, AfterViewInit {
+  readonly descriptionInput = viewChild<IonInput>('descriptionInput');
   readonly friend = model<FriendWithBalance | null>(null);
   readonly loading = signal(false);
   readonly isUpdating = input(false);
@@ -82,7 +83,6 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
   readonly http = inject(HttpClient);
   readonly helperService = inject<HelperService>(HelperService);
   readonly modalService = inject(ModalService);
-  readonly defineExpenseService = inject(DefineExpenseService);
   readonly formBuilder = inject(FormBuilder);
   readonly actionSheetCtrl = inject(ActionSheetController);
   readonly friendsStore = inject(FriendsStore);
@@ -149,6 +149,14 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
       if (role !== 'confirm') {
         this.modalService.dismiss(this.modalIndex());
       }
+    }
+  }
+
+  ngAfterViewInit(): void {
+    if (!this.isUpdating()) {
+      setTimeout(() => {
+        this.descriptionInput()?.setFocus();
+      }, 50)
     }
   }
 
