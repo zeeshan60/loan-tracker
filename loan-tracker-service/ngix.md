@@ -89,4 +89,8 @@ sudo systemctl start nginx
 sudo nginx -t
 sudo systemctl restart nginx
 
+#Renwe certificates
+sudo systemctl stop nginx
+sudo certbot renew
+sudo systemctl start nginx
 ```
