@@ -1,25 +1,5 @@
 @use "variables.scss" as *;
 
-ion-header {
-  box-shadow: none;
-
-  ion-toolbar {
-    padding: 16px;
-    background: linear-gradient(to right, $color-blue 0%, $color-green 100%);
-    --background: transparent;
-    --color: $color-white;
-    --border-width: 0;
-
-    ion-title {
-      font-size: 20px;
-      font-weight: 600;
-      color: $color-white;
-      padding: 0 40px;
-      text-align: left;
-    }
-  }
-}
-
 ion-content::part(background) {
   background-color: $color-mediumGrey;
 }

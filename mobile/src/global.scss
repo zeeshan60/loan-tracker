@@ -123,3 +123,47 @@ ion-label.small {
   background-color: $color-white;
 }
 
+ion-header {
+  box-shadow: none;
+  ion-toolbar {
+    padding-left: 16px;
+    padding-right: 10px;
+    background: transparent linear-gradient(to right, $color-blue 0%, $color-green 100%);
+    --background: transparent;
+    --color: $color-white;
+    --border-width: 0 !important;
+    ion-title {
+      padding: 0;
+      font-size: 20px;
+      font-weight: 600;
+      color: $color-white;
+      text-align: left;
+    }
+
+    ion-icon {
+      font-size: 26px;
+      color: $color-white;
+    }
+
+    ion-back-button {
+      &::part(text) {
+        display: none !important;
+      }
+
+      &::part(native) {
+        color: $color-white;
+      }
+    }
+  }
+  ion-buttons {
+    margin: 0;
+  }
+}
+
+ion-modal {
+  ion-header ion-toolbar ion-title {
+    padding-left: 40px;
+    font-size: 16px;
+  }
+}
+

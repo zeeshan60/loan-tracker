@@ -1,28 +1,5 @@
 @use "variables.scss" as *;
 
-ion-header {
-  box-shadow: none;
-
-  ion-toolbar {
-    background-color: $color-mediumGrey;
-    --background: $color-mediumGrey;
-    --color: $color-dark;
-    --border-width: 0;
-
-    ion-buttons ion-icon {
-      font-size: 26px;
-    }
-
-    ion-title {
-      padding: 0 40px;
-      text-align: left;
-      text-transform: capitalize;
-      font-size: 15px;
-      color: $color-dark;
-    }
-  }
-}
-
 ion-item {
   position: relative;
 

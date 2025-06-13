@@ -34,27 +34,13 @@ ion-item {
 }
 
 ion-header {
-  box-shadow: none;
-
   ion-toolbar {
-    padding: 16px;
-    // background-color: transparent;
-    background: linear-gradient(to right, $color-blue 0%, $color-green 100%);
-    --background: transparent;
-    --color: $color-white;
-    --border-width: 0;
-
     ion-title {
-      font-size: 20px;
-      font-weight: 600;
       padding-left: 40px;
-      color: $color-white;
-      text-align: left;
     }
 
     ion-buttons {
       margin: 0;
-
       ion-button {
         &::part(native) {
           background-color: $color-blue;
@@ -63,21 +49,11 @@ ion-header {
       }
     }
 
-    ion-back-button {
-      &::part(text) {
-        display: none !important;
-      }
-
-      &::part(native) {
-        color: $color-white;
-      }
-    }
-
     .add-btn {
       background: $color-blue;
       border-radius: 100%;
-      height: 36px;
-      width: 36px;
+      height: 32px;
+      width: 32px;
       text-align: center;
     }
   }

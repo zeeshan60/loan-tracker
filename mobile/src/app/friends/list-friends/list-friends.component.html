@@ -13,14 +13,13 @@
 
 <ion-content [fullscreen]="true">
 
-  @if (friendsStore['overallBalance']()) {
+  @if (friendsStore['overallBalance']()?.main) {
     <div class="top-section">
       <mr-overall-balance
         [overallBalance]="friendsStore['overallBalance']()"
       ></mr-overall-balance>
     </div>
     <div class="bottom-section"></div>
-
   }
 
   @if (friendsStore.friends().length) {
