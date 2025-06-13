@@ -44,7 +44,7 @@
       <ion-item>
         @if (!phoneInEditMode()) {
           <ion-icon name="call-outline"></ion-icon>
-          <ion-label>{{ user()?.phoneNumber | phone }}</ion-label>
+          <ion-label slot="end">{{ user()?.phoneNumber | phone }}</ion-label>
 
           <img (click)="phoneInEditMode.set(true)" slot="end" src="assets/images/edit.svg" alt="icon"/>
 
