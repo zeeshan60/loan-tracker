@@ -160,10 +160,14 @@ ion-header {
   }
 }
 
+.main-list-container {
+  background: $color-mediumGrey;
+  height: 100%;
+}
+
 ion-modal {
   ion-header ion-toolbar ion-title {
     padding-left: 40px;
     font-size: 16px;
   }
 }
-

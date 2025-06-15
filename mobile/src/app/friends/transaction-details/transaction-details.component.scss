@@ -38,7 +38,7 @@ ion-toolbar {
     border-radius: 20px;
     padding: 16px;
 
-    .summary-banlance {
+    .summary-balance {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -125,36 +125,17 @@ ion-content {
   height: 100vh;
 
   .top-section {
-    position: absolute;
-    top: 0;
+    position: relative;
+    top: -1px;
     left: 0;
     width: 100%;
-    height: 280px;
-    background: linear-gradient(to right, $color-blue 0%, $color-green 100%);
-    z-index: -1;
-  }
-
-  .bottom-section {
-    position: absolute;
-    top: 280px;
-    left: 0;
-    width: 100%;
-    bottom: 0; /* Automatically fills remaining space */
-    background-color: $color-mediumGrey;
-    z-index: -1;
+    padding-top: 10px;
+    padding-bottom: 20px;
   }
 
   &::part(background) {
-    background: $color-mediumGrey;
+    background: linear-gradient(to right, $color-blue 0%, $color-green 100%);
   }
-}
-
-.success {
-  color: $color-green;
-}
-
-.danger {
-  color: $color-red;
 }
 
 .text-right {

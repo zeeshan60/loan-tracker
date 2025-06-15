@@ -19,76 +19,76 @@
         [overallBalance]="friendsStore['overallBalance']()"
       ></mr-overall-balance>
     </div>
-    <div class="bottom-section"></div>
   }
+  <div class="main-list-container">
+    @if (friendsStore.friends().length) {
+      <ion-list class="summary-list">
+        <h3>Summary</h3>
+        @for( friend of friendsStore.unSettledFriends(); track friend.name) {
+          <ion-item (click)="chooseFriend(friend)" button>
+            <ion-avatar slot="start">
+              @if (friend.photoUrl) {
+                <img [src]="friend.photoUrl" alt="Friend's photo"/>
+              } @else {
+                <ion-icon size="large" name="person" color="medium"></ion-icon>
+              }
+            </ion-avatar>
+            <ion-label>
+              <h4>{{ friend.name }}</h4>
+              @if(friend.otherBalances?.length) {
+                <ul class="other-balances-list">
+                  @for(balance of friend.otherBalances; track balance.amount.currency) {
+                    <ion-label [color]="balance.amount.isOwed ? 'success' : 'danger'">
+                      {{!balance.amount.isOwed ? 'Owed' : 'Owe'}} : {{balance.amount.amount | currency: balance.amount.currency: 'symbol'}}
+                    </ion-label>
+                  }
+                </ul>
+              }
+            </ion-label>
+            @if (friend.mainBalance) {
+              <p>
+                <ion-label [color]="friend.mainBalance.isOwed ? 'success': 'danger'">
+                  {{ friend.mainBalance.amount | currency: friend.mainBalance.currency: 'symbol' }}
+                  @if (friend.mainBalance.isOwed) {
+                    <img
+                      class="arrow"
+                      src="assets/images/arrow-green-downward.svg" alt="wallet"
+                    />
+                  } @else () {
+                    <img
+                      class="arrow"
+                      src="assets/images/arrow-red-upword.svg" alt="wallet"
+                    />
+                  }
+                </ion-label>
+              </p>
+            }
+          </ion-item>
 
-  @if (friendsStore.friends().length) {
-    <ion-list class="summary-list">
-      <h3>Summary</h3>
-      @for( friend of friendsStore.unSettledFriends(); track friend.name) {
-        <ion-item (click)="chooseFriend(friend)" button>
-          <ion-avatar slot="start">
-            @if (friend.photoUrl) {
-              <img [src]="friend.photoUrl" alt="Friend's photo"/>
-            } @else {
-              <ion-icon size="large" name="person" color="medium"></ion-icon>
-            }
-          </ion-avatar>
+        }
+        @for( friend of friendsStore.inActiveFriends(); track friend.name) {
+          <ion-item (click)="chooseFriend(friend)" button>
+            <ion-avatar slot="start">
+              @if (friend.photoUrl) {
+                <img [src]="friend.photoUrl" alt="Friend's photo"/>
+              } @else {
+                <ion-icon size="large" name="person" color="medium"></ion-icon>
+              }
+            </ion-avatar>
+            <ion-label>
+              <h2>{{ friend.name }}</h2>
+            </ion-label>
+          </ion-item>
+        }
+      </ion-list>
+    } @else if (!friendsStore.loadingFriends() && !friendsStore.friends().length) {
+      <ion-list lines="none">
+        <ion-item>
           <ion-label>
-            <h4>{{ friend.name }}</h4>
-            @if(friend.otherBalances?.length) {
-              <ul class="other-balances-list">
-                @for(balance of friend.otherBalances; track balance.amount.currency) {
-                  <ion-label [color]="balance.amount.isOwed ? 'success' : 'danger'">
-                    {{!balance.amount.isOwed ? 'Owed' : 'Owe'}} : {{balance.amount.amount | currency: balance.amount.currency: 'symbol'}}
-                  </ion-label>
-                }
-              </ul>
-            }
-          </ion-label>
-          @if (friend.mainBalance) {
-            <p>
-              <ion-label [color]="friend.mainBalance.isOwed ? 'success': 'danger'">
-                {{ friend.mainBalance.amount | currency: friend.mainBalance.currency: 'symbol' }}
-                @if (friend.mainBalance.isOwed) {
-                  <img
-                    class="arrow"
-                    src="assets/images/arrow-green-downward.svg" alt="wallet"
-                  />
-                } @else () {
-                  <img
-                    class="arrow"
-                    src="assets/images/arrow-red-upword.svg" alt="wallet"
-                  />
-                }
-              </ion-label>
-            </p>
-          }
-        </ion-item>
-
-      }
-      @for( friend of friendsStore.inActiveFriends(); track friend.name) {
-        <ion-item (click)="chooseFriend(friend)" button>
-          <ion-avatar slot="start">
-            @if (friend.photoUrl) {
-              <img [src]="friend.photoUrl" alt="Friend's photo"/>
-            } @else {
-              <ion-icon size="large" name="person" color="medium"></ion-icon>
-            }
-          </ion-avatar>
-          <ion-label>
-            <h2>{{ friend.name }}</h2>
+            <p>Nothing here yet. Please add friends</p>
           </ion-label>
         </ion-item>
-      }
-    </ion-list>
-  } @else if (!friendsStore.loadingFriends() && !friendsStore.friends().length) {
-    <ion-list lines="none">
-      <ion-item>
-        <ion-label>
-          <p>Nothing here yet. Please add friends</p>
-        </ion-label>
-      </ion-item>
-    </ion-list>
-  }
+      </ion-list>
+    }
+  </div>
 </ion-content>

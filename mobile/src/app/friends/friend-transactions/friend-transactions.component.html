@@ -28,9 +28,8 @@
       </ion-buttons>
     </mr-overall-balance>
   </div>
-  <div class="bottom-section"></div>
 
-  <div class="lists-container">
+  <div class="main-list-container">
     @for(transactionsByMonth of transactions(); track transactionsByMonth.date) {
       <ion-list class="transactions-list">
         <h6 class="color-grey">{{transactionsByMonth.date | date :'MMM y': 'en-US'}}</h6>

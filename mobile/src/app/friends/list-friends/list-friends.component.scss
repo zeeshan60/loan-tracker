@@ -30,16 +30,8 @@ ion-content {
     background: linear-gradient(to right, $color-blue 0%, $color-green 100%);
   }
 
-  .bottom-section {
-    position: absolute;
-    left: 0;
-    width: 100%;
-    bottom: 0; /* Automatically fills remaining space */
-    background-color: $color-mediumGrey;
-    z-index: -1;
-  }
   &::part(background) {
-    background: $color-mediumGrey;
+    background: linear-gradient(to right, $color-blue 0%, $color-green 100%);
   }
 }
 

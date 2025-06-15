@@ -1,6 +1,6 @@
 @if (overallBalance()?.main) {
   <div class="overall-balance-wrapper">
-    <div class="summary-banlance">
+    <div class="summary-balance">
       <div>
         <ion-label>Overall Balance in your local currency</ion-label>
         <h1 [ngClass]="overallBalance().main.isOwed ? 'success': 'danger'">
