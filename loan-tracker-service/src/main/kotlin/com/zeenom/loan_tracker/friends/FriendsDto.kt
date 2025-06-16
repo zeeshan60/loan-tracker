@@ -4,6 +4,7 @@ import com.zeenom.loan_tracker.events.CommandPayloadDto
 import com.zeenom.loan_tracker.transactions.AmountDto
 import com.zeenom.loan_tracker.transactions.AmountResponse
 import com.zeenom.loan_tracker.transactions.OtherBalanceResponse
+import java.time.Instant
 import java.util.*
 
 data class FriendDto(
@@ -14,6 +15,7 @@ data class FriendDto(
     val name: String,
     val mainCurrency: Currency?,
     val balances: AllTimeBalanceDto,
+    val transactionUpdatedAt: Instant?
 )
 
 data class FriendSummaryDto(

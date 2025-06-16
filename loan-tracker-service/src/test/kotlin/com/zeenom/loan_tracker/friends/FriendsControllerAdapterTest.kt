@@ -46,7 +46,8 @@ class FriendsControllerAdapterTest {
                         )
                     )
                 )
-            )
+            ),
+            transactionUpdatedAt = null
         )
 
         // Act
@@ -81,7 +82,8 @@ class FriendsControllerAdapterTest {
             photoUrl = null,
             name = "John",
             mainCurrency = Currency.getInstance("USD"),
-            balances = AllTimeBalanceDto(null, emptyList())
+            balances = AllTimeBalanceDto(null, emptyList()),
+            transactionUpdatedAt = null
         )
 
         // Act

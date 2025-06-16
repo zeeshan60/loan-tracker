@@ -54,7 +54,8 @@ class FriendsControllerTest(
                     ),
                     mainCurrency = Currency.getInstance("USD"),
                     photoUrl = "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl2",
-                    friendId = UUID.randomUUID()
+                    friendId = UUID.randomUUID(),
+                    transactionUpdatedAt = null
                 )
             ),
             balance = AllTimeBalanceDto(
@@ -105,7 +106,8 @@ class FriendsControllerTest(
                 balances = AllTimeBalanceDto(
                     main = null,
                     other = emptyList()
-                )
+                ),
+                transactionUpdatedAt = null
             )
         )
         Mockito.doReturn(Unit).`when`(commandDao).addCommand<CommandPayloadDto>(any())

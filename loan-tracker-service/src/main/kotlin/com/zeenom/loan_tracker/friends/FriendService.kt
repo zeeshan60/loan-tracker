@@ -24,6 +24,10 @@ class FriendService(
         val friendDtos = friendFinderStrategy.findUserFriends(userId, false)
         val amountsPerFriend =
             transactionEventHandler.balancesOfFriendsByCurrency(userId, friendDtos.map { it.friendStreamId })
+        val lastTransactionPerFriend = transactionEventHandler.lastTransactionOfFriends(
+            userId = userId,
+            friendIds = friendDtos.map { it.friendStreamId }
+        )
         val mainCurrency = user.currency?.let { Currency.getInstance(user.currency) } ?: Currency.getInstance("USD")
         val friends = friendDtos.map {
             FriendDto(
@@ -42,9 +46,11 @@ class FriendService(
                 } ?: AllTimeBalanceDto(
                     main = null,
                     other = emptyList()
-                )
+                ),
+                transactionUpdatedAt = lastTransactionPerFriend[it.friendStreamId]?.updatedAt
             )
         }
+            .sortedWith(compareByDescending<FriendDto> { it.transactionUpdatedAt != null }.thenByDescending { it.transactionUpdatedAt })
         val balance =
             allTimeBalanceStrategy.calculateAllTimeBalance(
                 amountsPerFriend.values.map(Map<String, AmountDto>::values)
@@ -220,6 +226,10 @@ class FriendService(
         val friendDto = friendFinderStrategy.findUserFriend(userId, friendEmail, friendPhone)
         val amountsPerFriend =
             transactionEventHandler.balancesOfFriendsByCurrency(userId, listOf(friendDto.friendStreamId))
+        val lastTransactionPerFriend = transactionEventHandler.lastTransactionOfFriends(
+            userId = userId,
+            friendIds = listOf(friendDto.friendStreamId)
+        )
         return FriendDto(
             friendId = friendDto.friendStreamId,
             email = friendDto.email,
@@ -238,7 +248,8 @@ class FriendService(
                 ?: AllTimeBalanceDto(
                     main = null,
                     other = emptyList()
-                )
+                ),
+            transactionUpdatedAt = lastTransactionPerFriend[friendDto.friendStreamId]?.updatedAt
         )
     }
 }
