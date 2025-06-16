@@ -144,7 +144,7 @@ class FriendService(
             throw IllegalArgumentException("Email or phone number is required")
         }
 
-        if (user.email == friendDto.email || user.phoneNumber == friendDto.phoneNumber) {
+        if ((user.email != null && user.email == friendDto.email) || (user.phoneNumber != null && user.phoneNumber == friendDto.phoneNumber)) {
             throw IllegalArgumentException("Your friend can't have same email or phone as yours")
         }
 
