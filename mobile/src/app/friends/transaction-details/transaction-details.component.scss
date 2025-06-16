@@ -274,6 +274,9 @@ ion-content {
 
     .history-detail {
       p {
+        > span {
+          min-width: 30%;
+        }
         display: flex;
         justify-content: space-between;
         align-items: center;
