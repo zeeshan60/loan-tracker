@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.zeenomlabs.moneyrabbit',
+  appId: 'com.zflashstudios.moneyrabbit',
   appName: 'MoneyRabbit',
   webDir: 'www/browser',
   ios: {
