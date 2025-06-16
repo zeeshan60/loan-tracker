@@ -38,6 +38,10 @@
 //@import "@ionic/angular/css/palettes/dark.system.css";
 @import url('https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap');
 
+:root {
+  --ion-color-primary: #3063E3
+}
+
 *, body, ion-app, ion-content, h1, h2, h3, h4, h5, h6, label, p, ion-input, ion-label, ion-button, button {
   font-family: "Onest", sans-serif !important;
 }

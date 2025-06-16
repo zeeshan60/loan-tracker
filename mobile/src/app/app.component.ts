@@ -23,7 +23,8 @@ import {
   chevronDownOutline,
   closeOutline,
   ellipsisVerticalOutline,
-  arrowForwardOutline
+  arrowForwardOutline,
+  create
 } from 'ionicons/icons';
 import { FriendsStore } from './friends/friends.store';
 import { IonicStorageModule } from '@ionic/storage-angular';
@@ -49,6 +50,7 @@ export class AppComponent implements OnInit {
 
   constructor() {
     addIcons({
+      create,
       triangle,
       ellipse,
       square,

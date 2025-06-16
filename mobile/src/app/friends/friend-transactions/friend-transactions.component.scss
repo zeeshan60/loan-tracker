@@ -26,6 +26,17 @@ ion-item {
   }
 }
 
+::ng-deep {
+  ion-action-sheet.friend-options-sheet {
+    .action-sheet-button {
+      ion-icon {
+        font-size: 1.5em !important;
+      }
+      font-size: 1em
+    }
+  }
+}
+
 // -----------------------
 .other-balances-list {
   margin: 0;

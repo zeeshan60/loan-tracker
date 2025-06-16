@@ -142,17 +142,18 @@ export const FriendsStore = signalStore(
         throw e;
       }
     },
-    async deleteFriend(friend: FriendWithBalance): Promise<void> {
+    async deleteFriend(friend: FriendWithBalance): Promise<boolean|undefined> {
       const confirmation = await helperService.showConfirmAlert(
-        `Are you sure you want to remove all the transactions related to ${friend.name}.`, 'Let\'s do it'
+        `You are about to delete ${friend.name} and ALL their associated transactions. This action cannot be undone. Do you wish to proceed?`, 'Let\'s do it'
       )
-      if (confirmation.role !== 'confirm') return;
+      if (confirmation.role !== 'confirm') return undefined;
       const loader = await loadingCtrl.create();
       await loader.present();
       try {
         await firstValueFrom(friendsService.deleteFriend(friend));
         await this.loadFriends();
         await helperService.showToast('Friend deleted successfully');
+        return true;
       } catch (e: any) {
         await helperService.showToast(e.error?.error?.message || 'Unable to delete friend at the moment');
         throw e;

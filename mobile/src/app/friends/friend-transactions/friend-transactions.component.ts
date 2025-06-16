@@ -1,6 +1,7 @@
 import { Component, computed, inject, input, Signal, signal } from '@angular/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import {
+  ActionSheetController,
   IonAvatar,
   IonBackButton,
   IonButton,
@@ -51,12 +52,42 @@ import { ModalService } from '../../modal.service';
 export class FriendTransactionsComponent {
   readonly friend = computed(() => this.friendsStore.selectedFriend());
   readonly nav = inject(IonNav);
+  readonly actionSheetCtrl = inject(ActionSheetController);
   readonly friendsStore = inject(FriendsStore);
   readonly transactions = this.friendsStore.selectedTransactions;
   readonly modalService = inject(ModalService);
   readonly isLoading = computed(() => this.friendsStore.loadingFriends());
 
   constructor() {}
+
+  async presentActionSheet() {
+    const actionSheet = await this.actionSheetCtrl.create({
+      cssClass: 'friend-options-sheet',
+      buttons: [
+        {
+          text: 'Edit user',
+          icon: 'create-outline',
+          handler: () => {
+            this.editFriendInfo()
+          },
+        },
+        {
+          text: 'Delete user',
+          role: 'destructive',
+          icon: 'trash-outline',
+          handler: () => {
+            this.deleteFriend();
+          },
+        },
+        {
+          text: 'Cancel',
+          icon: 'close-outline',
+          role: 'cancel',
+        },
+      ],
+    });
+    actionSheet.present();
+  }
 
   openTransactionDetails(transaction: any) {
     this.nav.push(TransactionDetailsComponent, {
@@ -73,8 +104,9 @@ export class FriendTransactionsComponent {
   }
 
   async deleteFriend() {
-    await this.friendsStore.deleteFriend(this.friend());
-    await this.nav.pop();
+    if (await this.friendsStore.deleteFriend(this.friend())) {
+      await this.nav.pop();
+    }
   }
 
   async editFriendInfo() {

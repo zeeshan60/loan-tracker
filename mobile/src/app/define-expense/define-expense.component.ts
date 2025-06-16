@@ -72,6 +72,7 @@ export const SplitOptionsEnum = {
     CurrenciesDropdownComponent,
     IonIcon,
   ],
+  standalone: true,
 })
 export class DefineExpenseComponent extends ComponentDestroyedMixin() implements OnInit, AfterViewInit {
   readonly descriptionInput = viewChild<IonInput>('descriptionInput');
