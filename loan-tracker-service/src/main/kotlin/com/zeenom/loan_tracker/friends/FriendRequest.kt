@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.Pattern
 import java.util.*
 
-@Schema(description = "Request to create a new friend. Either email or phone number must be provided.")
+@Schema(description = "Request to create a new friend. Either email or phone number must be provided")
 data class FriendRequest(
     @Schema(description = "Email address of the friend", example = "friend@example.com")
     @field:Email(message = "Invalid email format")
