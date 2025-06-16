@@ -122,7 +122,8 @@
                   <div class="track-history">
                     <div class="history-detail">
                       @for (change of history.changes; track change.type) {
-                        <p>{{historyChangeType[change.type]}}
+                        <p>
+                          <span>{{historyChangeType[change.type]}}</span>
                           <strong>
                             @switch (change.type) {
                               @case (HistoryChangeType.TOTAL_AMOUNT) {
