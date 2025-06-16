@@ -166,7 +166,7 @@ ion-header {
 
 .main-list-container {
   background: $color-mediumGrey;
-  height: 100%;
+  min-height: 100%;
 }
 
 ion-modal {
