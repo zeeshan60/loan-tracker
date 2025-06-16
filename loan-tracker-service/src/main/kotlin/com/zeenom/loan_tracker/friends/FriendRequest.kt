@@ -14,7 +14,7 @@ data class FriendRequest(
 
     @Schema(description = "Phone number of the friend", example = "+1234567890")
     @field:Pattern(
-        regexp = "\\+?[0-9]+",
+        regexp = "\\+?[0-9 ]+",
         message = "Invalid phone number format"
     )
     var phoneNumber: String? = null,
