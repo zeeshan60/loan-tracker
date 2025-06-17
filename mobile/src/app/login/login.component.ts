@@ -1,27 +1,13 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import {
-  Auth,
-  createUserWithEmailAndPassword,
-  getAuth,
-  sendPasswordResetEmail,
-  signInWithEmailAndPassword,
-} from '@angular/fire/auth';
+import { ChangeDetectionStrategy, Component, inject, signal, ViewEncapsulation } from '@angular/core';
+import { Auth, getAuth, sendPasswordResetEmail, signInWithEmailAndPassword } from '@angular/fire/auth';
 import { Router } from '@angular/router';
-import {
-  IonButton,
-  IonContent,
-  IonInput, IonItem, IonLabel,
-} from '@ionic/angular/standalone';
-import {AuthStore} from './auth.store';
-import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { IonButton, IonContent, IonInput, IonItem, IonLabel } from '@ionic/angular/standalone';
+import { AuthStore } from './auth.store';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HelperService } from '../helper.service';
-import { addCircleOutline } from 'ionicons/icons';
-import {
-  FirebaseAuthError,
-  FirebaseErrorCodeMessageEnum,
-} from './types';
+import { FirebaseAuthError, FirebaseErrorCodeMessageEnum } from './types';
 import { extractFirebaseErrorMessage } from '../utility-functions';
-import { PhoneWithCountryComponent } from '../phone-with-country/phone-with-country.component';
+import { SignupComponent } from '../signup/signup.component';
 
 type ActiveUi = 'login' | 'signup' | 'forgotPassword';
 
@@ -30,7 +16,7 @@ type ActiveUi = 'login' | 'signup' | 'forgotPassword';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
   standalone: true,
-  imports: [IonContent, IonButton, IonItem, IonLabel, IonInput, FormsModule, ReactiveFormsModule, PhoneWithCountryComponent],
+  imports: [IonContent, IonButton, IonItem, IonLabel, IonInput, FormsModule, ReactiveFormsModule, SignupComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent {
@@ -47,27 +33,6 @@ export class LoginComponent {
     password: this.fb.nonNullable.control('', [Validators.required]),
   });
 
-  readonly signUpForm = this.fb.group({
-    name: this.fb.nonNullable.control('', [
-      Validators.required,
-      Validators.minLength(3),
-      Validators.maxLength(100)
-    ]),
-    email: this.fb.nonNullable.control('', [Validators.required, Validators.email]),
-    password: this.fb.nonNullable.control('', [
-      Validators.minLength(6),
-      Validators.maxLength(20),
-      Validators.required,
-      (control: AbstractControl) => {
-        const value = control.value;
-        if (!value) return null;
-        const hasLetter = /[a-zA-Z]/.test(value);
-        const hasNumber = /\d/.test(value);
-        const valid = hasLetter && hasNumber;
-        return valid ? null : { passwordStrength: 'Password must include letters and numbers' };
-      }
-    ]),
-  });
   readonly forgotPasswordForm = this.fb.group({
     email: this.fb.nonNullable.control('', [Validators.required, Validators.email]),
   });
@@ -85,26 +50,12 @@ export class LoginComponent {
     }
   }
 
-  passwordErrorMessage(form: FormGroup) {
-    let passwordControl = form.controls['password'];
-    if (passwordControl.hasError('passwordStrength')) {
-      return 'Password must contain numbers and alphabet both.'
-    } else if (passwordControl.hasError('required')) {
-      return 'Password is required'
-    } else if (passwordControl.hasError('minlength') || passwordControl.hasError('maxlength')) {
-      return 'Password should be 8 to 20 characters long'
-    }else {
-      return 'Invalid';
-    }
-  }
   async onLoginWithCreds() {
     if (this.loginForm.valid) {
       const auth = getAuth();
       this.loading.set(true);
-      console.log(this.loginForm.get('email').value, this.loginForm.get('password').value);
       signInWithEmailAndPassword(auth, this.loginForm.get('email').value, this.loginForm.get('password').value)
         .then(async () => {
-          console.log('hre.......');
           return this.authStore.login(await getAuth().currentUser?.getIdToken())
         })
         .then(() => {
@@ -128,33 +79,6 @@ export class LoginComponent {
     }
   }
 
-  async onSignUpWithCreds() {
-    if (this.signUpForm.valid) {
-      this.loading.set(true);
-      const auth = getAuth();
-      createUserWithEmailAndPassword(auth, this.signUpForm.get('email').value, this.signUpForm.get('password').value)
-        .then(async () => {
-          let toast = await this.helperService.showToast(
-            'You are successfully registered. You can login now.',
-            3000,
-            {
-              color: 'success',
-            },
-          );
-          await toast.onDidDismiss();
-          return this.activeUi.set('login');
-        })
-        .catch((error: FirebaseAuthError) => {
-          this.invalidCreds.set(FirebaseErrorCodeMessageEnum[error.code] || extractFirebaseErrorMessage(error.message));
-        })
-        .finally(() => {
-          this.loading.set(false);
-        });
-    } else {
-      this.signUpForm.markAllAsTouched();
-      await this.helperService.showToast('Please fill in the correct values');
-    }
-  }
 
   async onPasswordRecovery() {
     if (this.forgotPasswordForm.valid) {
@@ -190,11 +114,8 @@ export class LoginComponent {
 
   activateUi(ui: ActiveUi) {
     this.invalidCreds.set('');
-    this.signUpForm.reset();
     this.forgotPasswordForm.reset();
     this.loginForm.reset();
     this.activeUi.set(ui);
   }
-
-  protected readonly addCircleOutline = addCircleOutline;
 }

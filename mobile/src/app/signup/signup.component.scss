@@ -1,0 +1,28 @@
+@use "variables" as *;
+
+app-phone-with-country {
+  background: $color-mediumGrey;
+  border-radius: 10px;
+  align-items: center;
+  margin-top: 8px;
+  padding: 0 10px;
+  ::ng-deep ion-input{
+    min-width: auto !important;
+    min-height: 40px !important;
+  }
+  ::ng-deep .country {
+    margin-top: 0;
+  }
+  ::ng-deep .country .selected-wrapper{
+    margin-top: 0 !important;
+  }
+  ::ng-deep .country .label{
+    display: none;
+  }
+  ::ng-deep .input-wrapper .label-text-wrapper{
+    display: none;
+  }
+  ::ng-deep .input-bottom {
+    border-top: 0 !important;
+  }
+}
