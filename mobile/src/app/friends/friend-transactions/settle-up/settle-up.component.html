@@ -27,7 +27,7 @@
           interface="action-sheet"
         >
           @for (balance of friend().otherBalances; track balance) {
-            <ion-select-option [ngClass]="{'green': balance.amount.isOwed, 'red': !balance.amount.isOwed}" [value]="balance">{{balance.amount.currency}} | {{balance.amount.amount | number:'1.2-2' }}</ion-select-option>
+            <ion-select-option [ngClass]="{'green': balance.amount.isOwed, 'red': !balance.amount.isOwed}" [value]="balance.amount">{{balance.amount.currency}} | {{balance.amount.amount | number:'1.2-2' }}</ion-select-option>
           }
         </ion-select>
       </ion-item>

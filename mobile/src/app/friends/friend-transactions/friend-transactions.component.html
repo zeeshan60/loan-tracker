@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button></ion-back-button>
     </ion-buttons>
-    <ion-title>With you and {{friend()['name'] | shortenName}}</ion-title>
+    <ion-title>With you and {{friend()?.['name'] | shortenName}}</ion-title>
     <ion-buttons slot="primary">
       <ion-button
         (click)="presentActionSheet()"
