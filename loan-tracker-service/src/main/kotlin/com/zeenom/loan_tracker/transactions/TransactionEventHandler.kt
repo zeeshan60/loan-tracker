@@ -8,6 +8,7 @@ import com.zeenom.loan_tracker.friends.FriendModel
 import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
+import java.sql.Time
 import java.util.*
 
 @Service
@@ -143,6 +144,22 @@ class TransactionEventHandler(
             }
     }
 
+    suspend fun lastTransactionOfFriends(
+        userId: String,
+        friendIds: List<UUID>
+    ): Map<UUID, TransactionModel?> {
+        val transactions = transactionEventRepository.findAllByUserUidAndRecipientIdIn(userId, friendIds).toList()
+            .map { it.toEvent() as ITransactionEvent }
+
+        return transactions
+            .groupBy { it.streamId }
+            .values
+            .map { resolveStream(it)!! }.filter { !it.deleted }
+            .groupBy { it.recipientId }
+            .mapValues { (_, transactionsByFriend) ->
+                transactionsByFriend.maxByOrNull { it.updatedAt ?: it.createdAt }
+            }
+    }
 
     suspend fun addEvent(event: ITransactionEvent) {
         transactionEventRepository.save(event.toEntity())

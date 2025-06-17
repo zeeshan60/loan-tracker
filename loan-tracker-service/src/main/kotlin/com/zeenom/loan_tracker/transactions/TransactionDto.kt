@@ -38,6 +38,11 @@ data class AmountDto(
     val isOwed: Boolean
 )
 
+data class TimedAmountDto(
+    val amountDto: AmountDto,
+    val lastUpdated: Instant,
+)
+
 data class ChangeSummaryDto(
     val date: Instant,
     val changedBy: String,
