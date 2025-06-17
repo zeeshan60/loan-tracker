@@ -157,7 +157,7 @@ class TransactionEventHandler(
             .map { resolveStream(it)!! }.filter { !it.deleted }
             .groupBy { it.recipientId }
             .mapValues { (_, transactionsByFriend) ->
-                transactionsByFriend.maxByOrNull { it.updatedAt ?: it.createdAt }
+                transactionsByFriend.maxByOrNull { it.createdAt }
             }
     }
 
