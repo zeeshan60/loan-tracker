@@ -75,13 +75,6 @@ export class SelectFriendComponent {
 
   }
 
-  friendBalanceColor(friend: FriendWithBalance) {
-    if (!friend.mainBalance) {
-      return 'light';
-    }
-    return friend.mainBalance.isOwed ? 'success' : 'danger';
-  }
-
   async chooseFriend(friend: FriendWithBalance) {
     this.modalService.dismiss(this.modalIndex(), friend, 'confirm');
   }
