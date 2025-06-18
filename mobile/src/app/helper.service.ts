@@ -37,6 +37,7 @@ export class HelperService {
     const alert = await this.alertCtrl.create({
       message: customMessage,
       header: 'Are you sure?',
+      cssClass: 'danger-alert',
       buttons: [
         {
           text: 'Cancel',
@@ -45,6 +46,7 @@ export class HelperService {
         {
           text: okButtonText,
           role: 'confirm',
+          cssClass: 'danger'
         },
       ]
     })

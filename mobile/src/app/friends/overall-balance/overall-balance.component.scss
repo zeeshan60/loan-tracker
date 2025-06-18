@@ -29,7 +29,7 @@
 
   .other-details {
     background-color: $color-mediumGrey;
-    padding: 0 12px;
+    //padding: 0 12px;
     border-radius: 10px;
     margin-top: 16px;
 
@@ -40,10 +40,16 @@
         --border-color: transparent !important;
         --inner-padding-end: 0px;
         border-bottom: 1px solid $color-lightGrey;
-        background: $color-mediumGrey;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+        //background: $color-mediumGrey;
+        .item-wrapper {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          width: 100%;
+        }
+        ion-icon {
+          color: $color-grey;
+        }
 
         &:last-of-type {
           border-bottom: 0;
@@ -59,6 +65,10 @@
           font-size: 12px;
           font-weight: 500;
           margin: 0;
+          width: 45%;
+          &.converted {
+            text-align: right;
+          }
         }
 
         ion-label {

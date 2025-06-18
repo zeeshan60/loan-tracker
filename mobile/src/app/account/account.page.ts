@@ -11,11 +11,11 @@ import {
   IonItem,
   IonLabel,
   ToastController,
-  IonSpinner,
+  IonSpinner, LoadingController,
 } from '@ionic/angular/standalone';
 import { AuthStore } from '../login/auth.store';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { COUNTRIES_WITH_CALLING_CODES, CURRENCIES, DEFAULT_TOAST_DURATION } from '../constants';
+import { COUNTRIES_WITH_CALLING_CODES, CURRENCIES, DEFAULT_TOAST_DURATION, PRIVATE_API } from '../constants';
 import { FriendsStore } from '../friends/friends.store';
 import { HelperService } from '../helper.service';
 import { PhoneWithCountryComponent } from '../phone-with-country/phone-with-country.component';
@@ -24,6 +24,8 @@ import { PhonePipe } from '../pipes/phone.pipe';
 import { FakeDropdownComponent } from '../fake-dropdown/fake-dropdown.component';
 import { ModalService } from '../modal.service';
 import { CurrenciesDropdownComponent } from '../currencies-dropdown/currencies-dropdown.component';
+import { firstValueFrom } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'mr-account',
@@ -35,6 +37,8 @@ import { CurrenciesDropdownComponent } from '../currencies-dropdown/currencies-d
 })
 export class AccountPage {
   defaultCurrency = model('');
+  readonly loadingCtrl = inject(LoadingController);
+  readonly http = inject(HttpClient);
   readonly authStore = inject(AuthStore);
   readonly friendsStore = inject(FriendsStore);
   readonly user = computed(() => this.authStore.user())
@@ -42,7 +46,6 @@ export class AccountPage {
     return CURRENCIES.find(currency => currency.code === this.user()!.currency)
   });
   phoneInEditMode = signal(false);
-
   private formBuilder = inject(FormBuilder);
   private helperService = inject(HelperService);
   private toastCtrl = inject(ToastController);
@@ -91,6 +94,29 @@ export class AccountPage {
     });
     this.friendsStore.loadFriends();
   }
+
+  async deleteUserAccount(): Promise<void> {
+    const confirmation = await this.helperService.showConfirmAlert(
+      `You are about to delete your account and data. This action cannot be undone. Do you wish to proceed?`, 'Let\'s do it'
+    )
+    if (confirmation.role !== 'confirm') return;
+
+    const loader = await this.loadingCtrl.create();
+    loader.present();
+    try {
+      await firstValueFrom(this.http.delete(`${PRIVATE_API}/users`));
+      await this.authStore.signOut();
+    } catch (e) {
+      let toast = await this.toastCtrl.create({
+        message: 'Unable to delete user at the moment. Please tray again.',
+        duration: DEFAULT_TOAST_DURATION,
+      });
+      toast.present();
+    } finally {
+      await loader.dismiss();
+    }
+  }
+
 
   ionViewWillEnter() {
     if (!this.user()?.currency) {

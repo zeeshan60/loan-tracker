@@ -175,3 +175,12 @@ ion-modal {
     font-size: 16px;
   }
 }
+
+ion-alert.danger-alert {
+  .alert-title {
+    color: var(--ion-color-danger);
+  }
+}
+.alert-button.alert-button-role-confirm.danger {
+  color: var(--ion-color-danger);
+}

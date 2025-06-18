@@ -6,15 +6,15 @@
         <h1 [ngClass]="overallBalance().main.isOwed ? 'success': 'danger'">
           {{ overallBalance().main.amount | currency: overallBalance().main.currency: 'symbol' }}
           @if (overallBalance().main.isOwed) {
-            <img class="arrow" src="assets/images/arrow-green-downward.svg" alt="wallet" />
+            <img class="arrow" src="assets/images/arrow-green-downward.svg" alt="wallet"/>
           } @else {
-            <img class="arrow" src="assets/images/arrow-red-upword.svg" alt="wallet" />
+            <img class="arrow" src="assets/images/arrow-red-upword.svg" alt="wallet"/>
           }
         </h1>
       </div>
 
       <ng-content>
-        <img src="assets/images/wallet-icon.svg" alt="wallet" />
+        <img src="assets/images/wallet-icon.svg" alt="wallet"/>
       </ng-content>
     </div>
 
@@ -23,8 +23,8 @@
         <ion-list>
           @for (otherBalance of sortedOtherBalance(); track otherBalance.amount.currency) {
             <ion-item>
-              <div slot="start">
-                <p>Total :
+              <div class="item-wrapper">
+                <p>
                   <span
                     [ngClass]="otherBalance.amount.isOwed ? 'success': 'danger'"
                   >
@@ -42,12 +42,10 @@
                     }
                 </span>
                 </p>
-              </div>
-              <ion-label>Converted to</ion-label>
-              <div slot="end">
-                <p>
-                <span
-                  [ngClass]="otherBalance.amount.isOwed ? 'success': 'danger'"
+                <ion-icon size="small" name="arrow-forward-outline"></ion-icon>
+                <p
+                  [class]="otherBalance.amount.isOwed ? 'success': 'danger'"
+                  class="converted"
                 >
                   {{ otherBalance.convertedAmount.amount | currency: otherBalance.convertedAmount.currency: 'symbol' }}
                   @if (otherBalance.convertedAmount.isOwed) {
@@ -61,7 +59,6 @@
                       src="assets/images/arrow-red-upword.svg" alt="wallet"
                     />
                   }
-                </span>
                 </p>
               </div>
             </ion-item>
