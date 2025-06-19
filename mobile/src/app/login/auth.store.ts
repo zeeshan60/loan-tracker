@@ -120,12 +120,31 @@ export const AuthStore = signalStore(
             this.askForPhoneNumber();
           }
         })
-        .catch(async (err: Error) => {
+        .catch(async () => {
           this.signOut();
           await helperService.showToast('Unable to login at the moment', 2000, {
             color: 'danger'
           });
         });
+    },
+
+    async loginWithApple(): Promise<boolean | void> {
+      // todo: login with apple plugin
+      // const loginPromise = this.getLoginPluginToken();
+      //
+      // return loginPromise
+      //   .then(async (token) => this.login(token!))
+      //   .then(() => {
+      //     if (!store.user()?.phoneNumber) {
+      //       this.askForPhoneNumber();
+      //     }
+      //   })
+      //   .catch(async () => {
+      //     this.signOut();
+      //     await helperService.showToast('Unable to login at the moment', 2000, {
+      //       color: 'danger'
+      //     });
+      //   });
     },
 
     async askForPhoneNumber() {

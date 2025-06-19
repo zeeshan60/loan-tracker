@@ -115,10 +115,18 @@
     <div class="text">Or Sign In</div>
     <div class="line"></div>
   </div>
-  <div class="social-login-container">
-    <ion-button  (click)="loginWithGoogle()">
-      <img src="assets/images/google-icon.svg" alt="Google Logo"/>
-    </ion-button>
-    <p class="center-text">Google</p>
+  <div class="social-login-wrapper">
+    <div class="social-login-container">
+      <ion-button  (click)="loginWithGoogle()">
+        <img src="assets/images/google-icon.svg" alt="Google Logo"/>
+      </ion-button>
+      <p class="center-text">Google</p>
+    </div>
+    <div class="social-login-container">
+      <ion-button  (click)="loginWithApple()">
+        <img src="assets/images/apple-icon.svg" alt="Apple Logo"/>
+      </ion-button>
+      <p class="center-text">Apple</p>
+    </div>
   </div>
 </ion-content>

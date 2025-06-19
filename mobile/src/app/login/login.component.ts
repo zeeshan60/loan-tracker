@@ -112,6 +112,10 @@ export class LoginComponent {
     this.authStore.loginWithGoogle()
   }
 
+  loginWithApple() {
+    this.authStore.loginWithApple()
+  }
+
   activateUi(ui: ActiveUi) {
     this.invalidCreds.set('');
     this.forgotPasswordForm.reset();

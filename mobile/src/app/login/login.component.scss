@@ -1,17 +1,21 @@
 @use "variables.scss" as *;
 
-::ng-deep {
+.social-login-wrapper {
+  display: flex;
+  justify-content: space-evenly;
   .social-login-container {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    p{
+
+    p {
       color: $color-dark;
       font-size: 12px;
       margin-top: 6px;
     }
-    ion-button{
+
+    ion-button {
       &::part(native) {
         background-color: $color-white;
         height: 60px;
@@ -21,14 +25,9 @@
       }
     }
   }
+}
 
-  .app-name {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 20px;
-    color: #333;
-  }
-
+::ng-deep {
   ion-item {
     position: relative;
 
@@ -60,14 +59,15 @@
     }
   }
 
-  .card-heading{
-    h1{
+  .card-heading {
+    h1 {
       color: $color-dark;
       font-size: 24px;
       font-weight: 600;
       margin: 0 0 4px;
     }
-    p{
+
+    p {
       color: $color-grey;
       font-size: 15px;
       margin: 0;
@@ -97,12 +97,13 @@
       background-color: $color-mediumGrey;
       z-index: -1;
     }
+
     &::part(background) {
       background: $color-mediumGrey;
     }
   }
 
-  .form-card{
+  .form-card {
     background-color: $color-white;
     border: 1px solid $color-lightGrey;
     border-radius: 10px;
@@ -110,7 +111,8 @@
     box-shadow: 0 0 5px #00000024;
     margin-top: 54px;
   }
-  .button-filled{
+
+  .button-filled {
     &::part(native) {
       background-color: $color-green;
       color: $color-white;
@@ -123,8 +125,9 @@
       margin-top: 24px;
     }
   }
-  .button-text{
-    color:$color-blue;
+
+  .button-text {
+    color: $color-blue;
     font-size: 14px;
     font-weight: 600;
     text-transform: capitalize;
@@ -136,8 +139,9 @@
     color: $color-dark;
     font-weight: 600;
   }
-  .input-field{
-    ::ng-deep .input-wrapper{
+
+  .input-field {
+    ::ng-deep .input-wrapper {
       background-color: $color-mediumGrey;
       padding: 8px 40px 8px 40px;
       font-size: 14px;
@@ -153,6 +157,7 @@
     align-items: center;
     width: 100%;
     font-size: 14px;
+
     ion-button::part(native) {
       text-transform: capitalize;
       padding: 0;
@@ -180,7 +185,7 @@
     }
   }
 
-  .invalid-cred{
+  .invalid-cred {
     text-align: center;
     display: block;
     margin-top: 12px;
