@@ -6,7 +6,7 @@ import java.util.UUID
 
 data class ActivityLogResponse(
     val id: UUID,
-    val userUid: String,
+    val userUid: UUID,
     val activityByName: String?,
     val activityByPhoto: String?,
     val description: String,

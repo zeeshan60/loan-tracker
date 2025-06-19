@@ -3,11 +3,12 @@ package com.zeenom.loan_tracker.events
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.zeenom.loan_tracker.transactions.TransactionDto
+import java.util.UUID
 
 data class CommandDto<T : CommandPayloadDto?>(
     val commandType: CommandType,
     val payload: T,
-    val userId: String
+    val userId: UUID?
 )
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")

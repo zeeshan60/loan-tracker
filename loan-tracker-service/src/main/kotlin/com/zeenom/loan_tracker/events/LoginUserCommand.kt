@@ -19,7 +19,9 @@ class LoginUserCommand(
         CoroutineScope(Dispatchers.IO).launch { commandDao.addCommand(commandDto) }
         userService.findByUserEmailOrPhoneNumber(email = commandDto.payload.email, phoneNumber = null) ?: let {
             userService.createUser(userDto = commandDto.payload)
-            friendService.searchUsersImFriendOfAndAddThemAsMyFriends(commandDto.userId)
+            val user = userService.findUserByFBId(commandDto.payload.userFBId) ?: throw IllegalStateException("User not found after creation")
+            requireNotNull(user.uid) { "User UID should not be null after creation" }
+            friendService.searchUsersImFriendOfAndAddThemAsMyFriends(user.uid)
         }
     }
 }

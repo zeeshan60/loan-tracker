@@ -2,13 +2,14 @@ package com.zeenom.loan_tracker.friends
 
 import com.zeenom.loan_tracker.users.UserEventHandler
 import org.springframework.stereotype.Service
+import java.util.UUID
 
 @Service
 class FriendFinderStrategy(
     private val friendsEventHandler: FriendsEventHandler,
     private val userEventHandler: UserEventHandler,
 ) {
-    suspend fun findUserFriends(userId: String, includeDeleted: Boolean = false): List<FriendUserDto> {
+    suspend fun findUserFriends(userId: UUID, includeDeleted: Boolean = false): List<FriendUserDto> {
         val friends = friendsEventHandler.findAllFriendsByUserId(userId = userId, includeDeleted = includeDeleted)
         val usersByPhones =
             userEventHandler.findUsersByPhoneNumbers(friends.mapNotNull { it.friendPhoneNumber })
@@ -31,7 +32,7 @@ class FriendFinderStrategy(
         }
     }
 
-    suspend fun findUserFriend(userId: String, friendEmail: String?, friendPhone: String?): FriendUserDto {
+    suspend fun findUserFriend(userId: UUID, friendEmail: String?, friendPhone: String?): FriendUserDto {
         val friend = findFriendModel(userId = userId, friendEmail = friendEmail, friendPhone = friendPhone)
             ?: throw IllegalStateException("Friend not found with email or phone")
         val user = friend.friendPhoneNumber?.let { userEventHandler.findUserByPhoneNumber(friend.friendPhoneNumber) }
@@ -48,7 +49,7 @@ class FriendFinderStrategy(
     }
 
     suspend fun findFriendModel(
-        userId: String,
+        userId: UUID,
         friendEmail: String?,
         friendPhone: String?
     ): FriendModel? {

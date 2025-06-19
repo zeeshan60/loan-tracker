@@ -20,10 +20,11 @@ class UserService(
             throw IllegalArgumentException("User with email ${userDto.email} or phone number ${userDto.phoneNumber} already exist")
         }
 
-        userEventHandler.findUserById(userDto.uid)?.let {
+        userEventHandler.findUserById(userDto.userFBId)?.let {
             throw IllegalStateException("User with this unique identifier already exist")
         }
 
+        val streamId = UUID.randomUUID()
         userEventHandler.addEvent(
             UserCreated(
                 displayName = userDto.displayName,
@@ -31,25 +32,24 @@ class UserService(
                 email = userDto.email,
                 photoUrl = userDto.photoUrl,
                 emailVerified = userDto.emailVerified,
-                userId = userDto.uid,
+                userId = userDto.userFBId,
                 createdAt = Instant.now(),
-                streamId = UUID.randomUUID(),
+                streamId = streamId,
                 version = 1,
-                createdBy = userDto.uid
+                createdBy = streamId
             )
         )
     }
 
     suspend fun updateUser(userDto: UserUpdateDto) {
 
-        var existing = userEventHandler.findUserModelByUid(userDto.uid)
+        var existing = userEventHandler.findModelByUserId(userDto.uid)
             ?: throw IllegalArgumentException("User with this unique identifier does not exist")
 
 
         if (userDto.currency != null && userDto.currency != existing.currency) {
             userEventHandler.addEvent(
                 UserCurrencyChanged(
-                    userId = userDto.uid,
                     currency = userDto.currency,
                     createdAt = Instant.now(),
                     streamId = existing.streamId,
@@ -64,7 +64,6 @@ class UserService(
         if (userDto.displayName != null && userDto.displayName != existing.displayName) {
             userEventHandler.addEvent(
                 UserDisplayNameChanged(
-                    userId = userDto.uid,
                     displayName = userDto.displayName,
                     createdAt = Instant.now(),
                     streamId = existing.streamId,
@@ -79,7 +78,6 @@ class UserService(
         if (userDto.phoneNumber != null && userDto.phoneNumber != existing.phoneNumber) {
             userEventHandler.addEvent(
                 UserPhoneNumberChanged(
-                    userId = userDto.uid,
                     phoneNumber = userDto.phoneNumber,
                     createdAt = Instant.now(),
                     streamId = existing.streamId,
@@ -92,7 +90,11 @@ class UserService(
         }
     }
 
-    suspend fun findUserById(uid: String): UserDto? {
+    suspend fun findUserById(uid: UUID): UserDto? {
+        return userEventHandler.findByUserId(uid)
+    }
+
+    suspend fun findUserByFBId(uid: String): UserDto? {
         return userEventHandler.findUserById(uid)
     }
 
@@ -104,17 +106,16 @@ class UserService(
         }
     }
 
-    suspend fun deleteUser(string: String) {
-        val existing = userEventHandler.findUserModelByUid(string)
+    suspend fun deleteUser(userId: UUID) {
+        val existing = userEventHandler.findModelByUserId(userId)
             ?: throw IllegalArgumentException("User with this unique identifier does not exist")
 
         userEventHandler.addEvent(
             UserDeleted(
-                userId = string,
                 createdAt = Instant.now(),
                 streamId = existing.streamId,
                 version = existing.version + 1,
-                createdBy = string
+                createdBy = userId
             )
         )
     }

@@ -4,7 +4,6 @@ import com.zeenom.loan_tracker.common.events.IEvent
 import com.zeenom.loan_tracker.transactions.IEventAble
 import kotlinx.coroutines.flow.Flow
 import org.springframework.data.annotation.Id
-import org.springframework.data.r2dbc.repository.Query
 import org.springframework.data.relational.core.mapping.Table
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import org.springframework.stereotype.Repository
@@ -18,11 +17,12 @@ interface IFriendEvent : IEvent<FriendModel> {
 @Table("friend_events")
 data class FriendEvent(
     @Id val id: UUID? = null,
-    val userUid: String,
+    val userUid: UUID?,
     val friendEmail: String?,
     val friendPhoneNumber: String?,
     val friendDisplayName: String?,
     val createdAt: Instant,
+    val createdBy: UUID, //TODO zeeshan add created by field
     val streamId: UUID,
     val version: Int,
     val eventType: FriendEventType,
@@ -34,28 +34,28 @@ data class FriendEvent(
                 friendEmail = friendEmail,
                 friendPhoneNumber = friendPhoneNumber,
                 friendDisplayName = friendDisplayName ?: throw IllegalStateException("Friend display name is required"),
-                userId = userUid,
+                userId = userUid ?: throw IllegalStateException("User ID is required"),
                 createdAt = createdAt,
                 streamId = streamId,
                 version = version,
                 createdBy = userUid
             )
+
             FriendEventType.FRIEND_UPDATED -> FriendUpdated(
                 friendEmail = friendEmail,
                 friendPhoneNumber = friendPhoneNumber,
                 friendDisplayName = friendDisplayName,
-                userId = userUid,
                 createdAt = createdAt,
                 streamId = streamId,
                 version = version,
-                createdBy = userUid
+                createdBy = createdBy
             )
+
             FriendEventType.FRIEND_DELETED -> FriendDeleted(
-                userId = userUid,
                 createdAt = createdAt,
                 streamId = streamId,
                 version = version,
-                createdBy = userUid
+                createdBy = createdBy
             )
         }
     }
@@ -63,14 +63,14 @@ data class FriendEvent(
 
 @Repository
 interface FriendModelRepository : CoroutineCrudRepository<FriendModel, UUID> {
-    suspend fun findAllByUserUidAndDeletedIsFalse(userUid: String): Flow<FriendModel>
-    suspend fun findByUserUidAndFriendEmailAndDeletedIsFalse(userUid: String, email: String): FriendModel?
+    suspend fun findAllByUserUidAndDeletedIsFalse(userUid: UUID): Flow<FriendModel>
+    suspend fun findByUserUidAndFriendEmailAndDeletedIsFalse(userUid: UUID, email: String): FriendModel?
     suspend fun findAllByFriendEmailAndDeletedIsFalse(email: String): Flow<FriendModel>
-    suspend fun findByUserUidAndFriendPhoneNumberAndDeletedIsFalse(userUid: String, phoneNumber: String): FriendModel?
+    suspend fun findByUserUidAndFriendPhoneNumberAndDeletedIsFalse(userUid: UUID, phoneNumber: String): FriendModel?
     suspend fun findAllByFriendPhoneNumberAndDeletedIsFalse(phoneNumber: String): Flow<FriendModel>
-    suspend fun findByUserUidAndStreamIdAndDeletedIsFalse(userUid: String, recipientId: UUID): FriendModel?
+    suspend fun findByUserUidAndStreamIdAndDeletedIsFalse(userUid: UUID, recipientId: UUID): FriendModel?
     suspend fun findByStreamIdAndDeletedIsFalse(streamId: UUID): FriendModel?
-    suspend fun findAllByUserUid(string: String): Flow<FriendModel>
+    suspend fun findAllByUserUid(string: UUID): Flow<FriendModel>
 }
 
 @Table("friend_model")
@@ -78,7 +78,7 @@ data class FriendModel(
     @Id
     val id: UUID? = null,
     val streamId: UUID,
-    val userUid: String,
+    val userUid: UUID, //todo zeeshan make userUid uuid
     val friendEmail: String?,
     val friendPhoneNumber: String?,
     val friendDisplayName: String,
@@ -93,11 +93,11 @@ data class FriendCreated(
     val friendEmail: String?,
     val friendPhoneNumber: String?,
     val friendDisplayName: String,
-    override val userId: String,
+    val userId: UUID,
     override val createdAt: Instant,
     override val streamId: UUID,
     override val version: Int,
-    override val createdBy: String,
+    override val createdBy: UUID,
 ) : IFriendEvent {
     override fun toEntity(): FriendEvent {
         return FriendEvent(
@@ -106,6 +106,7 @@ data class FriendCreated(
             friendPhoneNumber = friendPhoneNumber,
             friendDisplayName = friendDisplayName,
             createdAt = createdAt,
+            createdBy = createdBy,
             streamId = streamId,
             version = version,
             eventType = FriendEventType.FRIEND_CREATED
@@ -131,19 +132,19 @@ data class FriendUpdated(
     val friendEmail: String?,
     val friendPhoneNumber: String?,
     val friendDisplayName: String?,
-    override val userId: String,
     override val createdAt: Instant,
     override val streamId: UUID,
     override val version: Int,
-    override val createdBy: String,
+    override val createdBy: UUID,
 ) : IFriendEvent {
     override fun toEntity(): FriendEvent {
         return FriendEvent(
-            userUid = userId,
+            userUid = null,
             friendEmail = friendEmail,
             friendPhoneNumber = friendPhoneNumber,
             friendDisplayName = friendDisplayName,
             createdAt = createdAt,
+            createdBy = createdBy,
             streamId = streamId,
             version = version,
             eventType = FriendEventType.FRIEND_UPDATED
@@ -152,7 +153,6 @@ data class FriendUpdated(
 
     override fun applyEvent(existing: FriendModel?): FriendModel {
         return existing?.copy(
-            userUid = userId,
             friendEmail = friendEmail ?: existing.friendEmail,
             friendPhoneNumber = friendPhoneNumber ?: existing.friendPhoneNumber,
             friendDisplayName = friendDisplayName ?: existing.friendDisplayName,
@@ -164,16 +164,16 @@ data class FriendUpdated(
 }
 
 data class FriendDeleted(
-    override val userId: String,
     override val createdAt: Instant,
     override val streamId: UUID,
     override val version: Int,
-    override val createdBy: String,
+    override val createdBy: UUID,
 ) : IFriendEvent {
     override fun toEntity(): FriendEvent {
         return FriendEvent(
-            userUid = userId,
+            userUid = null,
             createdAt = createdAt,
+            createdBy = createdBy,
             streamId = streamId,
             version = version,
             eventType = FriendEventType.FRIEND_DELETED,
@@ -186,7 +186,6 @@ data class FriendDeleted(
 
     override fun applyEvent(existing: FriendModel?): FriendModel {
         return existing?.copy(
-            userUid = userId,
             updatedAt = createdAt,
             streamId = streamId,
             version = version,

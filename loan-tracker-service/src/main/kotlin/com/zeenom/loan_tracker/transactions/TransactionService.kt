@@ -23,11 +23,11 @@ class TransactionService(
     private val currencyClient: ICurrencyClient,
 ) {
     suspend fun addTransaction(
-        userUid: String,
+        userUid: UUID,
         transactionDto: TransactionDto,
     ) {
 
-        val existingUser = userEventHandler.findUserModelByUid(userUid)
+        val existingUser = userEventHandler.findModelByUserId(userUid)
             ?: throw IllegalArgumentException("User with id $userUid does not exist")
         val (friendUser, userStreamId) = friendUserAndMyStreamId(
             me = existingUser,
@@ -52,7 +52,7 @@ class TransactionService(
         addDefaultCurrencyIfNotSet(existingUser, userUid, transactionDto.currency)
         if (friendUser != null && userStreamId != null) transactionEventHandler.addEvent(
             event.crossTransaction(
-                friendUser.uid,
+                friendUser.uid ?: throw IllegalArgumentException("Friend user not found"),
                 userStreamId
             )
         )
@@ -64,14 +64,13 @@ class TransactionService(
      */
     private fun addDefaultCurrencyIfNotSet(
         existingUser: UserModel,
-        userUid: String,
+        userUid: UUID,
         currency: Currency
     ) {
         if (existingUser.currency == null) {
             CoroutineScope(Dispatchers.IO).launch {
                 userEventHandler.addEvent(
                     UserCurrencyChanged(
-                        userId = existingUser.uid,
                         currency = currency.toString(),
                         createdAt = Instant.now(),
                         streamId = existingUser.streamId,
@@ -84,7 +83,7 @@ class TransactionService(
     }
 
     suspend fun updateTransaction(
-        userUid: String,
+        userUid: UUID,
         transactionDto: TransactionDto,
     ) {
 
@@ -98,7 +97,7 @@ class TransactionService(
         }
 
         val recipientId = existing.recipientId
-        val existingUser = userEventHandler.findUserModelByUid(userUid)
+        val existingUser = userEventHandler.findModelByUserId(userUid)
             ?: throw IllegalArgumentException("User with id $userUid does not exist")
         val (friendUser, userStreamId) = friendUserAndMyStreamId(
             me = existingUser, recipientId = recipientId
@@ -109,18 +108,16 @@ class TransactionService(
         if (existing.transactionDate != transactionDto.transactionDate) {
             val event = TransactionDateChanged(
                 id = null,
-                userId = userUid,
                 transactionDate = transactionDto.transactionDate,
                 createdAt = createdAt,
                 createdBy = userUid,
                 streamId = existing.streamId,
                 version = ++eventVersion,
-                recipientId = recipientId
             )
             transactionEventHandler.addEvent(event)
             if (friendUser != null && userStreamId != null) transactionEventHandler.addEvent(
                 event.crossTransaction(
-                    friendUser.uid,
+                    friendUser.uid ?: throw IllegalArgumentException("Friend user not found"),
                     userStreamId
                 )
             )
@@ -129,19 +126,16 @@ class TransactionService(
         if (existing.description != transactionDto.description) {
             val event = DescriptionChanged(
                 id = null,
-                userId = userUid,
                 description = transactionDto.description,
-                transactionDate = existing.transactionDate,
                 createdAt = createdAt,
                 createdBy = userUid,
                 streamId = existing.streamId,
                 version = ++eventVersion,
-                recipientId = recipientId
             )
             transactionEventHandler.addEvent(event)
             if (friendUser != null && userStreamId != null) transactionEventHandler.addEvent(
                 event.crossTransaction(
-                    friendUser.uid,
+                    friendUser.uid ?: throw IllegalArgumentException("Friend user not found"),
                     userStreamId
                 )
             )
@@ -150,19 +144,16 @@ class TransactionService(
         if (existing.splitType != transactionDto.splitType) {
             val event = SplitTypeChanged(
                 id = null,
-                userId = userUid,
                 splitType = transactionDto.splitType,
-                transactionDate = existing.transactionDate,
                 createdAt = createdAt,
                 createdBy = userUid,
                 streamId = existing.streamId,
                 version = ++eventVersion,
-                recipientId = recipientId
             )
             transactionEventHandler.addEvent(event)
             if (friendUser != null && userStreamId != null) transactionEventHandler.addEvent(
                 event.crossTransaction(
-                    friendUser.uid,
+                    friendUser.uid ?: throw IllegalArgumentException("Friend user not found"),
                     userStreamId
                 )
             )
@@ -171,19 +162,16 @@ class TransactionService(
         if (existing.totalAmount != transactionDto.originalAmount) {
             val event = TotalAmountChanged(
                 id = null,
-                userId = userUid,
                 totalAmount = transactionDto.originalAmount,
-                transactionDate = existing.transactionDate,
                 createdAt = createdAt,
                 createdBy = userUid,
                 streamId = existing.streamId,
                 version = ++eventVersion,
-                recipientId = recipientId
             )
             transactionEventHandler.addEvent(event)
             if (friendUser != null && userStreamId != null) transactionEventHandler.addEvent(
                 event.crossTransaction(
-                    friendUser.uid,
+                    friendUser.uid ?: throw IllegalArgumentException("Friend user not found"),
                     userStreamId
                 )
             )
@@ -192,19 +180,16 @@ class TransactionService(
         if (existing.currency != transactionDto.currency.toString()) {
             val event = CurrencyChanged(
                 id = null,
-                userId = userUid,
                 currency = transactionDto.currency.toString(),
                 createdAt = createdAt,
-                transactionDate = existing.transactionDate,
                 createdBy = userUid,
                 streamId = existing.streamId,
                 version = ++eventVersion,
-                recipientId = recipientId
             )
             transactionEventHandler.addEvent(event)
             if (friendUser != null && userStreamId != null) transactionEventHandler.addEvent(
                 event.crossTransaction(
-                    friendUser.uid,
+                    friendUser.uid ?: throw IllegalArgumentException("Friend user not found"),
                     userStreamId
                 )
             )
@@ -212,16 +197,17 @@ class TransactionService(
     }
 
     suspend fun friendUserAndMyStreamId(me: UserModel, recipientId: UUID): Pair<UserDto?, UUID?> {
-        val friend = friendsEventHandler.findFriendByUserIdAndFriendId(me.uid, recipientId)
+        val friend = friendsEventHandler.findFriendByUserIdAndFriendId(me.streamId, recipientId)
             ?: throw IllegalArgumentException("User with id ${me.uid} does not have friend with id $recipientId")
         val friendUser = userEventHandler.findUserByEmailOrPhoneNumber(friend.email, friend.phoneNumber)
         val userStreamId = friendUser?.let {
+            requireNotNull(friendUser.uid) { "Friend user uid is required" }
             friendsEventHandler.findFriendStreamIdByEmailOrPhoneNumber(friendUser.uid, me.email, me.phoneNumber)
         }
         return Pair(friendUser, userStreamId)
     }
 
-    suspend fun transactionsByFriendId(userId: String, friendId: UUID): TransactionsDto {
+    suspend fun transactionsByFriendId(userId: UUID, friendId: UUID): TransactionsDto {
         val (user, friendUsersByUid, friendUsersByStreamId) = userAndFriendInfo(userId)
         val models = transactionEventHandler.transactionModelsByFriend(userId, friendId)
 
@@ -252,39 +238,36 @@ class TransactionService(
         }
     }
 
-    suspend fun deleteTransaction(userUid: String, transactionStreamId: UUID) {
+    suspend fun deleteTransaction(userUid: UUID, transactionStreamId: UUID) {
         val existing = transactionEventHandler.read(userUid, transactionStreamId)
             ?: throw IllegalArgumentException("Transaction with id $transactionStreamId does not exist")
 
         val recipientId = existing.recipientId
-        val existingUser = userEventHandler.findUserModelByUid(userUid)
+        val existingUser = userEventHandler.findModelByUserId(userUid)
             ?: throw IllegalArgumentException("User with id $userUid does not exist")
         val (friendUser, userStreamId) = friendUserAndMyStreamId(
             me = existingUser, recipientId = recipientId
         )
         val event = TransactionDeleted(
             id = null,
-            userId = userUid,
             createdAt = Instant.now(),
-            transactionDate = existing.transactionDate,
             createdBy = userUid,
             streamId = transactionStreamId,
             version = existing.version + 1,
-            recipientId = recipientId
         )
         transactionEventHandler.addEvent(
             event
         )
         if (friendUser != null && userStreamId != null) transactionEventHandler.addEvent(
             event.crossTransaction(
-                friendUser.uid,
+                friendUser.uid ?: throw IllegalArgumentException("Friend user not found"),
                 userStreamId
             )
         )
     }
 
-    private suspend fun userAndFriendInfo(userId: String): Triple<UserDto, Map<String, FriendUserDto>, Map<UUID, FriendUserDto>> {
-        val user = userEventHandler.findUserById(userId)
+    private suspend fun userAndFriendInfo(userId: UUID): Triple<UserDto, Map<UUID, FriendUserDto>, Map<UUID, FriendUserDto>> {
+        val user = userEventHandler.findByUserId(userId)
         requireNotNull(user) { "User with id $userId does not exist" }
         val findUserFriends = friendFinderStrategy.findUserFriends(userId = userId, includeDeleted = true)
         val friendUsersByUid =
@@ -298,7 +281,7 @@ class TransactionService(
         return Triple(user, friendUsersByUid, friendUsersByStreamId)
     }
 
-    suspend fun transactionActivityLogs(userId: String): List<ActivityLogWithFriendInfo> {
+    suspend fun transactionActivityLogs(userId: UUID): List<ActivityLogWithFriendInfo> {
         val (user, friendUsersByUid, friendUsersByStreamId) = userAndFriendInfo(userId)
         val transactionsWithLogs = transactionEventHandler.transactionsWithActivityLogs(userId)
 
@@ -330,7 +313,7 @@ class TransactionService(
         }.flatten().sortedWith(compareByDescending<ActivityLogWithFriendInfo> { it.date }.thenByDescending { it.id })
     }
 
-    suspend fun findByUserIdTransactionId(userId: String, transactionId: UUID): TransactionDto {
+    suspend fun findByUserIdTransactionId(userId: UUID, transactionId: UUID): TransactionDto {
         val (user, friendUsersByUid, friendUsersByStreamId) = userAndFriendInfo(userId)
         val transactionModel = transactionEventHandler.transactionModelByTransactionId(userId, transactionId)
         return transactionModel.transactionModel.toTransactionDto(
@@ -345,7 +328,7 @@ class TransactionService(
 
     fun TransactionModel.toTransactionDto(
         friendUsersByStreamId: Map<UUID, FriendUserDto>,
-        friendUsersByUserId: Map<String, FriendUserDto>,
+        friendUsersByUserId: Map<UUID, FriendUserDto>,
         userDto: UserDto,
         history: List<ChangeSummary>,
         currencyRateMap: Map<String, BigDecimal>,
@@ -397,8 +380,8 @@ class TransactionService(
 
 data class ActivityLogWithFriendInfo(
     val id: UUID,
-    val userUid: String,
-    val activityByUid: String,
+    val userUid: UUID,
+    val activityByUid: UUID,
     val activityByName: String?,
     val activityByPhoto: String?,
     val description: String,

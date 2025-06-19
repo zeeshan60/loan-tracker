@@ -6,7 +6,7 @@ import java.util.*
 
 data class TransactionModel(
     val streamId: UUID,
-    val userUid: String,
+    val userId: UUID,
     val description: String,
     val currency: String,
     val splitType: SplitType,
@@ -15,8 +15,8 @@ data class TransactionModel(
     val createdAt: Instant,
     val updatedAt: Instant?,
     val firstCreatedAt: Instant,
-    val createdBy: String,
-    val updatedBy: String?,
+    val createdBy: UUID,
+    val updatedBy: UUID?,
     val deleted: Boolean = false,
     val version: Int,
     val transactionDate: Instant,
@@ -25,8 +25,8 @@ data class TransactionModel(
 
 data class ActivityLog(
     val id: UUID,
-    val userUid: String,
-    val activityByUid: String,
+    val userId: UUID,
+    val activityByUid: UUID,
     val description: String,
     val activityType: ActivityType,
     val amount: BigDecimal,

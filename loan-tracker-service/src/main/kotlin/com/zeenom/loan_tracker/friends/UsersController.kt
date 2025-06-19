@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.Pattern
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
+import java.util.UUID
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -19,10 +20,10 @@ class UsersController(
 
     @Operation(summary = "Get user", description = "Get user details")
     @GetMapping
-    suspend fun getUser(@AuthenticationPrincipal userId: String): UserResponse {
+    suspend fun getUser(@AuthenticationPrincipal userId: UUID): UserResponse {
         return userQuery.execute(userId).let {
             UserResponse(
-                uid = it.uid,
+                uid = it.uid.toString(),
                 email = it.email,
                 phoneNumber = it.phoneNumber,
                 displayName = it.displayName,
@@ -37,7 +38,7 @@ class UsersController(
     @PutMapping
     suspend fun updateUser(
         @RequestBody userRequest: UpdateUserRequest,
-        @AuthenticationPrincipal userId: String,
+        @AuthenticationPrincipal userId: UUID,
     ): UserResponse {
         updateUserCommand.execute(
             CommandDto(
@@ -53,7 +54,7 @@ class UsersController(
         )
         return userQuery.execute(userId).let {
             UserResponse(
-                uid = it.uid,
+                uid = it.uid.toString(),
                 email = it.email,
                 phoneNumber = it.phoneNumber,
                 displayName = it.displayName,
@@ -66,7 +67,7 @@ class UsersController(
 
     @Operation(summary = "Delete a user", description = "Delete user")
     @DeleteMapping
-    suspend fun deleteUser(@AuthenticationPrincipal userId: String) {
+    suspend fun deleteUser(@AuthenticationPrincipal userId: UUID) {
         userService.deleteUser(userId)
     }
 }

@@ -5,10 +5,9 @@ import java.time.Instant
 import java.util.*
 
 interface IEvent<MODEL> {
-    val userId: String
     val streamId: UUID
     val createdAt: Instant
-    val createdBy: String
+    val createdBy: UUID
     val version: Int
 
     fun toEntity(): IEventAble<MODEL>

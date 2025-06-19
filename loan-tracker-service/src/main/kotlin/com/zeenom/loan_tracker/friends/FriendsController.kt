@@ -34,7 +34,7 @@ class FriendsController(
     suspend fun getFriends(
         @Parameter(description = "Pagination token for the next set of results")
         @RequestParam next: String? = null,
-        @AuthenticationPrincipal userId: String,
+        @AuthenticationPrincipal userId: UUID,
     ): Paginated<FriendsResponse> {
         logger.info("Getting friends for user $userId")
         return friendsQuery.execute(PaginationDto(input = userId, next = next)).let { result ->
@@ -46,7 +46,7 @@ class FriendsController(
     @PostMapping("/add")
     suspend fun addFriend(
         @Valid @RequestBody friendRequest: FriendRequest,
-        @AuthenticationPrincipal userId: String,
+        @AuthenticationPrincipal userId: UUID,
     ): FriendResponse {
         logger.info("Adding friend for user $userId")
         createFriendCommand.execute(
@@ -72,7 +72,7 @@ class FriendsController(
     suspend fun updateFriend(
         @PathVariable friendId: UUID,
         @Valid @RequestBody friendRequest: UpdateFriendRequest,
-        @AuthenticationPrincipal userId: String,
+        @AuthenticationPrincipal userId: UUID,
     ): FriendResponse {
         logger.info("Updating friend $friendId for user $userId")
         updateFriendCommand.execute(
@@ -97,7 +97,7 @@ class FriendsController(
     @DeleteMapping("/{friendId}")
     suspend fun deleteFriend(
         @PathVariable friendId: UUID,
-        @AuthenticationPrincipal userId: String,
+        @AuthenticationPrincipal userId: UUID,
     ): MessageResponse {
         logger.info("Deleting friend $friendId for user $userId")
         deleteFriendCommand.execute(

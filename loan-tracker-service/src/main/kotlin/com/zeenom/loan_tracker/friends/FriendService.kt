@@ -19,8 +19,8 @@ class FriendService(
     private val currencyClient: ICurrencyClient,
 ) {
 
-    suspend fun findAllByUserId(userId: String): FriendsWithAllTimeBalancesDto {
-        val user = userEventHandler.findUserById(userId) ?: throw IllegalArgumentException("User $userId not found")
+    suspend fun findAllByUserId(userId: UUID): FriendsWithAllTimeBalancesDto {
+        val user = userEventHandler.findByUserId(userId) ?: throw IllegalArgumentException("User $userId not found")
         val friendDtos = friendFinderStrategy.findUserFriends(userId, false)
         val amountsPerFriend =
             transactionEventHandler.balancesOfFriendsByCurrency(userId, friendDtos.map { it.friendStreamId })
@@ -64,8 +64,8 @@ class FriendService(
         )
     }
 
-    suspend fun createFriend(userId: String, friendDto: CreateFriendDto) {
-        val user = userEventHandler.findUserById(userId) ?: throw IllegalArgumentException("User $userId not found")
+    suspend fun createFriend(userId: UUID, friendDto: CreateFriendDto) {
+        val user = userEventHandler.findByUserId(userId) ?: throw IllegalArgumentException("User $userId not found")
         validateFriendInformation(friendDto = friendDto, user = user, friendId = null)
 
         friendsEventHandler.addEvent(
@@ -84,8 +84,8 @@ class FriendService(
         makeMeThisUsersFriendAsWell(friendDto.email, friendDto.phoneNumber, user)
     }
 
-    suspend fun updateFriend(userId: String, friendDto: UpdateFriendDto) {
-        val user = userEventHandler.findUserById(userId) ?: throw IllegalArgumentException("User $userId not found")
+    suspend fun updateFriend(userId: UUID, friendDto: UpdateFriendDto) {
+        val user = userEventHandler.findByUserId(userId) ?: throw IllegalArgumentException("User $userId not found")
         validateFriendInformation(friendDto = friendDto, user = user, friendId = friendDto.friendId)
         val friend = friendsEventHandler.findByUserUidAndFriendId(
             userId,
@@ -97,7 +97,6 @@ class FriendService(
         }
         friendsEventHandler.addEvent(
             FriendUpdated(
-                userId = userId,
                 friendEmail = friendDto.email,
                 friendPhoneNumber = friendDto.phoneNumber,
                 friendDisplayName = friendDto.name,
@@ -120,13 +119,12 @@ class FriendService(
         }
     }
 
-    suspend fun deleteFriend(userId: String, friendId: UUID) {
-        userEventHandler.findUserById(userId) ?: throw IllegalArgumentException("User $userId not found")
+    suspend fun deleteFriend(userId: UUID, friendId: UUID) {
+        userEventHandler.findByUserId(userId) ?: throw IllegalArgumentException("User $userId not found")
         val friend = friendsEventHandler.findByUserUidAndFriendId(userId, friendId)
             ?: throw IllegalArgumentException("Friend not found")
         friendsEventHandler.addEvent(
             FriendDeleted(
-                userId = userId,
                 createdAt = Instant.now(),
                 streamId = friend.streamId,
                 version = friend.version + 1,
@@ -148,6 +146,8 @@ class FriendService(
             throw IllegalArgumentException("Your friend can't have same email or phone as yours")
         }
 
+        requireNotNull(user.uid) { "User UID must not be null while validating friend information" }
+
         if (friendDto.email != null)
             friendsEventHandler.findByUserUidAndFriendEmail(user.uid, friendDto.email!!)
                 ?.let {
@@ -164,11 +164,13 @@ class FriendService(
     }
 
     private suspend fun makeMeThisUsersFriendAsWell(friendEmail: String?, phoneNumber: String?, me: UserDto) {
+        requireNotNull(me.uid) { "ME User UID must not be null while makeMeThisUsersFriendAsWell" }
         val friendsExistingUser =
             friendEmail?.let { userEventHandler.findUserByEmail(friendEmail) } ?: phoneNumber?.let {
                 userEventHandler.findUserByPhoneNumber(phoneNumber)
             }
         friendsExistingUser?.let { usersFriend ->
+            requireNotNull(usersFriend.uid) { "User UID must not be null while makeMeThisUsersFriendAsWell" }
             (me.email?.let {
                 friendsEventHandler.findByUserUidAndFriendEmail(
                     usersFriend.uid,
@@ -200,8 +202,8 @@ class FriendService(
         }
     }
 
-    suspend fun searchUsersImFriendOfAndAddThemAsMyFriends(uid: String) {
-        val user = userEventHandler.findUserById(uid) ?: throw IllegalArgumentException("User not found")
+    suspend fun searchUsersImFriendOfAndAddThemAsMyFriends(uid: UUID) {
+        val user = userEventHandler.findByUserId(uid) ?: throw IllegalArgumentException("User not found")
         val emailFriends = user.email?.let { friendsEventHandler.findByFriendEmail(user.email) } ?: emptyList()
         val phoneFriends =
             user.phoneNumber?.let { friendsEventHandler.findByFriendPhoneNumber(user.phoneNumber) } ?: emptyList()
@@ -221,8 +223,8 @@ class FriendService(
         }
     }
 
-    suspend fun findByUserIdFriendId(userId: String, friendEmail: String?, friendPhone: String?): FriendDto {
-        val user = userEventHandler.findUserById(userId) ?: throw IllegalArgumentException("User $userId not found")
+    suspend fun findByUserIdFriendId(userId: UUID, friendEmail: String?, friendPhone: String?): FriendDto {
+        val user = userEventHandler.findByUserId(userId) ?: throw IllegalArgumentException("User $userId not found")
         val friendDto = friendFinderStrategy.findUserFriend(userId, friendEmail, friendPhone)
         val amountsPerFriend =
             transactionEventHandler.balancesOfFriendsByCurrency(userId, listOf(friendDto.friendStreamId))

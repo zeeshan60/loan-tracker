@@ -15,6 +15,7 @@ class CreateFriendCommand(
 ) : Command<CreateFriendDto> {
     override suspend fun execute(commandDto: CommandDto<CreateFriendDto>) {
         CoroutineScope(Dispatchers.IO).launch { commandDao.addCommand(commandDto) }
+        requireNotNull(commandDto.userId) { "User ID must not be null for CreateFriend" }
         friendService.createFriend(commandDto.userId, commandDto.payload)
     }
 }
@@ -26,6 +27,7 @@ class UpdateFriendCommand(
 ) : Command<UpdateFriendDto> {
     override suspend fun execute(commandDto: CommandDto<UpdateFriendDto>) {
         CoroutineScope(Dispatchers.IO).launch { commandDao.addCommand(commandDto) }
+        requireNotNull(commandDto.userId) { "User ID must not be null for UpdateFriend" }
         friendService.updateFriend(commandDto.userId, commandDto.payload)
     }
 }
@@ -37,6 +39,7 @@ class DeleteFriendCommand(
 ) : Command<DeleteFriendDto> {
     override suspend fun execute(commandDto: CommandDto<DeleteFriendDto>) {
         CoroutineScope(Dispatchers.IO).launch { commandDao.addCommand(commandDto) }
+        requireNotNull(commandDto.userId) { "User ID must not be null for DeleteFriend" }
         friendService.deleteFriend(commandDto.userId, commandDto.payload.friendId)
     }
 }

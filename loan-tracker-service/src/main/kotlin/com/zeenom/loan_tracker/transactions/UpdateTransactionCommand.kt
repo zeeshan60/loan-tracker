@@ -19,6 +19,7 @@ class UpdateTransactionCommand(
         CoroutineScope(Dispatchers.IO).launch {
             commandDao.addCommand(commandDto)
         }
+        requireNotNull(commandDto.userId) { "User ID must not be null for UpdateTransaction" }
         transactionService.updateTransaction(
             userUid = commandDto.userId,
             transactionDto = commandDto.payload
@@ -35,6 +36,7 @@ class DeleteTransactionCommand(
         CoroutineScope(Dispatchers.IO).launch {
             commandDao.addCommand(commandDto)
         }
+        requireNotNull(commandDto.userId) { "User ID must not be null for DeleteTransaction" }
         transactionService.deleteTransaction(
             userUid = commandDto.userId,
             transactionStreamId = commandDto.payload.transactionStreamId

@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
+import java.util.UUID
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
 
@@ -65,13 +66,14 @@ fun <T> ApiFuture<T>.toCompletableFuture(): CompletableFuture<T> {
 class FirebaseAdapter {
     fun tokenToUser(token: FirebaseToken): UserDto {
         return UserDto(
-            uid = token.uid,
+            uid = null,
             email = token.email,
             displayName = token.name?: "",
             photoUrl = token.picture,
             emailVerified = token.isEmailVerified,
             currency = null,
-            phoneNumber = null
+            phoneNumber = null,
+            userFBId = token.uid
         )
     }
 }
