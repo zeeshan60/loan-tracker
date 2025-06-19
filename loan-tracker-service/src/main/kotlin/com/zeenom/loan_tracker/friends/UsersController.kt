@@ -2,6 +2,7 @@ package com.zeenom.loan_tracker.friends
 
 import com.zeenom.loan_tracker.events.CommandDto
 import com.zeenom.loan_tracker.events.CommandType
+import com.zeenom.loan_tracker.users.UserService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.Pattern
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*
 class UsersController(
     private val updateUserCommand: UpdateUserCommand,
     private val userQuery: UserQuery,
+    private val userService: UserService
 ) {
 
     @Operation(summary = "Get user", description = "Get user details")
@@ -60,6 +62,12 @@ class UsersController(
                 emailVerified = it.emailVerified
             )
         }
+    }
+
+    @Operation(summary = "Delete a user", description = "Delete user")
+    @DeleteMapping
+    suspend fun deleteUser(@AuthenticationPrincipal userId: String) {
+        userService.deleteUser(userId)
     }
 }
 

@@ -103,4 +103,19 @@ class UserService(
             userEventHandler.findUsersByPhoneNumbers(listOf(it)).firstOrNull()
         }
     }
+
+    suspend fun deleteUser(string: String) {
+        val existing = userEventHandler.findUserModelByUid(string)
+            ?: throw IllegalArgumentException("User with this unique identifier does not exist")
+
+        userEventHandler.addEvent(
+            UserDeleted(
+                userId = string,
+                createdAt = Instant.now(),
+                streamId = existing.streamId,
+                version = existing.version + 1,
+                createdBy = string
+            )
+        )
+    }
 }

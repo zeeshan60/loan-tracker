@@ -87,4 +87,29 @@ class UsersControllerIntegrationTest(@LocalServerPort private val port: Int) : B
         assertThat(userResponse.currency).isEqualTo(userRequest.currency)
     }
 
+    @Order(2)
+    @Test
+    fun `delete user sucessfully and create a new user with same uid`(): Unit = runBlocking {
+        webTestClient.delete()
+            .uri("/api/v1/users")
+            .header("Authorization", "Bearer $zeeToken")
+            .exchange()
+            .expectStatus().isOk
+
+        webTestClient.get()
+            .uri("/api/v1/users")
+            .header("Authorization", "Bearer $zeeToken")
+            .exchange()
+            .expectStatus().isNotFound
+        zeeToken = loginUser(
+            userDto = zeeDto
+        ).token
+
+        webTestClient.get()
+            .uri("/api/v1/users")
+            .header("Authorization", "Bearer $zeeToken")
+            .exchange()
+            .expectStatus().isOk
+
+    }
 }

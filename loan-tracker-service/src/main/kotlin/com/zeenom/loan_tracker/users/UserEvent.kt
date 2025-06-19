@@ -70,6 +70,14 @@ data class UserEvent(
                 streamId = streamId,
                 createdBy = uid
             )
+
+            UserEventType.USER_DELETED -> UserDeleted(
+                userId = uid,
+                createdAt = createdAt,
+                version = version,
+                streamId = streamId,
+                createdBy = uid
+            )
         }
     }
 }
@@ -96,10 +104,11 @@ data class UserModel(
     val currency: String?,
     val email: String?,
     val photoUrl: String?,
-    val emailVerified: Boolean?,
+    val emailVerified: Boolean,
     val createdAt: Instant,
     val updatedAt: Instant,
     val version: Int,
+    val deleted: Boolean,
 )
 
 data class UserCreated(
@@ -143,7 +152,8 @@ data class UserCreated(
             emailVerified = emailVerified,
             createdAt = createdAt,
             updatedAt = createdAt,
-            version = version
+            version = version,
+            deleted = false,
         )
     }
 }
@@ -216,6 +226,48 @@ data class UserPhoneNumberChanged(
     }
 }
 
+data class UserDeleted(
+    override val userId: String,
+    override val createdAt: Instant,
+    override val version: Int,
+    override val streamId: UUID,
+    override val createdBy: String,
+) : IUserEvent {
+    override fun toEntity(): UserEvent {
+        return UserEvent(
+            uid = userId,
+            streamId = streamId,
+            displayName = null,
+            phoneNumber = null,
+            email = null,
+            photoUrl = null,
+            emailVerified = null,
+            currency = null,
+            createdAt = createdAt,
+            version = version,
+            eventType = UserEventType.USER_DELETED
+        )
+    }
+
+    override fun applyEvent(existing: UserModel?): UserModel {
+        requireNotNull(existing) { "User must exist" }
+        return existing.copy(
+            streamId = streamId,
+            uid = userId + "_"+ Instant.now().epochSecond,
+            displayName = "",
+            phoneNumber = null,
+            email = null,
+            photoUrl = null,
+            currency = null,
+            emailVerified = false,
+            createdAt = createdAt,
+            updatedAt = createdAt,
+            version = version,
+            deleted = true
+        )
+    }
+}
+
 data class UserDisplayNameChanged(
     val displayName: String,
     override val userId: String,
@@ -252,6 +304,7 @@ data class UserDisplayNameChanged(
 
 enum class UserEventType {
     USER_CREATED,
+    USER_DELETED,
     CURRENCY_CHANGED,
     PHONE_NUMBER_CHANGED,
     DISPLAY_NAME_CHANGED,
