@@ -8,6 +8,7 @@ import { HelperService } from '../helper.service';
 import { FirebaseAuthError, FirebaseErrorCodeMessageEnum } from './types';
 import { extractFirebaseErrorMessage } from '../utility-functions';
 import { SignupComponent } from '../signup/signup.component';
+import { isIos } from '../utils';
 
 type ActiveUi = 'login' | 'signup' | 'forgotPassword';
 
@@ -36,6 +37,8 @@ export class LoginComponent {
   readonly forgotPasswordForm = this.fb.group({
     email: this.fb.nonNullable.control('', [Validators.required, Validators.email]),
   });
+
+  readonly isIos = isIos;
 
   constructor() {}
 
