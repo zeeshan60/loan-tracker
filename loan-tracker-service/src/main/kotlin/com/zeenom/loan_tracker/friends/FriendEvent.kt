@@ -22,7 +22,7 @@ data class FriendEvent(
     val friendPhoneNumber: String?,
     val friendDisplayName: String?,
     val createdAt: Instant,
-    val createdBy: UUID, //TODO zeeshan add created by field
+    val createdBy: UUID,
     val streamId: UUID,
     val version: Int,
     val eventType: FriendEventType,
@@ -78,7 +78,7 @@ data class FriendModel(
     @Id
     val id: UUID? = null,
     val streamId: UUID,
-    val userUid: UUID, //todo zeeshan make userUid uuid
+    val userUid: UUID,
     val friendEmail: String?,
     val friendPhoneNumber: String?,
     val friendDisplayName: String,

@@ -20,15 +20,17 @@ interface IEventAble<T> {
 @Table("transaction_events")
 data class TransactionEvent(
     @Id private val id: UUID? = null,
-    val userId: UUID?, //TODO zeeshan make userid nullable
-    val transactionDate: Instant?, //TODO zeeshan make transactionDate nullable
+    val userId: UUID?,
+    val transactionDate: Instant?,
     val description: String?,
     val currency: String?,
     val splitType: SplitType?,
     val totalAmount: BigDecimal?,
-    val recipientId: UUID?, //TODO zeeshan make recipientId nullable
+    val recipientId: UUID?,
     val createdAt: Instant,
     val createdBy: UUID,
+    //Transaction events are unique by user_uid, stream_id and version not just stream_id and version. due to cross transaction mechanic
+    //Be careful resolving this in the future. resolve this stream using user_uid, stream_id not just stream_id
     val streamId: UUID,
     val version: Int,
     val eventType: TransactionEventType,

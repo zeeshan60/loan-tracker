@@ -17,7 +17,7 @@ interface IUserEvent : IEvent<UserModel> {
 @Table("user_events")
 data class UserEvent(
     @Id val id: UUID? = null,
-    val uid: String?, //TODO zeeshan make uid nullable
+    val uid: String?,
     val streamId: UUID,
     val displayName: String?,
     val phoneNumber: String?,
@@ -26,7 +26,7 @@ data class UserEvent(
     val emailVerified: Boolean?,
     val currency: String?,
     val createdAt: Instant,
-    val createdBy: UUID, //TODO zeeshan add created by field
+    val createdBy: UUID,
     val version: Int,
     val eventType: UserEventType,
 ) : IEventAble<UserModel> {
