@@ -63,7 +63,7 @@
     </div>
 
   } @else if (activeUi() === 'signup') {
-    <mr-signup></mr-signup>
+    <mr-signup (signupComplete)="activeUi.set('login')"></mr-signup>
     <div class="signup-row">
       <span class="left-text">Already have an account?</span>
       <ion-button fill="clear" color="primary" (click)="activateUi('login')">

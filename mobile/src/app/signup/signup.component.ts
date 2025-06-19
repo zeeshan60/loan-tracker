@@ -20,7 +20,7 @@ import { PhoneWithCountryComponent } from '../phone-with-country/phone-with-coun
     IonButton,
   ],
 })
-export class SignupComponent  implements OnInit {
+export class SignupComponent {
   readonly signupComplete = output<boolean>();
   readonly fb = inject(FormBuilder);
   readonly helperService = inject(HelperService);
@@ -56,7 +56,6 @@ export class SignupComponent  implements OnInit {
           const confirmPassword = control.get('confirmPassword') as AbstractControl;
           if (!password.value || !confirmPassword.value) return null;
           const valid = password.value === confirmPassword.value;
-          console.log('isValid: ', valid);
           if (valid) {
             confirmPassword.setErrors(null)
             return null
@@ -69,9 +68,8 @@ export class SignupComponent  implements OnInit {
     }),
   });
   loading = signal(false);
-  constructor() { }
 
-  ngOnInit() {}
+  constructor() { }
 
   emailErrorMessage(form: FormGroup) {
     let emailControl = form.controls['email'];
@@ -125,7 +123,7 @@ export class SignupComponent  implements OnInit {
               color: 'success',
             },
           );
-          await toast.onDidDismiss();
+          toast.onDidDismiss();
           return this.signupComplete.emit(true);
         })
         .catch((error: FirebaseAuthError) => {
