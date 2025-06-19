@@ -4,62 +4,63 @@
   <div class="bottom-section"></div>
   @if (activeUi() === 'login') {
     <form (submit)="onLoginWithCreds()" [formGroup]="loginForm">
-    <div class="form-card">
-      <div class="ion-margin card-heading">
-        <h1>Login</h1>
-        <p>
-          Let's get you started.
-        </p>
+      <div class="form-card">
+        <div class="ion-margin card-heading">
+          <h1>Login</h1>
+          <p>
+            Let's get you started.
+          </p>
+        </div>
+        <ion-item>
+          <ion-label position="stacked" class="input-label">Email ID</ion-label>
+          <ion-input
+            class="input-field"
+            [errorText]="emailErrorMessage(loginForm)"
+            type="email"
+            formControlName="email"
+            name="email"
+            placeholder="Write your email"
+          ></ion-input>
+          <img src="assets/images/email-icon.svg" alt="icon"/>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked" class="input-label">Password</ion-label>
+          <ion-input
+            class="input-field"
+            type="password"
+            formControlName="password"
+            name="password"
+            required
+            errorText="Password is required"
+            placeholder="Enter your password"
+          ></ion-input>
+          <!-- Left icon -->
+          <img src="assets/images/lock-icon.svg" alt="Lock icon"/>
+          <!-- Right icon (eye toggle) -->
+          <img class="eye-icon" src="assets/images/eye-icon.svg" alt="Toggle password"/>
+        </ion-item>
+
+        <div class="ion-text-end">
+          <ion-button fill="clear" (click)="activateUi('forgotPassword')" class="button-text">Forgot password?
+          </ion-button>
+        </div>
       </div>
-      <ion-item>
-        <ion-label position="stacked" class="input-label">Email ID</ion-label>
-        <ion-input
-                class="input-field"
-                [errorText]="emailErrorMessage(loginForm)"
-                type="email"
-                formControlName="email"
-                name="email"
-                placeholder="Write your email"
-              ></ion-input>
-        <img src="assets/images/email-icon.svg" alt="icon"/>
-      </ion-item>
+      <ion-button expand="full" type="submit" [disabled]="loading()" class="button-inner button-filled">
+        {{ loading() ? 'Signing in...' : 'Sign In' }}
+      </ion-button>
 
-      <ion-item>
-        <ion-label position="stacked" class="input-label">Password</ion-label>
-        <ion-input
-                class="input-field"
-                type="password"
-                formControlName="password"
-                name="password"
-                required
-                errorText="Password is required"
-                placeholder="Enter your password"
-              ></ion-input>
-        <!-- Left icon -->
-        <img src="assets/images/lock-icon.svg" alt="Lock icon"/>
-        <!-- Right icon (eye toggle) -->
-        <img class="eye-icon" src="assets/images/eye-icon.svg" alt="Toggle password"/>
-      </ion-item>
+      @if (invalidCreds()) {
+        <ion-label class="invalid-cred" color="danger">{{ invalidCreds() }}</ion-label>
+      }
+    </form>
 
-      <div class="ion-text-end">
-        <ion-button fill="clear" (click)="activateUi('forgotPassword')" class="button-text">Forgot password?</ion-button>
-      </div>
-    </div>
-    <ion-button expand="full" type="submit" [disabled]="loading()" class="button-inner button-filled">
-      {{ loading() ? 'Signing in...' : 'Sign In' }}
-    </ion-button>
-
-    @if (invalidCreds()) {
-      <ion-label class="invalid-cred" color="danger">{{invalidCreds()}}</ion-label>
-    }
-  </form>
-
-  <div class="signup-row">
-    <span class="left-text">Don't have an account?</span>
-    <ion-button fill="clear" color="primary" (click)="activateUi('signup')">
+    <div class="signup-row">
+      <span class="left-text">Don't have an account?</span>
+      <ion-button fill="clear" color="primary" (click)="activateUi('signup')">
         Sign Up
       </ion-button>
-  </div>
+    </div>
 
   } @else if (activeUi() === 'signup') {
     <mr-signup></mr-signup>
@@ -72,41 +73,39 @@
   } @else if (activeUi() === 'forgotPassword') {
 
     <form (submit)="onPasswordRecovery()" [formGroup]="forgotPasswordForm">
-    <div class="form-card">
-      <div class="ion-margin card-heading">
-        <h1>Forgot Password</h1>
-        <p>
-          Let’s get you back on track!
-        </p>
+      <div class="form-card">
+        <div class="ion-margin card-heading">
+          <h1>Forgot Password</h1>
+          <p>
+            Let’s get you back on track!
+          </p>
+        </div>
+
+        <ion-item>
+          <ion-label position="stacked" class="input-label">Email ID</ion-label>
+          <ion-input
+            class="input-field"
+            [errorText]="emailErrorMessage(forgotPasswordForm)"
+            type="email"
+            formControlName="email"
+            name="email"
+            placeholder="Write your email"
+          ></ion-input>
+          <img src="assets/images/email-icon.svg" alt="icon"/>
+        </ion-item>
       </div>
 
-      <ion-item>
-        <ion-label position="stacked" class="input-label">Email ID</ion-label>
-        <ion-input
-          class="input-field"
-          [errorText]="emailErrorMessage(forgotPasswordForm)"
-          type="email"
-          formControlName="email"
-          name="email"
-          placeholder="Write your email"
-        ></ion-input>
-        <img src="assets/images/email-icon.svg" alt="icon"/>
-      </ion-item>
-    </div>
-
-    <ion-button expand="full" type="submit" [disabled]="loading()" class="button-filled">
+      <ion-button expand="full" type="submit" [disabled]="loading()" class="button-filled">
         Submit
-    </ion-button>
+      </ion-button>
 
-    @if (invalidCreds()) {
-      <ion-label class="invalid-cred" color="danger">{{invalidCreds()}}</ion-label>
-    }
-  </form>
-  <div class="signup-row">
-    <ion-button fill="clear" (click)="activateUi('login')">Back to Login</ion-button>
-  </div>
-
-
+      @if (invalidCreds()) {
+        <ion-label class="invalid-cred" color="danger">{{ invalidCreds() }}</ion-label>
+      }
+    </form>
+    <div class="signup-row">
+      <ion-button fill="clear" (click)="activateUi('login')">Back to Login</ion-button>
+    </div>
   }
 
 
@@ -117,14 +116,14 @@
   </div>
   <div class="social-login-wrapper">
     <div class="social-login-container">
-      <ion-button  (click)="loginWithGoogle()">
+      <ion-button (click)="loginWithGoogle()">
         <img src="assets/images/google-icon.svg" alt="Google Logo"/>
       </ion-button>
       <p class="center-text">Google</p>
     </div>
     @if (isIos) {
       <div class="social-login-container">
-        <ion-button  (click)="loginWithApple()">
+        <ion-button (click)="loginWithApple()">
           <img src="assets/images/apple-icon.svg" alt="Apple Logo"/>
         </ion-button>
         <p class="center-text">Apple</p>
