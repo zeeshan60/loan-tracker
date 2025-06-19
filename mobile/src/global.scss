@@ -158,6 +158,12 @@ ion-header {
         color: $color-white;
       }
     }
+
+    ion-button {
+      &::part(native) {
+        color: $color-white;
+      }
+    }
   }
   ion-buttons {
     margin: 0;
