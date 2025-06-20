@@ -65,9 +65,11 @@
           font-size: 12px;
           font-weight: 500;
           margin: 0;
-          width: 45%;
+          width: 41%;
+          display: flex;
           &.converted {
             text-align: right;
+            justify-content: end;
           }
         }
 

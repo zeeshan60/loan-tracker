@@ -24,25 +24,24 @@
           @for (otherBalance of sortedOtherBalance(); track otherBalance.amount.currency) {
             <ion-item>
               <div class="item-wrapper">
-                <p>
-                  <span
-                    [ngClass]="otherBalance.amount.isOwed ? 'success': 'danger'"
-                  >
+                <p
+                  [class]="otherBalance.amount.isOwed ? 'success': 'danger'"
+                >
                   {{ otherBalance.amount.amount | currency: otherBalance.amount.currency: 'symbol' }}
-                    @if (otherBalance.amount.isOwed) {
-                      <img
-                        class="arrow"
-                        src="assets/images/arrow-green-downward.svg" alt="wallet"
-                      />
-                    } @else () {
-                      <img
-                        class="arrow"
-                        src="assets/images/arrow-red-upword.svg" alt="wallet"
-                      />
-                    }
-                </span>
+                  @if (otherBalance.amount.isOwed) {
+                    <img
+                      class="arrow"
+                      src="assets/images/arrow-green-downward.svg" alt="wallet"
+                    />
+                  } @else () {
+                    <img
+                      class="arrow"
+                      src="assets/images/arrow-red-upword.svg" alt="wallet"
+                    />
+                  }
                 </p>
-                <ion-icon size="small" name="arrow-forward-outline"></ion-icon>
+                <ion-label>Converted to</ion-label>
+<!--                <ion-icon size="small" name="arrow-forward-outline"></ion-icon>-->
                 <p
                   [class]="otherBalance.amount.isOwed ? 'success': 'danger'"
                   class="converted"
