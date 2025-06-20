@@ -34,7 +34,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSContactsUsageDescription</key>
-  <string>To help you split expenses and sync with friends on MoneyRabbit, we access your contacts to find mutual users. Expenses will sync automatically if your friend uses the app with the same phone number. Contacts are not stored on our servers.</string>
+  <string>To easily add friends and simplify sharing expenses, we access your contacts so you can select them directly, avoiding manual entry. Contacts are not stored on our servers.</string>
   <key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
