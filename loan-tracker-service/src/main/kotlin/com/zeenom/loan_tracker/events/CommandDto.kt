@@ -8,7 +8,8 @@ import java.util.UUID
 data class CommandDto<T : CommandPayloadDto?>(
     val commandType: CommandType,
     val payload: T,
-    val userId: UUID?
+    val userId: UUID?,
+    val userFBId: String?
 )
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")

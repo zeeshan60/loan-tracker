@@ -1,20 +1,28 @@
 package com.zeenom.loan_tracker.users
 
 import kotlinx.coroutines.flow.toList
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.util.UUID
+import java.util.*
 
 @Service
-class UserEventHandler(private val userRepository: UserEventRepository, private val userModelRepository: UserModelRepository) {
+class UserEventHandler(
+    private val userRepository: UserEventRepository,
+    private val userModelRepository: UserModelRepository
+) {
 
+    val logger = LoggerFactory.getLogger(UserEventHandler::class.java)
     suspend fun addEvent(event: IUserEvent) {
         userRepository.save(event.toEntity())
         val existing = userModelRepository.findByStreamId(event.streamId)
-        userModelRepository.save(event.applyEvent(existing))
-    }
-
-    suspend fun findUserModelByUid(uid: String): UserModel? {
-        return userModelRepository.findByUid(uid)
+        val updated = event.applyEvent(existing)
+        //If deleted event is received, delete the user model
+        if (updated.deleted) {
+            userModelRepository.deleteById(updated.id!!)
+            logger.warn("User with stream id ${updated.streamId} deleted")
+        } else {
+            userModelRepository.save(updated)
+        }
     }
 
     suspend fun findUserById(uid: String): UserDto? {

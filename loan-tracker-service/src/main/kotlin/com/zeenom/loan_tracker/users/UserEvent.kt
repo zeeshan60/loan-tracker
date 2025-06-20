@@ -251,7 +251,7 @@ data class UserDeleted(
         requireNotNull(existing) { "User must exist" }
         return existing.copy(
             streamId = streamId,
-            uid = existing.uid + "_"+ Instant.now().epochSecond,
+            uid = existing.uid,
             displayName = "",
             phoneNumber = null,
             email = null,

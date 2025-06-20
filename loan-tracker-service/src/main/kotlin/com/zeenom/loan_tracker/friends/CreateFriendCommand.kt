@@ -3,6 +3,7 @@ package com.zeenom.loan_tracker.friends
 import com.zeenom.loan_tracker.common.Command
 import com.zeenom.loan_tracker.events.CommandDao
 import com.zeenom.loan_tracker.events.CommandDto
+import io.swagger.v3.core.util.Json
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -14,6 +15,7 @@ class CreateFriendCommand(
     private val commandDao: CommandDao,
 ) : Command<CreateFriendDto> {
     override suspend fun execute(commandDto: CommandDto<CreateFriendDto>) {
+        Json.prettyPrint(commandDto)
         CoroutineScope(Dispatchers.IO).launch { commandDao.addCommand(commandDto) }
         requireNotNull(commandDto.userId) { "User ID must not be null for CreateFriend" }
         friendService.createFriend(commandDto.userId, commandDto.payload)

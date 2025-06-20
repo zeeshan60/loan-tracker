@@ -41,7 +41,8 @@ class TransactionsControllerIntegrationTest :
     private lateinit var johnToken: String
     private lateinit var jasonToken: String
     private var zeeDto = UserDto(
-        uid = "123",
+        uid = null,
+        userFBId = "123",
         email = "zee@gmail.com",
         phoneNumber = "+923001234567",
         displayName = "Zeeshan Tufail",
@@ -50,7 +51,8 @@ class TransactionsControllerIntegrationTest :
         emailVerified = true
     )
     private var johnDto = UserDto(
-        uid = "124",
+        uid = null,
+        userFBId = "124",
         email = "john@gmail.com",
         phoneNumber = "+923001234568",
         displayName = "John Doe",
@@ -59,7 +61,8 @@ class TransactionsControllerIntegrationTest :
         emailVerified = true
     )
     private var jasonDto = UserDto(
-        uid = "125",
+        uid = null,
+        userFBId = "125",
         email = "jason@gmail.com",
         phoneNumber = "+923001234569",
         displayName = "Jason Doe",
@@ -81,6 +84,18 @@ class TransactionsControllerIntegrationTest :
         zeeToken = loginUser(
             userDto = zeeDto
         ).token
+        zeeDto = userModelRepository.findByUid(zeeDto.userFBId)!!.let {
+            UserDto(
+                uid = it.streamId,
+                userFBId = it.uid,
+                email = it.email,
+                phoneNumber = it.phoneNumber,
+                displayName = it.displayName,
+                photoUrl = it.photoUrl,
+                currency = it.currency?.toString(),
+                emailVerified = it.emailVerified
+            )
+        }
         addFriend(zeeToken, "john")
         johnFriendId = queryFriend(
             token = zeeToken
@@ -110,7 +125,7 @@ class TransactionsControllerIntegrationTest :
                 .expectBody().jsonPath("$.description").isEqualTo("Sample transaction")
 
             delay(100)
-            val existing = userModelRepository.findByUid(zeeDto.uid)
+            val existing = userModelRepository.findByStreamId(zeeDto.uid!!)
             assertThat(existing!!.currency.toString()).isEqualTo("USD")
         }
 
@@ -193,6 +208,10 @@ class TransactionsControllerIntegrationTest :
     @Order(5)
     @Test
     fun `update transaction as zee`() {
+        `add a transaction adds transaction and also sets the currency successfully when user didnt have any currency`()
+        `get all transactions`()
+        `login with friend as user`()
+        `get all transactions as john`()
         webTestClient.put()
             .uri("/api/v1/transactions/update/transactionId/${transaction.transactionId}")
             .header("Authorization", "Bearer $zeeToken")

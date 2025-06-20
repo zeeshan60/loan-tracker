@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.*
-import javax.imageio.ImageIO
 
 interface IEventAble<T> {
     fun toEvent(): IEvent<T>
@@ -20,7 +19,7 @@ interface IEventAble<T> {
 @Table("transaction_events")
 data class TransactionEvent(
     @Id private val id: UUID? = null,
-    val userId: UUID?,
+    val userUid: UUID?,
     val transactionDate: Instant?,
     val description: String?,
     val currency: String?,
@@ -39,7 +38,7 @@ data class TransactionEvent(
         return when (eventType) {
             TransactionEventType.TRANSACTION_CREATED -> TransactionCreated(
                 id = id,
-                userId = userId ?: throw IllegalStateException("User ID is required"),
+                userId = userUid ?: throw IllegalStateException("User ID is required"),
                 description = description ?: throw IllegalStateException("Description is required"),
                 currency = currency ?: throw IllegalStateException("Currency is required"),
                 splitType = splitType ?: throw IllegalStateException("Split type is required"),

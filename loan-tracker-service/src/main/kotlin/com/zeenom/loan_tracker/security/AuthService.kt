@@ -32,7 +32,8 @@ class AuthService(
             CommandDto(
                 commandType = CommandType.LOGIN,
                 payload = user,
-                userId = null
+                userId = user.uid,
+                userFBId = user.userFBId
             )
         )
         //Do not use the user object from Firebase, it doesnt necessarily have the same uid

@@ -23,6 +23,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean
 import org.springframework.test.web.reactive.server.WebTestClient
+import java.util.UUID
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -42,8 +43,10 @@ class AuthControllerTest(
         val idToken =
             "eyJhbGciOiJSUzI1NiIsImtpZCI6ImE0MzRmMzFkN2Y3NWRiN2QyZjQ0YjgxZDg1MjMwZWQxN2ZlNTk3MzciLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiWmVlc2hhbiBUdWZhaWwiLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jS3hlSEhxNENsNU9RZjdDSENISHA4Ym1ObEswbmFGbzJHa282UTJPS0xDRjRkNjVHbHc9czk2LWMiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vbG9hbi10cmFja2VyLTliMjVkIiwiYXVkIjoibG9hbi10cmFja2VyLTliMjVkIiwiYXV0aF90aW1lIjoxNzM4NTEyNzA3LCJ1c2VyX2lkIjoiQ01XTDB0YXBaR1NET0kzVGJ6UUVNOHZibFRsMiIsInN1YiI6IkNNV0wwdGFwWkdTRE9JM1RielFFTTh2YmxUbDIiLCJpYXQiOjE3Mzg1MTI3MDcsImV4cCI6MTczODUxNjMwNywiZW1haWwiOiJ6ZWVzaGFudHVmYWlsODZAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZ29vZ2xlLmNvbSI6WyIxMTE4MzA4MjI1MDU4Mjc5Mzk3OTQiXSwiZW1haWwiOlsiemVlc2hhbnR1ZmFpbDg2QGdtYWlsLmNvbSJdfSwic2lnbl9pbl9wcm92aWRlciI6Imdvb2dsZS5jb20ifX0.T5p39Aja_tqrZ3Xlcl7AD0M9Lm9kkUY4ACNqr2a1eBfWfxp22Yu8BUkO3NiiSHAhx7-CgXRc8hs6KQRX3D5h8L_rwm3g5b7hVGkHy-YnvL0beOghhshJpp-WdYLP6xZ7gTB8ENwM8aC5U3kYuvc4VblwzdOC0jxkkvwNDDTmlhUJmVoua2VmEBjcuxEP0sILhHy0NWZjimf_DeeNDS7O6hI9uo5rnOfTPdfUaT5EagRyh0CNcP-FuxLsu6qFeMRqEXXIjYR8HpA3MnfcIen-_h-UTHWNxFv3SLIjkhkpRFP9oh7WGBIKJNfu6TExZlJ0A6aZSwF_lfxoGJdISnRLkQ"
 
+        val uid = UUID.randomUUID()
         val userDto = UserDto(
-            uid = "123",
+            uid = uid,
+            userFBId = "123",
             email = "sample@gmail.com",
             phoneNumber = "+923001234567",
             displayName = "Zeeshan Tufail",
@@ -60,8 +63,8 @@ class AuthControllerTest(
             email = userDto.email,
             phoneNumber = userDto.phoneNumber
         )
-        Mockito.doReturn(Unit).whenever(friendService).searchUsersImFriendOfAndAddThemAsMyFriends("123")
-        whenever(friendService.findAllByUserId("123")).thenReturn(
+        Mockito.doReturn(Unit).whenever(friendService).searchUsersImFriendOfAndAddThemAsMyFriends(uid)
+        whenever(friendService.findAllByUserId(uid)).thenReturn(
             FriendsWithAllTimeBalancesDto(
                 friends = emptyList(),
                 balance = AllTimeBalanceDto(main = null, other = emptyList())
@@ -72,7 +75,8 @@ class AuthControllerTest(
             CommandDto(
                 commandType = CommandType.LOGIN,
                 payload = userDto,
-                userId = "123",
+                userId = uid,
+                userFBId = "123"
             )
         )
 
@@ -94,7 +98,8 @@ class AuthControllerTest(
                 CommandDto(
                     commandType = CommandType.LOGIN,
                     payload = userDto,
-                    userId = "123",
+                    userId = uid,
+                    userFBId = "123"
                 )
             )
         }
@@ -104,7 +109,7 @@ class AuthControllerTest(
             .createUser(userDtoCaptor.capture())
         assertThat(userDtoCaptor.firstValue).isEqualTo(userDto)
 
-        Mockito.verify(friendService, Mockito.times(1)).searchUsersImFriendOfAndAddThemAsMyFriends("123")
+        Mockito.verify(friendService, Mockito.times(1)).searchUsersImFriendOfAndAddThemAsMyFriends(uid)
     }
 }
 

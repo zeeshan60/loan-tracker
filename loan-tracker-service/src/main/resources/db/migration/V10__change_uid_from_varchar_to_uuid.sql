@@ -2,6 +2,8 @@
 ALTER TABLE commands
     RENAME COLUMN user_id TO user_fb_id;
 ALTER TABLE commands
+    ALTER COLUMN user_fb_id DROP NOT NULL;
+ALTER TABLE commands
     ADD COLUMN user_id UUID;
 ALTER TABLE user_events
     ALTER COLUMN uid DROP NOT NULL;
@@ -22,7 +24,7 @@ UPDATE user_events set created_by = stream_id where created_by is null;
 ALTER TABLE user_events
     ALTER COLUMN created_by SET NOT NULL;
 ALTER TABLE friend_events add column created_by UUID;
-UPDATE friend_events set created_by = friend_events.user_id where created_by is null;
+UPDATE friend_events set created_by = friend_events.user_uid where created_by is null;
 ALTER TABLE friend_events
     ALTER COLUMN created_by SET NOT NULL;
 

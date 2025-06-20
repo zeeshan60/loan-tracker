@@ -39,6 +39,7 @@ class TransactionsController(
         createTransactionCommand.execute(
             CommandDto(
                 userId = userId,
+                userFBId = null,
                 payload = requestToDto(transactionRequest, transactionId),
                 commandType = CommandType.CREATE_TRANSACTION
             )
@@ -105,6 +106,7 @@ class TransactionsController(
         updateTransactionCommand.execute(
             CommandDto(
                 userId = userId,
+                userFBId = null,
                 payload = requestToDto(transactionRequest, transactionId),
                 commandType = CommandType.UPDATE_TRANSACTION
             )
@@ -127,6 +129,7 @@ class TransactionsController(
         deleteTransactionCommand.execute(
             CommandDto(
                 userId = userId,
+                userFBId = null,
                 payload = TransactionId(transactionStreamId = transactionId),
                 commandType = CommandType.DELETE_TRANSACTION
             )

@@ -53,7 +53,8 @@ class FriendsController(
             CommandDto(
                 commandType = CommandType.ADD_FRIEND,
                 payload = friendsAdapter.fromRequestToDto(friendRequest),
-                userId = userId
+                userId = userId,
+                userFBId = null
             )
         )
         return friendQuery.execute(
@@ -79,7 +80,8 @@ class FriendsController(
             CommandDto(
                 commandType = CommandType.UPDATE_FRIEND,
                 payload = friendsAdapter.fromRequestToDto(friendRequest, friendId),
-                userId = userId
+                userId = userId,
+                userFBId = null
             )
         )
         return friendQuery.execute(
@@ -104,7 +106,8 @@ class FriendsController(
             CommandDto(
                 commandType = CommandType.DELETE_FRIEND,
                 payload = DeleteFriendDto(friendId = friendId),
-                userId = userId
+                userId = userId,
+                userFBId = null
             )
         )
         return MessageResponse("Friend with ID $friendId deleted successfully")

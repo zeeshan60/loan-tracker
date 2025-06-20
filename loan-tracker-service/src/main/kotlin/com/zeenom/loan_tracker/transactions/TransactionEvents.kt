@@ -30,7 +30,7 @@ data class TransactionCreated(
 ) : ITransactionEvent {
     override fun toEntity(): TransactionEvent {
         return TransactionEvent(
-            userId = userId,
+            userUid = userId,
             description = description,
             currency = currency,
             splitType = splitType,
@@ -125,7 +125,7 @@ data class TransactionDateChanged(
 
     override fun toEntity(): TransactionEvent {
         return TransactionEvent(
-            userId = null,
+            userUid = null,
             description = null,
             currency = null,
             splitType = null,
@@ -212,7 +212,7 @@ data class DescriptionChanged(
             eventType = TransactionEventType.DESCRIPTION_CHANGED,
             transactionDate = null,
             id = id,
-            userId = null,
+            userUid = null,
         )
     }
 
@@ -285,7 +285,7 @@ data class TransactionDeleted(
             eventType = TransactionEventType.TRANSACTION_DELETED,
             transactionDate = null,
             id = id,
-            userId = null,
+            userUid = null,
         )
     }
 
@@ -353,7 +353,7 @@ data class TotalAmountChanged(
             splitType = null,
             totalAmount = totalAmount,
             recipientId = null,
-            userId = null,
+            userUid = null,
             createdAt = createdAt,
             createdBy = createdBy,
             streamId = streamId,
@@ -432,7 +432,7 @@ data class CurrencyChanged(
             version = version,
             eventType = TransactionEventType.CURRENCY_CHANGED,
             transactionDate = null,
-            userId = null
+            userUid = null
         )
     }
 
@@ -504,7 +504,7 @@ data class SplitTypeChanged(
 
     override fun toEntity(): TransactionEvent {
         return TransactionEvent(
-            userId = null,
+            userUid = null,
             description = null,
             currency = null,
             splitType = splitType,

@@ -14,6 +14,7 @@ class CommandDao(
         eventRepository.save(
             CommandEntity(
                 userId = commandDto.userId,
+                userFBId = commandDto.userFBId,
                 commandType = commandDto.commandType,
                 createdAt = Instant.now(),
                 payload = commandDto.payload?.toJson(objectMapper = objectMapper)

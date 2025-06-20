@@ -49,7 +49,8 @@ class UsersController(
                     phoneNumber = userRequest.phoneNumber,
                     currency = userRequest.currency,
                 ),
-                userId = userId
+                userId = userId,
+                userFBId = null
             )
         )
         return userQuery.execute(userId).let {
