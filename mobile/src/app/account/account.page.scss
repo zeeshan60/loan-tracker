@@ -107,7 +107,7 @@ ion-list {
     text-transform: capitalize;
     font-weight: 500;
     padding: 8px 12px;
-    background: $color-white;
+    background: var(--color-white);
     --inner-padding-end: 0px;
 
     &::part(native) {

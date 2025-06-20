@@ -17,11 +17,12 @@
 
     ion-button {
       &::part(native) {
-        background-color: $color-white;
+        background-color: var(--color-white);
         height: 60px;
         width: 60px;
         border-radius: 100%;
         box-shadow: 0 0 8px #ccc;
+        --background-activated: var(--color-white);
       }
     }
   }
@@ -103,7 +104,7 @@ ion-content {
   }
 
   .form-card {
-    background-color: $color-white;
+    background-color: var(--color-white);
     border: 1px solid $color-lightGrey;
     border-radius: 10px;
     padding: 0 0 8px;
@@ -114,7 +115,7 @@ ion-content {
   .button-filled {
     &::part(native) {
       background-color: $color-green;
-      color: $color-white;
+      color: var(--color-white);
       border-radius: 46px;
       padding: 12px 20px;
       font-size: 16px;

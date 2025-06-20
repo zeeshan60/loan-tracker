@@ -132,7 +132,7 @@ ion-list {
     --border-color: transparent !important;
     --inner-padding-end: 0px;
     border-radius: 10px;
-    background: $color-white;
+    background: var(--color-white);
 
     &::part(native) {
       padding: 12px;
@@ -199,7 +199,7 @@ ion-list {
   --border-color: transparent !important;
   // --inner-padding-end: 0px;
   border-radius: 10px;
-  background: $color-white;
+  background: var(--color-white);
 
   &::part(detail-icon) {
     display: none !important;
@@ -272,7 +272,7 @@ ion-list {
     font-size: 14px;
     font-weight: 500;
     color: $color-blue;
-    background-color: $color-white;
+    background-color: var(--color-white);
   }
 
 }

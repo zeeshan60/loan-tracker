@@ -39,7 +39,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap');
 
 :root {
-  --ion-color-primary: #3063E3
+  --ion-color-primary: #3063E3;
+  --color-white: #fff;
 }
 
 *, body, ion-app, ion-content, h1, h2, h3, h4, h5, h6, label, p, ion-input, ion-label, ion-button, button {
@@ -108,11 +109,11 @@ ion-label.small {
 
   &:hover, &:active {
     background-color: $color-green;
-    color: $color-white;
+    color: var(--color-white);
     opacity: 1;
   }
   ion-spinner {
-    color: $color-white;
+    color: var(--color-white);
   }
 }
 
@@ -124,7 +125,7 @@ ion-label.small {
   font-size: 14px;
   font-weight: 500;
   color: $color-red;
-  background-color: $color-white;
+  background-color: var(--color-white);
 }
 
 ion-header {
@@ -134,19 +135,19 @@ ion-header {
     padding-right: 10px;
     background: transparent linear-gradient(to right, $color-blue 0%, $color-green 100%);
     --background: transparent;
-    --color: $color-white;
+    --color: var(--color-white);
     --border-width: 0 !important;
     ion-title {
       padding: 0;
       font-size: 20px;
       font-weight: 600;
-      color: $color-white;
+      color: var(--color-white);
       text-align: left;
     }
 
     ion-icon {
       font-size: 26px;
-      color: $color-white;
+      color: var(--color-white);
     }
 
     ion-back-button {
@@ -155,13 +156,13 @@ ion-header {
       }
 
       &::part(native) {
-        color: $color-white;
+        color: var(--color-white);
       }
     }
 
     ion-button {
       &::part(native) {
-        color: $color-white;
+        color: var(--color-white);
       }
     }
   }
