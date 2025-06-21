@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, output, signal } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { createUserWithEmailAndPassword, getAuth } from '@angular/fire/auth';
+import { createUserWithEmailAndPassword, getAuth, updateProfile } from '@angular/fire/auth';
 import { FirebaseAuthError, FirebaseErrorCodeMessageEnum } from '../login/types';
 import { extractFirebaseErrorMessage } from '../utility-functions';
 import { HelperService } from '../helper.service';
@@ -115,7 +115,8 @@ export class SignupComponent {
       this.loading.set(true);
       const auth = getAuth();
       createUserWithEmailAndPassword(auth, this.signUpForm.get('email').value, this.signUpForm.get('passwords.password').value)
-        .then(async () => {
+        .then(async (userCredential) => {
+          await updateProfile(userCredential.user, { displayName: this.signUpForm.get('name').value });
           let toast = await this.helperService.showToast(
             'You are successfully registered. You can login now.',
             3000,

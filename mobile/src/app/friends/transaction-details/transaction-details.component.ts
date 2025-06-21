@@ -93,7 +93,7 @@ export class TransactionDetailsComponent {
     const response = await this.helperService.showConfirmAlert()
     if (response.role === 'confirm') {
       try {
-        await this.friendsStore.deleteTransaction(this.transactionId());
+        await this.friendsStore.deleteTransaction(this.transactionId() || this.transaction()?.transactionId);
         this.nav.pop();
       } catch (e) {}
     }

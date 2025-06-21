@@ -218,8 +218,9 @@ export const FriendsStore = signalStore(
         })
         await helperService.showToast('Transaction deleted successfully');
       } catch (e) {
-        await helperService.showToast('Unable to add friend at the moment');
-        throw new Error('Unable to add friend at the moment')
+        let errorMessage = 'Unable to delete transaction at the moment';
+        await helperService.showToast(errorMessage);
+        throw new Error(errorMessage)
       }
       if (transactionAdded) {
         this.loadSelectedTransactions()

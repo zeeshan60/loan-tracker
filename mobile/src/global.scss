@@ -41,6 +41,7 @@
 :root {
   --ion-color-primary: #3063E3;
   --color-white: #ffffff;
+  --ion-color-success: #21CE99;;
 }
 
 *, body, ion-app, ion-content, h1, h2, h3, h4, h5, h6, label, p, ion-input, ion-label, ion-button, button {
@@ -68,7 +69,7 @@ ion-action-sheet::part(button-text) {
     color: red;
   }
   &.green {
-    color: green;
+    color: var(--ion-color-success);
   }
 }
 
