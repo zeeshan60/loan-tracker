@@ -104,7 +104,8 @@ class UsersControllerIntegrationTest(@LocalServerPort private val port: Int) : B
             .exchange()
             .expectStatus().isNotFound
         zeeToken = loginUser(
-            userDto = zeeDto
+            //New users user id should be null or at-least different from previous user id
+            userDto = zeeDto.copy(uid = null)
         ).token
 
         webTestClient.get()

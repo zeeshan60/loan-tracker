@@ -59,6 +59,9 @@ class AuthControllerTest(
         ).whenever(firebaseService).userByVerifyingIdToken(idToken)
 
         Mockito.doReturn(Unit).whenever(userService).createUser(userDto)
+        Mockito.doReturn(userDto).whenever(userService).findUserByFBId(
+            userDto.userFBId
+        )
         Mockito.doReturn(userDto).whenever(userService).findByUserEmailOrPhoneNumber(
             email = userDto.email,
             phoneNumber = userDto.phoneNumber

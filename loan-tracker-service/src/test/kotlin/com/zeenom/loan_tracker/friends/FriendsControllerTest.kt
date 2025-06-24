@@ -114,7 +114,7 @@ class FriendsControllerTest(
         Mockito.doReturn(Unit).`when`(commandDao).addCommand<CommandPayloadDto>(any())
         webTestClient.post()
             .uri("/api/v1/friends/add")
-            .header("Authorization", "Bearer ${authService.generateJwt("sample uid")}")
+            .header("Authorization", "Bearer ${authService.generateJwt(userId.toString())}")
             .bodyValue(
                 FriendRequest(
                     name = "John Doe",
@@ -143,7 +143,7 @@ class FriendsControllerTest(
     fun `test cors configuration`() {
         val response = webTestClient.options()
             .uri("/api/v1/friends")
-            .header("Authorization", "Bearer ${authService.generateJwt("verified-id-token")}")
+            .header("Authorization", "Bearer ${authService.generateJwt(UUID.randomUUID().toString())}")
             .header("Origin", "https://any-origin.com")
             .header("Access-Control-Request-Method", "GET")
             .exchange()
@@ -171,7 +171,7 @@ class FriendsControllerTest(
         Mockito.doThrow(NotFoundException("Friend not found")).`when`(friendService).findAllByUserId(any())
         val result = webTestClient.get()
             .uri("/api/v1/friends")
-            .header("Authorization", "Bearer ${authService.generateJwt("sample uid")}")
+            .header("Authorization", "Bearer ${authService.generateJwt(UUID.randomUUID().toString())}")
             .exchange()
             .expectStatus().isNotFound
             .expectBody(String::class.java)
