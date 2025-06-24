@@ -15,7 +15,6 @@ class CreateFriendCommand(
     private val commandDao: CommandDao,
 ) : Command<CreateFriendDto> {
     override suspend fun execute(commandDto: CommandDto<CreateFriendDto>) {
-        Json.prettyPrint(commandDto)
         CoroutineScope(Dispatchers.IO).launch { commandDao.addCommand(commandDto) }
         requireNotNull(commandDto.userId) { "User ID must not be null for CreateFriend" }
         friendService.createFriend(commandDto.userId, commandDto.payload)

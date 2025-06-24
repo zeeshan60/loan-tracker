@@ -24,7 +24,7 @@ class UserService(
             throw IllegalStateException("User with this unique identifier already exist")
         }
 
-        val streamId = UUID.randomUUID()
+        val streamId = userDto.uid ?: UUID.randomUUID()
         userEventHandler.addEvent(
             UserCreated(
                 displayName = userDto.displayName,

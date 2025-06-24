@@ -19,13 +19,13 @@ interface IEventAble<T> {
 @Table("transaction_events")
 data class TransactionEvent(
     @Id private val id: UUID? = null,
-    val userUid: UUID?,
+    val userUid: UUID,
     val transactionDate: Instant?,
     val description: String?,
     val currency: String?,
     val splitType: SplitType?,
     val totalAmount: BigDecimal?,
-    val recipientId: UUID?,
+    val recipientId: UUID,
     val createdAt: Instant,
     val createdBy: UUID,
     //Transaction events are unique by user_uid, stream_id and version not just stream_id and version. due to cross transaction mechanic
@@ -38,7 +38,7 @@ data class TransactionEvent(
         return when (eventType) {
             TransactionEventType.TRANSACTION_CREATED -> TransactionCreated(
                 id = id,
-                userId = userUid ?: throw IllegalStateException("User ID is required"),
+                userId = userUid,
                 description = description ?: throw IllegalStateException("Description is required"),
                 currency = currency ?: throw IllegalStateException("Currency is required"),
                 splitType = splitType ?: throw IllegalStateException("Split type is required"),
@@ -53,6 +53,8 @@ data class TransactionEvent(
 
             TransactionEventType.DESCRIPTION_CHANGED -> DescriptionChanged(
                 id = id,
+                userId = userUid,
+                recipientId = recipientId,
                 description = description ?: throw IllegalStateException("Description is required"),
                 createdAt = createdAt,
                 createdBy = createdBy,
@@ -62,6 +64,8 @@ data class TransactionEvent(
 
             TransactionEventType.SPLIT_TYPE_CHANGED -> SplitTypeChanged(
                 id = id,
+                userId = userUid,
+                recipientId = recipientId,
                 splitType = splitType ?: throw IllegalStateException("Split type is required"),
                 createdAt = createdAt,
                 createdBy = createdBy,
@@ -71,6 +75,8 @@ data class TransactionEvent(
 
             TransactionEventType.TOTAL_AMOUNT_CHANGED -> TotalAmountChanged(
                 id = id,
+                userId = userUid,
+                recipientId = recipientId,
                 totalAmount = totalAmount ?: throw IllegalStateException("Total amount is required"),
                 createdAt = createdAt,
                 createdBy = createdBy,
@@ -80,6 +86,8 @@ data class TransactionEvent(
 
             TransactionEventType.CURRENCY_CHANGED -> CurrencyChanged(
                 id = id,
+                userId = userUid,
+                recipientId = recipientId,
                 currency = currency ?: throw IllegalStateException("Currency is required"),
                 createdAt = createdAt,
                 createdBy = createdBy,
@@ -89,6 +97,8 @@ data class TransactionEvent(
 
             TransactionEventType.TRANSACTION_DELETED -> TransactionDeleted(
                 id = id,
+                userId = userUid,
+                recipientId = recipientId,
                 createdAt = createdAt,
                 createdBy = createdBy,
                 streamId = streamId,
@@ -97,6 +107,8 @@ data class TransactionEvent(
 
             TransactionEventType.TRANSACTION_DATE_CHANGED -> TransactionDateChanged(
                 id = id,
+                userId = userUid,
+                recipientId = recipientId,
                 createdAt = createdAt,
                 createdBy = createdBy,
                 streamId = streamId,

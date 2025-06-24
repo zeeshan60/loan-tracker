@@ -163,8 +163,20 @@ class TransactionsControllerIntegrationTest :
 
     @Order(3)
     @Test
-    fun `login with friend as user`() {
+    fun `login with friend as user`(): Unit = runBlocking {
         johnToken = loginUser(johnDto).token
+        johnDto = userModelRepository.findByUid(johnDto.userFBId)!!.let {
+            UserDto(
+                uid = it.streamId,
+                userFBId = it.uid,
+                email = it.email,
+                phoneNumber = it.phoneNumber,
+                displayName = it.displayName,
+                photoUrl = it.photoUrl,
+                currency = it.currency?.toString(),
+                emailVerified = it.emailVerified
+            )
+        }
         val queryFriend = queryFriend(johnToken)
         zeeFriendId = queryFriend.data.friends.first().friendId
         assertThat(zeeFriendId).isNotNull()
@@ -208,10 +220,6 @@ class TransactionsControllerIntegrationTest :
     @Order(5)
     @Test
     fun `update transaction as zee`() {
-        `add a transaction adds transaction and also sets the currency successfully when user didnt have any currency`()
-        `get all transactions`()
-        `login with friend as user`()
-        `get all transactions as john`()
         webTestClient.put()
             .uri("/api/v1/transactions/update/transactionId/${transaction.transactionId}")
             .header("Authorization", "Bearer $zeeToken")
@@ -485,9 +493,9 @@ class TransactionsControllerIntegrationTest :
         assertThat(result.perMonth[0].transactions[1].splitType).isEqualTo(SplitType.YouOweThemAll)
         assertThat(result.perMonth[0].transactions[1].description).isEqualTo("Sample transaction edited by john")
         assertThat(result.perMonth[0].transactions[1].createdBy.name).isEqualTo("You")
-        assertThat(result.perMonth[0].transactions[1].updatedBy!!.name).isEqualTo("You")
+        assertThat(result.perMonth[0].transactions[1].updatedBy!!.name).isEqualTo("john")
         assertThat(result.perMonth[0].transactions[1].createdBy.id).isEqualTo(zeeDto.uid)
-        assertThat(result.perMonth[0].transactions[1].updatedBy!!.id).isEqualTo(zeeDto.uid)
+        assertThat(result.perMonth[0].transactions[1].updatedBy!!.id).isEqualTo(johnDto.uid)
         assertThat(result.perMonth[0].transactions[1].createdAt).isNotNull()
         assertThat(result.perMonth[0].transactions[1].updatedAt).isNotNull()
         assertThat(result.perMonth[0].transactions[1].history).hasSize(2)
@@ -738,9 +746,9 @@ class TransactionsControllerIntegrationTest :
 
         assertThat(transactionResponse.createdAt).isNotNull()
         assertThat(transactionResponse.updatedAt).isNotNull()
-        assertThat(transactionResponse.createdBy.id).isEqualTo("123")
+        assertThat(transactionResponse.createdBy.id).isEqualTo(zeeDto.uid)
         assertThat(transactionResponse.createdBy.name).isEqualTo("You")
-        assertThat(transactionResponse.updatedBy!!.id).isEqualTo("123")
+        assertThat(transactionResponse.updatedBy!!.id).isEqualTo(zeeDto.uid)
         assertThat(transactionResponse.updatedBy!!.name).isEqualTo("You")
     }
 
@@ -757,7 +765,7 @@ class TransactionsControllerIntegrationTest :
 
         assertThat(transactionResponse.createdAt).isNotNull()
         assertThat(transactionResponse.updatedAt).isNull()
-        assertThat(transactionResponse.createdBy.id).isEqualTo("123")
+        assertThat(transactionResponse.createdBy.id).isEqualTo(zeeDto.uid)
         assertThat(transactionResponse.createdBy.name).isEqualTo("You")
         assertThat(transactionResponse.updatedBy).isNull()
     }

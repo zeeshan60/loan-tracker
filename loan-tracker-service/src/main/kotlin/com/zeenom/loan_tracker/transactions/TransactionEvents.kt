@@ -10,19 +10,21 @@ import java.util.*
 
 interface ITransactionEvent : IEvent<TransactionModel>, TransactionChangeSummary, CrossTransactionable {
     val id: UUID?
+    val userId: UUID
+    val recipientId: UUID
     override fun toEntity(): TransactionEvent
     fun activityLog(current: TransactionModel): ActivityLog
 }
 
 data class TransactionCreated(
     override val id: UUID?,
-    val userId: UUID,
+    override val userId: UUID,
+    override val recipientId: UUID,
     val description: String,
     val currency: String,
     val splitType: SplitType,
     val totalAmount: BigDecimal,
     val transactionDate: Instant,
-    val recipientId: UUID,
     override val createdAt: Instant,
     override val createdBy: UUID,
     override val streamId: UUID,
@@ -71,11 +73,11 @@ data class TransactionCreated(
         return TransactionCreated(
             id = null,
             userId = recipientUserId,
+            recipientId = userStreamId,
             description = description,
             currency = currency,
             splitType = splitType.reverse(),
             totalAmount = totalAmount,
-            recipientId = userStreamId,
             createdAt = createdAt,
             createdBy = createdBy,
             streamId = streamId,
@@ -106,6 +108,9 @@ data class TransactionCreated(
 
 data class TransactionDateChanged(
     override val id: UUID?,
+    override val userId: UUID,
+    override val recipientId: UUID,
+
     val transactionDate: Instant,
     override val streamId: UUID,
     override val version: Int,
@@ -125,12 +130,12 @@ data class TransactionDateChanged(
 
     override fun toEntity(): TransactionEvent {
         return TransactionEvent(
-            userUid = null,
+            userUid = userId,
             description = null,
             currency = null,
             splitType = null,
             totalAmount = null,
-            recipientId = null,
+            recipientId = recipientId,
             createdAt = createdAt,
             createdBy = createdBy,
             streamId = streamId,
@@ -153,6 +158,8 @@ data class TransactionDateChanged(
     override fun crossTransaction(recipientUserId: UUID, userStreamId: UUID): ITransactionEvent {
         return TransactionDateChanged(
             id = id,
+            userId = recipientUserId,
+            recipientId = userStreamId,
             transactionDate = transactionDate,
             streamId = streamId,
             version = version,
@@ -180,6 +187,8 @@ data class TransactionDateChanged(
 
 data class DescriptionChanged(
     override val id: UUID?,
+    override val userId: UUID,
+    override val recipientId: UUID,
     val description: String,
     override val streamId: UUID,
     override val version: Int,
@@ -204,7 +213,7 @@ data class DescriptionChanged(
             currency = null,
             splitType = null,
             totalAmount = null,
-            recipientId = null,
+            recipientId = recipientId,
             createdAt = createdAt,
             createdBy = createdBy,
             streamId = streamId,
@@ -212,7 +221,7 @@ data class DescriptionChanged(
             eventType = TransactionEventType.DESCRIPTION_CHANGED,
             transactionDate = null,
             id = id,
-            userUid = null,
+            userUid = userId,
         )
     }
 
@@ -229,6 +238,8 @@ data class DescriptionChanged(
     override fun crossTransaction(recipientUserId: UUID, userStreamId: UUID): ITransactionEvent {
         return DescriptionChanged(
             id = id,
+            userId = recipientUserId,
+            recipientId = userStreamId,
             description = description,
             streamId = streamId,
             version = version,
@@ -255,6 +266,8 @@ data class DescriptionChanged(
 
 data class TransactionDeleted(
     override val id: UUID?,
+    override val userId: UUID,
+    override val recipientId: UUID,
     override val streamId: UUID,
     override val version: Int,
     override val createdAt: Instant,
@@ -277,7 +290,7 @@ data class TransactionDeleted(
             currency = null,
             splitType = null,
             totalAmount = null,
-            recipientId = null,
+            recipientId = recipientId,
             createdAt = createdAt,
             createdBy = createdBy,
             streamId = streamId,
@@ -285,7 +298,7 @@ data class TransactionDeleted(
             eventType = TransactionEventType.TRANSACTION_DELETED,
             transactionDate = null,
             id = id,
-            userUid = null,
+            userUid = userId,
         )
     }
 
@@ -302,6 +315,8 @@ data class TransactionDeleted(
     override fun crossTransaction(recipientUserId: UUID, userStreamId: UUID): ITransactionEvent {
         return TransactionDeleted(
             id = id,
+            userId = recipientUserId,
+            recipientId = userStreamId,
             streamId = streamId,
             version = version,
             createdAt = createdAt,
@@ -329,6 +344,8 @@ data class TransactionDeleted(
 
 data class TotalAmountChanged(
     override val id: UUID?,
+    override val userId: UUID,
+    override val recipientId: UUID,
     val totalAmount: BigDecimal,
     override val streamId: UUID,
     override val version: Int,
@@ -352,8 +369,8 @@ data class TotalAmountChanged(
             currency = null,
             splitType = null,
             totalAmount = totalAmount,
-            recipientId = null,
-            userUid = null,
+            recipientId = recipientId,
+            userUid = userId,
             createdAt = createdAt,
             createdBy = createdBy,
             streamId = streamId,
@@ -376,6 +393,8 @@ data class TotalAmountChanged(
     override fun crossTransaction(recipientUserId: UUID, userStreamId: UUID): ITransactionEvent {
         return TotalAmountChanged(
             id = id,
+            userId = recipientUserId,
+            recipientId = userStreamId,
             totalAmount = totalAmount,
             streamId = streamId,
             version = version,
@@ -402,6 +421,8 @@ data class TotalAmountChanged(
 
 data class CurrencyChanged(
     override val id: UUID?,
+    override val userId: UUID,
+    override val recipientId: UUID,
     val currency: String,
     override val streamId: UUID,
     override val version: Int,
@@ -425,14 +446,14 @@ data class CurrencyChanged(
             currency = currency,
             splitType = null,
             totalAmount = null,
-            recipientId = null,
+            recipientId = recipientId,
             createdAt = createdAt,
             createdBy = createdBy,
             streamId = streamId,
             version = version,
             eventType = TransactionEventType.CURRENCY_CHANGED,
             transactionDate = null,
-            userUid = null
+            userUid = userId
         )
     }
 
@@ -449,6 +470,8 @@ data class CurrencyChanged(
     override fun crossTransaction(recipientUserId: UUID, userStreamId: UUID): ITransactionEvent {
         return CurrencyChanged(
             id = id,
+            userId = recipientUserId,
+            recipientId = userStreamId,
             currency = currency,
             streamId = streamId,
             version = version,
@@ -475,6 +498,8 @@ data class CurrencyChanged(
 
 data class SplitTypeChanged(
     override val id: UUID?,
+    override val userId: UUID,
+    override val recipientId: UUID,
     val splitType: SplitType,
     override val streamId: UUID,
     override val version: Int,
@@ -504,12 +529,12 @@ data class SplitTypeChanged(
 
     override fun toEntity(): TransactionEvent {
         return TransactionEvent(
-            userUid = null,
+            userUid = userId,
             description = null,
             currency = null,
             splitType = splitType,
             totalAmount = null,
-            recipientId = null,
+            recipientId = recipientId,
             createdAt = createdAt,
             createdBy = createdBy,
             streamId = streamId,
@@ -522,6 +547,8 @@ data class SplitTypeChanged(
     override fun crossTransaction(recipientUserId: UUID, userStreamId: UUID): ITransactionEvent {
         return SplitTypeChanged(
             id = id,
+            userId = recipientUserId,
+            recipientId = userStreamId,
             splitType = splitType.reverse(),
             streamId = streamId,
             version = version,

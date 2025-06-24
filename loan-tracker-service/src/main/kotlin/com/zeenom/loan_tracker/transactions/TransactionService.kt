@@ -5,6 +5,7 @@ import com.zeenom.loan_tracker.users.UserCurrencyChanged
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventHandler
 import com.zeenom.loan_tracker.users.UserModel
+import io.swagger.v3.core.util.Json
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -37,12 +38,12 @@ class TransactionService(
         val event = TransactionCreated(
             id = null,
             userId = userUid,
+            recipientId = transactionDto.friendSummaryDto.friendId,
             description = transactionDto.description,
             transactionDate = transactionDto.transactionDate,
             currency = transactionDto.currency.toString(),
             splitType = transactionDto.splitType,
             totalAmount = transactionDto.originalAmount,
-            recipientId = transactionDto.friendSummaryDto.friendId,
             createdAt = Instant.now(),
             createdBy = userUid,
             streamId = transactionDto.transactionStreamId,
@@ -108,6 +109,8 @@ class TransactionService(
         if (existing.transactionDate != transactionDto.transactionDate) {
             val event = TransactionDateChanged(
                 id = null,
+                userId = userUid,
+                recipientId = existing.recipientId,
                 transactionDate = transactionDto.transactionDate,
                 createdAt = createdAt,
                 createdBy = userUid,
@@ -126,6 +129,8 @@ class TransactionService(
         if (existing.description != transactionDto.description) {
             val event = DescriptionChanged(
                 id = null,
+                userId = userUid,
+                recipientId = existing.recipientId,
                 description = transactionDto.description,
                 createdAt = createdAt,
                 createdBy = userUid,
@@ -144,6 +149,8 @@ class TransactionService(
         if (existing.splitType != transactionDto.splitType) {
             val event = SplitTypeChanged(
                 id = null,
+                userId = userUid,
+                recipientId = existing.recipientId,
                 splitType = transactionDto.splitType,
                 createdAt = createdAt,
                 createdBy = userUid,
@@ -162,6 +169,8 @@ class TransactionService(
         if (existing.totalAmount != transactionDto.originalAmount) {
             val event = TotalAmountChanged(
                 id = null,
+                userId = userUid,
+                recipientId = existing.recipientId,
                 totalAmount = transactionDto.originalAmount,
                 createdAt = createdAt,
                 createdBy = userUid,
@@ -180,6 +189,8 @@ class TransactionService(
         if (existing.currency != transactionDto.currency.toString()) {
             val event = CurrencyChanged(
                 id = null,
+                userId = userUid,
+                recipientId = existing.recipientId,
                 currency = transactionDto.currency.toString(),
                 createdAt = createdAt,
                 createdBy = userUid,
@@ -250,6 +261,8 @@ class TransactionService(
         )
         val event = TransactionDeleted(
             id = null,
+            userId = userUid,
+            recipientId = recipientId,
             createdAt = Instant.now(),
             createdBy = userUid,
             streamId = transactionStreamId,

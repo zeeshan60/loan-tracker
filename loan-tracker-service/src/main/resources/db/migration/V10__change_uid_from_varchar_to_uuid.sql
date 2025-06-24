@@ -47,8 +47,8 @@ where transaction_events.user_id is null;
 ALTER TABLE transaction_events drop user_uid;
 ALTER TABLE transaction_events
     RENAME COLUMN user_id TO user_uid;
+ALTER TABLE transaction_events ALTER COLUMN user_uid SET NOT NULL;
 --Transaction events are unique by user_uid, stream_id and version not just stream_id and version. due to cross transaction mechanic
 CREATE UNIQUE INDEX idx_transaction_events_version_userId ON transaction_events (user_uid, stream_id, version);
 
 ALTER TABLE transaction_events ALTER COLUMN transaction_date DROP NOT NULL;
-ALTER TABLE transaction_events ALTER COLUMN recipient_id DROP NOT NULL;

@@ -1,5 +1,6 @@
 package com.zeenom.loan_tracker.users
 
+import io.swagger.v3.core.util.Json
 import kotlinx.coroutines.flow.toList
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -61,6 +62,7 @@ class UserEventHandler(
 
     suspend fun findUsersByUids(uids: List<UUID>): List<UserDto> {
         if (uids.isEmpty()) return emptyList()
+        Json.prettyPrint(uids)
         return userModelRepository.findAllByStreamIdIn(uids).toList().map {
             UserDto(
                 uid = it.streamId,
