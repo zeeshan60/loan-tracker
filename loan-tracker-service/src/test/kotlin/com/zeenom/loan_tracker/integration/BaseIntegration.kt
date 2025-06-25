@@ -28,7 +28,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-class BaseIntegration /*: TestPostgresConfig()*/ {
+class BaseIntegration : TestPostgresConfig() {
 
     @Autowired
     @MockitoSpyBean
