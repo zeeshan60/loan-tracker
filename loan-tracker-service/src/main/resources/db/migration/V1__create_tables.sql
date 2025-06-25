@@ -7,7 +7,7 @@ CREATE TABLE commands
 (
     id           UUID PRIMARY KEY DEFAULT uuid_generate_v1(),
     command_type VARCHAR(255) NOT NULL,
-    user_id      VARCHAR(255) NOT NULL,  -- make this uuid and nullable
+    user_id      VARCHAR(255) NOT NULL,
     created_at   TIMESTAMP    NOT NULL,
     payload      JSONB
 );
