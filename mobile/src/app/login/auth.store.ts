@@ -169,12 +169,13 @@ export const AuthStore = signalStore(
     },
 
     async askForPhoneNumber() {
-      await modalService.showModal({
-        component: AskForPhoneComponent,
-        componentProps: {
-          region: store.region()
-        }
-      })
+      // todo: will enable later
+      // await modalService.showModal({
+      //   component: AskForPhoneComponent,
+      //   componentProps: {
+      //     region: store.region()
+      //   }
+      // })
     },
 
     async login(idToken: string) {
