@@ -2,6 +2,7 @@ package com.zeenom.loan_tracker.friends
 
 import com.zeenom.loan_tracker.events.CommandDto
 import com.zeenom.loan_tracker.events.CommandType
+import com.zeenom.loan_tracker.firebase.FirebaseService
 import com.zeenom.loan_tracker.users.UserService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Schema
@@ -15,7 +16,8 @@ import java.util.UUID
 class UsersController(
     private val updateUserCommand: UpdateUserCommand,
     private val userQuery: UserQuery,
-    private val userService: UserService
+    private val userService: UserService,
+    private val firebaseService: FirebaseService,
 ) {
 
     @Operation(summary = "Get user", description = "Get user details")
@@ -69,7 +71,8 @@ class UsersController(
     @Operation(summary = "Delete a user", description = "Delete user")
     @DeleteMapping
     suspend fun deleteUser(@AuthenticationPrincipal userId: UUID) {
-        userService.deleteUser(userId)
+        val deleted = userService.deleteUser(userId)
+        firebaseService.deleteUserByFBId(deleted.uid)
     }
 }
 

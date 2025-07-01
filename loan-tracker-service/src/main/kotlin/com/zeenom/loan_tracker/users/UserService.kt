@@ -1,6 +1,7 @@
 package com.zeenom.loan_tracker.users
 
 import com.zeenom.loan_tracker.friends.UserUpdateDto
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.util.*
@@ -106,17 +107,21 @@ class UserService(
         }
     }
 
-    suspend fun deleteUser(userId: UUID) {
+    val logger = LoggerFactory.getLogger(UserService::class.java)
+    suspend fun deleteUser(userId: UUID): UserModel {
+        logger.info("Deleting user with ID: $userId")
         val existing = userEventHandler.findModelByUserId(userId)
             ?: throw IllegalArgumentException("User with this unique identifier does not exist")
 
-        userEventHandler.addEvent(
-            UserDeleted(
-                createdAt = Instant.now(),
-                streamId = existing.streamId,
-                version = existing.version + 1,
-                createdBy = userId
-            )
+        val event = UserDeleted(
+            createdAt = Instant.now(),
+            streamId = existing.streamId,
+            version = existing.version + 1,
+            createdBy = userId
         )
+        userEventHandler.addEvent(
+            event
+        )
+        return event.applyEvent(existing)
     }
 }
