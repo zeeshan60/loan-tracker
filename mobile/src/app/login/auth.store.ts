@@ -1,7 +1,7 @@
 import {patchState, signalStore, withMethods, withState} from '@ngrx/signals';
 import {inject} from '@angular/core';
 import {HelperService} from '../helper.service';
-import { HttpClient, HttpContext, HttpContextToken } from '@angular/common/http';
+import {HttpClient, HttpContext, HttpContextToken} from '@angular/common/http';
 import {Router} from '@angular/router';
 import {ToastController} from '@ionic/angular/standalone';
 import {StorageService} from '../services/storage.service';
@@ -9,13 +9,15 @@ import {DEFAULT_TOAST_DURATION, PRIVATE_API, PUBLIC_API} from '../constants';
 import {LoadingController} from '@ionic/angular/standalone';
 import {FriendsStore} from '../friends/friends.store';
 import {firstValueFrom} from 'rxjs';
-import {Auth, signInWithPopup, GoogleAuthProvider } from '@angular/fire/auth';
+import {Auth, signInWithPopup, GoogleAuthProvider} from '@angular/fire/auth';
 import {AskForPhoneComponent} from '../ask-for-phone/ask-for-phone.component';
 import {Capacitor} from '@capacitor/core';
 import {LoginPlugin} from 'zeenom-capacitor-social-login';
 import {ModalService} from '../modal.service';
 import {environment} from "../../environments/environment";
+
 export const IS_PUBLIC_API = new HttpContextToken<boolean>(() => false);
+
 export interface User {
   uid: string,
   email: string,
@@ -94,13 +96,23 @@ export const AuthStore = signalStore(
       }
     },
 
-    async getLoginPluginToken(): Promise<string> {
+    async getLoginPluginToken(provider: string): Promise<string> {
       switch (Capacitor.getPlatform()) {
         case 'ios':
-          return LoginPlugin.echo({value: JSON.stringify(environment.firebaseIOS)})
+          return LoginPlugin.echo({
+            value: JSON.stringify({
+              ...environment.firebaseIOS,
+              provider: provider
+            })
+          })
             .then(({value: token}) => token);
         case 'android':
-          return LoginPlugin.echo({value: JSON.stringify(environment.firebaseAndroid)})
+          return LoginPlugin.echo({
+            value: JSON.stringify({
+              ...environment.firebaseAndroid,
+              provider: provider
+            })
+          })
             .then(({value: token}) => token);
         default:
           return signInWithPopup(auth, new GoogleAuthProvider())
@@ -111,7 +123,7 @@ export const AuthStore = signalStore(
     async loginWithGoogle(): Promise<boolean | void> {
       const loader = await loadingCtrl.create();
       loader.present();
-      return this.getLoginPluginToken()
+      return this.getLoginPluginToken("google")
         .then(async (token) => {
           return this.login(token!);
         })
@@ -133,22 +145,27 @@ export const AuthStore = signalStore(
     },
 
     async loginWithApple(): Promise<boolean | void> {
-      // todo: login with apple plugin
-      // const loginPromise = this.getLoginPluginToken();
-      //
-      // return loginPromise
-      //   .then(async (token) => this.login(token!))
-      //   .then(() => {
-      //     if (!store.user()?.phoneNumber) {
-      //       this.askForPhoneNumber();
-      //     }
-      //   })
-      //   .catch(async () => {
-      //     this.signOut();
-      //     await helperService.showToast('Unable to login at the moment', 2000, {
-      //       color: 'danger'
-      //     });
-      //   });
+      const loader = await loadingCtrl.create();
+      loader.present();
+      return this.getLoginPluginToken("apple")
+        .then(async (token) => {
+          return this.login(token!);
+        })
+        .then(() => {
+          loader.dismiss();
+          if (!store.user()?.phoneNumber) {
+            this.askForPhoneNumber();
+          }
+        })
+        .catch(async () => {
+          this.signOut();
+          await helperService.showToast('Unable to login at the moment', 2000, {
+            color: 'danger'
+          });
+        })
+        .finally(() => {
+          loader?.dismiss();
+        });
     },
 
     async askForPhoneNumber() {
@@ -166,7 +183,7 @@ export const AuthStore = signalStore(
         const {token: apiKey} = await firstValueFrom(
           http.post<{ token: string }>(url, {
             idToken: `Bearer ${idToken}`
-          }, { context: new HttpContext().set(IS_PUBLIC_API, true)})
+          }, {context: new HttpContext().set(IS_PUBLIC_API, true)})
         );
         await storageService.set('api_key', apiKey);
         patchState(store, {apiKey: apiKey})
