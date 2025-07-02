@@ -104,7 +104,6 @@ export class AccountPage {
     loader.present();
     try {
       await firstValueFrom(this.http.delete(`${PRIVATE_API}/users`));
-      await getAuth().currentUser?.delete()
     } catch (e) {
       let toast = await this.toastCtrl.create({
         message: 'Unable to delete user at the moment. Please login and try again.',
