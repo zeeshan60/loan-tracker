@@ -16,7 +16,7 @@ class ActivityLogsQuery(
             requireNotNull(log.transactionDto.transactionStreamId) { "Transaction stream id is required" }
             requireNotNull(log.transactionDto.friendSummaryDto.friendId) { "Recipient name is required" }
             requireNotNull(log.transactionDto.createdBy) { "Created by is required" }
-            requireNotNull(log.transactionDto.createdByName) { "Created by name is required" }
+//            requireNotNull(log.transactionDto.createdByName) { "Created by name is required" } //FIXME
             requireNotNull(log.transactionDto.createdAt) { "Created at is required" }
             ActivityLogResponse(
                 id = log.id,
@@ -62,7 +62,7 @@ class ActivityLogsQuery(
                     updatedAt = log.transactionDto.updatedAt,
                     createdBy = TransactionUserResponse(
                         id = log.transactionDto.createdBy,
-                        name = log.transactionDto.createdByName
+                        name = log.transactionDto.createdByName ?: "Deleted User" // TODO handle deleted user
                     ),
                     updatedBy = log.transactionDto.updatedBy?.let {
                         TransactionUserResponse(

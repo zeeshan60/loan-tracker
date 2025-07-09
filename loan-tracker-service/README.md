@@ -232,3 +232,8 @@ end
 µ
 We had to add capabilities in xcode project to allow apple sign in. under signing and capabilities tab, we added sign in with apple capabilities
 
+```bash
+#allow docker commands without sudo
+sudo usermod -aG docker ec2-user
+newgrp docker
+```

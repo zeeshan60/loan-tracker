@@ -366,7 +366,7 @@ class TransactionService(
                     date = it.date,
                     changedBy = it.changedBy,
                     changedByName = if (it.changedBy == userDto.uid) "You" else friendUsersByUserId[it.changedBy]?.name
-                        ?: "Unknown", // TODO handle deleted user
+                        ?: "Deleted User", // TODO handle deleted user
                     changedByPhoto = if (it.changedBy == userDto.uid) userDto.photoUrl else friendUsersByUserId[it.changedBy]?.photoUrl,
                     oldValue = it.oldValue,
                     newValue = it.newValue,
