@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
-import type { ModalOptions } from '@ionic/core/components';
 import { ModalController } from '@ionic/angular/standalone';
+import { ModalOptions } from '@ionic/angular';
 
 export type ModalIndex = 0|1|2|3|4;
 

@@ -30,7 +30,6 @@ import { CURRENCIES, CURRENCIES_CODES, Currency, PRIVATE_API } from '../constant
 import { ShortenNamePipe } from '../pipes/shorten-name.pipe';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ComponentDestroyedMixin } from '../component-destroyed.mixin';
-import { DefineExpenseService } from './define-expense.service';
 import { AuthStore } from '../login/auth.store';
 import { ModalIndex, ModalService } from '../modal.service';
 import { CurrenciesDropdownComponent } from '../currencies-dropdown/currencies-dropdown.component';
@@ -167,7 +166,9 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
    */
   private setAppropriateCurrency() {
     let currency = CURRENCIES[0].code;
-    if (this.authStore.user()?.currency) {
+    if (this.friendsStore.mostlyUsedCurrency()) {
+      currency = this.friendsStore.mostlyUsedCurrency();
+    } else if (this.authStore.user()?.currency) {
       currency = this.authStore.user()?.currency!;
     } else if (this.friend()?.otherBalances?.[0]?.amount.currency) {
       currency = this.friend()?.otherBalances?.[0]?.amount.currency!;
@@ -215,6 +216,7 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
           this.defineExpenseForm.getRawValue(),
           this.isUpdating() ? this.transaction() : undefined,
         );
+        await this.helperService.showToast('Expense added successfully.');
         this.modalService.dismiss(this.modalIndex(), updatedExpense, 'confirm');
       } catch (e) {
       } finally {

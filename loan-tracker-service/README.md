@@ -195,3 +195,40 @@ curl --location --request POST 'https://loandeploy.codewithzeeshan.com/deploy' \
 --header 'Content-Type: application/json' \
 --header 'Authorization: Bearer 49cf14928048efa5569abb0b6330251d'
 ```
+
+# Apple sign in setup
+- Configured moneyrabbit app id to use apple sign in in apple developer account
+- Added firebase server url as redirect url: https://money-rabbit-6024.firebaseapp.com/__/auth/handler
+- Now need to create sign in with apple private key. This was keys section under certificates, ids and profiles. added a new key and enabled sign in with apple. Downloaded the key and saved it as AuthKey_XXXXXXXX.p8 in gdrive
+- Now using blank xcode project to test firebase integration
+- getting error: CoreStore.framework/_CodeSignature" failed: Operation not permitted #500
+- Aparently its an open issue reported here: https://github.com/JohnEstropia/CoreStore/issues/500
+  - solution: Change your project Build Settings->User Script Sandboxing from Yes to No can solve this issue.
+  - while fixing this we ended up disabling csrutil security. we need to now run recovery mode by holding power button on start and type csrutil enable in terminal again.
+  - we also added full disk access to xcode and terminal in system preferences.but that didn't help. so removing them now
+
+we also added this part in podfile to fix the issue but didnt help:
+```yaml
+# ✅ Fully replace the rsync shell script to avoid SIP issues
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_phases.each do |phase|
+      next unless phase.respond_to?(:name)
+      next unless phase.name == '[CP] Embed Pods Frameworks'
+
+      phase.shell_script = <<~EOS
+        set -e
+        set -u
+        echo "✅ Using cp instead of rsync to avoid SIP issues"
+        mkdir -p "${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/"
+        find "${BUILT_PRODUCTS_DIR}" -name '*.framework' -type d | while read framework; do
+          cp -R "$framework" "${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/"
+        done
+      EOS
+    end
+  end
+end
+```
+µ
+We had to add capabilities in xcode project to allow apple sign in. under signing and capabilities tab, we added sign in with apple capabilities
+

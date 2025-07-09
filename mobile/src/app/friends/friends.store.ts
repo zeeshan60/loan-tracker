@@ -77,21 +77,34 @@ export const FriendsStore = signalStore(
         map.set(splitType as SplitOption, 0);
       })
 
-      selectedTransactions().forEach((byDate: TransactionsByMonth) => {
-        byDate.transactions.forEach((transaction) => {
+      selectedTransactions()?.[0]?.transactions.slice(0, 3)
+        .forEach((transaction) => {
           map.set(transaction.splitType, map.get(transaction.splitType) + 1)
         })
-      })
+
       return Array.from(map.entries()).sort((a, b) => {
         return a[1] > b[1] ? -1 : 1
       })[0][0] as SplitOption;
+    })
+    const mostlyUsedCurrency = computed(() => {
+      const map = new Map<string, number>();
+
+      selectedTransactions()?.[0]?.transactions.slice(0, 3)
+        .forEach((transaction) => {
+          map.set(transaction.amount.currency, (map.get(transaction.amount.currency) ?? 0) + 1)
+        })
+
+      return Array.from(map.entries()).sort((a, b) => {
+        return a[1] > b[1] ? -1 : 1
+      })[0]?.[0];
     })
 
     return {
       unSettledFriends,
       inActiveFriends,
       selectedFriend,
-      mostlyUsedSplitType
+      mostlyUsedSplitType,
+      mostlyUsedCurrency,
     }
   }),
   withMethods((

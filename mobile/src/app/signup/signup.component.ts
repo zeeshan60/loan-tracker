@@ -117,14 +117,13 @@ export class SignupComponent {
       createUserWithEmailAndPassword(auth, this.signUpForm.get('email').value, this.signUpForm.get('passwords.password').value)
         .then(async (userCredential) => {
           await updateProfile(userCredential.user, { displayName: this.signUpForm.get('name').value });
-          let toast = await this.helperService.showToast(
+          await this.helperService.showToast(
             'You are successfully registered. You can login now.',
             3000,
             {
               color: 'success',
             },
           );
-          toast.onDidDismiss();
           return this.signupComplete.emit(true);
         })
         .catch((error: FirebaseAuthError) => {

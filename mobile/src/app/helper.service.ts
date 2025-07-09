@@ -12,9 +12,22 @@ export class HelperService {
   readonly toastCtrl = inject(ToastController);
   readonly alertCtrl = inject(AlertController);
   readonly loadingCtrl = inject(LoadingController);
+  #toastsMuted = true;
   constructor() { }
 
+  muteToasts(mute: boolean) {
+    this.#toastsMuted = mute;
+    // this logic below will mute the notifications for 2 seconds only.
+    if (this.#toastsMuted) {
+      setTimeout(() => {
+        this.muteToasts(false);
+      }, 2000);
+    }
+  }
   async showToast(message: string, duration = DEFAULT_TOAST_DURATION, options?: ToastOptions) {
+    if (!this.#toastsMuted) {
+      return null;
+    }
     const toast = await this.toastCtrl.create({
       message,
       duration,

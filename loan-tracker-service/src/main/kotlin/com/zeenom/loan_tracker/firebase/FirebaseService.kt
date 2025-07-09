@@ -6,11 +6,11 @@ import com.google.firebase.auth.FirebaseToken
 import com.zeenom.loan_tracker.common.exceptions.UnauthorizedException
 import com.zeenom.loan_tracker.users.UserDto
 import kotlinx.coroutines.reactive.awaitSingle
+import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
-import java.util.UUID
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
 
@@ -33,10 +33,20 @@ class FirebaseService(
         val user = firebaseAdapter.tokenToUser(firebaseToken)
         return user
     }
+
+    suspend fun deleteUserByFBId(fbUserId: String) {
+        logger.info("Deleting user with ID: {}", fbUserId)
+        firebaseAuth.deleteUserAsync(fbUserId).awaitOrNull()
+        logger.info("User with ID: {} deleted successfully", fbUserId)
+    }
 }
 
 suspend fun <T> ApiFuture<T>.await(): T {
     return this.toMono().awaitSingle()
+}
+
+suspend fun <T> ApiFuture<T>.awaitOrNull(): T? {
+    return this.toMono().awaitSingleOrNull()
 }
 
 fun <T> ApiFuture<T>.toMono(): Mono<T> {

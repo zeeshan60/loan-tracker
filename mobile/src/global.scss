@@ -61,15 +61,15 @@ ion-action-sheet::part(button-text) {
   text-decoration: line-through;
 }
 
-.action-sheet-button {
-  &.red, &.green {
-    font-size: 1.2rem;
+ion-action-sheet .action-sheet-button {
+  &.action-sheet-selected, &.red, &.green {
+    font-size: 1rem;
   }
   &.red {
-    color: red;
+    color: red !important;
   }
   &.green {
-    color: var(--ion-color-success);
+    color: var(--ion-color-success) !important;
   }
 }
 
