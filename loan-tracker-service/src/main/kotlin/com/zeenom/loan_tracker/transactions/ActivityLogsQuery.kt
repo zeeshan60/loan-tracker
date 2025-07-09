@@ -68,7 +68,7 @@ class ActivityLogsQuery(
                         TransactionUserResponse(
                             id = it,
                             name = log.transactionDto.updatedByName
-                                ?: throw IllegalStateException("Updated by name is required")
+                                ?: "Deleted User"
                         )
                     },
                     deleted = log.transactionDto.deleted

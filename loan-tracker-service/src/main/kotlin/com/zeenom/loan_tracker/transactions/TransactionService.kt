@@ -5,7 +5,6 @@ import com.zeenom.loan_tracker.users.UserCurrencyChanged
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventHandler
 import com.zeenom.loan_tracker.users.UserModel
-import io.swagger.v3.core.util.Json
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -280,7 +279,7 @@ class TransactionService(
     }
 
     private suspend fun userAndFriendInfo(userId: UUID): Triple<UserDto, Map<UUID, FriendUserDto>, Map<UUID, FriendUserDto>> {
-        val user = userEventHandler.findByUserId(userId)
+        val user = userEventHandler.findByUserId(userId = userId, includeDeleted = true)
         requireNotNull(user) { "User with id $userId does not exist" }
         val findUserFriends = friendFinderStrategy.findUserFriends(userId = userId, includeDeleted = true)
         val friendUsersByUid =

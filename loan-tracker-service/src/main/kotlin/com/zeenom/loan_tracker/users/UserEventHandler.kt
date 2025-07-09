@@ -37,9 +37,11 @@ class UserEventHandler(
         }
     }
 
-    suspend fun findByUserId(userId: UUID): UserDto? {
+    suspend fun findByUserId(userId: UUID, includeDeleted: Boolean = false): UserDto? {
         synchronize()
-        return userModelRepository.findByStreamIdAndDeletedIsFalse(userId)?.let {
+        return (if (includeDeleted) userModelRepository.findByStreamId(userId) else userModelRepository.findByStreamIdAndDeletedIsFalse(
+            userId
+        ))?.let {
             UserDto(
                 uid = it.streamId,
                 displayName = it.displayName,
@@ -92,7 +94,7 @@ class UserEventHandler(
         }
     }
 
-    suspend fun findUsersByPhoneNumbers(phoneNumbers: List<String>): List<UserDto> {
+    suspend fun findUsersByPhoneNumbers(phoneNumbers: List<String>, includeDeleted: Boolean = false): List<UserDto> {
         if (phoneNumbers.isEmpty()) return emptyList()
         synchronize()
         return userModelRepository.findAllByPhoneNumberInAndDeletedIsFalse(phoneNumbers).toList().map {

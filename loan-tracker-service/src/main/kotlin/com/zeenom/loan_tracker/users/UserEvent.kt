@@ -88,7 +88,8 @@ interface UserModelRepository : CoroutineCrudRepository<UserModel, UUID>, Syncab
     suspend fun findAllByPhoneNumberInAndDeletedIsFalse(phones: List<String>): Flow<UserModel>
     suspend fun findByEmailAndDeletedIsFalse(email: String): UserModel?
     suspend fun findByPhoneNumberAndDeletedIsFalse(phone: String): UserModel?
-    override suspend fun findByStreamIdAndDeletedIsFalse(streamId: UUID): UserModel?
+    suspend fun findByStreamIdAndDeletedIsFalse(streamId: UUID): UserModel?
+    override suspend fun findByStreamId(streamId: UUID): UserModel?
 
     @Query("select * from user_model order by insert_order desc limit 1")
     override suspend fun findFirstSortByIdDescending(): UserModel?

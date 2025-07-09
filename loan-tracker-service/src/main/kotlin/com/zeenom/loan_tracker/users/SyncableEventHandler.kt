@@ -9,7 +9,7 @@ import java.util.UUID
 
 interface SyncableModelRepository<T : SyncableModel> {
     suspend fun findFirstSortByIdDescending(): T?
-    suspend fun findByStreamIdAndDeletedIsFalse(streamId: UUID): T?
+    suspend fun findByStreamId(streamId: UUID): T?
     fun saveAll(models: List<T>): Flow<T>
 }
 
@@ -68,7 +68,7 @@ interface SyncableEventHandler<M : SyncableModel, E : IEventAble<M>> {
                 if (event.version != 0 && model == null) {
                     //This means event already has an existing model in the past so we need to pick up from last known model for this event
                     //Alternatively we can get the entire event stream and apply it to the model but using the model from the repository is more efficient
-                    val existing = modelRepository.findByStreamIdAndDeletedIsFalse(event.streamId)
+                    val existing = modelRepository.findByStreamId(event.streamId)
                     event.applyEvent(existing)
                 } else {
                     event.applyEvent(model)

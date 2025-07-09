@@ -73,7 +73,7 @@ interface FriendModelRepository : CoroutineCrudRepository<FriendModel, UUID>, Sy
     suspend fun findByUserUidAndFriendPhoneNumberAndDeletedIsFalse(userUid: UUID, phoneNumber: String): FriendModel?
     suspend fun findAllByFriendPhoneNumberAndDeletedIsFalse(phoneNumber: String): Flow<FriendModel>
     suspend fun findByUserUidAndStreamIdAndDeletedIsFalse(userUid: UUID, recipientId: UUID): FriendModel?
-    override suspend fun findByStreamIdAndDeletedIsFalse(streamId: UUID): FriendModel?
+    override suspend fun findByStreamId(streamId: UUID): FriendModel?
     suspend fun findAllByUserUid(string: UUID): Flow<FriendModel>
     @Query("select * from friend_model order by insert_order desc limit 1")
     override suspend fun findFirstSortByIdDescending(): FriendModel?
