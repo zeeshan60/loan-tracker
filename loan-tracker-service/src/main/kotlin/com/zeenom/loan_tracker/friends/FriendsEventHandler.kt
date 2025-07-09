@@ -1,5 +1,8 @@
 package com.zeenom.loan_tracker.friends
 
+import com.zeenom.loan_tracker.users.SyncableEventHandler
+import com.zeenom.loan_tracker.users.SyncableEventRepository
+import com.zeenom.loan_tracker.users.SyncableModelRepository
 import com.zeenom.loan_tracker.users.UserDto
 import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
@@ -10,15 +13,22 @@ import java.util.*
 class FriendsEventHandler(
     private val eventRepository: FriendEventRepository,
     private val friendModelRepository: FriendModelRepository
-) {
+): SyncableEventHandler<FriendModel, FriendEvent> {
+
+    override fun eventRepository(): SyncableEventRepository<FriendEvent> {
+        return eventRepository
+    }
+
+    override fun modelRepository(): SyncableModelRepository<FriendModel> {
+        return friendModelRepository
+    }
 
     suspend fun addEvent(event: IFriendEvent) {
         eventRepository.save(event.toEntity())
-        val existing = friendModelRepository.findByStreamIdAndDeletedIsFalse(event.streamId)
-        friendModelRepository.save(event.applyEvent(existing))
     }
 
     suspend fun findAllFriendsByUserId(userId: UUID, includeDeleted: Boolean = false): List<FriendModel> {
+        synchronize()
         return if (includeDeleted) {
             friendModelRepository.findAllByUserUid(userId).toList()
         } else {
@@ -27,14 +37,17 @@ class FriendsEventHandler(
     }
 
     suspend fun findByUserUidAndFriendEmail(userUid: UUID, email: String): FriendModel? {
+        synchronize()
         return friendModelRepository.findByUserUidAndFriendEmailAndDeletedIsFalse(userUid, email)
     }
 
     suspend fun findByUserUidAndFriendPhoneNumber(userUid: UUID, phoneNumber: String): FriendModel? {
+        synchronize()
         return friendModelRepository.findByUserUidAndFriendPhoneNumberAndDeletedIsFalse(userUid, phoneNumber)
     }
 
     suspend fun findByUserUidAndFriendId(userUid: UUID, friendId: UUID): FriendModel? {
+        synchronize()
         return friendModelRepository.findByUserUidAndStreamIdAndDeletedIsFalse(userUid, friendId)
     }
 
@@ -53,41 +66,24 @@ class FriendsEventHandler(
             )
         }.also {
             eventRepository.saveAll(it).toList()
-            friendModelRepository.saveAll(
-                it.map { event ->
-                    FriendModel(
-                        streamId = event.streamId,
-                        userUid = userId,
-                        friendEmail = event.friendEmail,
-                        friendPhoneNumber = event.friendPhoneNumber,
-                        friendDisplayName = event.friendDisplayName
-                            ?: throw IllegalStateException("Friend display name is required"),
-                        createdAt = event.createdAt,
-                        updatedAt = event.createdAt,
-                        version = event.version,
-                        deleted = false
-                    )
-                }
-            ).toList()
         }
     }
 
     suspend fun findByFriendEmail(email: String): List<FriendModel> {
+        synchronize()
         return friendModelRepository.findAllByFriendEmailAndDeletedIsFalse(email).toList()
     }
 
     suspend fun findByFriendPhoneNumber(phoneNumber: String): List<FriendModel> {
+        synchronize()
         return friendModelRepository.findAllByFriendPhoneNumberAndDeletedIsFalse(phoneNumber).toList()
     }
 
     suspend fun findFriendByUserIdAndFriendId(userUid: UUID, friendId: UUID): FriendId? {
+        synchronize()
         return friendModelRepository.findByUserUidAndStreamIdAndDeletedIsFalse(userUid, friendId)?.let {
             FriendId(it.friendEmail, it.friendPhoneNumber, it.friendDisplayName)
         }
-    }
-
-    suspend fun friendExistsByUserIdAndFriendId(userUid: UUID, recipientId: UUID): Boolean {
-        return friendModelRepository.findByUserUidAndStreamIdAndDeletedIsFalse(userUid, recipientId) != null
     }
 
     suspend fun findFriendStreamIdByEmailOrPhoneNumber(userUid: UUID, email: String?, phoneNumber: String?): UUID? {
