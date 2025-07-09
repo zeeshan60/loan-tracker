@@ -10,7 +10,8 @@ import java.util.*
 data class CommandEntity(
     @Id val id: UUID? = null,
     val commandType: CommandType,
-    val userId: String,
+    val userId: UUID?, //TODO make it uuid and nullable
+    val userFBId: String?,
     val createdAt: Instant,
     val payload: Json?
 )

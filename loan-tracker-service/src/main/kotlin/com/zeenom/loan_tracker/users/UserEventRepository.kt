@@ -26,7 +26,6 @@ interface UserEventRepository : CoroutineCrudRepository<UserEvent, UUID> {
 
     @Query("SELECT * FROM user_events WHERE phone_number IN (:phoneNumbers)")
     suspend fun findUserEventStreamByPhoneNumberIn(phoneNumbers: List<String>): List<UserEvent>
-
 }
 
 suspend fun UserEventRepository.findByUid(uid: String): UserModel? {

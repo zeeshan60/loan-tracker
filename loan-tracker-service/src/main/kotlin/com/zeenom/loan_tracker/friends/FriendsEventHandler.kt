@@ -18,7 +18,7 @@ class FriendsEventHandler(
         friendModelRepository.save(event.applyEvent(existing))
     }
 
-    suspend fun findAllFriendsByUserId(userId: String, includeDeleted: Boolean = false): List<FriendModel> {
+    suspend fun findAllFriendsByUserId(userId: UUID, includeDeleted: Boolean = false): List<FriendModel> {
         return if (includeDeleted) {
             friendModelRepository.findAllByUserUid(userId).toList()
         } else {
@@ -26,19 +26,19 @@ class FriendsEventHandler(
         }
     }
 
-    suspend fun findByUserUidAndFriendEmail(userUid: String, email: String): FriendModel? {
+    suspend fun findByUserUidAndFriendEmail(userUid: UUID, email: String): FriendModel? {
         return friendModelRepository.findByUserUidAndFriendEmailAndDeletedIsFalse(userUid, email)
     }
 
-    suspend fun findByUserUidAndFriendPhoneNumber(userUid: String, phoneNumber: String): FriendModel? {
+    suspend fun findByUserUidAndFriendPhoneNumber(userUid: UUID, phoneNumber: String): FriendModel? {
         return friendModelRepository.findByUserUidAndFriendPhoneNumberAndDeletedIsFalse(userUid, phoneNumber)
     }
 
-    suspend fun findByUserUidAndFriendId(userUid: String, friendId: UUID): FriendModel? {
+    suspend fun findByUserUidAndFriendId(userUid: UUID, friendId: UUID): FriendModel? {
         return friendModelRepository.findByUserUidAndStreamIdAndDeletedIsFalse(userUid, friendId)
     }
 
-    suspend fun saveAllUsersAsFriends(userId: String, userDtos: List<UserDto>) {
+    suspend fun saveAllUsersAsFriends(userId: UUID, userDtos: List<UserDto>) {
         userDtos.map { userDto ->
             FriendEvent(
                 userUid = userId,
@@ -46,6 +46,7 @@ class FriendsEventHandler(
                 friendPhoneNumber = userDto.phoneNumber,
                 friendDisplayName = userDto.displayName,
                 createdAt = Instant.now(),
+                createdBy = userId,
                 streamId = UUID.randomUUID(),
                 version = 1,
                 eventType = FriendEventType.FRIEND_CREATED
@@ -79,17 +80,17 @@ class FriendsEventHandler(
         return friendModelRepository.findAllByFriendPhoneNumberAndDeletedIsFalse(phoneNumber).toList()
     }
 
-    suspend fun findFriendByUserIdAndFriendId(userUid: String, friendId: UUID): FriendId? {
+    suspend fun findFriendByUserIdAndFriendId(userUid: UUID, friendId: UUID): FriendId? {
         return friendModelRepository.findByUserUidAndStreamIdAndDeletedIsFalse(userUid, friendId)?.let {
             FriendId(it.friendEmail, it.friendPhoneNumber, it.friendDisplayName)
         }
     }
 
-    suspend fun friendExistsByUserIdAndFriendId(userUid: String, recipientId: UUID): Boolean {
+    suspend fun friendExistsByUserIdAndFriendId(userUid: UUID, recipientId: UUID): Boolean {
         return friendModelRepository.findByUserUidAndStreamIdAndDeletedIsFalse(userUid, recipientId) != null
     }
 
-    suspend fun findFriendStreamIdByEmailOrPhoneNumber(userUid: String, email: String?, phoneNumber: String?): UUID? {
+    suspend fun findFriendStreamIdByEmailOrPhoneNumber(userUid: UUID, email: String?, phoneNumber: String?): UUID? {
         return (email?.let { findByUserUidAndFriendEmail(userUid, it) }
             ?: phoneNumber?.let { findByUserUidAndFriendPhoneNumber(userUid, it) })?.streamId
     }

@@ -9,6 +9,7 @@ import org.springframework.security.web.server.authentication.ServerAuthenticati
 import org.springframework.stereotype.Component
 import org.springframework.web.server.ServerWebExchange
 import reactor.core.publisher.Mono
+import java.util.UUID
 
 @Component
 class AuthConverter(private val authProperties: AuthProperties) : ServerAuthenticationConverter {
@@ -35,11 +36,11 @@ class AuthConverter(private val authProperties: AuthProperties) : ServerAuthenti
         }
     }
 
-    fun validateToken(token: String): String {
+    fun validateToken(token: String): UUID {
         return Jwts.parserBuilder()
             .setSigningKey(authProperties.secretKey.toByteArray())
             .build()
             .parseClaimsJws(token)
-            .body.subject
+            .body.subject.let { UUID.fromString(it) }
     }
 }

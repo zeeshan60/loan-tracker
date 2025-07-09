@@ -36,7 +36,7 @@ class FriendsControllerTest(
 
     @Test
     fun `friends endpoint returns friends`(): Unit = runBlocking {
-        val userid = "userid"
+        val userid = UUID.randomUUID()
         val friendsDto = FriendsWithAllTimeBalancesDto(
             friends = listOf(
                 FriendDto(
@@ -68,7 +68,7 @@ class FriendsControllerTest(
         ).`when`(friendService).findAllByUserId(userid)
         val result = webTestClient.get()
             .uri("/api/v1/friends")
-            .header("Authorization", "Bearer ${authService.generateJwt(userid)}")
+            .header("Authorization", "Bearer ${authService.generateJwt(userid.toString())}")
             .exchange()
             .expectStatus().isOk
             .expectBody(String::class.java)
@@ -89,9 +89,10 @@ class FriendsControllerTest(
     @Test
     fun `addFriend creates friend successfully`(): Unit = runBlocking {
         Mockito.doReturn(Unit).`when`(friendService).createFriend(any(), any())
+        val userId = UUID.randomUUID()
         whenever(
             friendService.findByUserIdFriendId(
-                userId = "sample uid",
+                userId = userId,
                 friendEmail = "john@gmail.com",
                 friendPhone = "+923001234567"
             )
@@ -113,7 +114,7 @@ class FriendsControllerTest(
         Mockito.doReturn(Unit).`when`(commandDao).addCommand<CommandPayloadDto>(any())
         webTestClient.post()
             .uri("/api/v1/friends/add")
-            .header("Authorization", "Bearer ${authService.generateJwt("sample uid")}")
+            .header("Authorization", "Bearer ${authService.generateJwt(userId.toString())}")
             .bodyValue(
                 FriendRequest(
                     name = "John Doe",
@@ -126,9 +127,9 @@ class FriendsControllerTest(
             .expectBody()
             .jsonPath("$.name").isEqualTo("John Doe")
 
-        val captor = argumentCaptor<String, CreateFriendDto>()
+        val captor = argumentCaptor<UUID, CreateFriendDto>()
         Mockito.verify(friendService).createFriend(captor.first.capture(), captor.second.capture())
-        assertThat(captor.first.firstValue).isEqualTo("sample uid")
+        assertThat(captor.first.firstValue).isEqualTo(userId)
         assertThat(captor.second.firstValue).isEqualTo(
             CreateFriendDto(
                 name = "John Doe",
@@ -142,7 +143,7 @@ class FriendsControllerTest(
     fun `test cors configuration`() {
         val response = webTestClient.options()
             .uri("/api/v1/friends")
-            .header("Authorization", "Bearer ${authService.generateJwt("verified-id-token")}")
+            .header("Authorization", "Bearer ${authService.generateJwt(UUID.randomUUID().toString())}")
             .header("Origin", "https://any-origin.com")
             .header("Access-Control-Request-Method", "GET")
             .exchange()
@@ -170,7 +171,7 @@ class FriendsControllerTest(
         Mockito.doThrow(NotFoundException("Friend not found")).`when`(friendService).findAllByUserId(any())
         val result = webTestClient.get()
             .uri("/api/v1/friends")
-            .header("Authorization", "Bearer ${authService.generateJwt("sample uid")}")
+            .header("Authorization", "Bearer ${authService.generateJwt(UUID.randomUUID().toString())}")
             .exchange()
             .expectStatus().isNotFound
             .expectBody(String::class.java)

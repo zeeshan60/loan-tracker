@@ -24,9 +24,9 @@ data class TransactionDto(
     val transactionDate: Instant,
     val updatedAt: Instant?,
     val createdAt: Instant?,
-    val createdBy: String?,
+    val createdBy: UUID?,
     val createdByName: String?,
-    val updatedBy: String?,
+    val updatedBy: UUID?,
     val updatedByName: String?,
     val deleted: Boolean = false,
     val history: List<ChangeSummaryDto> = emptyList()
@@ -45,7 +45,7 @@ data class TimedAmountDto(
 
 data class ChangeSummaryDto(
     val date: Instant,
-    val changedBy: String,
+    val changedBy: UUID,
     val changedByName: String,
     val changedByPhoto: String?,
     val oldValue: String,

@@ -8,7 +8,6 @@ import com.zeenom.loan_tracker.friends.FriendModel
 import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
-import java.sql.Time
 import java.util.*
 
 @Service
@@ -16,7 +15,7 @@ class TransactionEventHandler(
     private val transactionEventRepository: TransactionEventRepository,
 ) {
 
-    suspend fun read(userId: String, streamId: UUID): TransactionModel? {
+    suspend fun read(userId: UUID, streamId: UUID): TransactionModel? {
         return transactionEventRepository
             .findAllByUserUidAndStreamId(userId, streamId).toList().map { it.toEvent() }.let {
                 resolveStream(it)
@@ -41,7 +40,7 @@ class TransactionEventHandler(
     }
 
     suspend fun transactionModelsByFriend(
-        userId: String,
+        userId: UUID,
         friendStreamId: UUID,
     ): List<TransactionModelWithChangeSummary> {
 
@@ -63,7 +62,7 @@ class TransactionEventHandler(
     }
 
     suspend fun transactionModelByTransactionId(
-        userId: String,
+        userId: UUID,
         transactionId: UUID,
     ): TransactionModelWithChangeSummary {
         val transactions = transactionEventRepository.findAllByUserUidAndStreamId(userId, transactionId).toList()
@@ -87,12 +86,14 @@ class TransactionEventHandler(
         }.toMap()
     }
 
-    suspend fun transactionsWithActivityLogs(userId: String): List<TransactionModelWithActivityLogs> {
+    suspend fun transactionsWithActivityLogs(userId: UUID): List<TransactionModelWithActivityLogs> {
 
         val transactions = transactionEventRepository.findAllByUserUid(userId).toList()
             .map { it.toEvent() as ITransactionEvent }
+        val modelByStreamId = transactions.groupBy { it.streamId }.mapNotNull { (_, events) -> resolveStream(events) }
+            .associateBy { it.streamId }
         val changeSummaryByTransactionId = changeSummaryByTransactionId(transactions)
-        val byStreamId = transactions.groupBy { Pair(it.streamId, it.recipientId) }
+        val byStreamId = transactions.groupBy { Pair(it.streamId, modelByStreamId[it.streamId]!!.recipientId) }
         return byStreamId.map { (_, events) ->
             val (model, logs) = resolveStreamAndGenerateLogs(events)
                 ?: throw IllegalStateException("Events cant be empty at this stage")
@@ -101,13 +102,13 @@ class TransactionEventHandler(
     }
 
     private suspend fun findAllByUserIdFriendId(
-        userId: String,
+        userId: UUID,
         friendStreamId: UUID,
     ) = findAllEventsByUserIdFriendId(userId, friendStreamId)
         .map { it.toEvent() as ITransactionEvent }
 
     private suspend fun findAllEventsByUserIdFriendId(
-        userId: String,
+        userId: UUID,
         friendStreamId: UUID,
     ): List<TransactionEvent> {
         return transactionEventRepository
@@ -117,7 +118,7 @@ class TransactionEventHandler(
             ).toList()
     }
 
-    suspend fun balancesOfFriendsByCurrency(userId: String, friendIds: List<UUID>): Map<UUID, Map<String, AmountDto>> {
+    suspend fun balancesOfFriendsByCurrency(userId: UUID, friendIds: List<UUID>): Map<UUID, Map<String, AmountDto>> {
         val transactions = transactionEventRepository.findAllByUserUidAndRecipientIdIn(userId, friendIds).toList()
             .map { it.toEvent() }
 
@@ -145,7 +146,7 @@ class TransactionEventHandler(
     }
 
     suspend fun lastTransactionOfFriends(
-        userId: String,
+        userId: UUID,
         friendIds: List<UUID>
     ): Map<UUID, TransactionModel?> {
         val transactions = transactionEventRepository.findAllByUserUidAndRecipientIdIn(userId, friendIds).toList()

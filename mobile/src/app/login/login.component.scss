@@ -1,34 +1,62 @@
 @use "variables.scss" as *;
 
-::ng-deep {
+.social-login-wrapper {
+  display: flex;
+  justify-content: space-evenly;
   .social-login-container {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    p{
+
+    p {
       color: $color-dark;
       font-size: 12px;
       margin-top: 6px;
     }
-    ion-button{
+
+    ion-button {
       &::part(native) {
-        background-color: $color-white;
+        background-color: var(--color-white);
         height: 60px;
         width: 60px;
         border-radius: 100%;
         box-shadow: 0 0 8px #ccc;
+        --background-activated: var(--color-white);
       }
     }
   }
+}
 
-  .app-name {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 20px;
-    color: #333;
+ion-content {
+  position: relative;
+  height: 100vh;
+
+  .top-section {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 200px;
+    background: linear-gradient(to right, $color-blue 0%, $color-green 100%);
+    z-index: -1;
   }
 
+  .bottom-section {
+    position: absolute;
+    top: 200px;
+    left: 0;
+    width: 100%;
+    bottom: 0; /* Automatically fills remaining space */
+    background-color: $color-mediumGrey;
+    z-index: -1;
+  }
+
+  &::part(background) {
+    background: $color-mediumGrey;
+  }
+}
+:host ::ng-deep {
   ion-item {
     position: relative;
 
@@ -60,60 +88,34 @@
     }
   }
 
-  .card-heading{
-    h1{
+  .card-heading {
+    h1 {
       color: $color-dark;
       font-size: 24px;
       font-weight: 600;
       margin: 0 0 4px;
     }
-    p{
+
+    p {
       color: $color-grey;
       font-size: 15px;
       margin: 0;
     }
   }
 
-  ion-content {
-    position: relative;
-    height: 100vh;
-
-    .top-section {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 200px;
-      background: linear-gradient(to right, $color-blue 0%, $color-green 100%);
-      z-index: -1;
-    }
-
-    .bottom-section {
-      position: absolute;
-      top: 200px;
-      left: 0;
-      width: 100%;
-      bottom: 0; /* Automatically fills remaining space */
-      background-color: $color-mediumGrey;
-      z-index: -1;
-    }
-    &::part(background) {
-      background: $color-mediumGrey;
-    }
-  }
-
-  .form-card{
-    background-color: $color-white;
+  .form-card {
+    background-color: var(--color-white);
     border: 1px solid $color-lightGrey;
     border-radius: 10px;
     padding: 0 0 8px;
     box-shadow: 0 0 5px #00000024;
     margin-top: 54px;
   }
-  .button-filled{
+
+  .button-filled {
     &::part(native) {
       background-color: $color-green;
-      color: $color-white;
+      color: var(--color-white);
       border-radius: 46px;
       padding: 12px 20px;
       font-size: 16px;
@@ -123,8 +125,9 @@
       margin-top: 24px;
     }
   }
-  .button-text{
-    color:$color-blue;
+
+  .button-text {
+    color: $color-blue;
     font-size: 14px;
     font-weight: 600;
     text-transform: capitalize;
@@ -136,8 +139,9 @@
     color: $color-dark;
     font-weight: 600;
   }
-  .input-field{
-    ::ng-deep .input-wrapper{
+
+  .input-field {
+    ::ng-deep .input-wrapper {
       background-color: $color-mediumGrey;
       padding: 8px 40px 8px 40px;
       font-size: 14px;
@@ -153,6 +157,7 @@
     align-items: center;
     width: 100%;
     font-size: 14px;
+
     ion-button::part(native) {
       text-transform: capitalize;
       padding: 0;
@@ -180,7 +185,7 @@
     }
   }
 
-  .invalid-cred{
+  .invalid-cred {
     text-align: center;
     display: block;
     margin-top: 12px;

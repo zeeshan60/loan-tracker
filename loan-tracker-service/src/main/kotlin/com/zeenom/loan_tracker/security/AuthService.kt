@@ -32,7 +32,8 @@ class AuthService(
             CommandDto(
                 commandType = CommandType.LOGIN,
                 payload = user,
-                userId = user.uid
+                userId = user.uid,
+                userFBId = user.userFBId
             )
         )
         //Do not use the user object from Firebase, it doesnt necessarily have the same uid
@@ -44,7 +45,7 @@ class AuthService(
             throw IllegalStateException("User not found")
         }
         logger.info("User logged in: {}", existing)
-        return existing.uid
+        return existing.uid.toString()
     }
 
     fun generateJwt(uid: String): String {

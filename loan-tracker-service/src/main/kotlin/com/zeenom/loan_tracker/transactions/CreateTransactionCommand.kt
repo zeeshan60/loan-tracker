@@ -19,6 +19,7 @@ class CreateTransactionCommand(
             commandDao.addCommand(commandDto)
         }
 
+        requireNotNull(commandDto.userId) { "User ID must not be null for CreateTransaction" }
         transactionService.addTransaction(
             userUid = commandDto.userId,
             transactionDto = commandDto.payload
@@ -27,11 +28,11 @@ class CreateTransactionCommand(
 }
 
 data class FriendTransactionsQueryDto(
-    val userId: String,
+    val userId: UUID,
     val friendId: UUID,
 )
 
 data class FriendTransactionQueryDto(
-    val userId: String,
+    val userId: UUID,
     val transactionId: UUID,
 )

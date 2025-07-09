@@ -1,0 +1,2 @@
+UPDATE transaction_events SET created_by = (SELECT stream_id FROM user_model WHERE user_model.uid = transaction_events.created_by);
+ALTER TABLE transaction_events ALTER COLUMN created_by SET DATA TYPE UUID USING created_by::uuid;

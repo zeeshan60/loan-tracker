@@ -8,6 +8,7 @@ import { HelperService } from '../helper.service';
 import { FirebaseAuthError, FirebaseErrorCodeMessageEnum } from './types';
 import { extractFirebaseErrorMessage } from '../utility-functions';
 import { SignupComponent } from '../signup/signup.component';
+import { isIos } from '../utils';
 
 type ActiveUi = 'login' | 'signup' | 'forgotPassword';
 
@@ -36,6 +37,8 @@ export class LoginComponent {
   readonly forgotPasswordForm = this.fb.group({
     email: this.fb.nonNullable.control('', [Validators.required, Validators.email]),
   });
+
+  readonly isIos = isIos;
 
   constructor() {}
 
@@ -86,15 +89,13 @@ export class LoginComponent {
       const auth = getAuth();
       sendPasswordResetEmail(auth, this.forgotPasswordForm.get('email').value)
         .then(() => {
-          return this.helperService.showToast(
-            'If an account with that email exists, a password reset link has been sent. Please check your inbox.',
+          this.helperService.showToast(
+            'If an account with given email exists, a password reset link has been sent. Please check your inbox.',
             3000,
             {
               color: 'success'
             }
-          )
-            .then(toast => toast.onDidDismiss()
-              .then(() => this.activeUi.set('login')))
+          );
         })
         .catch((error: FirebaseAuthError) => {
           this.invalidCreds.set(extractFirebaseErrorMessage(error.message))
@@ -110,6 +111,10 @@ export class LoginComponent {
 
   loginWithGoogle() {
     this.authStore.loginWithGoogle()
+  }
+
+  loginWithApple() {
+    this.authStore.loginWithApple()
   }
 
   activateUi(ui: ActiveUi) {

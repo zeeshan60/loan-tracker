@@ -28,13 +28,13 @@ ion-toolbar {
 
   h5 {
     font-size: 14px;
-    color: $color-white;
+    color: var(--color-white);
     text-transform: capitalize;
     margin-top: 0;
   }
 
   .details-card {
-    background-color: $color-white;
+    background-color: var(--color-white);
     border-radius: 20px;
     padding: 16px;
 
@@ -167,7 +167,7 @@ ion-content {
     font-size: 14px;
     font-weight: 500;
     color: $color-red;
-    background: $color-white;
+    background: var(--color-white);
   }
 }
 
@@ -191,7 +191,7 @@ ion-content {
     --border-color: transparent !important;
     --inner-padding-end: 0px;
     border-radius: 10px;
-    background: $color-white;
+    background: var(--color-white);
 
     &::part(native) {
       padding: 12px;

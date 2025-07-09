@@ -34,7 +34,7 @@ class FriendsController(
     suspend fun getFriends(
         @Parameter(description = "Pagination token for the next set of results")
         @RequestParam next: String? = null,
-        @AuthenticationPrincipal userId: String,
+        @AuthenticationPrincipal userId: UUID,
     ): Paginated<FriendsResponse> {
         logger.info("Getting friends for user $userId")
         return friendsQuery.execute(PaginationDto(input = userId, next = next)).let { result ->
@@ -46,14 +46,15 @@ class FriendsController(
     @PostMapping("/add")
     suspend fun addFriend(
         @Valid @RequestBody friendRequest: FriendRequest,
-        @AuthenticationPrincipal userId: String,
+        @AuthenticationPrincipal userId: UUID,
     ): FriendResponse {
         logger.info("Adding friend for user $userId")
         createFriendCommand.execute(
             CommandDto(
                 commandType = CommandType.ADD_FRIEND,
                 payload = friendsAdapter.fromRequestToDto(friendRequest),
-                userId = userId
+                userId = userId,
+                userFBId = null
             )
         )
         return friendQuery.execute(
@@ -72,14 +73,15 @@ class FriendsController(
     suspend fun updateFriend(
         @PathVariable friendId: UUID,
         @Valid @RequestBody friendRequest: UpdateFriendRequest,
-        @AuthenticationPrincipal userId: String,
+        @AuthenticationPrincipal userId: UUID,
     ): FriendResponse {
         logger.info("Updating friend $friendId for user $userId")
         updateFriendCommand.execute(
             CommandDto(
                 commandType = CommandType.UPDATE_FRIEND,
                 payload = friendsAdapter.fromRequestToDto(friendRequest, friendId),
-                userId = userId
+                userId = userId,
+                userFBId = null
             )
         )
         return friendQuery.execute(
@@ -97,14 +99,15 @@ class FriendsController(
     @DeleteMapping("/{friendId}")
     suspend fun deleteFriend(
         @PathVariable friendId: UUID,
-        @AuthenticationPrincipal userId: String,
+        @AuthenticationPrincipal userId: UUID,
     ): MessageResponse {
         logger.info("Deleting friend $friendId for user $userId")
         deleteFriendCommand.execute(
             CommandDto(
                 commandType = CommandType.DELETE_FRIEND,
                 payload = DeleteFriendDto(friendId = friendId),
-                userId = userId
+                userId = userId,
+                userFBId = null
             )
         )
         return MessageResponse("Friend with ID $friendId deleted successfully")

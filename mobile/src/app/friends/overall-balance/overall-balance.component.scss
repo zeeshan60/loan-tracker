@@ -2,7 +2,7 @@
 
 .overall-balance-wrapper {
   margin: 0 16px 0;
-  background-color: $color-white;
+  background-color: var(--color-white);
   border-radius: 20px;
   padding: 16px;
 
@@ -65,9 +65,11 @@
           font-size: 12px;
           font-weight: 500;
           margin: 0;
-          width: 45%;
+          width: 41%;
+          display: flex;
           &.converted {
             text-align: right;
+            justify-content: end;
           }
         }
 

@@ -36,7 +36,8 @@ class FriendUpdateTransactionSyncIntegrationTest() : BaseIntegration() {
 
     private lateinit var zeeToken: String
     private var zeeDto = UserDto(
-        uid = "123",
+        uid = UUID.randomUUID(),
+        userFBId = "123",
         email = "zee@gmail.com",
         phoneNumber = "+923001234567",
         displayName = "Zeeshan Tufail",
@@ -47,7 +48,8 @@ class FriendUpdateTransactionSyncIntegrationTest() : BaseIntegration() {
 
     private lateinit var johnToken: String
     private var johnDto = UserDto(
-        uid = "124",
+        uid = UUID.randomUUID(),
+        userFBId = "124",
         email = "john@gmail.com",
         phoneNumber = "+923001234569",
         displayName = "John Doe",

@@ -19,19 +19,21 @@ interface IEventAble<T> {
 @Table("transaction_events")
 data class TransactionEvent(
     @Id private val id: UUID? = null,
-    val userUid: String,
-    val transactionDate: Instant,
+    val userUid: UUID,
+    val transactionDate: Instant?,
     val description: String?,
     val currency: String?,
     val splitType: SplitType?,
     val totalAmount: BigDecimal?,
     val recipientId: UUID,
     val createdAt: Instant,
-    val createdBy: String,
+    val createdBy: UUID,
+    //Transaction events are unique by user_uid, stream_id and version not just stream_id and version. due to cross transaction mechanic
+    //Be careful resolving this in the future. resolve this stream using user_uid, stream_id not just stream_id
     val streamId: UUID,
     val version: Int,
     val eventType: TransactionEventType,
-): IEventAble<TransactionModel> {
+) : IEventAble<TransactionModel> {
     override fun toEvent(): IEvent<TransactionModel> {
         return when (eventType) {
             TransactionEventType.TRANSACTION_CREATED -> TransactionCreated(
@@ -46,77 +48,72 @@ data class TransactionEvent(
                 createdBy = createdBy,
                 streamId = streamId,
                 version = version,
-                transactionDate = transactionDate
+                transactionDate = transactionDate ?: throw IllegalStateException("Transaction date is required"),
             )
 
             TransactionEventType.DESCRIPTION_CHANGED -> DescriptionChanged(
                 id = id,
                 userId = userUid,
+                recipientId = recipientId,
                 description = description ?: throw IllegalStateException("Description is required"),
                 createdAt = createdAt,
                 createdBy = createdBy,
                 streamId = streamId,
                 version = version,
-                transactionDate = transactionDate,
-                recipientId = recipientId,
             )
 
             TransactionEventType.SPLIT_TYPE_CHANGED -> SplitTypeChanged(
                 id = id,
                 userId = userUid,
+                recipientId = recipientId,
                 splitType = splitType ?: throw IllegalStateException("Split type is required"),
                 createdAt = createdAt,
                 createdBy = createdBy,
                 streamId = streamId,
                 version = version,
-                transactionDate = transactionDate,
-                recipientId = recipientId
             )
 
             TransactionEventType.TOTAL_AMOUNT_CHANGED -> TotalAmountChanged(
                 id = id,
                 userId = userUid,
+                recipientId = recipientId,
                 totalAmount = totalAmount ?: throw IllegalStateException("Total amount is required"),
                 createdAt = createdAt,
                 createdBy = createdBy,
                 streamId = streamId,
                 version = version,
-                transactionDate = transactionDate,
-                recipientId = recipientId,
             )
 
             TransactionEventType.CURRENCY_CHANGED -> CurrencyChanged(
                 id = id,
                 userId = userUid,
+                recipientId = recipientId,
                 currency = currency ?: throw IllegalStateException("Currency is required"),
                 createdAt = createdAt,
                 createdBy = createdBy,
                 streamId = streamId,
                 version = version,
-                transactionDate = transactionDate,
-                recipientId = recipientId
             )
 
             TransactionEventType.TRANSACTION_DELETED -> TransactionDeleted(
                 id = id,
                 userId = userUid,
+                recipientId = recipientId,
                 createdAt = createdAt,
                 createdBy = createdBy,
                 streamId = streamId,
                 version = version,
-                transactionDate = transactionDate,
-                recipientId = recipientId
             )
 
             TransactionEventType.TRANSACTION_DATE_CHANGED -> TransactionDateChanged(
                 id = id,
                 userId = userUid,
+                recipientId = recipientId,
                 createdAt = createdAt,
                 createdBy = createdBy,
                 streamId = streamId,
                 version = version,
-                transactionDate = transactionDate,
-                recipientId = recipientId
+                transactionDate = transactionDate ?: throw IllegalStateException("Transaction date is required")
             )
         }
     }
@@ -135,11 +132,12 @@ enum class TransactionEventType {
 @Repository
 interface TransactionEventRepository : CoroutineCrudRepository<TransactionEvent, UUID> {
     @Query("SELECT * FROM transaction_events WHERE user_uid = :userId AND recipient_id = :recipientId order by stream_id desc, version")
-    suspend fun findAllByUserUidAndRecipientId(userId: String, recipientId: UUID): Flow<TransactionEvent>
+    suspend fun findAllByUserUidAndRecipientId(userId: UUID, recipientId: UUID): Flow<TransactionEvent>
+
     @Query("SELECT * FROM transaction_events WHERE user_uid = :userId order by stream_id desc, version desc")
-    suspend fun findAllByUserUid(userId: String): Flow<TransactionEvent>
+    suspend fun findAllByUserUid(userId: UUID): Flow<TransactionEvent>
     suspend fun findAllByUserUidAndRecipientIdIn(
-        userId: String,
+        userId: UUID,
         recipientIds: List<UUID>
     ): Flow<TransactionEvent> {
         if (recipientIds.isEmpty()) {
@@ -150,10 +148,10 @@ interface TransactionEventRepository : CoroutineCrudRepository<TransactionEvent,
 
     @Query("SELECT * FROM transaction_events WHERE user_uid = :userId AND recipient_id IN (:recipientIds) order by stream_id desc, version")
     suspend fun findAllByUserUidAndRecipientIdInInternal(
-        userId: String,
+        userId: UUID,
         recipientIds: List<UUID>
     ): Flow<TransactionEvent>
 
     @Query("SELECT * FROM transaction_events WHERE user_uid = :userId AND stream_id = :streamId order by version")
-    suspend fun findAllByUserUidAndStreamId(userId: String, streamId: UUID): Flow<TransactionEvent>
+    suspend fun findAllByUserUidAndStreamId(userId: UUID, streamId: UUID): Flow<TransactionEvent>
 }

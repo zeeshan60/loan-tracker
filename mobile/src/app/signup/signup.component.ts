@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, output, signal } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { createUserWithEmailAndPassword, getAuth } from '@angular/fire/auth';
+import { createUserWithEmailAndPassword, getAuth, updateProfile } from '@angular/fire/auth';
 import { FirebaseAuthError, FirebaseErrorCodeMessageEnum } from '../login/types';
 import { extractFirebaseErrorMessage } from '../utility-functions';
 import { HelperService } from '../helper.service';
@@ -20,7 +20,7 @@ import { PhoneWithCountryComponent } from '../phone-with-country/phone-with-coun
     IonButton,
   ],
 })
-export class SignupComponent  implements OnInit {
+export class SignupComponent {
   readonly signupComplete = output<boolean>();
   readonly fb = inject(FormBuilder);
   readonly helperService = inject(HelperService);
@@ -56,7 +56,6 @@ export class SignupComponent  implements OnInit {
           const confirmPassword = control.get('confirmPassword') as AbstractControl;
           if (!password.value || !confirmPassword.value) return null;
           const valid = password.value === confirmPassword.value;
-          console.log('isValid: ', valid);
           if (valid) {
             confirmPassword.setErrors(null)
             return null
@@ -69,9 +68,8 @@ export class SignupComponent  implements OnInit {
     }),
   });
   loading = signal(false);
-  constructor() { }
 
-  ngOnInit() {}
+  constructor() { }
 
   emailErrorMessage(form: FormGroup) {
     let emailControl = form.controls['email'];
@@ -117,7 +115,8 @@ export class SignupComponent  implements OnInit {
       this.loading.set(true);
       const auth = getAuth();
       createUserWithEmailAndPassword(auth, this.signUpForm.get('email').value, this.signUpForm.get('passwords.password').value)
-        .then(async () => {
+        .then(async (userCredential) => {
+          await updateProfile(userCredential.user, { displayName: this.signUpForm.get('name').value });
           let toast = await this.helperService.showToast(
             'You are successfully registered. You can login now.',
             3000,
@@ -125,7 +124,7 @@ export class SignupComponent  implements OnInit {
               color: 'success',
             },
           );
-          await toast.onDidDismiss();
+          toast.onDidDismiss();
           return this.signupComplete.emit(true);
         })
         .catch((error: FirebaseAuthError) => {

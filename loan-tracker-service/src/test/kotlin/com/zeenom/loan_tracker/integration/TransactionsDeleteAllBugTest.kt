@@ -42,7 +42,8 @@ class TransactionsDeleteAllBugTest: BaseIntegration() {
     private lateinit var transaction: TransactionResponse
 
     private var zeeDto = UserDto(
-        uid = "123",
+        uid = null,
+        userFBId = "123",
         email = "zee@gmail.com",
         phoneNumber = "+923001234567",
         displayName = "Zeeshan Tufail",
@@ -62,6 +63,18 @@ class TransactionsDeleteAllBugTest: BaseIntegration() {
         zeeToken = loginUser(
             userDto = zeeDto
         ).token
+        zeeDto = userModelRepository.findByUid(zeeDto.userFBId)!!.let {
+            UserDto(
+                uid = it.streamId,
+                userFBId = it.uid,
+                email = it.email,
+                phoneNumber = it.phoneNumber,
+                displayName = it.displayName,
+                photoUrl = it.photoUrl,
+                currency = it.currency,
+                emailVerified = it.emailVerified
+            )
+        }
         addFriend(zeeToken, "john")
         johnFriendId = queryFriend(
             token = zeeToken

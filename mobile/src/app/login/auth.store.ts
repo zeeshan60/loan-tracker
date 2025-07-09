@@ -110,22 +110,46 @@ export const AuthStore = signalStore(
     },
 
     async loginWithGoogle(): Promise<boolean | void> {
-
-      const loginPromise = this.getLoginPluginToken();
-
-      return loginPromise
-        .then(async (token) => this.login(token!))
+      const loader = await loadingCtrl.create();
+      loader.present();
+      return this.getLoginPluginToken()
+        .then(async (token) => {
+          return this.login(token!);
+        })
         .then(() => {
+          loader.dismiss();
           if (!store.user()?.phoneNumber) {
             this.askForPhoneNumber();
           }
         })
-        .catch(async (err: Error) => {
+        .catch(async () => {
           this.signOut();
           await helperService.showToast('Unable to login at the moment', 2000, {
             color: 'danger'
           });
+        })
+        .finally(() => {
+          loader?.dismiss();
         });
+    },
+
+    async loginWithApple(): Promise<boolean | void> {
+      // todo: login with apple plugin
+      // const loginPromise = this.getLoginPluginToken();
+      //
+      // return loginPromise
+      //   .then(async (token) => this.login(token!))
+      //   .then(() => {
+      //     if (!store.user()?.phoneNumber) {
+      //       this.askForPhoneNumber();
+      //     }
+      //   })
+      //   .catch(async () => {
+      //     this.signOut();
+      //     await helperService.showToast('Unable to login at the moment', 2000, {
+      //       color: 'danger'
+      //     });
+      //   });
     },
 
     async askForPhoneNumber() {
@@ -138,9 +162,7 @@ export const AuthStore = signalStore(
     },
 
     async login(idToken: string) {
-      const loader = await loadingCtrl.create();
       try {
-        loader.present();
         const url = `${PUBLIC_API}/login`
         const {token: apiKey} = await firstValueFrom(
           http.post<{ token: string }>(url, {
@@ -157,8 +179,6 @@ export const AuthStore = signalStore(
       } catch (e) {
         this.signOut();
         throw new Error('login failed.');
-      } finally {
-        loader.dismiss();
       }
     },
     async setApiKey() {

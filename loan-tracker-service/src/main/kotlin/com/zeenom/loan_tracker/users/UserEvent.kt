@@ -17,7 +17,7 @@ interface IUserEvent : IEvent<UserModel> {
 @Table("user_events")
 data class UserEvent(
     @Id val id: UUID? = null,
-    val uid: String,
+    val uid: String?,
     val streamId: UUID,
     val displayName: String?,
     val phoneNumber: String?,
@@ -26,13 +26,14 @@ data class UserEvent(
     val emailVerified: Boolean?,
     val currency: String?,
     val createdAt: Instant,
+    val createdBy: UUID,
     val version: Int,
     val eventType: UserEventType,
 ) : IEventAble<UserModel> {
     override fun toEvent(): IEvent<UserModel> {
         return when (eventType) {
             UserEventType.USER_CREATED -> UserCreated(
-                userId = uid,
+                userId = uid ?: throw IllegalStateException("User ID is required"),
                 displayName = displayName ?: throw IllegalStateException("Display name is required"),
                 phoneNumber = phoneNumber,
                 email = email,
@@ -41,34 +42,38 @@ data class UserEvent(
                 createdAt = createdAt,
                 version = version,
                 streamId = streamId,
-                createdBy = uid
+                createdBy = createdBy
             )
 
             UserEventType.CURRENCY_CHANGED -> UserCurrencyChanged(
-                userId = uid,
                 currency = currency ?: throw IllegalStateException("Currency is required"),
                 createdAt = createdAt,
                 version = version,
                 streamId = streamId,
-                createdBy = uid
+                createdBy = createdBy
             )
 
             UserEventType.PHONE_NUMBER_CHANGED -> UserPhoneNumberChanged(
-                userId = uid,
                 phoneNumber = phoneNumber,
                 createdAt = createdAt,
                 version = version,
                 streamId = streamId,
-                createdBy = uid
+                createdBy = createdBy
             )
 
             UserEventType.DISPLAY_NAME_CHANGED -> UserDisplayNameChanged(
-                userId = uid,
                 displayName = displayName ?: throw IllegalStateException("Display name is required"),
                 createdAt = createdAt,
                 version = version,
                 streamId = streamId,
-                createdBy = uid
+                createdBy = createdBy
+            )
+
+            UserEventType.USER_DELETED -> UserDeleted(
+                createdAt = createdAt,
+                version = version,
+                streamId = streamId,
+                createdBy = createdBy
             )
         }
     }
@@ -77,7 +82,7 @@ data class UserEvent(
 @Repository
 interface UserModelRepository : CoroutineCrudRepository<UserModel, UUID> {
     suspend fun findByUid(uid: String): UserModel?
-    suspend fun findAllByUidIn(uids: List<String>): Flow<UserModel>
+    suspend fun findAllByStreamIdIn(streamIds: List<UUID>): Flow<UserModel>
     suspend fun findAllByEmailIn(emails: List<String>): Flow<UserModel>
     suspend fun findAllByPhoneNumberIn(phones: List<String>): Flow<UserModel>
     suspend fun findByEmail(email: String): UserModel?
@@ -96,10 +101,11 @@ data class UserModel(
     val currency: String?,
     val email: String?,
     val photoUrl: String?,
-    val emailVerified: Boolean?,
+    val emailVerified: Boolean,
     val createdAt: Instant,
     val updatedAt: Instant,
     val version: Int,
+    val deleted: Boolean,
 )
 
 data class UserCreated(
@@ -108,11 +114,11 @@ data class UserCreated(
     val email: String?,
     val photoUrl: String?,
     val emailVerified: Boolean,
-    override val userId: String,
+    val userId: String,
     override val createdAt: Instant,
     override val version: Int,
     override val streamId: UUID,
-    override val createdBy: String,
+    override val createdBy: UUID,
 ) : IUserEvent {
     override fun toEntity(): UserEvent {
         return UserEvent(
@@ -125,6 +131,7 @@ data class UserCreated(
             emailVerified = emailVerified,
             currency = null,
             createdAt = createdAt,
+            createdBy = createdBy,
             version = version,
             eventType = UserEventType.USER_CREATED
         )
@@ -143,22 +150,22 @@ data class UserCreated(
             emailVerified = emailVerified,
             createdAt = createdAt,
             updatedAt = createdAt,
-            version = version
+            version = version,
+            deleted = false,
         )
     }
 }
 
 data class UserCurrencyChanged(
     val currency: String?,
-    override val userId: String,
     override val createdAt: Instant,
     override val version: Int,
     override val streamId: UUID,
-    override val createdBy: String,
+    override val createdBy: UUID,
 ) : IUserEvent {
     override fun toEntity(): UserEvent {
         return UserEvent(
-            uid = userId,
+            uid = null,
             streamId = streamId,
             displayName = null,
             phoneNumber = null,
@@ -167,6 +174,7 @@ data class UserCurrencyChanged(
             emailVerified = null,
             currency = currency,
             createdAt = createdAt,
+            createdBy = createdBy,
             version = version,
             eventType = UserEventType.CURRENCY_CHANGED
         )
@@ -184,15 +192,14 @@ data class UserCurrencyChanged(
 
 data class UserPhoneNumberChanged(
     val phoneNumber: String?,
-    override val userId: String,
     override val createdAt: Instant,
     override val version: Int,
     override val streamId: UUID,
-    override val createdBy: String,
+    override val createdBy: UUID,
 ) : IUserEvent {
     override fun toEntity(): UserEvent {
         return UserEvent(
-            uid = userId,
+            uid = null,
             streamId = streamId,
             displayName = null,
             phoneNumber = phoneNumber,
@@ -201,6 +208,7 @@ data class UserPhoneNumberChanged(
             emailVerified = null,
             currency = null,
             createdAt = createdAt,
+            createdBy = createdBy,
             version = version,
             eventType = UserEventType.PHONE_NUMBER_CHANGED
         )
@@ -216,17 +224,58 @@ data class UserPhoneNumberChanged(
     }
 }
 
-data class UserDisplayNameChanged(
-    val displayName: String,
-    override val userId: String,
+data class UserDeleted(
     override val createdAt: Instant,
     override val version: Int,
     override val streamId: UUID,
-    override val createdBy: String,
+    override val createdBy: UUID,
 ) : IUserEvent {
     override fun toEntity(): UserEvent {
         return UserEvent(
-            uid = userId,
+            uid = null,
+            streamId = streamId,
+            displayName = null,
+            phoneNumber = null,
+            email = null,
+            photoUrl = null,
+            emailVerified = null,
+            currency = null,
+            createdAt = createdAt,
+            createdBy = createdBy,
+            version = version,
+            eventType = UserEventType.USER_DELETED
+        )
+    }
+
+    override fun applyEvent(existing: UserModel?): UserModel {
+        requireNotNull(existing) { "User must exist" }
+        return existing.copy(
+            streamId = streamId,
+            uid = existing.uid,
+            displayName = "",
+            phoneNumber = null,
+            email = null,
+            photoUrl = null,
+            currency = null,
+            emailVerified = false,
+            createdAt = createdAt,
+            updatedAt = createdAt,
+            version = version,
+            deleted = true
+        )
+    }
+}
+
+data class UserDisplayNameChanged(
+    val displayName: String,
+    override val createdAt: Instant,
+    override val version: Int,
+    override val streamId: UUID,
+    override val createdBy: UUID,
+) : IUserEvent {
+    override fun toEntity(): UserEvent {
+        return UserEvent(
+            uid = null,
             streamId = streamId,
             displayName = displayName,
             phoneNumber = null,
@@ -235,6 +284,7 @@ data class UserDisplayNameChanged(
             emailVerified = null,
             currency = null,
             createdAt = createdAt,
+            createdBy = createdBy,
             version = version,
             eventType = UserEventType.DISPLAY_NAME_CHANGED
         )
@@ -252,6 +302,7 @@ data class UserDisplayNameChanged(
 
 enum class UserEventType {
     USER_CREATED,
+    USER_DELETED,
     CURRENCY_CHANGED,
     PHONE_NUMBER_CHANGED,
     DISPLAY_NAME_CHANGED,

@@ -2,6 +2,8 @@ package com.zeenom.loan_tracker.users
 
 import com.zeenom.loan_tracker.friends.TestPostgresConfig
 import com.zeenom.loan_tracker.friends.UserUpdateDto
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
@@ -11,13 +13,14 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest
+import java.util.*
 
 @DataR2dbcTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UserServiceTest(
     @Autowired private val userEventRepository: UserEventRepository,
     @Autowired private val userModelRepository: UserModelRepository,
-) : TestPostgresConfig() {
+) : TestPostgresConfig()  {
 
     private val userEventHandler = UserEventHandler(
         userRepository = userEventRepository,
@@ -41,7 +44,7 @@ class UserServiceTest(
         val userEvent = userEventRepository.findAll().toList()
 
         assertThat(userEvent).hasSize(1)
-        assertThat(userEvent[0].uid).isEqualTo(userDto.uid)
+        assertThat(userEvent[0].uid).isEqualTo(userDto.userFBId)
         assertThat(userEvent[0].email).isEqualTo(userDto.email)
         assertThat(userEvent[0].phoneNumber).isEqualTo(userDto.phoneNumber)
         assertThat(userEvent[0].displayName).isEqualTo(userDto.displayName)
@@ -49,10 +52,13 @@ class UserServiceTest(
         assertThat(userEvent[0].emailVerified).isEqualTo(userDto.emailVerified)
     }
 
+    val userId = UUID.randomUUID()
+    val userId2 = UUID.randomUUID()
     private val userDto: UserDto
         get() {
             val userDto = UserDto(
-                uid = "123",
+                uid = userId,
+                userFBId = "123",
                 email = "user@gmail.com",
                 phoneNumber = "+923001234567",
                 displayName = "Test User",
@@ -77,7 +83,8 @@ class UserServiceTest(
             runBlocking {
                 saveEvent(
                     userDto = UserDto(
-                        uid = "123",
+                        uid = userId,
+                        userFBId = "123",
                         email = "user1@gmail.com",
                         phoneNumber = "+923001234568",
                         displayName = "Test User",
@@ -105,7 +112,7 @@ class UserServiceTest(
     fun `find user by id returns user successfully`(): Unit = runBlocking {
         val userDto = saveEvent(userDto = userDto)
 
-        val user = userEventHandler.findUserById(userDto.uid)
+        val user = userEventHandler.findByUserId(userModelRepository.findAll().first().streamId)
 
         assertThat(user).isNotNull
         assertThat(user!!.uid).isEqualTo(userDto.uid)
@@ -119,10 +126,11 @@ class UserServiceTest(
     @Test
     fun `find multiple users using uids successfully`(): Unit = runBlocking {
         saveEvent(userDto = userDto)
-        val userDto2 = userDto.copy(uid = "124", email = "user2@gmail.com", phoneNumber = "+923001234568")
+        val userDto2 = userDto.copy(uid = userId2, userFBId = "124", email = "user2@gmail.com", phoneNumber = "+923001234568")
         saveEvent(userDto = userDto2)
 
-        val users = userEventHandler.findUsersByUids(listOf("123", "124")).toList()
+        val users =
+            userEventHandler.findUsersByUids(userModelRepository.findAll().map { it.streamId }.toList()).toList()
 
         assertThat(users).hasSize(2)
         val user = users[0]
@@ -148,14 +156,14 @@ class UserServiceTest(
 
         userService.updateUser(
             UserUpdateDto(
-                uid = userDto.uid,
+                uid = userDto.uid!!,
                 currency = "PKR",
                 displayName = userDto.displayName,
                 phoneNumber = userDto.phoneNumber,
             )
         )
 
-        userService.findUserById(userDto.uid)!!.let {
+        userService.findUserById(userDto.uid!!)!!.let {
             assertThat(it.currency).isEqualTo("PKR")
         }
     }

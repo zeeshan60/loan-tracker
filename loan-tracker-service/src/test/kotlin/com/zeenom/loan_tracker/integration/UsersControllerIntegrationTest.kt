@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.web.server.LocalServerPort
-import java.net.http.HttpHeaders
+import java.util.UUID
 
 class UsersControllerIntegrationTest(@LocalServerPort private val port: Int) : BaseIntegration() {
 
@@ -33,14 +33,16 @@ class UsersControllerIntegrationTest(@LocalServerPort private val port: Int) : B
     @Autowired
     private lateinit var friendModelRepository: FriendModelRepository
 
+    val zeeUid: UUID = UUID.randomUUID()
     private var zeeDto = UserDto(
-        uid = "123",
+        uid = zeeUid,
         email = "zee@gmail.com",
         phoneNumber = "+923001234567",
         displayName = "Zeeshan Tufail",
         photoUrl = "https://lh3.googleusercontent.com/a/A9GpZGSDOI3TbzQEM8vblTl2",
         currency = null,
-        emailVerified = true
+        emailVerified = true,
+        userFBId = "123"
     )
     private lateinit var zeeToken: String
 
@@ -87,4 +89,30 @@ class UsersControllerIntegrationTest(@LocalServerPort private val port: Int) : B
         assertThat(userResponse.currency).isEqualTo(userRequest.currency)
     }
 
+    @Order(2)
+    @Test
+    fun `delete user sucessfully and create a new user with same uid`(): Unit = runBlocking {
+        webTestClient.delete()
+            .uri("/api/v1/users")
+            .header("Authorization", "Bearer $zeeToken")
+            .exchange()
+            .expectStatus().isOk
+
+        webTestClient.get()
+            .uri("/api/v1/users")
+            .header("Authorization", "Bearer $zeeToken")
+            .exchange()
+            .expectStatus().isNotFound
+        zeeToken = loginUser(
+            //New users user id should be null or at-least different from previous user id
+            userDto = zeeDto.copy(uid = null)
+        ).token
+
+        webTestClient.get()
+            .uri("/api/v1/users")
+            .header("Authorization", "Bearer $zeeToken")
+            .exchange()
+            .expectStatus().isOk
+
+    }
 }

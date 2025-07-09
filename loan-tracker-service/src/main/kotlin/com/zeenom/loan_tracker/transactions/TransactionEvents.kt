@@ -10,23 +10,23 @@ import java.util.*
 
 interface ITransactionEvent : IEvent<TransactionModel>, TransactionChangeSummary, CrossTransactionable {
     val id: UUID?
+    val userId: UUID
     val recipientId: UUID
-    val transactionDate: Instant
     override fun toEntity(): TransactionEvent
     fun activityLog(current: TransactionModel): ActivityLog
 }
 
 data class TransactionCreated(
     override val id: UUID?,
-    override val userId: String,
+    override val userId: UUID,
+    override val recipientId: UUID,
     val description: String,
     val currency: String,
     val splitType: SplitType,
     val totalAmount: BigDecimal,
-    override val transactionDate: Instant,
-    override val recipientId: UUID,
+    val transactionDate: Instant,
     override val createdAt: Instant,
-    override val createdBy: String,
+    override val createdBy: UUID,
     override val streamId: UUID,
     override val version: Int,
 ) : ITransactionEvent {
@@ -50,7 +50,7 @@ data class TransactionCreated(
     override fun applyEvent(existing: TransactionModel?): TransactionModel {
         return TransactionModel(
             historyLogId = streamId,
-            userUid = userId,
+            userId = userId,
             description = description,
             currency = currency,
             splitType = splitType,
@@ -69,15 +69,15 @@ data class TransactionCreated(
 
     }
 
-    override fun crossTransaction(recipientUserId: String, userStreamId: UUID): ITransactionEvent {
+    override fun crossTransaction(recipientUserId: UUID, userStreamId: UUID): ITransactionEvent {
         return TransactionCreated(
             id = null,
             userId = recipientUserId,
+            recipientId = userStreamId,
             description = description,
             currency = currency,
             splitType = splitType.reverse(),
             totalAmount = totalAmount,
-            recipientId = userStreamId,
             createdAt = createdAt,
             createdBy = createdBy,
             streamId = streamId,
@@ -89,7 +89,7 @@ data class TransactionCreated(
     override fun activityLog(current: TransactionModel): ActivityLog {
         return ActivityLog(
             id = current.historyLogId ?: throw IllegalStateException("Transaction event id is required for activity log"),
-            userUid = userId,
+            userId = userId,
             activityType = ActivityType.CREATED,
             amount = splitType.apply(totalAmount),
             currency = currency,
@@ -108,13 +108,14 @@ data class TransactionCreated(
 
 data class TransactionDateChanged(
     override val id: UUID?,
-    override val transactionDate: Instant,
+    override val userId: UUID,
     override val recipientId: UUID,
-    override val userId: String,
+
+    val transactionDate: Instant,
     override val streamId: UUID,
     override val version: Int,
     override val createdAt: Instant,
-    override val createdBy: String,
+    override val createdBy: UUID,
 ) : ITransactionEvent {
     override fun applyEvent(existing: TransactionModel?): TransactionModel {
         requireNotNull(existing) {"TransactionModel cannot be null"}
@@ -122,7 +123,7 @@ data class TransactionDateChanged(
             historyLogId = id,
             transactionDate = transactionDate,
             version = version,
-            updatedBy = userId,
+            updatedBy = createdBy,
             updatedAt = createdAt
         )
     }
@@ -154,23 +155,23 @@ data class TransactionDateChanged(
         )
     }
 
-    override fun crossTransaction(recipientUserId: String, userStreamId: UUID): ITransactionEvent {
+    override fun crossTransaction(recipientUserId: UUID, userStreamId: UUID): ITransactionEvent {
         return TransactionDateChanged(
             id = id,
-            transactionDate = transactionDate,
             userId = recipientUserId,
+            recipientId = userStreamId,
+            transactionDate = transactionDate,
             streamId = streamId,
             version = version,
             createdAt = createdAt,
             createdBy = createdBy,
-            recipientId = userStreamId
         )
     }
 
     override fun activityLog(current: TransactionModel): ActivityLog {
         return ActivityLog(
-            id = current.historyLogId ?: throw IllegalStateException("Transaction event id is required for activity log"),
-            userUid = userId,
+            id = current.historyLogId
+                ?: throw IllegalStateException("Transaction event id is required for activity log"),
             activityType = ActivityType.UPDATED,
             amount = current.splitType.apply(current.totalAmount),
             currency = current.currency,
@@ -178,21 +179,21 @@ data class TransactionDateChanged(
             date = createdAt,
             activityByUid = createdBy,
             description = current.description,
-            transactionModel = current
+            userId = current.userId,
+            transactionModel = current,
         )
     }
 }
 
 data class DescriptionChanged(
     override val id: UUID?,
-    val description: String,
+    override val userId: UUID,
     override val recipientId: UUID,
-    override val userId: String,
+    val description: String,
     override val streamId: UUID,
     override val version: Int,
     override val createdAt: Instant,
-    override val createdBy: String,
-    override val transactionDate: Instant,
+    override val createdBy: UUID,
 ) : ITransactionEvent {
 
     override fun applyEvent(existing: TransactionModel?): TransactionModel {
@@ -201,14 +202,13 @@ data class DescriptionChanged(
             historyLogId = id,
             description = description,
             version = version,
-            updatedBy = userId,
+            updatedBy = createdBy,
             updatedAt = createdAt
         )
     }
 
     override fun toEntity(): TransactionEvent {
         return TransactionEvent(
-            userUid = userId,
             description = description,
             currency = null,
             splitType = null,
@@ -219,7 +219,9 @@ data class DescriptionChanged(
             streamId = streamId,
             version = version,
             eventType = TransactionEventType.DESCRIPTION_CHANGED,
-            transactionDate = transactionDate
+            transactionDate = null,
+            id = id,
+            userUid = userId,
         )
     }
 
@@ -233,24 +235,22 @@ data class DescriptionChanged(
         )
     }
 
-    override fun crossTransaction(recipientUserId: String, userStreamId: UUID): ITransactionEvent {
+    override fun crossTransaction(recipientUserId: UUID, userStreamId: UUID): ITransactionEvent {
         return DescriptionChanged(
             id = id,
-            description = description,
             userId = recipientUserId,
+            recipientId = userStreamId,
+            description = description,
             streamId = streamId,
             version = version,
             createdAt = createdAt,
             createdBy = createdBy,
-            recipientId = userStreamId,
-            transactionDate = transactionDate
         )
     }
 
     override fun activityLog(current: TransactionModel): ActivityLog {
         return ActivityLog(
             id = current.historyLogId ?: throw IllegalStateException("Transaction event id is required for activity log"),
-            userUid = userId,
             activityType = ActivityType.UPDATED,
             amount = current.splitType.apply(current.totalAmount),
             currency = current.currency,
@@ -258,6 +258,7 @@ data class DescriptionChanged(
             date = createdAt,
             activityByUid = createdBy,
             description = description,
+            userId = current.userId,
             transactionModel = current
         )
     }
@@ -265,13 +266,12 @@ data class DescriptionChanged(
 
 data class TransactionDeleted(
     override val id: UUID?,
+    override val userId: UUID,
     override val recipientId: UUID,
-    override val userId: String,
     override val streamId: UUID,
     override val version: Int,
     override val createdAt: Instant,
-    override val createdBy: String,
-    override val transactionDate: Instant,
+    override val createdBy: UUID,
 ) : ITransactionEvent {
     override fun applyEvent(existing: TransactionModel?): TransactionModel {
         requireNotNull(existing) {"TransactionModel cannot be null"}
@@ -279,14 +279,13 @@ data class TransactionDeleted(
             historyLogId = id,
             version = version,
             deleted = true,
-            updatedBy = userId,
+            updatedBy = createdBy,
             updatedAt = createdAt
         )
     }
 
     override fun toEntity(): TransactionEvent {
         return TransactionEvent(
-            userUid = userId,
             description = null,
             currency = null,
             splitType = null,
@@ -297,7 +296,9 @@ data class TransactionDeleted(
             streamId = streamId,
             version = version,
             eventType = TransactionEventType.TRANSACTION_DELETED,
-            transactionDate = transactionDate
+            transactionDate = null,
+            id = id,
+            userUid = userId,
         )
     }
 
@@ -311,23 +312,22 @@ data class TransactionDeleted(
         )
     }
 
-    override fun crossTransaction(recipientUserId: String, userStreamId: UUID): ITransactionEvent {
+    override fun crossTransaction(recipientUserId: UUID, userStreamId: UUID): ITransactionEvent {
         return TransactionDeleted(
             id = id,
             userId = recipientUserId,
+            recipientId = userStreamId,
             streamId = streamId,
             version = version,
             createdAt = createdAt,
             createdBy = createdBy,
-            recipientId = userStreamId,
-            transactionDate = transactionDate
         )
     }
 
     override fun activityLog(current: TransactionModel): ActivityLog {
         return ActivityLog(
-            id = current.historyLogId ?: throw IllegalStateException("Transaction event id is required for activity log"),
-            userUid = userId,
+            id = current.historyLogId
+                ?: throw IllegalStateException("Transaction event id is required for activity log"),
             activityType = ActivityType.DELETED,
             amount = current.splitType.apply(current.totalAmount),
             currency = current.currency,
@@ -335,7 +335,8 @@ data class TransactionDeleted(
             date = createdAt,
             transactionModel = current,
             activityByUid = createdBy,
-            description = current.description
+            description = current.description,
+            userId = current.userId,
         )
     }
 }
@@ -343,14 +344,13 @@ data class TransactionDeleted(
 
 data class TotalAmountChanged(
     override val id: UUID?,
-    val totalAmount: BigDecimal,
+    override val userId: UUID,
     override val recipientId: UUID,
-    override val userId: String,
+    val totalAmount: BigDecimal,
     override val streamId: UUID,
     override val version: Int,
     override val createdAt: Instant,
-    override val createdBy: String,
-    override val transactionDate: Instant,
+    override val createdBy: UUID,
 ) : ITransactionEvent {
     override fun applyEvent(existing: TransactionModel?): TransactionModel {
         requireNotNull(existing) {"TransactionModel cannot be null"}
@@ -358,25 +358,25 @@ data class TotalAmountChanged(
             historyLogId = id,
             totalAmount = totalAmount,
             version = version,
-            updatedBy = userId,
+            updatedBy = createdBy,
             updatedAt = createdAt
         )
     }
 
     override fun toEntity(): TransactionEvent {
         return TransactionEvent(
-            userUid = userId,
             description = null,
             currency = null,
             splitType = null,
             totalAmount = totalAmount,
             recipientId = recipientId,
+            userUid = userId,
             createdAt = createdAt,
             createdBy = createdBy,
             streamId = streamId,
             version = version,
             eventType = TransactionEventType.TOTAL_AMOUNT_CHANGED,
-            transactionDate = transactionDate
+            transactionDate = null
         )
     }
 
@@ -390,24 +390,23 @@ data class TotalAmountChanged(
         )
     }
 
-    override fun crossTransaction(recipientUserId: String, userStreamId: UUID): ITransactionEvent {
+    override fun crossTransaction(recipientUserId: UUID, userStreamId: UUID): ITransactionEvent {
         return TotalAmountChanged(
             id = id,
-            totalAmount = totalAmount,
             userId = recipientUserId,
+            recipientId = userStreamId,
+            totalAmount = totalAmount,
             streamId = streamId,
             version = version,
             createdAt = createdAt,
             createdBy = createdBy,
-            recipientId = userStreamId,
-            transactionDate = transactionDate
         )
     }
 
     override fun activityLog(current: TransactionModel): ActivityLog {
         return ActivityLog(
             id = current.historyLogId ?: throw IllegalStateException("Transaction event id is required for activity log"),
-            userUid = userId,
+            userId = current.userId,
             activityType = ActivityType.UPDATED,
             currency = current.currency,
             date = createdAt,
@@ -422,14 +421,13 @@ data class TotalAmountChanged(
 
 data class CurrencyChanged(
     override val id: UUID?,
-    val currency: String,
+    override val userId: UUID,
     override val recipientId: UUID,
-    override val userId: String,
+    val currency: String,
     override val streamId: UUID,
     override val version: Int,
     override val createdAt: Instant,
-    override val createdBy: String,
-    override val transactionDate: Instant,
+    override val createdBy: UUID,
 ) : ITransactionEvent {
     override fun applyEvent(existing: TransactionModel?): TransactionModel {
         requireNotNull(existing) {"TransactionModel cannot be null"}
@@ -437,14 +435,13 @@ data class CurrencyChanged(
             historyLogId = id,
             currency = currency,
             version = version,
-            updatedBy = userId,
+            updatedBy = createdBy,
             updatedAt = createdAt
         )
     }
 
     override fun toEntity(): TransactionEvent {
         return TransactionEvent(
-            userUid = userId,
             description = null,
             currency = currency,
             splitType = null,
@@ -455,7 +452,8 @@ data class CurrencyChanged(
             streamId = streamId,
             version = version,
             eventType = TransactionEventType.CURRENCY_CHANGED,
-            transactionDate = transactionDate
+            transactionDate = null,
+            userUid = userId
         )
     }
 
@@ -469,24 +467,23 @@ data class CurrencyChanged(
         )
     }
 
-    override fun crossTransaction(recipientUserId: String, userStreamId: UUID): ITransactionEvent {
+    override fun crossTransaction(recipientUserId: UUID, userStreamId: UUID): ITransactionEvent {
         return CurrencyChanged(
             id = id,
-            currency = currency,
             userId = recipientUserId,
+            recipientId = userStreamId,
+            currency = currency,
             streamId = streamId,
             version = version,
             createdAt = createdAt,
             createdBy = createdBy,
-            recipientId = userStreamId,
-            transactionDate = transactionDate
         )
     }
 
     override fun activityLog(current: TransactionModel): ActivityLog {
         return ActivityLog(
             id = current.historyLogId ?: throw IllegalStateException("Transaction event id is required for activity log"),
-            userUid = userId,
+            userId = current.userId,
             activityType = ActivityType.UPDATED,
             currency = currency,
             date = createdAt,
@@ -501,14 +498,13 @@ data class CurrencyChanged(
 
 data class SplitTypeChanged(
     override val id: UUID?,
-    val splitType: SplitType,
+    override val userId: UUID,
     override val recipientId: UUID,
-    override val userId: String,
+    val splitType: SplitType,
     override val streamId: UUID,
     override val version: Int,
     override val createdAt: Instant,
-    override val createdBy: String,
-    override val transactionDate: Instant,
+    override val createdBy: UUID,
 ) : ITransactionEvent {
     override fun applyEvent(existing: TransactionModel?): TransactionModel {
         requireNotNull(existing) {"TransactionModel cannot be null"}
@@ -516,7 +512,7 @@ data class SplitTypeChanged(
             historyLogId = id,
             splitType = splitType,
             version = version,
-            updatedBy = userId,
+            updatedBy = createdBy,
             updatedAt = createdAt
         )
     }
@@ -544,28 +540,27 @@ data class SplitTypeChanged(
             streamId = streamId,
             version = version,
             eventType = TransactionEventType.SPLIT_TYPE_CHANGED,
-            transactionDate = transactionDate
+            transactionDate = null
         )
     }
 
-    override fun crossTransaction(recipientUserId: String, userStreamId: UUID): ITransactionEvent {
+    override fun crossTransaction(recipientUserId: UUID, userStreamId: UUID): ITransactionEvent {
         return SplitTypeChanged(
             id = id,
-            splitType = splitType.reverse(),
             userId = recipientUserId,
+            recipientId = userStreamId,
+            splitType = splitType.reverse(),
             streamId = streamId,
             version = version,
             createdAt = createdAt,
             createdBy = createdBy,
-            recipientId = userStreamId,
-            transactionDate = transactionDate
         )
     }
 
     override fun activityLog(current: TransactionModel): ActivityLog {
         return ActivityLog(
             id = current.historyLogId ?: throw IllegalStateException("Transaction event id is required for activity log"),
-            userUid = userId,
+            userId = current.userId,
             activityType = ActivityType.UPDATED,
             currency = current.currency,
             date = createdAt,
@@ -579,7 +574,7 @@ data class SplitTypeChanged(
 }
 
 interface CrossTransactionable {
-    fun crossTransaction(recipientUserId: String, userStreamId: UUID): ITransactionEvent
+    fun crossTransaction(recipientUserId: UUID, userStreamId: UUID): ITransactionEvent
 }
 
 interface TransactionChangeSummary {
@@ -588,7 +583,7 @@ interface TransactionChangeSummary {
 
 data class ChangeSummary(
     val date: Instant,
-    val changedBy: String,
+    val changedBy: UUID,
     val oldValue: String,
     val newValue: String,
     val type: TransactionChangeType,

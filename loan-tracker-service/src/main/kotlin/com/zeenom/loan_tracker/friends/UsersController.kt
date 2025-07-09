@@ -2,25 +2,28 @@ package com.zeenom.loan_tracker.friends
 
 import com.zeenom.loan_tracker.events.CommandDto
 import com.zeenom.loan_tracker.events.CommandType
+import com.zeenom.loan_tracker.users.UserService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.Pattern
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
+import java.util.UUID
 
 @RestController
 @RequestMapping("/api/v1/users")
 class UsersController(
     private val updateUserCommand: UpdateUserCommand,
     private val userQuery: UserQuery,
+    private val userService: UserService
 ) {
 
     @Operation(summary = "Get user", description = "Get user details")
     @GetMapping
-    suspend fun getUser(@AuthenticationPrincipal userId: String): UserResponse {
+    suspend fun getUser(@AuthenticationPrincipal userId: UUID): UserResponse {
         return userQuery.execute(userId).let {
             UserResponse(
-                uid = it.uid,
+                uid = it.uid.toString(),
                 email = it.email,
                 phoneNumber = it.phoneNumber,
                 displayName = it.displayName,
@@ -35,7 +38,7 @@ class UsersController(
     @PutMapping
     suspend fun updateUser(
         @RequestBody userRequest: UpdateUserRequest,
-        @AuthenticationPrincipal userId: String,
+        @AuthenticationPrincipal userId: UUID,
     ): UserResponse {
         updateUserCommand.execute(
             CommandDto(
@@ -46,12 +49,13 @@ class UsersController(
                     phoneNumber = userRequest.phoneNumber,
                     currency = userRequest.currency,
                 ),
-                userId = userId
+                userId = userId,
+                userFBId = null
             )
         )
         return userQuery.execute(userId).let {
             UserResponse(
-                uid = it.uid,
+                uid = it.uid.toString(),
                 email = it.email,
                 phoneNumber = it.phoneNumber,
                 displayName = it.displayName,
@@ -60,6 +64,12 @@ class UsersController(
                 emailVerified = it.emailVerified
             )
         }
+    }
+
+    @Operation(summary = "Delete a user", description = "Delete user")
+    @DeleteMapping
+    suspend fun deleteUser(@AuthenticationPrincipal userId: UUID) {
+        userService.deleteUser(userId)
     }
 }
 

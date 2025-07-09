@@ -5,12 +5,13 @@ import com.zeenom.loan_tracker.common.Query
 import com.zeenom.loan_tracker.common.apply
 import com.zeenom.loan_tracker.common.isOwed
 import org.springframework.stereotype.Service
+import java.util.UUID
 
 @Service
 class ActivityLogsQuery(
     private val transactionService: TransactionService,
-) : Query<String, Paginated<List<ActivityLogResponse>>> {
-    override suspend fun execute(input: String): Paginated<List<ActivityLogResponse>> {
+) : Query<UUID, Paginated<List<ActivityLogResponse>>> {
+    override suspend fun execute(input: UUID): Paginated<List<ActivityLogResponse>> {
         return Paginated(transactionService.transactionActivityLogs(userId = input).map { log ->
             requireNotNull(log.transactionDto.transactionStreamId) { "Transaction stream id is required" }
             requireNotNull(log.transactionDto.friendSummaryDto.friendId) { "Recipient name is required" }

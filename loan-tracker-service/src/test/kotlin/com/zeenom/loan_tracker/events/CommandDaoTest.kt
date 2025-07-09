@@ -62,7 +62,8 @@ class CommandDaoTest(
                 defaultCurrency = null,
                 amountInDefaultCurrency = null,
             ),
-            userId = "123",
+            userId = UUID.randomUUID(),
+            userFBId = null
         )
         commandDao.addCommand(commandDto)
 

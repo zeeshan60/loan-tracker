@@ -15,17 +15,16 @@ import {
 } from '@ionic/angular/standalone';
 import { AuthStore } from '../login/auth.store';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { COUNTRIES_WITH_CALLING_CODES, CURRENCIES, DEFAULT_TOAST_DURATION, PRIVATE_API } from '../constants';
+import { CURRENCIES, DEFAULT_TOAST_DURATION, PRIVATE_API } from '../constants';
 import { FriendsStore } from '../friends/friends.store';
 import { HelperService } from '../helper.service';
 import { PhoneWithCountryComponent } from '../phone-with-country/phone-with-country.component';
 import { extractCountryCode, toInternationalPhone, toNationalPhone } from '../utility-functions';
 import { PhonePipe } from '../pipes/phone.pipe';
-import { FakeDropdownComponent } from '../fake-dropdown/fake-dropdown.component';
-import { ModalService } from '../modal.service';
 import { CurrenciesDropdownComponent } from '../currencies-dropdown/currencies-dropdown.component';
-import { firstValueFrom } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { getAuth } from '@angular/fire/auth';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'mr-account',
@@ -105,14 +104,16 @@ export class AccountPage {
     loader.present();
     try {
       await firstValueFrom(this.http.delete(`${PRIVATE_API}/users`));
-      await this.authStore.signOut();
+      await getAuth().currentUser?.delete()
     } catch (e) {
       let toast = await this.toastCtrl.create({
-        message: 'Unable to delete user at the moment. Please tray again.',
+        message: 'Unable to delete user at the moment. Please login and try again.',
         duration: DEFAULT_TOAST_DURATION,
+        color: 'danger'
       });
       toast.present();
     } finally {
+      await this.authStore.signOut();
       await loader.dismiss();
     }
   }

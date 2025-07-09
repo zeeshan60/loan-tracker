@@ -11,6 +11,8 @@ import java.util.*
 
 class TransactionEventHandlerTest {
 
+    val userId = UUID.randomUUID()
+
     @Test
     fun `given a friend and some transactions return balance successfully`(): Unit = runBlocking {
         val friendStreamId = UUID.randomUUID()
@@ -19,7 +21,7 @@ class TransactionEventHandlerTest {
                 on {
                     runBlocking {
                         findAllByUserUidAndRecipientIdIn(
-                            "123",
+                            userId,
                             listOf(friendStreamId)
                         )
                     }
@@ -29,7 +31,7 @@ class TransactionEventHandlerTest {
             }
         )
 
-        val balances = transactionEventHandler.balancesOfFriendsByCurrency("123", listOf(friendStreamId))
+        val balances = transactionEventHandler.balancesOfFriendsByCurrency(userId, listOf(friendStreamId))
         assertThat(balances).hasSize(1)
         assertThat(balances[friendStreamId]?.get("USD")?.amount).isEqualTo(250.0.toBigDecimal())
         assertThat(balances[friendStreamId]?.get("USD")?.currency).isEqualTo(Currency.getInstance("USD"))
@@ -45,7 +47,7 @@ class TransactionEventHandlerTest {
                 on {
                     runBlocking {
                         findAllByUserUidAndRecipientIdIn(
-                            "123",
+                            userId,
                             listOf(friendStreamId1, friendStreamId2)
                         )
                     }
@@ -55,7 +57,8 @@ class TransactionEventHandlerTest {
             }
         )
 
-        val balances = transactionEventHandler.balancesOfFriendsByCurrency("123", listOf(friendStreamId1, friendStreamId2))
+        val balances =
+            transactionEventHandler.balancesOfFriendsByCurrency(userId, listOf(friendStreamId1, friendStreamId2))
         assertThat(balances).hasSize(2)
         assertThat(balances[friendStreamId1]?.get("USD")?.amount).isEqualTo(250.0.toBigDecimal())
         assertThat(balances[friendStreamId1]?.get("USD")?.currency).isEqualTo(Currency.getInstance("USD"))
@@ -75,18 +78,18 @@ class TransactionEventHandlerTest {
                 on {
                     runBlocking {
                         findAllByUserUidAndStreamId(
-                            "123",
+                            userId,
                             transactionStreamId
                         )
                     }
                 } doReturn listOf(
                     TransactionEvent(
-                        userUid = "123",
+                        userUid = userId,
                         currency = "USD",
                         recipientId = friendStreamId,
                         createdAt = Instant.now(),
                         transactionDate = Instant.now(),
-                        createdBy = "123",
+                        createdBy = userId,
                         streamId = transactionStreamId,
                         version = 1,
                         eventType = TransactionEventType.TRANSACTION_CREATED,
@@ -95,12 +98,12 @@ class TransactionEventHandlerTest {
                         totalAmount = 200.0.toBigDecimal()
                     ),
                     TransactionEvent(
-                        userUid = "123",
+                        userUid = userId,
                         currency = null,
                         recipientId = friendStreamId,
                         createdAt = Instant.now(),
                         transactionDate = Instant.now(),
-                        createdBy = "123",
+                        createdBy = userId,
                         streamId = transactionStreamId,
                         version = 2,
                         eventType = TransactionEventType.SPLIT_TYPE_CHANGED,
@@ -109,12 +112,12 @@ class TransactionEventHandlerTest {
                         totalAmount = null
                     ),
                     TransactionEvent(
-                        userUid = "123",
+                        userUid = userId,
                         currency = null,
                         recipientId = friendStreamId,
                         createdAt = Instant.now(),
                         transactionDate = Instant.now(),
-                        createdBy = "123",
+                        createdBy = userId,
                         streamId = transactionStreamId,
                         version = 3,
                         eventType = TransactionEventType.TOTAL_AMOUNT_CHANGED,
@@ -126,7 +129,7 @@ class TransactionEventHandlerTest {
             }
         )
 
-        val transaction = transactionEventHandler.read("123", transactionStreamId)
+        val transaction = transactionEventHandler.read(userId, transactionStreamId)
         assertThat(transaction).isNotNull
         assertThat(transaction?.totalAmount).isEqualTo(100.0.toBigDecimal())
         assertThat(transaction?.currency).isEqualTo("USD")
@@ -137,12 +140,12 @@ class TransactionEventHandlerTest {
         val transactionStreamId = UUID.randomUUID()
         return listOf(
             TransactionEvent(
-                userUid = "123",
+                userUid = userId,
                 currency = "USD",
                 recipientId = friendStreamId,
                 createdAt = Instant.now(),
                 transactionDate = Instant.now(),
-                createdBy = "123",
+                createdBy = userId,
                 streamId = UUID.randomUUID(),
                 version = 1,
                 eventType = TransactionEventType.TRANSACTION_CREATED,
@@ -151,12 +154,12 @@ class TransactionEventHandlerTest {
                 totalAmount = 100.0.toBigDecimal()
             ),
             TransactionEvent(
-                userUid = "123",
+                userUid = userId,
                 currency = "USD",
                 recipientId = friendStreamId,
                 createdAt = Instant.now(),
                 transactionDate = Instant.now(),
-                createdBy = "123",
+                createdBy = userId,
                 streamId = transactionStreamId,
                 version = 1,
                 eventType = TransactionEventType.TRANSACTION_CREATED,
@@ -165,12 +168,12 @@ class TransactionEventHandlerTest {
                 totalAmount = 200.0.toBigDecimal()
             ),
             TransactionEvent(
-                userUid = "123",
+                userUid = userId,
                 currency = null,
                 recipientId = friendStreamId,
                 createdAt = Instant.now(),
                 transactionDate = Instant.now(),
-                createdBy = "123",
+                createdBy = userId,
                 streamId = transactionStreamId,
                 version = 2,
                 eventType = TransactionEventType.SPLIT_TYPE_CHANGED,
@@ -179,12 +182,12 @@ class TransactionEventHandlerTest {
                 totalAmount = null
             ),
             TransactionEvent(
-                userUid = "123",
+                userUid = userId,
                 currency = "USD",
                 recipientId = friendStreamId,
                 createdAt = Instant.now(),
                 transactionDate = Instant.now(),
-                createdBy = "123",
+                createdBy = userId,
                 streamId = UUID.randomUUID(),
                 version = 1,
                 eventType = TransactionEventType.TRANSACTION_CREATED,

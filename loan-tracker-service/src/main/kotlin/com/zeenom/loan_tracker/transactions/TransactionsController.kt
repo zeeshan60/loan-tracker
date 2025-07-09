@@ -33,12 +33,13 @@ class TransactionsController(
     @PostMapping("/add")
     suspend fun addTransaction(
         @RequestBody transactionRequest: TransactionCreateRequest,
-        @AuthenticationPrincipal userId: String,
+        @AuthenticationPrincipal userId: UUID,
     ): TransactionResponse {
         val transactionId = UUID.randomUUID()
         createTransactionCommand.execute(
             CommandDto(
                 userId = userId,
+                userFBId = null,
                 payload = requestToDto(transactionRequest, transactionId),
                 commandType = CommandType.CREATE_TRANSACTION
             )
@@ -100,11 +101,12 @@ class TransactionsController(
     suspend fun updateTransaction(
         @PathVariable transactionId: UUID,
         @RequestBody transactionRequest: TransactionUpdateRequest,
-        @AuthenticationPrincipal userId: String,
+        @AuthenticationPrincipal userId: UUID,
     ): TransactionResponse {
         updateTransactionCommand.execute(
             CommandDto(
                 userId = userId,
+                userFBId = null,
                 payload = requestToDto(transactionRequest, transactionId),
                 commandType = CommandType.UPDATE_TRANSACTION
             )
@@ -122,11 +124,12 @@ class TransactionsController(
     @DeleteMapping("/delete/transactionId/{transactionId}")
     suspend fun deleteTransaction(
         @PathVariable transactionId: UUID,
-        @AuthenticationPrincipal userId: String,
+        @AuthenticationPrincipal userId: UUID,
     ): TransactionResponse {
         deleteTransactionCommand.execute(
             CommandDto(
                 userId = userId,
+                userFBId = null,
                 payload = TransactionId(transactionStreamId = transactionId),
                 commandType = CommandType.DELETE_TRANSACTION
             )
@@ -148,7 +151,7 @@ class TransactionsController(
         @RequestParam friendId: UUID,
         @Schema(description = "Timezone", example = "Asia/Singapore")
         @RequestParam timeZone: String,
-        @AuthenticationPrincipal userId: String,
+        @AuthenticationPrincipal userId: UUID,
     ): TransactionsResponse {
         if (timeZone !in ZoneId.getAvailableZoneIds()) {
             throw IllegalArgumentException("Invalid timezone")
@@ -177,7 +180,7 @@ class TransactionsController(
 
     @GetMapping("/activityLogs")
     suspend fun getTransactionActivityLogs(
-        @AuthenticationPrincipal userId: String,
+        @AuthenticationPrincipal userId: UUID,
     ): Paginated<List<ActivityLogResponse>> {
         return activityLogsQuery.execute(userId)
     }
@@ -277,12 +280,12 @@ data class TransactionResponse(
 )
 
 data class TransactionUserResponse(
-    val id: String,
+    val id: UUID,
     val name: String,
 )
 
 data class ChangeSummaryResponse(
-    val changedBy: String,
+    val changedBy: UUID,
     val changedByName: String,
     val changedByPhoto: String?,
     val changes: List<ChangeSummaryDto>,
