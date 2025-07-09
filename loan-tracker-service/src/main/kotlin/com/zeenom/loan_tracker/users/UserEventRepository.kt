@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository
 import java.util.*
 
 @Repository
-interface UserEventRepository : CoroutineCrudRepository<UserEvent, UUID> {
+interface UserEventRepository : CoroutineCrudRepository<UserEvent, UUID>, SyncableEventRepository<UserEvent> {
     @Query(
         """
         select * from user_events 
@@ -15,7 +15,7 @@ interface UserEventRepository : CoroutineCrudRepository<UserEvent, UUID> {
         ) order by insert_order
         """
     )
-    suspend fun findAllSinceStreamIdAndVersion(streamId: UUID, version: Int): List<UserEvent>
+    override suspend fun findAllSinceStreamIdAndVersion(streamId: UUID, version: Int): List<UserEvent>
 }
 
 fun userModels(eventStreams: List<UserEvent>) =

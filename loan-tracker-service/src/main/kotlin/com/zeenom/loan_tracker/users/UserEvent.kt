@@ -81,23 +81,24 @@ data class UserEvent(
 }
 
 @Repository
-interface UserModelRepository : CoroutineCrudRepository<UserModel, UUID> {
+interface UserModelRepository : CoroutineCrudRepository<UserModel, UUID>, SyncableModelRepository<UserModel> {
     suspend fun findByUidAndDeletedIsFalse(uid: String): UserModel?
     suspend fun findAllByStreamIdInAndDeletedIsFalse(streamIds: List<UUID>): Flow<UserModel>
     suspend fun findAllByEmailInAndDeletedIsFalse(emails: List<String>): Flow<UserModel>
     suspend fun findAllByPhoneNumberInAndDeletedIsFalse(phones: List<String>): Flow<UserModel>
     suspend fun findByEmailAndDeletedIsFalse(email: String): UserModel?
     suspend fun findByPhoneNumberAndDeletedIsFalse(phone: String): UserModel?
-    suspend fun findByStreamIdAndDeletedIsFalse(streamId: UUID): UserModel?
+    override suspend fun findByStreamIdAndDeletedIsFalse(streamId: UUID): UserModel?
+
     @Query("select * from user_model order by insert_order desc limit 1")
-    suspend fun findFirstSortByIdDescending(): UserModel?
+    override suspend fun findFirstSortByIdDescending(): UserModel?
 }
 
 @Table("user_model")
 data class UserModel(
     @Id()
     val id: UUID?,
-    val streamId: UUID,
+    override val streamId: UUID,
     val uid: String,
     val displayName: String,
     val phoneNumber: String?,
@@ -107,10 +108,10 @@ data class UserModel(
     val emailVerified: Boolean,
     val createdAt: Instant,
     val updatedAt: Instant,
-    val version: Int,
-    val deleted: Boolean,
+    override val version: Int,
+    override val deleted: Boolean,
     val insertOrder: Long? = null,
-)
+) : SyncableModel
 
 data class UserCreated(
     val displayName: String,
