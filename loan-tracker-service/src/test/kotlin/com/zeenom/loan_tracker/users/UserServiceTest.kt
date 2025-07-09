@@ -112,6 +112,7 @@ class UserServiceTest(
     fun `find user by id returns user successfully`(): Unit = runBlocking {
         val userDto = saveEvent(userDto = userDto)
 
+        userEventHandler.synchronize()
         val user = userEventHandler.findByUserId(userModelRepository.findAll().first().streamId)
 
         assertThat(user).isNotNull
@@ -129,6 +130,7 @@ class UserServiceTest(
         val userDto2 = userDto.copy(uid = userId2, userFBId = "124", email = "user2@gmail.com", phoneNumber = "+923001234568")
         saveEvent(userDto = userDto2)
 
+        userEventHandler.synchronize()
         val users =
             userEventHandler.findUsersByUids(userModelRepository.findAll().map { it.streamId }.toList()).toList()
 

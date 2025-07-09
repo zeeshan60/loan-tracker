@@ -1,6 +1,5 @@
 package com.zeenom.loan_tracker.users
 
-import io.swagger.v3.core.util.Json
 import kotlinx.coroutines.flow.toList
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -18,26 +17,62 @@ class UserEventHandler(
      * Synchronize the user model with the user events.
      * This method is called to ensure that the user model is up-to-date with the latest user events.
      * It can be used to handle any discrepancies between the user model and the user events.
+     *
+     * NOTE: This method assumes number of events are small since it loads all un-synchronized events into memory.
+     *      like less than 1000. Otherwise, please use migration script to form models rather than this method.
      */
     suspend fun synchronize() {
         val latestModel = userModelRepository.findFirstSortByIdDescending()
+        if (latestModel == null) {
+            logger.warn("No user model found, skipping synchronization")
+        }
+        val eventsAfter = (latestModel?.let {
+            userRepository.findAllSinceStreamIdAndVersion(
+                it.streamId,
+                it.version
+            )
+        } ?: userRepository.findAll().toList())
+            .map { it.toEvent() }
+        if (eventsAfter.isEmpty()) {
+            logger.debug(
+                "No new events found after user model with stream id {} and version {}",
+                latestModel?.streamId,
+                latestModel?.version
+            )
+            return
+        }
+        val models = eventsAfter.groupBy { it.streamId }.mapNotNull { entry ->
+            val sorted = entry.value.sortedBy { it.version }
+            sorted.fold(null as UserModel?) { model, event ->
+                if (event.version != 0 && model == null) {
+                    //This means event already has an existing model in the past so we need to pick up from last known model for this event
+                    //Alternatively we can get the entire event stream and apply it to the model but using the model from the repository is more efficient
+                    val existing = userModelRepository.findByStreamIdAndDeletedIsFalse(event.streamId)
+                    event.applyEvent(existing)
+                } else {
+                    event.applyEvent(model)
+                }
+            } ?: run {
+                logger.warn("No user model found for stream id ${entry.key}, this should not have happened")
+                null
+            }
+        }
+        val updatedModels = userModelRepository.saveAll(models).toList()
+        //FIXME: Currently we are not keeping deleted models. we need fix this in future. ideally nothing should be deleted
+        val toDelete = updatedModels.filter { it.deleted }
+        if (toDelete.isNotEmpty()) {
+            userModelRepository.deleteAll(toDelete)
+            logger.warn("Deleted user models: ${toDelete.map { it.streamId }}")
+        }
     }
 
     suspend fun addEvent(event: IUserEvent) {
         userRepository.save(event.toEntity())
-        val existing = userModelRepository.findByStreamId(event.streamId)
-        val updated = event.applyEvent(existing)
-        //If deleted event is received, delete the user model
-        if (updated.deleted) {
-            userModelRepository.deleteById(updated.id!!)
-            logger.warn("User with stream id ${updated.streamId} deleted")
-        } else {
-            userModelRepository.save(updated)
-        }
     }
 
     suspend fun findUserById(uid: String): UserDto? {
-        return userModelRepository.findByUid(uid)?.let {
+        synchronize()
+        return userModelRepository.findByUidAndDeletedIsFalse(uid)?.let {
             UserDto(
                 uid = it.streamId,
                 displayName = it.displayName,
@@ -52,7 +87,8 @@ class UserEventHandler(
     }
 
     suspend fun findByUserId(userId: UUID): UserDto? {
-        return userModelRepository.findByStreamId(userId)?.let {
+        synchronize()
+        return userModelRepository.findByStreamIdAndDeletedIsFalse(userId)?.let {
             UserDto(
                 uid = it.streamId,
                 displayName = it.displayName,
@@ -67,13 +103,14 @@ class UserEventHandler(
     }
 
     suspend fun findModelByUserId(userId: UUID): UserModel? {
-        return userModelRepository.findByStreamId(userId)
+        synchronize()
+        return userModelRepository.findByStreamIdAndDeletedIsFalse(userId)
     }
 
     suspend fun findUsersByUids(uids: List<UUID>): List<UserDto> {
         if (uids.isEmpty()) return emptyList()
-        Json.prettyPrint(uids)
-        return userModelRepository.findAllByStreamIdIn(uids).toList().map {
+        synchronize()
+        return userModelRepository.findAllByStreamIdInAndDeletedIsFalse(uids).toList().map {
             UserDto(
                 uid = it.streamId,
                 displayName = it.displayName,
@@ -89,7 +126,8 @@ class UserEventHandler(
 
     suspend fun findUsersByEmails(emails: List<String>): List<UserDto> {
         if (emails.isEmpty()) return emptyList()
-        return userModelRepository.findAllByEmailIn(emails).toList().map {
+        synchronize()
+        return userModelRepository.findAllByEmailInAndDeletedIsFalse(emails).toList().map {
             UserDto(
                 uid = it.streamId,
                 displayName = it.displayName,
@@ -105,7 +143,8 @@ class UserEventHandler(
 
     suspend fun findUsersByPhoneNumbers(phoneNumbers: List<String>): List<UserDto> {
         if (phoneNumbers.isEmpty()) return emptyList()
-        return userModelRepository.findAllByPhoneNumberIn(phoneNumbers).toList().map {
+        synchronize()
+        return userModelRepository.findAllByPhoneNumberInAndDeletedIsFalse(phoneNumbers).toList().map {
             UserDto(
                 uid = it.streamId,
                 displayName = it.displayName,
@@ -120,7 +159,8 @@ class UserEventHandler(
     }
 
     suspend fun findUserByEmail(email: String): UserDto? {
-        return userModelRepository.findByEmail(email)?.let {
+        synchronize()
+        return userModelRepository.findByEmailAndDeletedIsFalse(email)?.let {
             UserDto(
                 uid = it.streamId,
                 displayName = it.displayName,
@@ -135,7 +175,8 @@ class UserEventHandler(
     }
 
     suspend fun findUserByPhoneNumber(phoneNumber: String): UserDto? {
-        return userModelRepository.findByPhoneNumber(phoneNumber)?.let {
+        synchronize()
+        return userModelRepository.findByPhoneNumberAndDeletedIsFalse(phoneNumber)?.let {
             UserDto(
                 uid = it.streamId,
                 displayName = it.displayName,

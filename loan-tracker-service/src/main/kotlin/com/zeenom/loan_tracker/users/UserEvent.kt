@@ -82,14 +82,14 @@ data class UserEvent(
 
 @Repository
 interface UserModelRepository : CoroutineCrudRepository<UserModel, UUID> {
-    suspend fun findByUid(uid: String): UserModel?
-    suspend fun findAllByStreamIdIn(streamIds: List<UUID>): Flow<UserModel>
-    suspend fun findAllByEmailIn(emails: List<String>): Flow<UserModel>
-    suspend fun findAllByPhoneNumberIn(phones: List<String>): Flow<UserModel>
-    suspend fun findByEmail(email: String): UserModel?
-    suspend fun findByPhoneNumber(phone: String): UserModel?
-    suspend fun findByStreamId(streamId: UUID): UserModel?
-    @Query("select * from UserModel where uid = :uid")
+    suspend fun findByUidAndDeletedIsFalse(uid: String): UserModel?
+    suspend fun findAllByStreamIdInAndDeletedIsFalse(streamIds: List<UUID>): Flow<UserModel>
+    suspend fun findAllByEmailInAndDeletedIsFalse(emails: List<String>): Flow<UserModel>
+    suspend fun findAllByPhoneNumberInAndDeletedIsFalse(phones: List<String>): Flow<UserModel>
+    suspend fun findByEmailAndDeletedIsFalse(email: String): UserModel?
+    suspend fun findByPhoneNumberAndDeletedIsFalse(phone: String): UserModel?
+    suspend fun findByStreamIdAndDeletedIsFalse(streamId: UUID): UserModel?
+    @Query("select * from user_model order by insert_order desc limit 1")
     suspend fun findFirstSortByIdDescending(): UserModel?
 }
 
@@ -109,6 +109,7 @@ data class UserModel(
     val updatedAt: Instant,
     val version: Int,
     val deleted: Boolean,
+    val insertOrder: Long? = null,
 )
 
 data class UserCreated(
