@@ -24,5 +24,5 @@ export const environment = {
     storageBucket: "money-rabbit-6024.firebasestorage.app",
     appId: "1:583697131660:ios:c2be1fe0cf8b3d84c6b3a9"
   },
-  apiBaseUrl: "http://localhost:8080",
+  apiBaseUrl: "https://loanapi-prod.codewithzeeshan.com",
 };
