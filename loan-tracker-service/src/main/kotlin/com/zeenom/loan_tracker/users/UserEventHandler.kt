@@ -13,6 +13,16 @@ class UserEventHandler(
 ) {
 
     val logger = LoggerFactory.getLogger(UserEventHandler::class.java)
+
+    /**
+     * Synchronize the user model with the user events.
+     * This method is called to ensure that the user model is up-to-date with the latest user events.
+     * It can be used to handle any discrepancies between the user model and the user events.
+     */
+    suspend fun synchronize() {
+        val latestModel = userModelRepository.findFirstSortByIdDescending()
+    }
+
     suspend fun addEvent(event: IUserEvent) {
         userRepository.save(event.toEntity())
         val existing = userModelRepository.findByStreamId(event.streamId)

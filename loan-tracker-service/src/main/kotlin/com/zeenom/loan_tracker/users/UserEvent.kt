@@ -4,6 +4,7 @@ import com.zeenom.loan_tracker.common.events.IEvent
 import com.zeenom.loan_tracker.transactions.IEventAble
 import kotlinx.coroutines.flow.Flow
 import org.springframework.data.annotation.Id
+import org.springframework.data.r2dbc.repository.Query
 import org.springframework.data.relational.core.mapping.Table
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import org.springframework.stereotype.Repository
@@ -88,6 +89,8 @@ interface UserModelRepository : CoroutineCrudRepository<UserModel, UUID> {
     suspend fun findByEmail(email: String): UserModel?
     suspend fun findByPhoneNumber(phone: String): UserModel?
     suspend fun findByStreamId(streamId: UUID): UserModel?
+    @Query("select * from UserModel where uid = :uid")
+    suspend fun findFirstSortByIdDescending(): UserModel?
 }
 
 @Table("user_model")
