@@ -22,6 +22,7 @@ interface IFriendEvent : IEvent<FriendModel> {
 data class FriendEvent(
     @Id val id: UUID? = null,
     val userUid: UUID?,
+    val friendId: UUID?,
     val friendEmail: String?,
     val friendPhoneNumber: String?,
     val friendDisplayName: String?,
@@ -39,6 +40,7 @@ data class FriendEvent(
                 friendPhoneNumber = friendPhoneNumber,
                 friendDisplayName = friendDisplayName ?: throw IllegalStateException("Friend display name is required"),
                 userId = userUid ?: throw IllegalStateException("User ID is required"),
+                friendId = friendId,
                 createdAt = createdAt,
                 streamId = streamId,
                 version = version,
@@ -85,6 +87,7 @@ data class FriendModel(
     val id: UUID? = null,
     override val streamId: UUID,
     val userUid: UUID,
+    val friendId: UUID?,
     val friendEmail: String?,
     val friendPhoneNumber: String?,
     val friendDisplayName: String,
@@ -100,6 +103,7 @@ data class FriendCreated(
     val friendPhoneNumber: String?,
     val friendDisplayName: String,
     val userId: UUID,
+    val friendId: UUID?,
     override val createdAt: Instant,
     override val streamId: UUID,
     override val version: Int,
@@ -108,6 +112,7 @@ data class FriendCreated(
     override fun toEntity(): FriendEvent {
         return FriendEvent(
             userUid = userId,
+            friendId = friendId,
             friendEmail = friendEmail,
             friendPhoneNumber = friendPhoneNumber,
             friendDisplayName = friendDisplayName,
@@ -121,15 +126,16 @@ data class FriendCreated(
 
     override fun applyEvent(existing: FriendModel?): FriendModel {
         return FriendModel(
+            streamId = streamId,
             userUid = userId,
+            friendId = friendId,
             friendEmail = friendEmail,
             friendPhoneNumber = friendPhoneNumber,
             friendDisplayName = friendDisplayName,
             createdAt = createdAt,
             updatedAt = createdAt,
-            streamId = streamId,
             version = version,
-            deleted = false
+            deleted = false,
         )
     }
 }
@@ -146,6 +152,7 @@ data class FriendUpdated(
     override fun toEntity(): FriendEvent {
         return FriendEvent(
             userUid = null,
+            friendId = null,
             friendEmail = friendEmail,
             friendPhoneNumber = friendPhoneNumber,
             friendDisplayName = friendDisplayName,
@@ -178,6 +185,7 @@ data class FriendDeleted(
     override fun toEntity(): FriendEvent {
         return FriendEvent(
             userUid = null,
+            friendId = null,
             createdAt = createdAt,
             createdBy = createdBy,
             streamId = streamId,

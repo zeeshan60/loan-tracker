@@ -11,6 +11,7 @@ interface SyncableModelRepository<T : SyncableModel> {
     suspend fun findFirstSortByIdDescending(): T?
     suspend fun findByStreamId(streamId: UUID): T?
     fun saveAll(models: List<T>): Flow<T>
+    suspend fun deleteAll()
 }
 
 interface SyncableEventRepository<T : IEventAble<*>> {
@@ -79,5 +80,11 @@ interface SyncableEventHandler<M : SyncableModel, E : IEventAble<M>> {
             }
         }
         modelRepository.saveAll(models).toList()
+    }
+    suspend fun rehydrateModels() {
+        modelRepository().deleteAll()
+        logger.info("Rehydrating user models from events")
+        synchronize()
+        logger.info("Rehydration complete")
     }
 }

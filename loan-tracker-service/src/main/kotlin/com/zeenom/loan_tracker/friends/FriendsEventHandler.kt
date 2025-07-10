@@ -53,17 +53,18 @@ class FriendsEventHandler(
 
     suspend fun saveAllUsersAsFriends(userId: UUID, userDtos: List<UserDto>) {
         userDtos.map { userDto ->
-            FriendEvent(
-                userUid = userId,
+            FriendCreated(
+                id = null,
                 friendEmail = userDto.email,
                 friendPhoneNumber = userDto.phoneNumber,
                 friendDisplayName = userDto.displayName,
+                userId = userId,
+                friendId = userDto.uid,
                 createdAt = Instant.now(),
-                createdBy = userId,
                 streamId = UUID.randomUUID(),
                 version = 1,
-                eventType = FriendEventType.FRIEND_CREATED
-            )
+                createdBy = userId
+            ).toEntity()
         }.also {
             eventRepository.saveAll(it).toList()
         }

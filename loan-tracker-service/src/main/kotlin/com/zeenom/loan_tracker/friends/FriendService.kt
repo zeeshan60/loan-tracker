@@ -68,20 +68,30 @@ class FriendService(
         val user = userEventHandler.findByUserId(userId) ?: throw IllegalArgumentException("User $userId not found")
         validateFriendInformation(friendDto = friendDto, user = user, friendId = null)
 
+        val friendUser = userEventHandler.findUserByEmailOrPhoneNumber(friendDto.email, friendDto.phoneNumber)
+
         friendsEventHandler.addEvent(
             FriendCreated(
-                userId = userId,
+                id = null,
                 friendEmail = friendDto.email,
                 friendPhoneNumber = friendDto.phoneNumber,
                 friendDisplayName = friendDto.name,
+                userId = userId,
                 createdAt = Instant.now(),
                 streamId = UUID.randomUUID(),
                 version = 1,
-                id = null,
                 createdBy = userId,
+                friendId = friendUser?.uid,
             )
         )
-        makeMeThisUsersFriendAsWell(friendDto.email, friendDto.phoneNumber, user)
+        friendUser?.uid?.let {
+            makeMeThisUsersFriendAsWell(
+                friendEmail = friendDto.email,
+                phoneNumber = friendDto.phoneNumber,
+                me = user,
+                friendId = it
+            )
+        }
     }
 
     suspend fun updateFriend(userId: UUID, friendDto: UpdateFriendDto) {
@@ -106,17 +116,6 @@ class FriendService(
                 createdBy = userId,
             )
         )
-        makeMeThisUsersFriendAsWell(friendDto.email, friendDto.phoneNumber, user)
-        val friendUser = friendFinderStrategy.findUserFriend(userId, friendDto.email, friendDto.phoneNumber)
-        if (friendUser.friendUid == null) {
-            return
-        }
-        val findSelf = friendFinderStrategy.findUserFriend(friendUser.friendUid, user.email, user.phoneNumber)
-        val friendModel =
-            friendsEventHandler.findByUserUidAndFriendId(friendUser.friendUid, findSelf.friendStreamId)
-        friendModel?.let {
-            transactionEventHandler.syncTransactions(friendModel, friend)
-        }
     }
 
     suspend fun deleteFriend(userId: UUID, friendId: UUID) {
@@ -163,43 +162,27 @@ class FriendService(
                 }
     }
 
-    private suspend fun makeMeThisUsersFriendAsWell(friendEmail: String?, phoneNumber: String?, me: UserDto) {
+    private suspend fun makeMeThisUsersFriendAsWell(
+        friendEmail: String?,
+        phoneNumber: String?,
+        me: UserDto,
+        friendId: UUID
+    ) {
         requireNotNull(me.uid) { "ME User UID must not be null while makeMeThisUsersFriendAsWell" }
-        val friendsExistingUser =
-            friendEmail?.let { userEventHandler.findUserByEmail(friendEmail) } ?: phoneNumber?.let {
-                userEventHandler.findUserByPhoneNumber(phoneNumber)
-            }
-        friendsExistingUser?.let { usersFriend ->
-            requireNotNull(usersFriend.uid) { "User UID must not be null while makeMeThisUsersFriendAsWell" }
-            (me.email?.let {
-                friendsEventHandler.findByUserUidAndFriendEmail(
-                    usersFriend.uid,
-                    me.email
-                )
-            }
-                ?: me.phoneNumber?.let {
-                    friendsEventHandler.findByUserUidAndFriendPhoneNumber(
-                        usersFriend.uid,
-                        me.phoneNumber
-                    )
-                }).let {
-                if (it == null) {
-                    friendsEventHandler.addEvent(
-                        FriendCreated(
-                            userId = usersFriend.uid,
-                            friendEmail = me.email,
-                            friendPhoneNumber = me.phoneNumber,
-                            friendDisplayName = me.displayName,
-                            createdAt = Instant.now(),
-                            streamId = UUID.randomUUID(),
-                            version = 1,
-                            id = null,
-                            createdBy = me.uid,
-                        )
-                    )
-                }
-            }
-        }
+        friendsEventHandler.addEvent(
+            FriendCreated(
+                id = null,
+                friendEmail = friendEmail,
+                friendPhoneNumber = phoneNumber,
+                friendDisplayName = me.displayName,
+                userId = friendId,
+                createdAt = Instant.now(),
+                streamId = UUID.randomUUID(),
+                version = 1,
+                createdBy = me.uid,
+                friendId = me.uid
+            )
+        )
     }
 
     suspend fun searchUsersImFriendOfAndAddThemAsMyFriends(uid: UUID) {
