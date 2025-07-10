@@ -185,6 +185,23 @@ class FriendService(
         )
     }
 
+    suspend fun updateMyFriendsWithMyId(me: UserDto) {
+        val byEmail = me.email?.let { friendsEventHandler.findByFriendEmail(it) } ?: emptyList()
+        val byPhone = me.phoneNumber?.let { friendsEventHandler.findByFriendPhoneNumber(it) } ?: emptyList()
+        val allFriends = (byEmail + byPhone).distinctBy { it.userUid }.filter { it.friendId == null }
+        allFriends.map { friend ->
+            FriendIdAdded(
+                friendId = me.uid ?: throw IllegalStateException("Friend ID must not be null"),
+                createdAt = Instant.now(),
+                streamId = friend.streamId,
+                version = friend.version + 1,
+                createdBy = me.uid
+            )
+        }.also {
+            friendsEventHandler.saveAll(it)
+        }
+    }
+
     suspend fun searchUsersImFriendOfAndAddThemAsMyFriends(uid: UUID) {
         val imFriendOf = friendsEventHandler.findByFriendId(uid)
         val userFriends = userEventHandler.findUsersByUids(imFriendOf.map { it.userUid })

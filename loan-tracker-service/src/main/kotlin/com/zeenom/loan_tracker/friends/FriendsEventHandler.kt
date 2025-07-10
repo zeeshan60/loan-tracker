@@ -96,6 +96,10 @@ class FriendsEventHandler(
         return (email?.let { findByUserUidAndFriendEmail(userUid, it) }
             ?: phoneNumber?.let { findByUserUidAndFriendPhoneNumber(userUid, it) })?.streamId
     }
+
+    suspend fun saveAll(events: List<IFriendEvent>) {
+        eventRepository.saveAll(events.map { it.toEntity() }).toList()
+    }
 }
 
 data class FriendId(val email: String?, val phoneNumber: String?, val name: String)

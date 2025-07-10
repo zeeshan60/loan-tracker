@@ -3,7 +3,7 @@ ALTER TABLE friend_events
 
 UPDATE friend_events
 SET friend_id = (select stream_id
-                 from postgres.public.user_model um
+                 from user_model um
                  where (um.email is not null and um.email = friend_events.friend_email)
                     or (um.phone_number is not null and um.phone_number = friend_events.friend_phone_number))
 WHERE friend_id IS NULL and friend_events.event_type = 'FRIEND_CREATED';

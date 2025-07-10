@@ -63,6 +63,14 @@ data class FriendEvent(
                 version = version,
                 createdBy = createdBy
             )
+
+            FriendEventType.FRIEND_ID_ADDED -> FriendIdAdded(
+                friendId = friendId ?: throw IllegalStateException("Friend ID is required"),
+                createdAt = createdAt,
+                streamId = streamId,
+                version = version,
+                createdBy = createdBy
+            )
         }
     }
 }
@@ -141,6 +149,39 @@ data class FriendCreated(
     }
 }
 
+data class FriendIdAdded(
+    val friendId: UUID,
+    override val createdAt: Instant,
+    override val streamId: UUID,
+    override val version: Int,
+    override val createdBy: UUID,
+) : IFriendEvent {
+    override fun toEntity(): FriendEvent {
+        return FriendEvent(
+            userUid = null,
+            friendId = friendId,
+            createdAt = createdAt,
+            createdBy = createdBy,
+            streamId = streamId,
+            version = version,
+            eventType = FriendEventType.FRIEND_ID_ADDED,
+            id = null,
+            friendEmail = null,
+            friendPhoneNumber = null,
+            friendDisplayName = null,
+        )
+    }
+
+    override fun applyEvent(existing: FriendModel?): FriendModel {
+        return existing?.copy(
+            friendId = friendId,
+            updatedAt = createdAt,
+            streamId = streamId,
+            version = version
+        ) ?: throw IllegalStateException("Friend not found while trying to resolve friend ID addition")
+    }
+}
+
 data class FriendUpdated(
     val friendEmail: String?,
     val friendPhoneNumber: String?,
@@ -211,6 +252,7 @@ data class FriendDeleted(
 
 enum class FriendEventType {
     FRIEND_CREATED,
+    FRIEND_ID_ADDED,
     FRIEND_UPDATED,
     FRIEND_DELETED
 }
