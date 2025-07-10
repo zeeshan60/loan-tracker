@@ -186,23 +186,22 @@ class FriendService(
     }
 
     suspend fun searchUsersImFriendOfAndAddThemAsMyFriends(uid: UUID) {
-        val user = userEventHandler.findByUserId(uid) ?: throw IllegalArgumentException("User not found")
-        val emailFriends = user.email?.let { friendsEventHandler.findByFriendEmail(user.email) } ?: emptyList()
-        val phoneFriends =
-            user.phoneNumber?.let { friendsEventHandler.findByFriendPhoneNumber(user.phoneNumber) } ?: emptyList()
+        val imFriendOf = friendsEventHandler.findByFriendId(uid)
+        val userFriends = userEventHandler.findUsersByUids(imFriendOf.map { it.userUid })
+        if (userFriends.isEmpty()) {
+            return
+        }
 
-        val allFriends = emailFriends.plus(phoneFriends).distinct()
-        val myFriendIds = allFriends.map { it.userUid }
-        val friends =
-            userEventHandler.findUsersByUids(myFriendIds)
-
-        friendsEventHandler.saveAllUsersAsFriends(uid, friends)
-
-        val userFriends = friendsEventHandler.findAllFriendsByUserId(uid)
-        userFriends.forEach { friend ->
-            val friendUser =
-                allFriends.find { it.friendEmail == user.email || it.friendPhoneNumber == user.phoneNumber }
-            friendUser?.let { transactionEventHandler.syncTransactions(friend, friendUser) }
+        val existingFriendsByTheirId = friendsEventHandler.findAllFriendsByUserId(uid).map { it.friendId }.toSet()
+        val remainingUserFriends = userFriends.filter { !existingFriendsByTheirId.contains(it.uid) }
+        friendsEventHandler.saveAllUsersAsFriends(uid, remainingUserFriends)
+        val myFriends = friendsEventHandler.findAllFriendsByUserId(uid)
+        val imFriendOfByTheirIds = imFriendOf.associateBy { it.userUid }
+        myFriends.forEach { myFriend ->
+            val meAsTheirFriend = imFriendOfByTheirIds[myFriend.userUid]
+            if (meAsTheirFriend != null) {
+                transactionEventHandler.syncTransactions(myFriend, meAsTheirFriend)
+            }
         }
     }
 

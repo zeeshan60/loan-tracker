@@ -75,6 +75,11 @@ class FriendsEventHandler(
         return friendModelRepository.findAllByFriendEmailAndDeletedIsFalse(email).toList()
     }
 
+    suspend fun findByFriendId(friendId: UUID): List<FriendModel> {
+        synchronize()
+        return friendModelRepository.findByFriendIdAndDeletedIsFalse(friendId).toList()
+    }
+
     suspend fun findByFriendPhoneNumber(phoneNumber: String): List<FriendModel> {
         synchronize()
         return friendModelRepository.findAllByFriendPhoneNumberAndDeletedIsFalse(phoneNumber).toList()
