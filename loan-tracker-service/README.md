@@ -237,3 +237,30 @@ We had to add capabilities in xcode project to allow apple sign in. under signin
 sudo usermod -aG docker ec2-user
 newgrp docker
 ```
+
+Installed on android trhough playstore. google login not working
+trying to debug
+on android device settings, about, build number pressed multiple times to enable developer mode
+then search auto block in settings and turn that off than in developer options, enabled usb debugging.
+now run this command 
+```bash
+# -s and device id to select device id
+adb -s R5CY31JS5BT install app-release.apk
+adb -s R5CY31JS5BT install app-debug.apk
+
+adb -s R5CY31JS5BT logcat | grep -i com.zeenom
+```
+
+we made some progress. found this error log:
+- One Tap sign-in failed: 10: [28444] Developer console is not set up correctly.
+
+Most likely this means that we have not set up the SHA-1 fingerprint in firebase console.
+To get the SHA-1 fingerprint, we can use the following command:
+```bash
+keytool -list -v -keystore ./user.keystore -alias zflash -storepass password -keypass password
+```
+found this sha-1
+53:7B:63:BA:43:7A:11:B2:13:A0:F2:8D:EA:B2:28:EF:A2:A3:73:5E
+added it to console
+problem solved.
+
