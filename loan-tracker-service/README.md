@@ -262,5 +262,14 @@ keytool -list -v -keystore ./user.keystore -alias zflash -storepass password -ke
 found this sha-1
 53:7B:63:BA:43:7A:11:B2:13:A0:F2:8D:EA:B2:28:EF:A2:A3:73:5E
 added it to console
-problem solved.
+problem solved but only for release apks.
+for playstore builds we need to add the sha-1 fingerprint of playstore managed certificate.
+this can be found in test and release -> appintegrity -> appsigning section in play console.
+copy the sha-1 and add to firebase console.
+
+requesting new keystore cert
+$ keytool -export -rfc -keystore user.keystore -alias zflash -storepass password -keypass password -file upload_certificate.pem
+existing sha-1 for the game was:
+38:A9:76:31:60:9F:D3:BC:87:B1:CA:18:58:07:E1:3B:FB:1E:C1:12
+trying to change to correct one.
 
