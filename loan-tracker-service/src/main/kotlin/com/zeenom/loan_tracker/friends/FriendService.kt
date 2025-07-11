@@ -243,7 +243,7 @@ class FriendService(
         val myFriends = friendsEventHandler.findAllFriendsByUserId(uid)
         val imFriendOfByTheirIds = imFriendOf.associateBy { it.userUid }
         myFriends.forEach { myFriend ->
-            val meAsTheirFriend = imFriendOfByTheirIds[myFriend.userUid]
+            val meAsTheirFriend = imFriendOfByTheirIds[myFriend.friendId]
             if (meAsTheirFriend != null) {
                 transactionEventHandler.syncTransactions(myFriend, meAsTheirFriend)
             }
