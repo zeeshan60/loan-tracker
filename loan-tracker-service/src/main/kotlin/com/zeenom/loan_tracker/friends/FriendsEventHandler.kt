@@ -46,9 +46,14 @@ class FriendsEventHandler(
         return friendModelRepository.findByUserUidAndFriendPhoneNumberAndDeletedIsFalse(userUid, phoneNumber)
     }
 
-    suspend fun findByUserUidAndFriendId(userUid: UUID, friendId: UUID): FriendModel? {
+    suspend fun findByUserUidAndStreamId(userUid: UUID, friendId: UUID): FriendModel? {
         synchronize()
         return friendModelRepository.findByUserUidAndStreamIdAndDeletedIsFalse(userUid, friendId)
+    }
+
+    suspend fun findByUserUidAndFriendId(userUid: UUID, friendId: UUID): FriendModel? {
+        synchronize()
+        return friendModelRepository.findByUserUidAndFriendIdAndDeletedIsFalse(userUid, friendId)
     }
 
     suspend fun saveAllUsersAsFriends(userId: UUID, userDtos: List<UserDto>) {

@@ -86,8 +86,6 @@ class FriendService(
         )
         friendUser?.uid?.let {
             makeMeThisUsersFriendAsWell(
-                friendEmail = friendDto.email,
-                phoneNumber = friendDto.phoneNumber,
                 me = user,
                 friendId = it
             )
@@ -97,9 +95,9 @@ class FriendService(
     suspend fun updateFriend(userId: UUID, friendDto: UpdateFriendDto) {
         val user = userEventHandler.findByUserId(userId) ?: throw IllegalArgumentException("User $userId not found")
         validateFriendInformation(friendDto = friendDto, user = user, friendId = friendDto.friendId)
-        val friend = friendsEventHandler.findByUserUidAndFriendId(
+        val friend = friendsEventHandler.findByUserUidAndStreamId(
             userId,
-            friendDto.friendId
+            friendDto.friendId //friendId is the streamId of the friend to update
         ) ?: throw IllegalArgumentException("Friend not found")
 
         if (friend.deleted) {
@@ -116,11 +114,34 @@ class FriendService(
                 createdBy = userId,
             )
         )
+        val friendUser = userEventHandler.findUserByEmailOrPhoneNumber(friendDto.email, friendDto.phoneNumber)
+        if (friendUser == null) {
+            return
+        }
+        updateMyFriendsWithMyId(friendUser)
+        makeMeThisUsersFriendAsWell(
+            me = user,
+            friendId = friendUser.uid ?: throw IllegalArgumentException("Friend user not found")
+        )
+        val friend1 = friendsEventHandler.findByUserUidAndStreamId(
+            friendUser.uid,
+            userId
+        )
+
+        val friend2 = friendsEventHandler.findByUserUidAndStreamId(
+            user.uid ?: throw IllegalArgumentException("User UID not found"),
+            friendUser.uid
+        )
+
+        if (friend1 == null || friend2 == null) {
+            return
+        }
+        transactionEventHandler.syncTransactions(friend1, friend2)
     }
 
     suspend fun deleteFriend(userId: UUID, friendId: UUID) {
         userEventHandler.findByUserId(userId) ?: throw IllegalArgumentException("User $userId not found")
-        val friend = friendsEventHandler.findByUserUidAndFriendId(userId, friendId)
+        val friend = friendsEventHandler.findByUserUidAndStreamId(userId, friendId)
             ?: throw IllegalArgumentException("Friend not found")
         friendsEventHandler.addEvent(
             FriendDeleted(
@@ -163,8 +184,6 @@ class FriendService(
     }
 
     private suspend fun makeMeThisUsersFriendAsWell(
-        friendEmail: String?,
-        phoneNumber: String?,
         me: UserDto,
         friendId: UUID
     ) {
@@ -172,8 +191,8 @@ class FriendService(
         friendsEventHandler.addEvent(
             FriendCreated(
                 id = null,
-                friendEmail = friendEmail,
-                friendPhoneNumber = phoneNumber,
+                friendEmail = me.email,
+                friendPhoneNumber = me.phoneNumber,
                 friendDisplayName = me.displayName,
                 userId = friendId,
                 createdAt = Instant.now(),
@@ -183,6 +202,15 @@ class FriendService(
                 friendId = me.uid
             )
         )
+        val friend1 = friendsEventHandler.findByUserUidAndFriendId(
+            userUid = friendId,
+            friendId = me.uid
+        ) ?: throw IllegalArgumentException("Friend not found")
+        val friend2 = friendsEventHandler.findByUserUidAndFriendId(
+            userUid = me.uid,
+            friendId = friendId
+        ) ?: throw IllegalArgumentException("Friend not found")
+        transactionEventHandler.syncTransactions(friend1, friend2)
     }
 
     suspend fun updateMyFriendsWithMyId(me: UserDto) {
