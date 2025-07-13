@@ -4,10 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.zeenom.loan_tracker.common.Paginated
 import com.zeenom.loan_tracker.firebase.FirebaseService
-import com.zeenom.loan_tracker.friends.FriendRequest
-import com.zeenom.loan_tracker.friends.FriendResponse
-import com.zeenom.loan_tracker.friends.FriendsResponse
-import com.zeenom.loan_tracker.friends.TestPostgresConfig
+import com.zeenom.loan_tracker.friends.*
 import com.zeenom.loan_tracker.security.JWTTokenResponse
 import com.zeenom.loan_tracker.security.LoginRequest
 import com.zeenom.loan_tracker.users.UserDto
@@ -63,15 +60,20 @@ class BaseIntegration : TestPostgresConfig() {
         return responseToken!!
     }
 
-    fun addFriend(token: String, name: String = "John Doe"): FriendResponse {
+    fun addFriend(
+        token: String,
+        name: String = "John Doe",
+        email: String? = "${name.replace(" ", "_")}@gmail.com",
+        phone: String? = "+923001234568"
+    ): FriendResponse {
         return webTestClient.post()
             .uri("/api/v1/friends/add")
             .header("Authorization", "Bearer $token")
             .bodyValue(
                 FriendRequest(
                     name = name,
-                    email = "${name.replace(" ", "_")}@gmail.com",
-                    phoneNumber = "+923001234568",
+                    email = email,
+                    phoneNumber = phone,
                 )
             )
             .exchange()
@@ -91,5 +93,16 @@ class BaseIntegration : TestPostgresConfig() {
                     it,
                     object : TypeReference<Paginated<FriendsResponse>>() {})
             }
+    }
+
+
+    fun queryUser(token: String): UserResponse {
+        return webTestClient.get()
+            .uri("/api/v1/users")
+            .header("Authorization", "Bearer $token")
+            .exchange()
+            .expectStatus().isOk
+            .expectBody(UserResponse::class.java)
+            .returnResult().responseBody!!
     }
 }
