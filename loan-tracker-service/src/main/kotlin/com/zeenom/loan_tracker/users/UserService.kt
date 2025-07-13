@@ -12,13 +12,12 @@ class UserService(
     private val userEventHandler: UserEventHandler,
     private val applicationEventPublisher: ApplicationEventPublisher,
 ) {
-
+    val logger = LoggerFactory.getLogger(UserService::class.java)
     suspend fun createUser(userDto: UserDto) {
-        val existing =
-            userDto.email?.let { userEventHandler.findUsersByEmails(listOf(userDto.email)).toList() }
-                ?: userDto.phoneNumber?.let {
-                    userEventHandler.findUsersByPhoneNumbers(listOf(userDto.phoneNumber)).toList()
-                } ?: emptyList()
+        val existing = userDto.email?.let { userEventHandler.findUsersByEmails(listOf(userDto.email)).toList() }
+            ?: userDto.phoneNumber?.let {
+                userEventHandler.findUsersByPhoneNumbers(listOf(userDto.phoneNumber)).toList()
+            } ?: emptyList()
         if (existing.isNotEmpty()) {
             throw IllegalArgumentException("User with email ${userDto.email} or phone number ${userDto.phoneNumber} already exist")
         }
@@ -42,6 +41,7 @@ class UserService(
                 createdBy = streamId
             )
         )
+        userEventHandler.synchronize()
     }
 
     suspend fun updateUser(userDto: UserUpdateDto) {
@@ -60,8 +60,7 @@ class UserService(
                     createdBy = userDto.uid
                 ).also {
                     existing = it.applyEvent(existing)
-                }
-            )
+                })
         }
 
         if (userDto.displayName != null && userDto.displayName != existing.displayName) {
@@ -74,8 +73,7 @@ class UserService(
                     createdBy = userDto.uid
                 ).also {
                     existing = it.applyEvent(existing)
-                }
-            )
+                })
         }
 
         if (userDto.phoneNumber != null && userDto.phoneNumber != existing.phoneNumber) {
@@ -88,9 +86,9 @@ class UserService(
                     createdBy = userDto.uid
                 ).also {
                     existing = it.applyEvent(existing)
-                }
-            )
+                })
         }
+        userEventHandler.synchronize()
     }
 
     suspend fun findUserById(uid: UUID): UserDto? {
@@ -109,17 +107,13 @@ class UserService(
         }
     }
 
-    val logger = LoggerFactory.getLogger(UserService::class.java)
     suspend fun deleteUser(userId: UUID): UserModel {
         logger.info("Deleting user with ID: $userId")
         val existing = userEventHandler.findModelByUserId(userId)
             ?: throw IllegalArgumentException("User with this unique identifier does not exist")
 
         val event = UserDeleted(
-            createdAt = Instant.now(),
-            streamId = existing.streamId,
-            version = existing.version + 1,
-            createdBy = userId
+            createdAt = Instant.now(), streamId = existing.streamId, version = existing.version + 1, createdBy = userId
         )
         //trigger application wide userdeleted event
         applicationEventPublisher.publishEvent(event)
@@ -127,6 +121,7 @@ class UserService(
         userEventHandler.addEvent(
             event
         )
+        userEventHandler.synchronize()
         return event.applyEvent(existing)
     }
 }
