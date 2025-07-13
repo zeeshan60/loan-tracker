@@ -78,6 +78,7 @@ class TransactionService(
                         createdBy = userUid
                     )
                 )
+                userEventHandler.synchronize() //TODO use applicationEventPublisher instead
             }
         }
     }
