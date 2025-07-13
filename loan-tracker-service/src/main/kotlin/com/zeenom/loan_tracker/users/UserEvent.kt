@@ -258,13 +258,6 @@ data class UserDeleted(
         return existing.copy(
             streamId = streamId,
             uid = existing.uid,
-            displayName = "",
-            phoneNumber = null,
-            email = null,
-            photoUrl = null,
-            currency = null,
-            emailVerified = false,
-            createdAt = createdAt,
             updatedAt = createdAt,
             version = version,
             deleted = true

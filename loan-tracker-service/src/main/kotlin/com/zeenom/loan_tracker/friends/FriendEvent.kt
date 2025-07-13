@@ -71,6 +71,13 @@ data class FriendEvent(
                 version = version,
                 createdBy = createdBy
             )
+
+            FriendEventType.FRIEND_ID_REMOVED -> FriendIdRemoved(
+                createdAt = createdAt,
+                streamId = streamId,
+                version = version,
+                createdBy = createdBy
+            )
         }
     }
 }
@@ -85,6 +92,7 @@ interface FriendModelRepository : CoroutineCrudRepository<FriendModel, UUID>, Sy
     suspend fun findByUserUidAndStreamIdAndDeletedIsFalse(userUid: UUID, recipientId: UUID): FriendModel?
     override suspend fun findByStreamId(streamId: UUID): FriendModel?
     suspend fun findByFriendIdAndDeletedIsFalse(userId: UUID): Flow<FriendModel>
+    suspend fun findByFriendId(userId: UUID): Flow<FriendModel>
     suspend fun findByUserUidAndFriendIdAndDeletedIsFalse(userUid: UUID, friendId: UUID): FriendModel?
     suspend fun findAllByUserUid(string: UUID): Flow<FriendModel>
     @Query("select * from friend_model order by insert_order desc limit 1")
@@ -183,6 +191,38 @@ data class FriendIdAdded(
     }
 }
 
+data class FriendIdRemoved(
+    override val createdAt: Instant,
+    override val streamId: UUID,
+    override val version: Int,
+    override val createdBy: UUID,
+) : IFriendEvent {
+    override fun toEntity(): FriendEvent {
+        return FriendEvent(
+            userUid = null,
+            friendId = null,
+            createdAt = createdAt,
+            createdBy = createdBy,
+            streamId = streamId,
+            version = version,
+            eventType = FriendEventType.FRIEND_ID_REMOVED,
+            id = null,
+            friendEmail = null,
+            friendPhoneNumber = null,
+            friendDisplayName = null,
+        )
+    }
+
+    override fun applyEvent(existing: FriendModel?): FriendModel {
+        return existing?.copy(
+            friendId = null, // Removing the friend ID
+            updatedAt = createdAt,
+            streamId = streamId,
+            version = version
+        ) ?: throw IllegalStateException("Friend not found while trying to resolve friend ID removal")
+    }
+}
+
 data class FriendUpdated(
     val friendEmail: String?,
     val friendPhoneNumber: String?,
@@ -254,6 +294,7 @@ data class FriendDeleted(
 enum class FriendEventType {
     FRIEND_CREATED,
     FRIEND_ID_ADDED,
+    FRIEND_ID_REMOVED,
     FRIEND_UPDATED,
     FRIEND_DELETED
 }

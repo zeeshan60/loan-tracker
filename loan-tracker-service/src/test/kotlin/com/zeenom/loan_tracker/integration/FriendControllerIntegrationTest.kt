@@ -10,6 +10,7 @@ import com.zeenom.loan_tracker.transactions.TransactionsResponse
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventRepository
 import com.zeenom.loan_tracker.users.UserModelRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.CoreMatchers.containsString
@@ -182,7 +183,7 @@ class FriendDeleteIssueTest() : BaseIntegration() {
     }
 
     @Test
-    fun `running the documented usecase`() {
+    fun `running the documented usecase`(): Unit = runBlocking {
         // 1. Signup with user 1 (Zee)
         zeeToken = loginUser(
             userDto = zeeDto
@@ -221,6 +222,7 @@ class FriendDeleteIssueTest() : BaseIntegration() {
         assertThat(transactions).hasSize(1)
         // 7. Delete user 2 account
         deleteUser(token = johnToken)
+        delay(100) // Wait millis for async deletion to complete
         // 8. Check that user 1 still has the friend and transaction
         val zeeFriendResponse = queryFriend(token = zeeToken)
         assertThat(zeeFriendResponse.data.friends).hasSize(1)

@@ -27,6 +27,10 @@ class FriendsEventHandler(
         eventRepository.save(event.toEntity())
     }
 
+    suspend fun addEvents(events: List<IFriendEvent>) {
+        eventRepository.saveAll(events.map { it.toEntity() }).toList()
+    }
+
     suspend fun findAllFriendsByUserId(userId: UUID, includeDeleted: Boolean = false): List<FriendModel> {
         synchronize()
         return if (includeDeleted) {
@@ -80,9 +84,13 @@ class FriendsEventHandler(
         return friendModelRepository.findAllByFriendEmailAndDeletedIsFalse(email).toList()
     }
 
-    suspend fun findByFriendId(friendId: UUID): List<FriendModel> {
+    suspend fun findByFriendId(friendId: UUID, includeDeleted: Boolean): List<FriendModel> {
         synchronize()
-        return friendModelRepository.findByFriendIdAndDeletedIsFalse(friendId).toList()
+        if (includeDeleted) {
+            return friendModelRepository.findByFriendId(friendId).toList()
+        } else {
+            return friendModelRepository.findByFriendIdAndDeletedIsFalse(friendId).toList()
+        }
     }
 
     suspend fun findByFriendPhoneNumber(phoneNumber: String): List<FriendModel> {

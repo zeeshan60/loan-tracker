@@ -2,13 +2,15 @@ package com.zeenom.loan_tracker.users
 
 import com.zeenom.loan_tracker.friends.UserUpdateDto
 import org.slf4j.LoggerFactory
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.util.*
 
 @Service
 class UserService(
-    private val userEventHandler: UserEventHandler
+    private val userEventHandler: UserEventHandler,
+    private val applicationEventPublisher: ApplicationEventPublisher,
 ) {
 
     suspend fun createUser(userDto: UserDto) {
@@ -119,6 +121,9 @@ class UserService(
             version = existing.version + 1,
             createdBy = userId
         )
+        //trigger application wide userdeleted event
+        applicationEventPublisher.publishEvent(event)
+
         userEventHandler.addEvent(
             event
         )

@@ -3,8 +3,13 @@ package com.zeenom.loan_tracker.friends
 import com.zeenom.loan_tracker.transactions.AmountDto
 import com.zeenom.loan_tracker.transactions.ICurrencyClient
 import com.zeenom.loan_tracker.transactions.TransactionEventHandler
+import com.zeenom.loan_tracker.users.UserDeleted
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.util.*
@@ -18,6 +23,35 @@ class FriendService(
     private val allTimeBalanceStrategy: AllTimeBalanceStrategy,
     private val currencyClient: ICurrencyClient,
 ) {
+
+    @EventListener
+    fun userDeletedListener(userDeleted: UserDeleted) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val userId = userDeleted.streamId
+            //Since the user is deleted, we need to remove all friends of this user
+            friendsEventHandler.findAllFriendsByUserId(userId = userId, includeDeleted = false).map { friend ->
+                FriendDeleted(
+                    createdAt = Instant.now(),
+                    streamId = friend.streamId,
+                    version = friend.version + 1,
+                    createdBy = userId,
+                )
+            }.also {
+                friendsEventHandler.saveAll(it)
+            }
+            //Also we need to remove all references of this user from its friends
+            friendsEventHandler.findByFriendId(friendId = userId, includeDeleted = true).map { friend ->
+                FriendIdRemoved(
+                    createdAt = Instant.now(),
+                    streamId = friend.streamId,
+                    version = friend.version + 1,
+                    createdBy = userId,
+                )
+            }.also {
+                friendsEventHandler.saveAll(it)
+            }
+        }
+    }
 
     suspend fun findAllByUserId(userId: UUID): FriendsWithAllTimeBalancesDto {
         val user = userEventHandler.findByUserId(userId) ?: throw IllegalArgumentException("User $userId not found")
@@ -231,7 +265,7 @@ class FriendService(
     }
 
     suspend fun searchUsersImFriendOfAndAddThemAsMyFriends(uid: UUID) {
-        val imFriendOf = friendsEventHandler.findByFriendId(uid)
+        val imFriendOf = friendsEventHandler.findByFriendId(uid, false)
         val userFriends = userEventHandler.findUsersByUids(imFriendOf.map { it.userUid })
         if (userFriends.isEmpty()) {
             return
