@@ -50,6 +50,7 @@ class FriendService(
             }.also {
                 friendsEventHandler.saveAll(it)
             }
+            friendsEventHandler.synchronize()
         }
     }
 
@@ -118,12 +119,14 @@ class FriendService(
                 friendId = friendUser?.uid,
             )
         )
+        friendsEventHandler.synchronize()
         friendUser?.uid?.let {
             makeMeThisUsersFriendAsWell(
                 me = user,
                 friendId = it
             )
         }
+        friendsEventHandler.synchronize()
     }
 
     suspend fun updateFriend(userId: UUID, friendDto: UpdateFriendDto) {
@@ -148,6 +151,7 @@ class FriendService(
                 createdBy = userId,
             )
         )
+        friendsEventHandler.synchronize()
         val friendUser = userEventHandler.findUserByEmailOrPhoneNumber(friendDto.email, friendDto.phoneNumber)
         if (friendUser == null) {
             return
@@ -185,6 +189,7 @@ class FriendService(
                 createdBy = userId,
             )
         )
+        friendsEventHandler.synchronize()
     }
 
     private suspend fun validateFriendInformation(
@@ -236,6 +241,7 @@ class FriendService(
                 friendId = me.uid
             )
         )
+        friendsEventHandler.synchronize()
         val friend1 = friendsEventHandler.findByUserUidAndFriendId(
             userUid = friendId,
             friendId = me.uid
@@ -262,6 +268,7 @@ class FriendService(
         }.also {
             friendsEventHandler.saveAll(it)
         }
+        friendsEventHandler.synchronize()
     }
 
     suspend fun searchUsersImFriendOfAndAddThemAsMyFriends(uid: UUID) {
@@ -274,6 +281,7 @@ class FriendService(
         val existingFriendsByTheirId = friendsEventHandler.findAllFriendsByUserId(uid).map { it.friendId }.toSet()
         val remainingUserFriends = userFriends.filter { !existingFriendsByTheirId.contains(it.uid) }
         friendsEventHandler.saveAllUsersAsFriends(uid, remainingUserFriends)
+        friendsEventHandler.synchronize()
         val myFriends = friendsEventHandler.findAllFriendsByUserId(uid)
         val imFriendOfByTheirIds = imFriendOf.associateBy { it.userUid }
         myFriends.forEach { myFriend ->

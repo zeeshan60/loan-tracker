@@ -27,12 +27,7 @@ class FriendsEventHandler(
         eventRepository.save(event.toEntity())
     }
 
-    suspend fun addEvents(events: List<IFriendEvent>) {
-        eventRepository.saveAll(events.map { it.toEntity() }).toList()
-    }
-
     suspend fun findAllFriendsByUserId(userId: UUID, includeDeleted: Boolean = false): List<FriendModel> {
-        synchronize()
         return if (includeDeleted) {
             friendModelRepository.findAllByUserUid(userId).toList()
         } else {
@@ -41,22 +36,18 @@ class FriendsEventHandler(
     }
 
     suspend fun findByUserUidAndFriendEmail(userUid: UUID, email: String): FriendModel? {
-        synchronize()
         return friendModelRepository.findByUserUidAndFriendEmailAndDeletedIsFalse(userUid, email)
     }
 
     suspend fun findByUserUidAndFriendPhoneNumber(userUid: UUID, phoneNumber: String): FriendModel? {
-        synchronize()
         return friendModelRepository.findByUserUidAndFriendPhoneNumberAndDeletedIsFalse(userUid, phoneNumber)
     }
 
     suspend fun findByUserUidAndStreamId(userUid: UUID, friendId: UUID): FriendModel? {
-        synchronize()
         return friendModelRepository.findByUserUidAndStreamIdAndDeletedIsFalse(userUid, friendId)
     }
 
     suspend fun findByUserUidAndFriendId(userUid: UUID, friendId: UUID): FriendModel? {
-        synchronize()
         return friendModelRepository.findByUserUidAndFriendIdAndDeletedIsFalse(userUid, friendId)
     }
 
@@ -80,12 +71,10 @@ class FriendsEventHandler(
     }
 
     suspend fun findByFriendEmail(email: String): List<FriendModel> {
-        synchronize()
         return friendModelRepository.findAllByFriendEmailAndDeletedIsFalse(email).toList()
     }
 
     suspend fun findByFriendId(friendId: UUID, includeDeleted: Boolean): List<FriendModel> {
-        synchronize()
         if (includeDeleted) {
             return friendModelRepository.findByFriendId(friendId).toList()
         } else {
@@ -94,12 +83,10 @@ class FriendsEventHandler(
     }
 
     suspend fun findByFriendPhoneNumber(phoneNumber: String): List<FriendModel> {
-        synchronize()
         return friendModelRepository.findAllByFriendPhoneNumberAndDeletedIsFalse(phoneNumber).toList()
     }
 
     suspend fun findFriendByUserIdAndFriendId(userUid: UUID, friendId: UUID): FriendId? {
-        synchronize()
         return friendModelRepository.findByUserUidAndStreamIdAndDeletedIsFalse(userUid, friendId)?.let {
             FriendId(it.friendEmail, it.friendPhoneNumber, it.friendDisplayName)
         }
