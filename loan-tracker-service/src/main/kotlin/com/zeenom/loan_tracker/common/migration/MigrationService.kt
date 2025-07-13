@@ -4,6 +4,7 @@ import com.zeenom.loan_tracker.friends.FriendEvent
 import com.zeenom.loan_tracker.friends.FriendEventRepository
 import com.zeenom.loan_tracker.friends.FriendModel
 import com.zeenom.loan_tracker.friends.FriendModelRepository
+import com.zeenom.loan_tracker.friends.FriendsEventHandler
 import com.zeenom.loan_tracker.users.UserEventRepository
 import com.zeenom.loan_tracker.users.UserModelRepository
 import com.zeenom.loan_tracker.users.userModels
@@ -38,11 +39,12 @@ class MigrationService(
     private val userEventRepository: UserEventRepository,
     private val friendEventRepository: FriendEventRepository,
     private val userModelRepository: UserModelRepository,
-    private val friendModelRepository: FriendModelRepository
+    private val friendModelRepository: FriendModelRepository,
+    private val friendsEventHandler: FriendsEventHandler
 ) {
     val logger = LoggerFactory.getLogger(MigrationService::class.java)
 
-    val currentVersion = 2
+    val currentVersion = 3
 
     suspend fun migrateData() {
         val lastSuccessfulMigrationVersion =
@@ -65,6 +67,7 @@ class MigrationService(
             0 -> {}
             1 -> {}
             2 -> migrateV2()
+            3 -> friendsEventHandler.rehydrateModels()
             else -> throw IllegalStateException("Migration not found for version $version")
         }
         migrationStatusRepository.save(

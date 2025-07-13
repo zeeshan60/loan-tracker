@@ -21,6 +21,7 @@ class LoginUserCommand(
             userService.createUser(userDto = commandDto.payload)
             val user = userService.findUserByFBId(commandDto.payload.userFBId) ?: throw IllegalStateException("User not found after creation")
             requireNotNull(user.uid) { "User UID should not be null after creation" }
+            friendService.updateMyFriendsWithMyId(user)
             friendService.searchUsersImFriendOfAndAddThemAsMyFriends(user.uid)
         }
     }

@@ -11,6 +11,7 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.Mockito.mock
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest
 import java.util.*
@@ -28,7 +29,8 @@ class UserServiceTest(
     )
 
     private val userService = UserService(
-        userEventHandler = userEventHandler
+        userEventHandler = userEventHandler,
+        applicationEventPublisher = mock()
     )
 
     @BeforeEach
