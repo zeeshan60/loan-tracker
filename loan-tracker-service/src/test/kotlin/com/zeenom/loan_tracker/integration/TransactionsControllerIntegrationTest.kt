@@ -764,7 +764,7 @@ class TransactionsControllerIntegrationTest :
         assertThat(transactionResponse.amount.isOwed).isTrue()
 
         assertThat(transactionResponse.createdAt).isNotNull()
-        assertThat(transactionResponse.updatedAt).isNull()
+        assertThat(transactionResponse.updatedAt).isNotNull()
         assertThat(transactionResponse.createdBy.id).isEqualTo(zeeDto.uid)
         assertThat(transactionResponse.createdBy.name).isEqualTo("You")
         assertThat(transactionResponse.updatedBy).isNull()
