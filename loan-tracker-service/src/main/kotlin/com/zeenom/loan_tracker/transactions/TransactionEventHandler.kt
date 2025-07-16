@@ -5,6 +5,7 @@ import com.zeenom.loan_tracker.common.events.IEvent
 import com.zeenom.loan_tracker.common.exceptions.NotFoundException
 import com.zeenom.loan_tracker.common.isOwed
 import com.zeenom.loan_tracker.friends.FriendModel
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
@@ -88,12 +89,22 @@ class TransactionEventHandler(
 
     suspend fun transactionsWithActivityLogs(userId: UUID): List<TransactionModelWithActivityLogs> {
 
+        //These transactions are supposed to be ordered by streamId and then version both descending
         val transactions = transactionEventRepository.findAllByUserUid(userId).toList()
             .map { it.toEvent() as ITransactionEvent }
-        val modelByStreamId = transactions.groupBy { it.streamId }.mapNotNull { (_, events) -> resolveStream(events) }
+        var completeStreamTransactionEvents = transactions
+        val lastTransaction = transactions.last()
+        if (lastTransaction.version != 1) {
+            completeStreamTransactionEvents =
+                transactions + transactionEventRepository.findAllByUserUidAndStreamId(userId, lastTransaction.streamId)
+                    .map { it.toEvent() as ITransactionEvent }.toList()
+        }
+        val modelByStreamId = completeStreamTransactionEvents.groupBy { it.streamId }
+            .mapNotNull { (_, events) -> resolveStream(events) }
             .associateBy { it.streamId }
-        val changeSummaryByTransactionId = changeSummaryByTransactionId(transactions)
-        val byStreamId = transactions.groupBy { Pair(it.streamId, modelByStreamId[it.streamId]!!.recipientId) }
+        val changeSummaryByTransactionId = changeSummaryByTransactionId(completeStreamTransactionEvents)
+        val byStreamId =
+            completeStreamTransactionEvents.groupBy { Pair(it.streamId, modelByStreamId[it.streamId]!!.recipientId) }
         return byStreamId.map { (_, events) ->
             val (model, logs) = resolveStreamAndGenerateLogs(events)
                 ?: throw IllegalStateException("Events cant be empty at this stage")

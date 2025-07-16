@@ -134,7 +134,7 @@ interface TransactionEventRepository : CoroutineCrudRepository<TransactionEvent,
     @Query("SELECT * FROM transaction_events WHERE user_uid = :userId AND recipient_id = :recipientId order by stream_id desc, version")
     suspend fun findAllByUserUidAndRecipientId(userId: UUID, recipientId: UUID): Flow<TransactionEvent>
 
-    @Query("SELECT * FROM transaction_events WHERE user_uid = :userId order by stream_id desc, version desc")
+    @Query("SELECT * FROM transaction_events WHERE user_uid = :userId order by stream_id desc, version desc limit 200")
     suspend fun findAllByUserUid(userId: UUID): Flow<TransactionEvent>
     suspend fun findAllByUserUidAndRecipientIdIn(
         userId: UUID,
