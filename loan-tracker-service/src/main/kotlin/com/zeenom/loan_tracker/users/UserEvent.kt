@@ -4,6 +4,7 @@ import com.zeenom.loan_tracker.common.events.IEvent
 import com.zeenom.loan_tracker.transactions.IEventAble
 import kotlinx.coroutines.flow.Flow
 import org.springframework.data.annotation.Id
+import org.springframework.data.r2dbc.repository.Query
 import org.springframework.data.relational.core.mapping.Table
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import org.springframework.stereotype.Repository
@@ -80,21 +81,25 @@ data class UserEvent(
 }
 
 @Repository
-interface UserModelRepository : CoroutineCrudRepository<UserModel, UUID> {
-    suspend fun findByUid(uid: String): UserModel?
-    suspend fun findAllByStreamIdIn(streamIds: List<UUID>): Flow<UserModel>
-    suspend fun findAllByEmailIn(emails: List<String>): Flow<UserModel>
-    suspend fun findAllByPhoneNumberIn(phones: List<String>): Flow<UserModel>
-    suspend fun findByEmail(email: String): UserModel?
-    suspend fun findByPhoneNumber(phone: String): UserModel?
-    suspend fun findByStreamId(streamId: UUID): UserModel?
+interface UserModelRepository : CoroutineCrudRepository<UserModel, UUID>, SyncableModelRepository<UserModel> {
+    suspend fun findByUidAndDeletedIsFalse(uid: String): UserModel?
+    suspend fun findAllByStreamIdInAndDeletedIsFalse(streamIds: List<UUID>): Flow<UserModel>
+    suspend fun findAllByEmailInAndDeletedIsFalse(emails: List<String>): Flow<UserModel>
+    suspend fun findAllByPhoneNumberInAndDeletedIsFalse(phones: List<String>): Flow<UserModel>
+    suspend fun findByEmailAndDeletedIsFalse(email: String): UserModel?
+    suspend fun findByPhoneNumberAndDeletedIsFalse(phone: String): UserModel?
+    suspend fun findByStreamIdAndDeletedIsFalse(streamId: UUID): UserModel?
+    override suspend fun findByStreamId(streamId: UUID): UserModel?
+
+    @Query("select * from user_model order by insert_order desc limit 1")
+    override suspend fun findFirstSortByIdDescending(): UserModel?
 }
 
 @Table("user_model")
 data class UserModel(
     @Id()
     val id: UUID?,
-    val streamId: UUID,
+    override val streamId: UUID,
     val uid: String,
     val displayName: String,
     val phoneNumber: String?,
@@ -104,9 +109,10 @@ data class UserModel(
     val emailVerified: Boolean,
     val createdAt: Instant,
     val updatedAt: Instant,
-    val version: Int,
-    val deleted: Boolean,
-)
+    override val version: Int,
+    override val deleted: Boolean,
+    val insertOrder: Long? = null,
+) : SyncableModel
 
 data class UserCreated(
     val displayName: String,
@@ -252,13 +258,6 @@ data class UserDeleted(
         return existing.copy(
             streamId = streamId,
             uid = existing.uid,
-            displayName = "",
-            phoneNumber = null,
-            email = null,
-            photoUrl = null,
-            currency = null,
-            emailVerified = false,
-            createdAt = createdAt,
             updatedAt = createdAt,
             version = version,
             deleted = true

@@ -1,5 +1,6 @@
 package com.zeenom.loan_tracker.integration
 
+import com.zeenom.loan_tracker.firebase.FirebaseService
 import com.zeenom.loan_tracker.friends.FriendEventRepository
 import com.zeenom.loan_tracker.friends.FriendModelRepository
 import com.zeenom.loan_tracker.friends.UpdateUserRequest
@@ -7,13 +8,19 @@ import com.zeenom.loan_tracker.friends.UserResponse
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventRepository
 import com.zeenom.loan_tracker.users.UserModelRepository
+import com.zeenom.loan_tracker.users.UserService
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
+import org.mockito.Mockito
+import org.mockito.kotlin.any
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.mock.mockito.SpyBean
 import org.springframework.boot.test.web.server.LocalServerPort
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean
 import java.util.UUID
 
 class UsersControllerIntegrationTest(@LocalServerPort private val port: Int) : BaseIntegration() {
@@ -32,6 +39,9 @@ class UsersControllerIntegrationTest(@LocalServerPort private val port: Int) : B
 
     @Autowired
     private lateinit var friendModelRepository: FriendModelRepository
+
+    @MockitoSpyBean
+    private lateinit var firebaseService: FirebaseService
 
     val zeeUid: UUID = UUID.randomUUID()
     private var zeeDto = UserDto(
@@ -92,6 +102,7 @@ class UsersControllerIntegrationTest(@LocalServerPort private val port: Int) : B
     @Order(2)
     @Test
     fun `delete user sucessfully and create a new user with same uid`(): Unit = runBlocking {
+        Mockito.doReturn(Unit).whenever(firebaseService).deleteUserByFBId(any())
         webTestClient.delete()
             .uri("/api/v1/users")
             .header("Authorization", "Bearer $zeeToken")

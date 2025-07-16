@@ -5,7 +5,6 @@ import com.zeenom.loan_tracker.users.UserCurrencyChanged
 import com.zeenom.loan_tracker.users.UserDto
 import com.zeenom.loan_tracker.users.UserEventHandler
 import com.zeenom.loan_tracker.users.UserModel
-import io.swagger.v3.core.util.Json
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -79,6 +78,7 @@ class TransactionService(
                         createdBy = userUid
                     )
                 )
+                userEventHandler.synchronize() //TODO use applicationEventPublisher instead
             }
         }
     }
@@ -280,7 +280,7 @@ class TransactionService(
     }
 
     private suspend fun userAndFriendInfo(userId: UUID): Triple<UserDto, Map<UUID, FriendUserDto>, Map<UUID, FriendUserDto>> {
-        val user = userEventHandler.findByUserId(userId)
+        val user = userEventHandler.findByUserId(userId = userId, includeDeleted = true)
         requireNotNull(user) { "User with id $userId does not exist" }
         val findUserFriends = friendFinderStrategy.findUserFriends(userId = userId, includeDeleted = true)
         val friendUsersByUid =
@@ -366,7 +366,7 @@ class TransactionService(
                     date = it.date,
                     changedBy = it.changedBy,
                     changedByName = if (it.changedBy == userDto.uid) "You" else friendUsersByUserId[it.changedBy]?.name
-                        ?: "Unknown", // TODO handle deleted user
+                        ?: "Deleted User", // TODO handle deleted user
                     changedByPhoto = if (it.changedBy == userDto.uid) userDto.photoUrl else friendUsersByUserId[it.changedBy]?.photoUrl,
                     oldValue = it.oldValue,
                     newValue = it.newValue,

@@ -1,6 +1,6 @@
 spring:
   r2dbc:
-    url: r2dbc:postgresql://localhost:5433/postgres
+    url: r2dbc:postgresql://localhost:5434/postgres
     username: postgres
     password: postgres
   flyway:
@@ -9,7 +9,7 @@ spring:
     baseline-on-migrate: true
     placeholder-replacement: true
     validate-on-migrate: true
-    url: jdbc:postgresql://localhost:5433/postgres
+    url: jdbc:postgresql://localhost:5434/postgres
     user: postgres
     password: postgres
 self:

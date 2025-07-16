@@ -41,8 +41,8 @@ jobs:
           docker buildx build --platform linux/amd64 -t zeeshan60/loan-tracker-service:latest --push .
 
       # 🔥 Deploy using Flask REST API instead of CodeDeploy
-      - name: Deploy via Flask API
-        run: |
-          curl -X POST "https://loandeploy.codewithzeeshan.com/deploy" \
-            -H "Authorization: Bearer ${{ secrets.FLASK_DEPLOY_DEV_TOKEN }}" \
-            -H "Content-Type: application/json"
+#      - name: Deploy via Flask API
+#        run: |
+#          curl -X POST "https://loandeploy.codewithzeeshan.com/deploy" \
+#            -H "Authorization: Bearer ${{ secrets.FLASK_DEPLOY_DEV_TOKEN }}" \
+#            -H "Content-Type: application/json"
