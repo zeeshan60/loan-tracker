@@ -84,7 +84,7 @@ class TransactionsControllerIntegrationTest :
         zeeToken = loginUser(
             userDto = zeeDto
         ).token
-        zeeDto = userModelRepository.findByUid(zeeDto.userFBId)!!.let {
+        zeeDto = userModelRepository.findByUidAndDeletedIsFalse(zeeDto.userFBId)!!.let {
             UserDto(
                 uid = it.streamId,
                 userFBId = it.uid,
@@ -125,7 +125,7 @@ class TransactionsControllerIntegrationTest :
                 .expectBody().jsonPath("$.description").isEqualTo("Sample transaction")
 
             delay(100)
-            val existing = userModelRepository.findByStreamId(zeeDto.uid!!)
+            val existing = userModelRepository.findByStreamIdAndDeletedIsFalse(zeeDto.uid!!)
             assertThat(existing!!.currency.toString()).isEqualTo("USD")
         }
 
@@ -165,7 +165,7 @@ class TransactionsControllerIntegrationTest :
     @Test
     fun `login with friend as user`(): Unit = runBlocking {
         johnToken = loginUser(johnDto).token
-        johnDto = userModelRepository.findByUid(johnDto.userFBId)!!.let {
+        johnDto = userModelRepository.findByUidAndDeletedIsFalse(johnDto.userFBId)!!.let {
             UserDto(
                 uid = it.streamId,
                 userFBId = it.uid,
@@ -764,7 +764,7 @@ class TransactionsControllerIntegrationTest :
         assertThat(transactionResponse.amount.isOwed).isTrue()
 
         assertThat(transactionResponse.createdAt).isNotNull()
-        assertThat(transactionResponse.updatedAt).isNull()
+        assertThat(transactionResponse.updatedAt).isNotNull()
         assertThat(transactionResponse.createdBy.id).isEqualTo(zeeDto.uid)
         assertThat(transactionResponse.createdBy.name).isEqualTo("You")
         assertThat(transactionResponse.updatedBy).isNull()

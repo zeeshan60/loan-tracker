@@ -1,8 +1,6 @@
 package com.zeenom.loan_tracker.users
 
-import io.swagger.v3.core.util.Json
 import kotlinx.coroutines.flow.toList
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -10,24 +8,21 @@ import java.util.*
 class UserEventHandler(
     private val userRepository: UserEventRepository,
     private val userModelRepository: UserModelRepository
-) {
+) : SyncableEventHandler<UserModel, UserEvent> {
+    override fun modelRepository(): SyncableModelRepository<UserModel> {
+        return userModelRepository
+    }
 
-    val logger = LoggerFactory.getLogger(UserEventHandler::class.java)
+    override fun eventRepository(): SyncableEventRepository<UserEvent> {
+        return userRepository
+    }
+
     suspend fun addEvent(event: IUserEvent) {
         userRepository.save(event.toEntity())
-        val existing = userModelRepository.findByStreamId(event.streamId)
-        val updated = event.applyEvent(existing)
-        //If deleted event is received, delete the user model
-        if (updated.deleted) {
-            userModelRepository.deleteById(updated.id!!)
-            logger.warn("User with stream id ${updated.streamId} deleted")
-        } else {
-            userModelRepository.save(updated)
-        }
     }
 
     suspend fun findUserById(uid: String): UserDto? {
-        return userModelRepository.findByUid(uid)?.let {
+        return userModelRepository.findByUidAndDeletedIsFalse(uid)?.let {
             UserDto(
                 uid = it.streamId,
                 displayName = it.displayName,
@@ -41,8 +36,10 @@ class UserEventHandler(
         }
     }
 
-    suspend fun findByUserId(userId: UUID): UserDto? {
-        return userModelRepository.findByStreamId(userId)?.let {
+    suspend fun findByUserId(userId: UUID, includeDeleted: Boolean = false): UserDto? {
+        return (if (includeDeleted) userModelRepository.findByStreamId(userId) else userModelRepository.findByStreamIdAndDeletedIsFalse(
+            userId
+        ))?.let {
             UserDto(
                 uid = it.streamId,
                 displayName = it.displayName,
@@ -57,13 +54,12 @@ class UserEventHandler(
     }
 
     suspend fun findModelByUserId(userId: UUID): UserModel? {
-        return userModelRepository.findByStreamId(userId)
+        return userModelRepository.findByStreamIdAndDeletedIsFalse(userId)
     }
 
     suspend fun findUsersByUids(uids: List<UUID>): List<UserDto> {
         if (uids.isEmpty()) return emptyList()
-        Json.prettyPrint(uids)
-        return userModelRepository.findAllByStreamIdIn(uids).toList().map {
+        return userModelRepository.findAllByStreamIdInAndDeletedIsFalse(uids).toList().map {
             UserDto(
                 uid = it.streamId,
                 displayName = it.displayName,
@@ -79,7 +75,7 @@ class UserEventHandler(
 
     suspend fun findUsersByEmails(emails: List<String>): List<UserDto> {
         if (emails.isEmpty()) return emptyList()
-        return userModelRepository.findAllByEmailIn(emails).toList().map {
+        return userModelRepository.findAllByEmailInAndDeletedIsFalse(emails).toList().map {
             UserDto(
                 uid = it.streamId,
                 displayName = it.displayName,
@@ -93,9 +89,9 @@ class UserEventHandler(
         }
     }
 
-    suspend fun findUsersByPhoneNumbers(phoneNumbers: List<String>): List<UserDto> {
+    suspend fun findUsersByPhoneNumbers(phoneNumbers: List<String>, includeDeleted: Boolean = false): List<UserDto> {
         if (phoneNumbers.isEmpty()) return emptyList()
-        return userModelRepository.findAllByPhoneNumberIn(phoneNumbers).toList().map {
+        return userModelRepository.findAllByPhoneNumberInAndDeletedIsFalse(phoneNumbers).toList().map {
             UserDto(
                 uid = it.streamId,
                 displayName = it.displayName,
@@ -110,7 +106,7 @@ class UserEventHandler(
     }
 
     suspend fun findUserByEmail(email: String): UserDto? {
-        return userModelRepository.findByEmail(email)?.let {
+        return userModelRepository.findByEmailAndDeletedIsFalse(email)?.let {
             UserDto(
                 uid = it.streamId,
                 displayName = it.displayName,
@@ -125,7 +121,7 @@ class UserEventHandler(
     }
 
     suspend fun findUserByPhoneNumber(phoneNumber: String): UserDto? {
-        return userModelRepository.findByPhoneNumber(phoneNumber)?.let {
+        return userModelRepository.findByPhoneNumberAndDeletedIsFalse(phoneNumber)?.let {
             UserDto(
                 uid = it.streamId,
                 displayName = it.displayName,

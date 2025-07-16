@@ -61,7 +61,7 @@ data class TransactionCreated(
             streamId = streamId,
             version = version,
             firstCreatedAt = createdAt,
-            updatedAt = null,
+            updatedAt = createdAt,
             updatedBy = null,
             deleted = false,
             transactionDate = transactionDate

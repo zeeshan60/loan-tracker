@@ -63,7 +63,7 @@ class TransactionsDeleteAllBugTest: BaseIntegration() {
         zeeToken = loginUser(
             userDto = zeeDto
         ).token
-        zeeDto = userModelRepository.findByUid(zeeDto.userFBId)!!.let {
+        zeeDto = userModelRepository.findByUidAndDeletedIsFalse(zeeDto.userFBId)!!.let {
             UserDto(
                 uid = it.streamId,
                 userFBId = it.uid,

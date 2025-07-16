@@ -11,6 +11,7 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.Mockito.mock
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest
 import java.util.*
@@ -28,7 +29,8 @@ class UserServiceTest(
     )
 
     private val userService = UserService(
-        userEventHandler = userEventHandler
+        userEventHandler = userEventHandler,
+        applicationEventPublisher = mock()
     )
 
     @BeforeEach
@@ -112,6 +114,7 @@ class UserServiceTest(
     fun `find user by id returns user successfully`(): Unit = runBlocking {
         val userDto = saveEvent(userDto = userDto)
 
+        userEventHandler.synchronize()
         val user = userEventHandler.findByUserId(userModelRepository.findAll().first().streamId)
 
         assertThat(user).isNotNull
@@ -129,6 +132,7 @@ class UserServiceTest(
         val userDto2 = userDto.copy(uid = userId2, userFBId = "124", email = "user2@gmail.com", phoneNumber = "+923001234568")
         saveEvent(userDto = userDto2)
 
+        userEventHandler.synchronize()
         val users =
             userEventHandler.findUsersByUids(userModelRepository.findAll().map { it.streamId }.toList()).toList()
 

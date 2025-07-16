@@ -232,3 +232,44 @@ end
 µ
 We had to add capabilities in xcode project to allow apple sign in. under signing and capabilities tab, we added sign in with apple capabilities
 
+```bash
+#allow docker commands without sudo
+sudo usermod -aG docker ec2-user
+newgrp docker
+```
+
+Installed on android trhough playstore. google login not working
+trying to debug
+on android device settings, about, build number pressed multiple times to enable developer mode
+then search auto block in settings and turn that off than in developer options, enabled usb debugging.
+now run this command 
+```bash
+# -s and device id to select device id
+adb -s R5CY31JS5BT install app-release.apk
+adb -s R5CY31JS5BT install app-debug.apk
+
+adb -s R5CY31JS5BT logcat | grep -i com.zeenom
+```
+
+we made some progress. found this error log:
+- One Tap sign-in failed: 10: [28444] Developer console is not set up correctly.
+
+Most likely this means that we have not set up the SHA-1 fingerprint in firebase console.
+To get the SHA-1 fingerprint, we can use the following command:
+```bash
+keytool -list -v -keystore ./user.keystore -alias zflash -storepass password -keypass password
+```
+found this sha-1
+53:7B:63:BA:43:7A:11:B2:13:A0:F2:8D:EA:B2:28:EF:A2:A3:73:5E
+added it to console
+problem solved but only for release apks.
+for playstore builds we need to add the sha-1 fingerprint of playstore managed certificate.
+this can be found in test and release -> appintegrity -> appsigning section in play console.
+copy the sha-1 and add to firebase console.
+
+requesting new keystore cert
+$ keytool -export -rfc -keystore user.keystore -alias zflash -storepass password -keypass password -file upload_certificate.pem
+existing sha-1 for the game was:
+38:A9:76:31:60:9F:D3:BC:87:B1:CA:18:58:07:E1:3B:FB:1E:C1:12
+trying to change to correct one.
+

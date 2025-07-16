@@ -21,4 +21,4 @@ include ':capacitor-status-bar'
 project(':capacitor-status-bar').projectDir = new File('../node_modules/@capacitor/status-bar/android')
 
 include ':zeenom-capacitor-social-login'
-project(':zeenom-capacitor-social-login').projectDir = new File('../../../../zeenom-capacitor-social-login/android')
+project(':zeenom-capacitor-social-login').projectDir = new File('../node_modules/zeenom-capacitor-social-login/android')

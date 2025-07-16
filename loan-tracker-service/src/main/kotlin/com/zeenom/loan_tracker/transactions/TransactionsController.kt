@@ -83,13 +83,13 @@ class TransactionsController(
         createdBy = createdBy?.let {
             TransactionUserResponse(
                 id = it,
-                name = createdByName ?: throw IllegalStateException("Created by name is required")
+                name = createdByName ?: "Deleted User"
             )
         } ?: throw IllegalStateException("Created by is required"),
         updatedBy = updatedBy?.let {
             TransactionUserResponse(
                 id = it,
-                name = updatedByName ?: throw IllegalStateException("Updated by name is required")
+                name = updatedByName ?: "Deleted User"
             )
         },
         friend = friendSummaryDto,
