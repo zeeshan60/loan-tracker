@@ -1,12 +1,13 @@
 <ng-container  formGroupName="phone">
   <mr-countries-dropdown
     class="country"
+    [label]="canShowLabels()? 'Country' : ''"
     formControlName="country"
   ></mr-countries-dropdown>
   <ion-input
     type="tel"
     labelPlacement="stacked"
-    label="Phone number"
+    [label]="canShowLabels() ? 'Phone Number' : ''"
     formControlName="phoneNumber"
     [placeholder]="selectedCountryPlaceholder()"
     [errorText]="getErrorTextForPhone()"

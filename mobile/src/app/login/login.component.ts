@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal, ViewEncapsulation } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, inject, signal, ViewEncapsulation } from '@angular/core';
 import { Auth, getAuth, sendPasswordResetEmail, signInWithEmailAndPassword } from '@angular/fire/auth';
 import { Router } from '@angular/router';
 import { IonButton, IonContent, IonInput, IonItem, IonLabel } from '@ionic/angular/standalone';

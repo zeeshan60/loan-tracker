@@ -1,4 +1,4 @@
-import { Component, computed, forwardRef, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, forwardRef, inject, input, OnInit, signal } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { FakeDropdownComponent } from '../fake-dropdown/fake-dropdown.component';
 import { COUNTRIES_WITH_CALLING_CODES, Country } from '../constants';
@@ -19,6 +19,7 @@ import { ModalService } from '../modal.service';
   ],
 })
 export class CountriesDropdownComponent  implements ControlValueAccessor {
+  readonly label = input('');
   modalService = inject(ModalService);
   value = signal<string|null>(null);
   isDisabled = signal<boolean>(false);

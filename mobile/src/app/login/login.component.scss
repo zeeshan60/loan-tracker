@@ -72,12 +72,6 @@ ion-content {
       padding-right: 36px;
     }
 
-    img {
-      position: absolute;
-      top: 50px;
-      z-index: 9;
-    }
-
     img:first-of-type {
       left: 12px;
     }
@@ -140,15 +134,35 @@ ion-content {
     font-weight: 600;
   }
 
-  .input-field {
-    ::ng-deep .input-wrapper {
-      background-color: $color-mediumGrey;
-      padding: 8px 40px 8px 40px;
-      font-size: 14px;
-      margin-top: 8px;
-      border-radius: 10px;
-
+  .mr-input-wrapper {
+    ion-input {
+      .input-bottom {
+        position: absolute;
+        top: 40px;
+        left: -23px;
+      }
     }
+    mr-phone-with-country {
+      .input-bottom {
+        position: absolute;
+        left: -100px;
+      }
+      ion-input {
+        min-height: 44px;
+      }
+    }
+    img {
+      margin-right: 5px;
+      padding-bottom: 3px;
+    }
+    display: flex;
+    width: 100%;
+    background-color: $color-mediumGrey;
+    padding: 8px 8px 0;
+    font-size: 14px;
+    margin-top: 8px;
+    margin-bottom: 15px;
+    border-radius: 10px;
   }
 
   .signup-row {

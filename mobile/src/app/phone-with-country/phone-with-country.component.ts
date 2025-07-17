@@ -32,6 +32,7 @@ import { CountriesDropdownComponent } from '../countries-dropdown/countries-drop
   ]
 })
 export class PhoneWithCountryComponent  implements OnInit {
+  readonly canShowLabels = input<boolean>(true);
   readonly isRequired = input<boolean>(false);
   readonly selectedValue = input<{phoneNumber?: string, country?: string}>()
   readonly fb = inject(FormBuilder);

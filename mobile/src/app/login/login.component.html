@@ -13,32 +13,40 @@
         </div>
         <ion-item>
           <ion-label position="stacked" class="input-label">Email ID</ion-label>
-          <ion-input
-            class="input-field"
-            [errorText]="emailErrorMessage(loginForm)"
-            type="email"
-            formControlName="email"
-            name="email"
-            placeholder="Write your email"
-          ></ion-input>
-          <img src="assets/images/email-icon.svg" alt="icon"/>
+          <div class="mr-input-wrapper">
+            <img
+              slot="start"
+              src="assets/images/email-icon.svg"
+              alt="icon"
+            />
+            <ion-input
+              class="input-field"
+              [errorText]="emailErrorMessage(loginForm)"
+              type="email"
+              formControlName="email"
+              name="email"
+              placeholder="Write your email"
+            ></ion-input>
+          </div>
         </ion-item>
 
         <ion-item>
           <ion-label position="stacked" class="input-label">Password</ion-label>
-          <ion-input
-            class="input-field"
-            type="password"
-            formControlName="password"
-            name="password"
-            required
-            errorText="Password is required"
-            placeholder="Enter your password"
-          ></ion-input>
+          <div class="mr-input-wrapper">
+            <img src="assets/images/lock-icon.svg" alt="Lock icon"/>
+            <ion-input
+              class="input-field"
+              type="password"
+              formControlName="password"
+              name="password"
+              required
+              errorText="Password is required"
+              placeholder="Enter your password"
+            ></ion-input>
+            <img class="eye-icon" src="assets/images/eye-icon.svg" alt="Toggle password"/>
+          </div>
           <!-- Left icon -->
-          <img src="assets/images/lock-icon.svg" alt="Lock icon"/>
           <!-- Right icon (eye toggle) -->
-          <img class="eye-icon" src="assets/images/eye-icon.svg" alt="Toggle password"/>
         </ion-item>
 
         <div class="ion-text-end">
@@ -79,20 +87,21 @@
           <p>
             Let’s get you back on track!
           </p>
-          <ion-label class="success">Reset password link has been sent.</ion-label>
         </div>
 
         <ion-item>
           <ion-label position="stacked" class="input-label">Email ID</ion-label>
-          <ion-input
-            class="input-field"
-            [errorText]="emailErrorMessage(forgotPasswordForm)"
-            type="email"
-            formControlName="email"
-            name="email"
-            placeholder="Write your email"
-          ></ion-input>
-          <img src="assets/images/email-icon.svg" alt="icon"/>
+          <div class="mr-input-wrapper">
+            <img src="assets/images/email-icon.svg" alt="icon"/>
+            <ion-input
+              class="input-field"
+              [errorText]="emailErrorMessage(forgotPasswordForm)"
+              type="email"
+              formControlName="email"
+              name="email"
+              placeholder="Write your email"
+            ></ion-input>
+          </div>
         </ion-item>
       </div>
 
