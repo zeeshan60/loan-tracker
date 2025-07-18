@@ -44,14 +44,14 @@
           <img src="assets/images/lock-icon.svg" alt="Lock icon"/>
           <ion-input
             class="input-field"
-            type="password"
+            [type]="showPassword() ? 'text' : 'password'"
             formControlName="password"
             name="password"
             required
             [errorText]="passwordErrorMessage(signUpForm)"
             placeholder="Enter your password"
           ></ion-input>
-          <img class="eye-icon" src="assets/images/eye-icon.svg" alt="Toggle password"/>
+          <img (click)="password() ? showPassword.set(!showPassword()) : null" class="eye-icon" src="assets/images/eye-icon.svg" alt="Toggle password"/>
         </div>
       </ion-item>
 
@@ -61,14 +61,14 @@
           <img src="assets/images/lock-icon.svg" alt="Lock icon"/>
           <ion-input
             class="input-field"
-            type="password"
+            [type]="showConfirmPassword() ? 'text' : 'password'"
             formControlName="confirmPassword"
             name="password"
             required
             [errorText]="confirmPasswordErrorMessage(signUpForm)"
             placeholder="Re-enter your password"
           ></ion-input>
-          <img class="eye-icon" src="assets/images/eye-icon.svg" alt="Toggle password"/>
+          <img (click)="confirmPassword() ? showConfirmPassword.set(!showConfirmPassword()) : null" class="eye-icon" src="assets/images/eye-icon.svg" alt="Toggle password"/>
         </div>
       </ion-item>
     </ng-container>

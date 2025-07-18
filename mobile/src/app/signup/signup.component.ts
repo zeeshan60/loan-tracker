@@ -25,6 +25,8 @@ export class SignupComponent {
   readonly fb = inject(FormBuilder);
   readonly helperService = inject(HelperService);
 
+  readonly showPassword = signal<boolean>(false)
+  readonly showConfirmPassword = signal<boolean>(false)
   readonly invalidCreds = signal<string>('');
   readonly passwordValidators = [
     Validators.minLength(6),
@@ -70,6 +72,14 @@ export class SignupComponent {
   loading = signal(false);
 
   constructor() { }
+
+  password() {
+    return this.signUpForm.get('passwords.password').value || ''
+  }
+
+  confirmPassword() {
+    return this.signUpForm.get('passwords.confirmPassword').value || ''
+  }
 
   emailErrorMessage(form: FormGroup) {
     let emailControl = form.controls['email'];

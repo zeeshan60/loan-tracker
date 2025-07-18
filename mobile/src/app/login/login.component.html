@@ -36,17 +36,15 @@
             <img src="assets/images/lock-icon.svg" alt="Lock icon"/>
             <ion-input
               class="input-field"
-              type="password"
+              [type]="showPassword() ? 'text' : 'password'"
               formControlName="password"
               name="password"
               required
               errorText="Password is required"
               placeholder="Enter your password"
             ></ion-input>
-            <img class="eye-icon" src="assets/images/eye-icon.svg" alt="Toggle password"/>
+            <img (click)="password() ? showPassword.set(!showPassword()) : null" class="eye-icon" src="assets/images/eye-icon.svg" alt="Toggle password"/>
           </div>
-          <!-- Left icon -->
-          <!-- Right icon (eye toggle) -->
         </ion-item>
 
         <div class="ion-text-end">

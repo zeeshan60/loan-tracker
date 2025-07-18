@@ -6,7 +6,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "start-android": "npx cap run android",
+    "start-android": "npm run build-prod && npx cap sync && npx cap run android",
     "build-prod": "ng build --configuration production",
     "build-dev": "ng build --configuration development",
     "watch": "ng build --watch --configuration development",

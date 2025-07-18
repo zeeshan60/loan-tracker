@@ -23,6 +23,7 @@ type ActiveUi = 'login' | 'signup' | 'forgotPassword';
 export class LoginComponent {
   fb = inject(FormBuilder);
   helperService = inject(HelperService);
+  showPassword = signal<boolean>(false);
   invalidCreds = signal<string>('');
   loading = signal(false);
   activeUi = signal<ActiveUi>('login')
@@ -42,6 +43,9 @@ export class LoginComponent {
 
   constructor() {}
 
+  password() {
+    return this.loginForm.get('password').value || '';
+  }
   emailErrorMessage(form: FormGroup) {
     let emailControl = form.controls['email'];
     if (emailControl.hasError('email')) {
