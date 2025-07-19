@@ -6,6 +6,7 @@ import { extractFirebaseErrorMessage } from '../utility-functions';
 import { HelperService } from '../helper.service';
 import { IonButton, IonInput, IonItem, IonLabel } from '@ionic/angular/standalone';
 import { PhoneWithCountryComponent } from '../phone-with-country/phone-with-country.component';
+import { AuthStore } from '../login/auth.store';
 
 @Component({
   selector: 'mr-signup',
@@ -25,6 +26,7 @@ export class SignupComponent {
   readonly fb = inject(FormBuilder);
   readonly helperService = inject(HelperService);
 
+  readonly authStore = inject(AuthStore);
   readonly showPassword = signal<boolean>(false)
   readonly showConfirmPassword = signal<boolean>(false)
   readonly invalidCreds = signal<string>('');
@@ -127,13 +129,15 @@ export class SignupComponent {
       createUserWithEmailAndPassword(auth, this.signUpForm.get('email').value, this.signUpForm.get('passwords.password').value)
         .then(async (userCredential) => {
           await updateProfile(userCredential.user, { displayName: this.signUpForm.get('name').value });
+          const idToken = await userCredential.user.getIdToken();
           await this.helperService.showToast(
-            'You are successfully registered. You can login now.',
+            'Registration successful! Signing you in...',
             3000,
             {
               color: 'success',
             },
           );
+          await this.authStore.login(idToken);
           return this.signupComplete.emit(true);
         })
         .catch((error: FirebaseAuthError) => {
