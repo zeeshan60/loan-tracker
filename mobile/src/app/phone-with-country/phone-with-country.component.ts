@@ -40,7 +40,6 @@ export class PhoneWithCountryComponent  implements OnInit {
   get parentFormGroup() {
     return this.parentGroupContainer.control as FormGroup;
   }
-  readonly group = input<FormGroup>();
   readonly phoneNumberValidator = (): ValidatorFn => {
     return (control: AbstractControl): ValidationErrors | null => {
       const value = control.value;
@@ -81,7 +80,7 @@ export class PhoneWithCountryComponent  implements OnInit {
     const initialSelectedCountry = this.selectedValue()?.country || COUNTRIES_WITH_CALLING_CODES[0].code;
     this.selectedCountryCode.set(initialSelectedCountry);
     this.parentFormGroup.addControl('phone', this.fb.group({
-      phoneNumber: this.fb.nonNullable.control(toNationalPhone(this.selectedValue()?.phoneNumber) || '', this.isRequired() ? [Validators.required] : []),
+      phoneNumber: this.fb.nonNullable.control(this.selectedValue()?.phoneNumber || '', this.isRequired() ? [Validators.required] : []),
       country: this.fb.nonNullable.control(initialSelectedCountry)
     }));
 

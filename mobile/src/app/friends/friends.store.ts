@@ -74,7 +74,9 @@ export const FriendsStore = signalStore(
     const mostlyUsedSplitType = computed(() => {
       const map = new Map<SplitOption, number>();
       Object.keys(SplitOptionsEnum).forEach((splitType: string) => {
-        map.set(splitType as SplitOption, 0);
+        if (!splitType.toLowerCase().includes('settle')) {
+          map.set(splitType as SplitOption, 0);
+        }
       })
 
       selectedTransactions()?.[0]?.transactions.slice(0, 3)

@@ -92,6 +92,7 @@ export class AccountPage {
       displayName: this.user()!.displayName,
     });
     this.friendsStore.loadFriends();
+    this.friendsStore.loadSelectedTransactions();
   }
 
   async deleteUserAccount(): Promise<void> {
