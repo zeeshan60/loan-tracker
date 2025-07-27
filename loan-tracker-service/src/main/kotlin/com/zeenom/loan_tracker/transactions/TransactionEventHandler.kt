@@ -105,13 +105,15 @@ class TransactionEventHandler(
             .map { it.streamId }
             .toSet()
         val inCompleteStreamIds = otherVersion1SteamIds - version1SteamIds
-        completeStreamTransactionEvents.removeIf { it.streamId in inCompleteStreamIds }
+        if (inCompleteStreamIds.isNotEmpty()) {
+            completeStreamTransactionEvents.removeIf { it.streamId in inCompleteStreamIds }
 
-        logger.info("Refetching full events for incomplete streamId: $inCompleteStreamIds for user: $userId")
-        completeStreamTransactionEvents.addAll(
-            transactionEventRepository.findAllByUserUidAndStreamIdIn(userId, inCompleteStreamIds)
-                .map { it.toEvent() as ITransactionEvent }.toList()
-        )
+            logger.info("Refetching full events for incomplete streamId: $inCompleteStreamIds for user: $userId")
+            completeStreamTransactionEvents.addAll(
+                transactionEventRepository.findAllByUserUidAndStreamIdIn(userId, inCompleteStreamIds)
+                    .map { it.toEvent() as ITransactionEvent }.toList()
+            )
+        }
         val modelByStreamId = completeStreamTransactionEvents.groupBy { it.streamId }
             .mapNotNull { (_, events) ->
                 resolveStream(events)
