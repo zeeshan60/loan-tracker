@@ -87,20 +87,35 @@ class TransactionEventHandler(
         }.toMap()
     }
 
+    val logger = org.slf4j.LoggerFactory.getLogger(TransactionEventHandler::class.java)
     suspend fun transactionsWithActivityLogs(userId: UUID): List<TransactionModelWithActivityLogs> {
 
-        //These transactions are supposed to be ordered by streamId and then version both descending
+        //These transactions are supposed to be ordered by createdAt descending
+        //We only picking first few events. 200 at the time of this comment.
+        //Meaning some events for the same streamId could be missing.
         val transactions = transactionEventRepository.findAllByUserUid(userId).toList()
             .map { it.toEvent() as ITransactionEvent }
-        var completeStreamTransactionEvents = transactions
-        val lastTransaction = transactions.last()
-        if (lastTransaction.version != 1) {
-            completeStreamTransactionEvents =
-                transactions + transactionEventRepository.findAllByUserUidAndStreamId(userId, lastTransaction.streamId)
-                    .map { it.toEvent() as ITransactionEvent }.toList()
-        }
+        var completeStreamTransactionEvents = transactions.toMutableList()
+        val version1SteamIds = transactions
+            .filter { it.version == 1 }
+            .map { it.streamId }
+            .toSet()
+        val otherVersion1SteamIds = transactions
+            .filter { it.version != 1 }
+            .map { it.streamId }
+            .toSet()
+        val inCompleteStreamIds = otherVersion1SteamIds - version1SteamIds
+        completeStreamTransactionEvents.removeIf { it.streamId in inCompleteStreamIds }
+
+        logger.info("Refetching full events for incomplete streamId: $inCompleteStreamIds for user: $userId")
+        completeStreamTransactionEvents.addAll(
+            transactionEventRepository.findAllByUserUidAndStreamIdIn(userId, inCompleteStreamIds)
+                .map { it.toEvent() as ITransactionEvent }.toList()
+        )
         val modelByStreamId = completeStreamTransactionEvents.groupBy { it.streamId }
-            .mapNotNull { (_, events) -> resolveStream(events) }
+            .mapNotNull { (_, events) ->
+                resolveStream(events)
+            }
             .associateBy { it.streamId }
         val changeSummaryByTransactionId = changeSummaryByTransactionId(completeStreamTransactionEvents)
         val byStreamId =
