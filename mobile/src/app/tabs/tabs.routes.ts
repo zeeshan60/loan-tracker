@@ -12,6 +12,11 @@ export const routes: Routes = [
           import('../friends/friends.page').then((m) => m.FriendsPage),
       },
       {
+        path: 'groups',
+        loadComponent: () => import('../groups/list-groups.page')
+          .then(m => m.ListGroupsPage)
+      },
+      {
         path: 'account',
         loadComponent: () =>
           import('../account/account.page').then((m) => m.AccountPage),
