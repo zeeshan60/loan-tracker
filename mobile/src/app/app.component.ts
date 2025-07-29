@@ -24,7 +24,8 @@ import {
   closeOutline,
   ellipsisVerticalOutline,
   arrowForwardOutline,
-  create
+  create,
+  peopleCircleOutline,
 } from 'ionicons/icons';
 import { FriendsStore } from './friends/friends.store';
 import { IonicStorageModule } from '@ionic/storage-angular';
@@ -77,7 +78,8 @@ export class AppComponent implements OnInit {
       chevronDownOutline,
       closeOutline,
       ellipsisVerticalOutline,
-      arrowForwardOutline
+      arrowForwardOutline,
+      peopleCircleOutline
     });
   }
 
