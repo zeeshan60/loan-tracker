@@ -46,7 +46,8 @@ class TransactionService(
             createdAt = Instant.now(),
             createdBy = userUid,
             streamId = transactionDto.transactionStreamId,
-            version = 1
+            version = 1,
+            groupId = transactionDto.groupId,
         )
         transactionEventHandler.addEvent(event)
         addDefaultCurrencyIfNotSet(existingUser, userUid, transactionDto.currency)
@@ -115,6 +116,7 @@ class TransactionService(
                 createdAt = createdAt,
                 createdBy = userUid,
                 streamId = existing.streamId,
+                groupId = existing.groupId,
                 version = ++eventVersion,
             )
             transactionEventHandler.addEvent(event)
@@ -135,6 +137,7 @@ class TransactionService(
                 createdAt = createdAt,
                 createdBy = userUid,
                 streamId = existing.streamId,
+                groupId = existing.groupId,
                 version = ++eventVersion,
             )
             transactionEventHandler.addEvent(event)
@@ -155,6 +158,7 @@ class TransactionService(
                 createdAt = createdAt,
                 createdBy = userUid,
                 streamId = existing.streamId,
+                groupId = existing.groupId,
                 version = ++eventVersion,
             )
             transactionEventHandler.addEvent(event)
@@ -175,6 +179,7 @@ class TransactionService(
                 createdAt = createdAt,
                 createdBy = userUid,
                 streamId = existing.streamId,
+                groupId = existing.groupId,
                 version = ++eventVersion,
             )
             transactionEventHandler.addEvent(event)
@@ -195,6 +200,7 @@ class TransactionService(
                 createdAt = createdAt,
                 createdBy = userUid,
                 streamId = existing.streamId,
+                groupId = existing.groupId,
                 version = ++eventVersion,
             )
             transactionEventHandler.addEvent(event)
@@ -266,6 +272,7 @@ class TransactionService(
             createdAt = Instant.now(),
             createdBy = userUid,
             streamId = transactionStreamId,
+            groupId = existing.groupId,
             version = existing.version + 1,
         )
         transactionEventHandler.addEvent(
@@ -381,6 +388,7 @@ class TransactionService(
             updatedByName = if (updatedBy == userDto.uid) "You" else friendUsersByUserId[updatedBy]?.name,
             transactionDate = transactionDate,
             defaultCurrency = baseCurrency,
+            groupId = groupId,
             amountInDefaultCurrency = allTimeBalanceStrategy.convertCurrency(
                 amount = totalAmount,
                 currentCurrency = currency,

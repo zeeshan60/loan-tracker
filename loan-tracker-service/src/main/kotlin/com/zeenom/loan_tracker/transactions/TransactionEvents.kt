@@ -12,6 +12,9 @@ interface ITransactionEvent : IEvent<TransactionModel>, TransactionChangeSummary
     val id: UUID?
     val userId: UUID
     val recipientId: UUID
+    //i hate it. for now we are including these properties to be able to filter events by group
+    //ideally events should resolve to models and models should be filtered
+    val groupId: UUID?
     override fun toEntity(): TransactionEvent
     fun activityLog(current: TransactionModel): ActivityLog
 }
@@ -25,6 +28,7 @@ data class TransactionCreated(
     val splitType: SplitType,
     val totalAmount: BigDecimal,
     val transactionDate: Instant,
+    override val groupId: UUID?,
     override val createdAt: Instant,
     override val createdBy: UUID,
     override val streamId: UUID,
@@ -43,7 +47,8 @@ data class TransactionCreated(
             streamId = streamId,
             version = version,
             eventType = TransactionEventType.TRANSACTION_CREATED,
-            transactionDate = transactionDate
+            transactionDate = transactionDate,
+            groupId = groupId,
         )
     }
 
@@ -64,9 +69,9 @@ data class TransactionCreated(
             updatedAt = createdAt,
             updatedBy = null,
             deleted = false,
-            transactionDate = transactionDate
+            transactionDate = transactionDate,
+            groupId = groupId
         )
-
     }
 
     override fun crossTransaction(recipientUserId: UUID, userStreamId: UUID): ITransactionEvent {
@@ -82,7 +87,8 @@ data class TransactionCreated(
             createdBy = createdBy,
             streamId = streamId,
             version = version,
-            transactionDate = transactionDate
+            transactionDate = transactionDate,
+            groupId = groupId
         )
     }
 
@@ -110,8 +116,8 @@ data class TransactionDateChanged(
     override val id: UUID?,
     override val userId: UUID,
     override val recipientId: UUID,
-
     val transactionDate: Instant,
+    override val groupId: UUID?,
     override val streamId: UUID,
     override val version: Int,
     override val createdAt: Instant,
@@ -141,7 +147,8 @@ data class TransactionDateChanged(
             streamId = streamId,
             version = version,
             eventType = TransactionEventType.TRANSACTION_DATE_CHANGED,
-            transactionDate = transactionDate
+            transactionDate = transactionDate,
+            groupId = groupId
         )
     }
 
@@ -165,6 +172,7 @@ data class TransactionDateChanged(
             version = version,
             createdAt = createdAt,
             createdBy = createdBy,
+            groupId = groupId
         )
     }
 
@@ -189,6 +197,7 @@ data class DescriptionChanged(
     override val id: UUID?,
     override val userId: UUID,
     override val recipientId: UUID,
+    override val groupId: UUID?,
     val description: String,
     override val streamId: UUID,
     override val version: Int,
@@ -222,6 +231,7 @@ data class DescriptionChanged(
             transactionDate = null,
             id = id,
             userUid = userId,
+            groupId = groupId,
         )
     }
 
@@ -245,6 +255,7 @@ data class DescriptionChanged(
             version = version,
             createdAt = createdAt,
             createdBy = createdBy,
+            groupId = groupId
         )
     }
 
@@ -268,6 +279,7 @@ data class TransactionDeleted(
     override val id: UUID?,
     override val userId: UUID,
     override val recipientId: UUID,
+    override val groupId: UUID?,
     override val streamId: UUID,
     override val version: Int,
     override val createdAt: Instant,
@@ -299,6 +311,7 @@ data class TransactionDeleted(
             transactionDate = null,
             id = id,
             userUid = userId,
+            groupId = groupId
         )
     }
 
@@ -321,6 +334,7 @@ data class TransactionDeleted(
             version = version,
             createdAt = createdAt,
             createdBy = createdBy,
+            groupId = groupId
         )
     }
 
@@ -346,6 +360,7 @@ data class TotalAmountChanged(
     override val id: UUID?,
     override val userId: UUID,
     override val recipientId: UUID,
+    override val groupId: UUID?,
     val totalAmount: BigDecimal,
     override val streamId: UUID,
     override val version: Int,
@@ -376,7 +391,8 @@ data class TotalAmountChanged(
             streamId = streamId,
             version = version,
             eventType = TransactionEventType.TOTAL_AMOUNT_CHANGED,
-            transactionDate = null
+            transactionDate = null,
+            groupId = groupId
         )
     }
 
@@ -400,6 +416,7 @@ data class TotalAmountChanged(
             version = version,
             createdAt = createdAt,
             createdBy = createdBy,
+            groupId = groupId,
         )
     }
 
@@ -423,6 +440,7 @@ data class CurrencyChanged(
     override val id: UUID?,
     override val userId: UUID,
     override val recipientId: UUID,
+    override val groupId: UUID?,
     val currency: String,
     override val streamId: UUID,
     override val version: Int,
@@ -453,7 +471,8 @@ data class CurrencyChanged(
             version = version,
             eventType = TransactionEventType.CURRENCY_CHANGED,
             transactionDate = null,
-            userUid = userId
+            userUid = userId,
+            groupId = groupId,
         )
     }
 
@@ -477,6 +496,7 @@ data class CurrencyChanged(
             version = version,
             createdAt = createdAt,
             createdBy = createdBy,
+            groupId = groupId,
         )
     }
 
@@ -500,6 +520,7 @@ data class SplitTypeChanged(
     override val id: UUID?,
     override val userId: UUID,
     override val recipientId: UUID,
+    override val groupId: UUID?,
     val splitType: SplitType,
     override val streamId: UUID,
     override val version: Int,
@@ -540,7 +561,8 @@ data class SplitTypeChanged(
             streamId = streamId,
             version = version,
             eventType = TransactionEventType.SPLIT_TYPE_CHANGED,
-            transactionDate = null
+            transactionDate = null,
+            groupId = groupId,
         )
     }
 
@@ -554,6 +576,7 @@ data class SplitTypeChanged(
             version = version,
             createdAt = createdAt,
             createdBy = createdBy,
+            groupId = groupId,
         )
     }
 

@@ -210,6 +210,7 @@ class TransactionsController(
             ),
             defaultCurrency = null,
             amountInDefaultCurrency = null,
+            groupId = transactionRequest.groupId,
         )
 }
 
@@ -220,6 +221,7 @@ interface TransactionBaseRequest {
     val currency: String
     val type: SplitType
     val description: String
+    val groupId: UUID?
 }
 
 data class TransactionCreateRequest(
@@ -227,6 +229,7 @@ data class TransactionCreateRequest(
     override val amount: BigDecimal,
     override val currency: String,
     override val type: SplitType,
+    override val groupId: UUID?,
     val recipientId: UUID?,
     override val description: String,
 ) : TransactionBaseRequest
@@ -237,6 +240,7 @@ data class TransactionUpdateRequest(
     override val currency: String,
     override val type: SplitType,
     override val description: String,
+    override val groupId: UUID?
 ) : TransactionBaseRequest
 
 enum class SplitType {

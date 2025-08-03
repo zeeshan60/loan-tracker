@@ -29,7 +29,8 @@ data class TransactionDto(
     val updatedBy: UUID?,
     val updatedByName: String?,
     val deleted: Boolean = false,
-    val history: List<ChangeSummaryDto> = emptyList()
+    val history: List<ChangeSummaryDto> = emptyList(),
+    val groupId: UUID?,
 ) : CommandPayloadDto
 
 data class AmountDto(

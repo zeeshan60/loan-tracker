@@ -20,7 +20,9 @@ data class TransactionModel(
     val deleted: Boolean = false,
     val version: Int,
     val transactionDate: Instant,
-    val historyLogId: UUID?
+    //i hate it
+    val historyLogId: UUID?,
+    val groupId: UUID?,
 )
 
 data class ActivityLog(

@@ -94,7 +94,8 @@ class TransactionsDeleteAllBugTest: BaseIntegration() {
                     type = SplitType.YouPaidSplitEqually,
                     recipientId = johnFriendId,
                     description = "Sample transaction",
-                    transactionDate = Instant.parse("2025-02-26T00:00:00Z")
+                    transactionDate = Instant.parse("2025-02-26T00:00:00Z"),
+                    groupId = null
                 )
             )
             .exchange()

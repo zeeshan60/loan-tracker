@@ -61,6 +61,7 @@ class CommandDaoTest(
                 transactionStreamId = UUID.randomUUID(),
                 defaultCurrency = null,
                 amountInDefaultCurrency = null,
+                groupId = null
             ),
             userId = UUID.randomUUID(),
             userFBId = null

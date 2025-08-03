@@ -117,7 +117,8 @@ class TransactionsControllerIntegrationTest :
                         type = SplitType.YouPaidSplitEqually,
                         recipientId = johnFriendId,
                         description = "Sample transaction",
-                        transactionDate = Instant.parse("2025-02-26T00:00:00Z")
+                        transactionDate = Instant.parse("2025-02-26T00:00:00Z"),
+                        groupId = null
                     )
                 )
                 .exchange()
@@ -230,7 +231,8 @@ class TransactionsControllerIntegrationTest :
                     type = SplitType.TheyOweYouAll,
 
                     description = "Sample transaction edited",
-                    transactionDate = Instant.parse("2025-02-25T00:00:00Z")
+                    transactionDate = Instant.parse("2025-02-25T00:00:00Z"),
+                    groupId = null
                 )
             )
             .exchange()
@@ -411,7 +413,8 @@ class TransactionsControllerIntegrationTest :
                     type = SplitType.YouPaidSplitEqually,
                     recipientId = johnFriendId,
                     description = "Sample transaction 2",
-                    transactionDate = Instant.parse("2025-02-27T00:00:00Z")
+                    transactionDate = Instant.parse("2025-02-27T00:00:00Z"),
+                    groupId = null
                 )
             )
             .exchange()
@@ -457,7 +460,8 @@ class TransactionsControllerIntegrationTest :
                     currency = "SGD",
                     type = SplitType.TheyOweYouAll,
                     description = "Sample transaction edited by john",
-                    transactionDate = Instant.parse("2025-02-25T00:00:00Z")
+                    transactionDate = Instant.parse("2025-02-25T00:00:00Z"),
+                    groupId = null
                 )
             )
             .exchange()

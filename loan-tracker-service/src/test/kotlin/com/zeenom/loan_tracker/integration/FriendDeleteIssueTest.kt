@@ -199,7 +199,8 @@ class FriendDeleteIssueTest() : BaseIntegration() {
                     type = SplitType.YouPaidSplitEqually,
                     recipientId = recipientId,
                     description = "Sample transaction",
-                    transactionDate = Instant.parse("2025-02-26T00:00:00Z")
+                    transactionDate = Instant.parse("2025-02-26T00:00:00Z"),
+                    groupId = null
                 )
             )
             .exchange()

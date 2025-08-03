@@ -26,6 +26,7 @@ data class TransactionEvent(
     val splitType: SplitType?,
     val totalAmount: BigDecimal?,
     val recipientId: UUID,
+    val groupId: UUID?,
     val createdAt: Instant,
     val createdBy: UUID,
     //Transaction events are unique by user_uid, stream_id and version not just stream_id and version. due to cross transaction mechanic
@@ -49,6 +50,7 @@ data class TransactionEvent(
                 streamId = streamId,
                 version = version,
                 transactionDate = transactionDate ?: throw IllegalStateException("Transaction date is required"),
+                groupId = groupId,
             )
 
             TransactionEventType.DESCRIPTION_CHANGED -> DescriptionChanged(
@@ -60,6 +62,7 @@ data class TransactionEvent(
                 createdBy = createdBy,
                 streamId = streamId,
                 version = version,
+                groupId = groupId,
             )
 
             TransactionEventType.SPLIT_TYPE_CHANGED -> SplitTypeChanged(
@@ -71,6 +74,7 @@ data class TransactionEvent(
                 createdBy = createdBy,
                 streamId = streamId,
                 version = version,
+                groupId = groupId,
             )
 
             TransactionEventType.TOTAL_AMOUNT_CHANGED -> TotalAmountChanged(
@@ -82,6 +86,7 @@ data class TransactionEvent(
                 createdBy = createdBy,
                 streamId = streamId,
                 version = version,
+                groupId = groupId,
             )
 
             TransactionEventType.CURRENCY_CHANGED -> CurrencyChanged(
@@ -93,6 +98,7 @@ data class TransactionEvent(
                 createdBy = createdBy,
                 streamId = streamId,
                 version = version,
+                groupId = groupId,
             )
 
             TransactionEventType.TRANSACTION_DELETED -> TransactionDeleted(
@@ -103,6 +109,7 @@ data class TransactionEvent(
                 createdBy = createdBy,
                 streamId = streamId,
                 version = version,
+                groupId = groupId,
             )
 
             TransactionEventType.TRANSACTION_DATE_CHANGED -> TransactionDateChanged(
@@ -113,7 +120,8 @@ data class TransactionEvent(
                 createdBy = createdBy,
                 streamId = streamId,
                 version = version,
-                transactionDate = transactionDate ?: throw IllegalStateException("Transaction date is required")
+                transactionDate = transactionDate ?: throw IllegalStateException("Transaction date is required"),
+                groupId = groupId,
             )
         }
     }

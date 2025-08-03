@@ -95,7 +95,8 @@ class TransactionEventHandlerTest {
                         eventType = TransactionEventType.TRANSACTION_CREATED,
                         description = "some description",
                         splitType = SplitType.TheyOweYouAll,
-                        totalAmount = 200.0.toBigDecimal()
+                        totalAmount = 200.0.toBigDecimal(),
+                        groupId = null
                     ),
                     TransactionEvent(
                         userUid = userId,
@@ -109,7 +110,8 @@ class TransactionEventHandlerTest {
                         eventType = TransactionEventType.SPLIT_TYPE_CHANGED,
                         description = null,
                         splitType = SplitType.YouOweThemAll,
-                        totalAmount = null
+                        totalAmount = null,
+                        groupId = null
                     ),
                     TransactionEvent(
                         userUid = userId,
@@ -123,7 +125,8 @@ class TransactionEventHandlerTest {
                         eventType = TransactionEventType.TOTAL_AMOUNT_CHANGED,
                         description = null,
                         splitType = null,
-                        totalAmount = 100.0.toBigDecimal()
+                        totalAmount = 100.0.toBigDecimal(),
+                        groupId = null
                     )
                 ).asFlow()
             }
@@ -151,7 +154,8 @@ class TransactionEventHandlerTest {
                 eventType = TransactionEventType.TRANSACTION_CREATED,
                 description = "some description",
                 splitType = SplitType.TheyOweYouAll,
-                totalAmount = 100.0.toBigDecimal()
+                totalAmount = 100.0.toBigDecimal(),
+                groupId = null
             ),
             TransactionEvent(
                 userUid = userId,
@@ -165,7 +169,8 @@ class TransactionEventHandlerTest {
                 eventType = TransactionEventType.TRANSACTION_CREATED,
                 description = "some description",
                 splitType = SplitType.TheyOweYouAll,
-                totalAmount = 200.0.toBigDecimal()
+                totalAmount = 200.0.toBigDecimal(),
+                groupId = null
             ),
             TransactionEvent(
                 userUid = userId,
@@ -179,7 +184,8 @@ class TransactionEventHandlerTest {
                 eventType = TransactionEventType.SPLIT_TYPE_CHANGED,
                 description = null,
                 splitType = SplitType.YouOweThemAll,
-                totalAmount = null
+                totalAmount = null,
+                groupId = null
             ),
             TransactionEvent(
                 userUid = userId,
@@ -193,7 +199,8 @@ class TransactionEventHandlerTest {
                 eventType = TransactionEventType.TRANSACTION_CREATED,
                 description = "some description",
                 splitType = SplitType.YouOweThemAll,
-                totalAmount = 150.0.toBigDecimal()
+                totalAmount = 150.0.toBigDecimal(),
+                groupId = null
             )
         )
     }
