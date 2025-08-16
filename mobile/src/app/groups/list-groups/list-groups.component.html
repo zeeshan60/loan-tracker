@@ -1,0 +1,86 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title slot="start">
+      Groups summary
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button class="add-btn" (click)="addGroup()">
+        <img src="assets/images/add-icon.svg" alt="icon"/>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="main-list-container">
+    @if (groupsStore.groups().length) {
+      <ion-list class="summary-list">
+        <h3>Summary</h3>
+        @for( group of groupsStore.groups(); track group.name) {
+          <ion-item (click)="chooseGroup(group)" button>
+            <ion-avatar slot="start">
+              @if (group.photoUrl) {
+                <img [src]="group.photoUrl" alt="Friend's photo"/>
+              } @else {
+                <ion-icon size="large" name="person" color="medium"></ion-icon>
+              }
+            </ion-avatar>
+            <ion-label>
+              <h4>{{ group.name }}</h4>
+              @if(group.otherBalances?.length) {
+                <ul class="other-balances-list">
+                  @for(balance of group.otherBalances; track balance.amount.currency) {
+                    <ion-label [color]="balance.amount.isOwed ? 'success' : 'danger'">
+                      {{balance.amount.amount | currency: balance.amount.currency: 'symbol'}}
+                    </ion-label>
+                  }
+                </ul>
+              }
+            </ion-label>
+            @if (group.mainBalance) {
+              <p class="amount-wrapper">
+                <ion-label [color]="group.mainBalance.isOwed ? 'success': 'danger'">
+                  {{ group.mainBalance.amount | currency: group.mainBalance.currency: 'symbol' }}
+                </ion-label>
+                @if (group.mainBalance.isOwed) {
+                  <img
+                    class="arrow"
+                    src="assets/images/arrow-green-downward.svg" alt="wallet"
+                  />
+                } @else () {
+                  <img
+                    class="arrow"
+                    src="assets/images/arrow-red-upword.svg" alt="wallet"
+                  />
+                }
+              </p>
+            }
+          </ion-item>
+
+        }
+        @for( group of groupsStore.inActiveGroups(); track group.name) {
+          <ion-item (click)="chooseGroup(group)" button>
+            <ion-avatar slot="start">
+              @if (group.photoUrl) {
+                <img [src]="group.photoUrl" alt="group's photo"/>
+              } @else {
+                <ion-icon size="large" name="person" color="medium"></ion-icon>
+              }
+            </ion-avatar>
+            <ion-label>
+              <h2>{{ group.name }}</h2>
+            </ion-label>
+          </ion-item>
+        }
+      </ion-list>
+    } @else if (!groupsStore.loadingGroups() && !groupsStore.groups().length) {
+      <ion-list lines="none">
+        <ion-item>
+          <ion-label>
+            <p>Nothing here yet. Please add groups</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    }
+  </div>
+</ion-content>

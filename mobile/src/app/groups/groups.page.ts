@@ -1,16 +1,18 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { IonNav } from '@ionic/angular/standalone';
+import { ListGroupsComponent } from './list-groups/list-groups.component';
 
 @Component({
-  selector: 'mr-list-groups',
-  templateUrl: 'list-groups.page.html',
-  styleUrls: ['list-groups.page.scss'],
+  selector: 'mr-groups',
+  templateUrl: 'groups.page.html',
+  styleUrls: ['groups.page.scss'],
   standalone: true,
   imports: [
     IonNav
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ListGroupsPage {
+export class GroupsPage {
+  listGroupsComponent = ListGroupsComponent;
   constructor() {}
 }

@@ -3,7 +3,7 @@ import { computed, inject } from '@angular/core';
 import { FriendsService } from './friends.service';
 import { firstValueFrom } from 'rxjs';
 import { HelperService } from '../helper.service';
-import { FriendWithBalance, Transaction, TransactionsByMonth } from './model'
+import { Balance, FriendWithBalance, OtherBalance, Transaction, TransactionsByMonth } from './model'
 import { HttpClient } from '@angular/common/http';
 import { PRIVATE_API } from '../constants';
 import { LoadingController } from '@ionic/angular/standalone';
@@ -21,16 +21,6 @@ export type OverallBalance = {
   other: OtherBalance[]
 } | null;
 
-export type Balance = {
-  currency: string,
-  amount: number,
-  isOwed: boolean
-}
-
-export type OtherBalance = {
-  convertedAmount: Balance,
-  amount: Balance,
-}
 
 type FriendsState = {
   friends: FriendWithBalance[],

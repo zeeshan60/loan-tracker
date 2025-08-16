@@ -13,8 +13,8 @@ export const routes: Routes = [
       },
       {
         path: 'groups',
-        loadComponent: () => import('../groups/list-groups.page')
-          .then(m => m.ListGroupsPage)
+        loadComponent: () => import('../groups/groups.page')
+          .then(m => m.GroupsPage)
       },
       {
         path: 'account',

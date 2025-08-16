@@ -1,5 +1,4 @@
 import { SplitOption } from '../define-expense/define-expense.component';
-import { OtherBalance } from './friends.store';
 
 export type HistoryChangeType = (typeof HistoryChangeTypeEnum)[keyof typeof HistoryChangeTypeEnum];
 export const HistoryChangeTypeEnum = {
@@ -10,12 +9,24 @@ export const HistoryChangeTypeEnum = {
   DELETED: "DELETED",
   TRANSACTION_DATE: "TRANSACTION_DATE"
 } as const satisfies Record<string, string>
+
 export interface Friend {
   friendId: string;
   photoUrl: string|null;
   name: string;
   phone?: string;
   email: string
+}
+
+export type Balance = {
+  currency: string,
+  amount: number,
+  isOwed: boolean
+}
+
+export type OtherBalance = {
+  convertedAmount: Balance,
+  amount: Balance,
 }
 
 export interface FriendWithBalance extends Friend {

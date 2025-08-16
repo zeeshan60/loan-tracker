@@ -1,15 +1,9 @@
 import { inject, Injectable } from '@angular/core';
-import { map, Observable, timer } from 'rxjs';
+import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { AddFriend, OtherBalance, OverallBalance } from './friends.store';
+import { AddFriend, OverallBalance } from './friends.store';
 import { FriendWithBalance } from './model';
 import { PRIVATE_API } from '../constants';
-
-interface Balance {
-  "currency": string;
-  "amount": number;
-  "isOwed": boolean;
-}
 
 @Injectable({
   providedIn: 'root'
