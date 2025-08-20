@@ -3,6 +3,7 @@ package com.zeenom.loan_tracker.security
 import io.jsonwebtoken.ExpiredJwtException
 import io.jsonwebtoken.Jwts
 import kotlinx.coroutines.reactor.mono
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.BadCredentialsException
@@ -15,6 +16,7 @@ import java.util.*
 
 @Component
 class AuthConverter(private val authProperties: AuthProperties) : ServerAuthenticationConverter {
+    val logger = LoggerFactory.getLogger(AuthConverter::class.java)
     override fun convert(exchange: ServerWebExchange): Mono<Authentication> {
         val authHeader = exchange.request.headers.getFirst(HttpHeaders.AUTHORIZATION)
         val action = when (exchange.request.method) {
@@ -39,15 +41,17 @@ class AuthConverter(private val authProperties: AuthProperties) : ServerAuthenti
     }
 
     fun validateToken(token: String): UUID {
-        return try {
-            Jwts.parserBuilder()
+        try {
+            return Jwts.parserBuilder()
                 .setSigningKey(authProperties.secretKey.toByteArray())
                 .build()
                 .parseClaimsJws(token)
                 .body.subject.let { UUID.fromString(it) }
         } catch (ex: ExpiredJwtException) {
+            logger.error("Expired JWT token: {}", ex.message, ex)
             throw BadCredentialsException("JWT expired", ex) // Wrap as AuthenticationException
         } catch (ex: Exception) {
+            logger.error("Invalid JWT token: {}", ex.message, ex)
             throw BadCredentialsException("Invalid JWT", ex)
         }
     }
