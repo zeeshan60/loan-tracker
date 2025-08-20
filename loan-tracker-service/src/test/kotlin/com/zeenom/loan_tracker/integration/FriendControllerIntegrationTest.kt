@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.util.*
+import kotlin.math.exp
 
 class FriendControllerIntegrationTest() : BaseIntegration() {
 
@@ -62,6 +63,7 @@ class FriendControllerIntegrationTest() : BaseIntegration() {
         zeeToken = loginUser(
             userDto = zeeDto
         ).token
+        println(zeeToken)
         queryUser(token = zeeToken).also { response ->
             zeeDto = zeeDto.copy(
                 uid = UUID.fromString(response.uid),
@@ -186,5 +188,16 @@ class FriendControllerIntegrationTest() : BaseIntegration() {
         assertThat(response.data.friends).isEmpty()
         assertThat(response.data.balance.main).isNull()
         assertThat(response.data.balance.other).isEmpty()
+    }
+
+    @Order(9)
+    @Test
+    fun `calling get freinds with expired token returns unauthorized`() {
+        val expiredToken = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI4NTEzOTAwOC1kODFiLTQxMDgtYTI5My0yZDhlYzU4ZWM4MGUiLCJpYXQiOjE3NTU2Nzk2NDcsImV4cCI6MTc1MzA4NzY0N30.eG9V3MAYoq1rkNtqWjp8rfHyB5BLaYMKD8E3GF_rsR0"
+        webTestClient.get()
+            .uri("/api/v1/friends")
+            .header("Authorization", "Bearer $expiredToken")
+            .exchange()
+            .expectStatus().isUnauthorized
     }
 }

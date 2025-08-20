@@ -22,7 +22,6 @@ import org.springframework.security.web.server.util.matcher.ServerWebExchangeMat
 import reactor.core.publisher.Mono
 import java.nio.charset.StandardCharsets
 
-
 @Configuration
 @EnableWebFluxSecurity
 class SecurityConfig {

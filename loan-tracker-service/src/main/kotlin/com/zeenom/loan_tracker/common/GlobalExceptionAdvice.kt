@@ -37,13 +37,6 @@ class GlobalExceptionAdvice {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse)
     }
 
-    @ExceptionHandler(ExpiredJwtException::class)
-    suspend fun handleExpiredJwt(ex: ExpiredJwtException): ResponseEntity<ErrorResponse> {
-        logger.info("Error occurred", ex)
-        val errorResponse = ErrorResponse(ErrorMessage(ex.message ?: "Token has expired"))
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse)
-    }
-
     @ExceptionHandler(UnauthorizedException::class)
     suspend fun handleUnauthorized(ex: UnauthorizedException): ResponseEntity<ErrorResponse> {
         logger.info("Error occurred", ex)
