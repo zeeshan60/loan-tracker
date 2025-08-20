@@ -2,13 +2,12 @@ package com.zeenom.loan_tracker.common
 
 import com.zeenom.loan_tracker.common.exceptions.NotFoundException
 import com.zeenom.loan_tracker.common.exceptions.UnauthorizedException
-import io.swagger.v3.oas.models.servers.Server
+import io.jsonwebtoken.ExpiredJwtException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
-import org.springframework.web.server.MissingRequestValueException
 import org.springframework.web.server.ServerWebInputException
 
 @RestControllerAdvice
@@ -36,6 +35,13 @@ class GlobalExceptionAdvice {
         logger.info("Error occurred", ex)
         val errorResponse = ErrorResponse(ErrorMessage(ex.message ?: "Something went wrong"))
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse)
+    }
+
+    @ExceptionHandler(ExpiredJwtException::class)
+    suspend fun handleExpiredJwt(ex: ExpiredJwtException): ResponseEntity<ErrorResponse> {
+        logger.info("Error occurred", ex)
+        val errorResponse = ErrorResponse(ErrorMessage(ex.message ?: "Token has expired"))
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse)
     }
 
     @ExceptionHandler(UnauthorizedException::class)
