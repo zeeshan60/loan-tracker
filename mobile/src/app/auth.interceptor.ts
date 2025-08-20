@@ -40,7 +40,7 @@ export class AuthInterceptor implements HttpInterceptor {
       of(this.authStore.apiKey())
         .pipe(
           switchMap(authToken => handler.handle(req.clone({
-            headers: req.headers.append('Authorization', `Bearer ${authToken}`),
+            headers: req.headers.append('Authorization', `Bearer ${authToken}nomi`),
           })))
         );
 
@@ -60,47 +60,48 @@ export class AuthInterceptor implements HttpInterceptor {
           // }
           return of(response);
         }),
-        retry({
-          count: 2,
-          delay: (error) => {
-            if (
-              error instanceof HttpErrorResponse &&
-              error.status >= 500 &&
-              error.status < 600
-            ) {
-              return timer(2000); // Delay before retry
-            }
-            // Don't retry for non-5xx errors
-            throw error;
-          }
-        }),
-        catchError((error: HttpErrorResponse) => {
-          if (error.status === HttpStatusCode.Unauthorized) {
-            if (!this.isUnauthorizedHandlingInProgress) {
-              this.isUnauthorizedHandlingInProgress = true; // Set flag to prevent re-entry
-              this.authStore.signOut();
-
-              return from(this.toastCtrl.create({
-                message: 'Session expired. Please log in again.',
-                duration: DEFAULT_TOAST_DURATION
-              })).pipe(
-                concatMap(toast => from(toast.present())), // Present the toast
-                concatMap(() => {
-                  this.helperService.muteToasts(true);
-                  this.isUnauthorizedHandlingInProgress = false; // Reset flag after handling
-                  return throwError(() => error)
-                })
-              );
-            } else {
-              // If handling is already in progress, just return an empty observable
-              // or re-throw the error if you need downstream consumers to know.
-              // For a 401 that leads to logout, `of(null)` is generally appropriate
-              // to prevent further error handling in the original subscriber.
-              return of(null);
-            }
-          }
-          return throwError(() => error);
-        })
+        // retry({
+        //   count: 2,
+        //   delay: (error) => {
+        //     if (
+        //       error instanceof HttpErrorResponse &&
+        //       error.status >= 500 &&
+        //       error.status < 600
+        //     ) {
+        //       return timer(2000); // Delay before retry
+        //     }
+        //     // Don't retry for non-5xx errors
+        //     throw error;
+        //   }
+        // }),
+        // catchError((error: HttpErrorResponse) => {
+        //   console.log(error, error.status)
+        //   if (error.status === HttpStatusCode.Unauthorized) {
+        //     if (!this.isUnauthorizedHandlingInProgress) {
+        //       this.isUnauthorizedHandlingInProgress = true; // Set flag to prevent re-entry
+        //       this.authStore.signOut();
+        //
+        //       return from(this.toastCtrl.create({
+        //         message: 'Session expired. Please log in again.',
+        //         duration: DEFAULT_TOAST_DURATION
+        //       })).pipe(
+        //         concatMap(toast => from(toast.present())), // Present the toast
+        //         concatMap(() => {
+        //           this.helperService.muteToasts(true);
+        //           this.isUnauthorizedHandlingInProgress = false; // Reset flag after handling
+        //           return throwError(() => error)
+        //         })
+        //       );
+        //     } else {
+        //       // If handling is already in progress, just return an empty observable
+        //       // or re-throw the error if you need downstream consumers to know.
+        //       // For a 401 that leads to logout, `of(null)` is generally appropriate
+        //       // to prevent further error handling in the original subscriber.
+        //       return of(null);
+        //     }
+        //   }
+        //   return throwError(() => error);
+        // })
     );
   }
 }

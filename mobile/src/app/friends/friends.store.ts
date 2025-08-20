@@ -120,8 +120,12 @@ export const FriendsStore = signalStore(
     async loadFriends(config = { showLoader: true }): Promise<void> {
       try {
         const loadAllFriends = async () => {
-          const {data} = await firstValueFrom(friendsService.loadAllFriends());
-          patchState(store, { friends: data.friends, overallBalance: data.balance })
+          try {
+            const {data} = await firstValueFrom(friendsService.loadAllFriends());
+            patchState(store, { friends: data.friends, overallBalance: data.balance })
+          } catch (e) {
+            console.log(e);
+          }
         };
         if (config.showLoader) {
           patchState(store, { loadingFriends: true });
