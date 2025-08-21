@@ -24,6 +24,6 @@ class GroupEventHandler(val groupEventRepository: GroupEventRepository, val grou
     }
 
     suspend fun getModelByStreamId(streamId: UUID): GroupModel? {
-        return groupModelRepository.findByStreamId(streamId)
+        return groupModelRepository.findByStreamIdAndDeletedIsFalse(streamId)
     }
 }

@@ -1,51 +1,137 @@
 package com.zeenom.loan_tracker.groups
 
+import com.zeenom.loan_tracker.common.exceptions.NotFoundException
+import com.zeenom.loan_tracker.users.UserEventHandler
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.util.*
 
 @Service
-class GroupsService(private val eventHandler: GroupEventHandler) {
+class GroupsService(private val eventHandler: GroupEventHandler, val userEventHandler: UserEventHandler) {
 
-    suspend fun createGroup(request: GroupCreateRequest, userId: UUID): GroupResponse {
+    suspend fun createGroup(request: GroupCreateRequest, userId: UUID): UUID {
+        val streamId = UUID.randomUUID()
         val event = GroupCreated(
             name = request.name,
             description = request.description,
             createdAt = Instant.now(),
             createdBy = userId,
-            streamId = UUID.randomUUID(),
+            streamId = streamId,
             version = 1
         )
 
         eventHandler.saveEvent(event)
+        val addMemberEvent = GroupMembersAdded(
+            memberIds = listOf(userId),
+            createdAt = Instant.now(),
+            createdBy = userId,
+            streamId = streamId,
+            version = 2
+        )
+        eventHandler.saveEvent(addMemberEvent)
         eventHandler.synchronize()
 
-        val model = eventHandler.getModelByStreamId(event.streamId)
+        return streamId
+    }
+
+    suspend fun getGroupResponseById(groupId: UUID): GroupResponse {
+        val model = eventHandler.getModelByStreamId(groupId)
         if (model == null) {
-            throw IllegalStateException("Group model not found after creation")
+            throw NotFoundException("Group model not found after creation")
         }
+
+        val members = model.memberIds?.ids?.let { userEventHandler.findUsersByUids(it) } ?: emptyList()
 
         return GroupResponse(
             id = model.streamId,
             name = model.name,
             description = model.description,
-            members = emptyList(),
+            members = members.map { member ->
+                GroupMemberResponse(
+                    memberId = member.uid ?: throw IllegalStateException("Member UID is null"),
+                    memberName = member.displayName,
+                    userBalanceWithThisMember = null
+                )
+            },
             balance = null
         )
     }
 
-    suspend fun removeMembers(groupId: UUID, request: GroupRemoveMembersRequest): GroupSummaryResponse {
-        // Logic to remove members from a group and return its updated summary
-        TODO("Implement member removal logic")
+    suspend fun addMembers(groupId: UUID, request: GroupAddMembersRequest, userId: UUID) {
+        val existing = eventHandler.getModelByStreamId(groupId)
+            ?: throw IllegalArgumentException("Group with ID $groupId does not exist")
+
+        val memberIds = request.memberIds
+        val event = GroupMembersAdded(
+            memberIds = memberIds,
+            createdAt = Instant.now(),
+            createdBy = userId,
+            streamId = existing.streamId,
+            version = existing.version + 1
+        )
+
+        validateMembers(memberIds)
+
+        eventHandler.saveEvent(event)
+        eventHandler.synchronize()
     }
 
-    suspend fun addMembers(groupId: UUID, request: GroupAddMembersRequest): GroupSummaryResponse {
-        // Logic to add members to a group and return its updated summary
-        TODO("Implement member addition logic")
+    private suspend fun validateMembers(memberIds: List<UUID>) {
+        val members = userEventHandler.findUsersByUids(memberIds)
+
+        if (members.size != memberIds.size) {
+            val missingIds = memberIds.filter { id -> members.none { it.uid == id } }
+            throw IllegalArgumentException("Some member IDs do not correspond to existing users: $missingIds")
+        }
+    }
+
+    suspend fun removeMembers(groupId: UUID, request: GroupRemoveMembersRequest, userId: UUID) {
+        val existing = eventHandler.getModelByStreamId(groupId)
+            ?: throw IllegalArgumentException("Group with ID $groupId does not exist")
+        val event = GroupMembersRemoved(
+            memberIds = request.memberIds,
+            createdAt = Instant.now(),
+            createdBy = userId,
+            streamId = existing.streamId,
+            version = existing.version + 1
+        )
+
+        eventHandler.saveEvent(event)
+        eventHandler.synchronize()
     }
 
     suspend fun getGroupSummaries(): GroupSummariesResponse {
         // Logic to fetch all group summaries
         TODO("Implement fetching group summaries logic")
+    }
+
+    suspend fun updateGroup(groupId: UUID, request: GroupCreateRequest, userId: UUID) {
+        val existing = eventHandler.getModelByStreamId(groupId)
+            ?: throw IllegalArgumentException("Group with ID $groupId does not exist")
+
+        val event = GroupUpdated(
+            name = request.name,
+            description = request.description,
+            createdAt = Instant.now(),
+            createdBy = userId,
+            streamId = existing.streamId,
+            version = existing.version + 1
+        )
+        eventHandler.saveEvent(event)
+        eventHandler.synchronize()
+    }
+
+    suspend fun deleteGroup(groupId: UUID, userId: UUID) {
+        val existing = eventHandler.getModelByStreamId(groupId)
+            ?: throw IllegalArgumentException("Group with ID $groupId does not exist")
+
+        val event = GroupDeleted(
+            createdAt = Instant.now(),
+            streamId = existing.streamId,
+            version = existing.version + 1,
+            createdBy = userId
+        )
+        eventHandler.saveEvent(event)
+        eventHandler.synchronize()
     }
 }

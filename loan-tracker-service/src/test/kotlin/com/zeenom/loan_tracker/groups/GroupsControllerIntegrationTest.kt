@@ -28,6 +28,12 @@ class GroupsControllerIntegrationTest : BaseIntegration() {
     @Autowired
     private lateinit var userModelRepository: UserModelRepository
 
+    @Autowired
+    private lateinit var groupModelRepository: GroupModelRepository
+
+    @Autowired
+    private lateinit var groupEventRepository: GroupEventRepository
+
     private lateinit var zeeToken: String
     private var zeeDto = UserDto(
         uid = null,
@@ -54,12 +60,16 @@ class GroupsControllerIntegrationTest : BaseIntegration() {
 
     private lateinit var johnFriendId: UUID
 
+    private lateinit var groupId: UUID
+
     @BeforeAll
     fun beforeAll(): Unit = runBlocking {
         userEventRepository.deleteAll()
         friendEventRepository.deleteAll()
         userModelRepository.deleteAll()
         friendModelRepository.deleteAll()
+        groupModelRepository.deleteAll()
+        groupEventRepository.deleteAll()
         zeeToken = loginUser(
             userDto = zeeDto
         ).token
@@ -69,12 +79,19 @@ class GroupsControllerIntegrationTest : BaseIntegration() {
                 uid = UUID.fromString(response.uid),
             )
         }
+        johnToken = loginUser(
+            userDto = johnDto
+        ).token
+        queryUser(token = johnToken).also { response ->
+            johnDto = johnDto.copy(
+                uid = UUID.fromString(response.uid),
+            )
+        }
     }
 
     @Test
     @Order(1)
     fun `create group successfully`() {
-
 
         val response = webTestClient.post()
             .uri("/api/v1/groups/create")
@@ -91,11 +108,112 @@ class GroupsControllerIntegrationTest : BaseIntegration() {
 
         assertThat(response.id).isNotNull
         assertThat(response.members).hasSize(1)
-        assertThat(response.members[0].memberId).isEqualTo(zeeDto.uid.toString())
+        assertThat(response.members[0].memberId).isEqualTo(zeeDto.uid)
         assertThat(response.members[0].memberName).isEqualTo(zeeDto.displayName)
         assertThat(response.members[0].userBalanceWithThisMember).isNull()
         assertThat(response.name).isEqualTo("Test Group")
         assertThat(response.description).isEqualTo("This is a test group")
         assertThat(response.balance).isNull()
+        groupId = response.id
+    }
+
+    @Test
+    @Order(2)
+    fun `add members to group successfully`() {
+        val groupResponse = webTestClient.put()
+            .uri("/api/v1/groups/$groupId/addMembers")
+            .header("Authorization", "Bearer $zeeToken")
+            .bodyValue(
+                GroupAddMembersRequest(
+                    memberIds = listOf(johnDto.uid!!)
+                )
+            )
+            .exchange()
+            .expectStatus().isOk
+            .expectBody(GroupResponse::class.java).returnResult().responseBody!!
+
+        assertThat(groupResponse.members).hasSize(2)
+        assertThat(groupResponse.members[1].memberId).isEqualTo(johnDto.uid)
+        assertThat(groupResponse.members[1].memberName).isEqualTo(johnDto.displayName)
+    }
+
+    @Test
+    @Order(3)
+    fun `remove group members successfully`() {
+
+        val groupResponse = webTestClient.put()
+            .uri("/api/v1/groups/$groupId/removeMembers")
+            .header("Authorization", "Bearer $zeeToken")
+            .bodyValue(
+                GroupRemoveMembersRequest(
+                    memberIds = listOf(johnDto.uid!!)
+                )
+            )
+            .exchange()
+            .expectStatus().isOk
+            .expectBody(GroupResponse::class.java).returnResult().responseBody!!
+
+        assertThat(groupResponse.members).hasSize(1)
+        assertThat(groupResponse.members[0].memberId).isEqualTo(zeeDto.uid)
+        assertThat(groupResponse.members[0].memberName).isEqualTo(zeeDto.displayName)
+    }
+
+    @Test
+    @Order(4)
+    fun `update group successfully`() {
+        val updatedGroupResponse = webTestClient.put()
+            .uri("/api/v1/groups/$groupId/update")
+            .header("Authorization", "Bearer $zeeToken")
+            .bodyValue(
+                GroupCreateRequest(
+                    name = "Updated Test Group",
+                    description = "This is an updated test group",
+                )
+            )
+            .exchange()
+            .expectStatus().isOk
+            .expectBody(GroupResponse::class.java).returnResult().responseBody!!
+
+        assertThat(updatedGroupResponse.id).isEqualTo(groupId)
+        assertThat(updatedGroupResponse.name).isEqualTo("Updated Test Group")
+        assertThat(updatedGroupResponse.description).isEqualTo("This is an updated test group")
+        assertThat(updatedGroupResponse.members).hasSize(1)
+        assertThat(updatedGroupResponse.members[0].memberId).isEqualTo(zeeDto.uid)
+        assertThat(updatedGroupResponse.members[0].memberName).isEqualTo(zeeDto.displayName)
+        assertThat(updatedGroupResponse.balance).isNull()
+    }
+
+    @Test
+    @Order(5)
+    fun `query group by id successfully`() {
+        val groupResponse = webTestClient.get()
+            .uri("/api/v1/groups/$groupId")
+            .header("Authorization", "Bearer $zeeToken")
+            .exchange()
+            .expectStatus().isOk
+            .expectBody(GroupResponse::class.java).returnResult().responseBody!!
+
+        assertThat(groupResponse.id).isEqualTo(groupId)
+        assertThat(groupResponse.name).isEqualTo("Updated Test Group")
+        assertThat(groupResponse.description).isEqualTo("This is an updated test group")
+        assertThat(groupResponse.members).hasSize(1)
+        assertThat(groupResponse.members[0].memberId).isEqualTo(zeeDto.uid)
+        assertThat(groupResponse.members[0].memberName).isEqualTo(zeeDto.displayName)
+        assertThat(groupResponse.balance).isNull()
+    }
+
+    @Test
+    @Order(6)
+    fun `delete group and than get groups should return 404`() {
+        webTestClient.delete()
+            .uri("/api/v1/groups/$groupId/delete")
+            .header("Authorization", "Bearer $zeeToken")
+            .exchange()
+            .expectStatus().isOk
+        webTestClient.get()
+            .uri("/api/v1/groups/$groupId")
+            .header("Authorization", "Bearer $zeeToken")
+            .exchange()
+            .expectStatus().isNotFound
     }
 }

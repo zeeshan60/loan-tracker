@@ -1,9 +1,14 @@
 package com.zeenom.loan_tracker.groups
 
+import com.zeenom.loan_tracker.common.MessageResponse
 import io.swagger.v3.oas.annotations.Operation
 import org.slf4j.LoggerFactory
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -21,7 +26,59 @@ class GroupsController(val groupsService: GroupsService) {
         @RequestBody request: GroupCreateRequest,
         @AuthenticationPrincipal userId: UUID
     ): GroupResponse {
-        return groupsService.createGroup(request, userId)
+        val groupId = groupsService.createGroup(request, userId)
+        return groupsService.getGroupResponseById(groupId)
     }
 
+    @Operation(summary = "Get group by ID", description = "Returns a group by its ID")
+    @GetMapping("/{groupId}")
+    suspend fun getGroupById(
+        @PathVariable groupId: UUID,
+        @AuthenticationPrincipal userId: UUID
+    ): GroupResponse {
+        return groupsService.getGroupResponseById(groupId)
+    }
+
+    @Operation(summary = "Update a existing group", description = "Updates a existing group")
+    @PutMapping("/{groupId}/update")
+    suspend fun updateGroup(
+        @PathVariable groupId: UUID,
+        @RequestBody request: GroupCreateRequest,
+        @AuthenticationPrincipal userId: UUID
+    ): GroupResponse {
+        groupsService.updateGroup(groupId = groupId, request = request, userId = userId)
+        return groupsService.getGroupResponseById(groupId)
+    }
+
+    @Operation(summary = "Add members to a group", description = "Adds members to an existing group")
+    @PutMapping("/{groupId}/addMembers")
+    suspend fun addMembers(
+        @PathVariable groupId: UUID,
+        @RequestBody request: GroupAddMembersRequest,
+        @AuthenticationPrincipal userId: UUID
+    ): GroupResponse {
+        groupsService.addMembers(groupId = groupId, request = request, userId = userId)
+        return groupsService.getGroupResponseById(groupId)
+    }
+
+    @Operation(summary = "Remove members from a group", description = "Removes members from an existing group")
+    @PutMapping("/{groupId}/removeMembers")
+    suspend fun removeMembers(
+        @PathVariable groupId: UUID,
+        @RequestBody request: GroupRemoveMembersRequest,
+        @AuthenticationPrincipal userId: UUID
+    ): GroupResponse {
+        groupsService.removeMembers(groupId = groupId, request = request, userId = userId)
+        return groupsService.getGroupResponseById(groupId)
+    }
+
+    @Operation(summary = "Delete a group", description = "Deletes an existing group")
+    @DeleteMapping("/{groupId}/delete")
+    suspend fun deleteGroup(
+        @PathVariable groupId: UUID,
+        @AuthenticationPrincipal userId: UUID
+    ): MessageResponse {
+        groupsService.deleteGroup(groupId = groupId, userId = userId)
+        return MessageResponse("Group with ID $groupId deleted successfully")
+    }
 }

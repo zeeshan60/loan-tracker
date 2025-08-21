@@ -1,8 +1,9 @@
 CREATE TABLE group_events
 (
     id           UUID PRIMARY KEY DEFAULT uuid_generate_v1(),
-    name         VARCHAR(255) NOT NULL,
+    name         VARCHAR(255),
     description  VARCHAR,
+    member_ids   jsonb,
     event_type   VARCHAR(255) NOT NULL,
     created_at   TIMESTAMP    NOT NULL,
     created_by   UUID         NOT NULL,
@@ -13,13 +14,14 @@ CREATE TABLE group_events
 
 CREATE INDEX idx_group_events_created_at ON group_events (created_at);
 CREATE INDEX idx_group_events_insert_order ON group_events (insert_order);
-CREATE UNIQUE INDEX idx_group_events_version_userid ON group_events (stream_id, version);
+CREATE UNIQUE INDEX idx_group_events_stream_id_version ON group_events (stream_id, version);
 
 CREATE TABLE group_model
 (
     id           UUID PRIMARY KEY DEFAULT uuid_generate_v1(),
     name         VARCHAR(255) NOT NULL,
     description  VARCHAR,
+    member_ids   jsonb,
     stream_id    UUID UNIQUE  NOT NULL,
     version      INT          NOT NULL,
     deleted      BOOLEAN          DEFAULT FALSE,
