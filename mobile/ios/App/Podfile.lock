@@ -9,20 +9,22 @@ PODS:
     - GoogleUtilities/Environment (~> 8.0)
     - GoogleUtilities/UserDefaults (~> 8.0)
     - PromisesObjC (~> 2.4)
-  - Capacitor (7.4.0):
+  - Capacitor (7.4.3):
     - CapacitorCordova
-  - CapacitorApp (7.0.1):
+  - CapacitorApp (7.0.2):
+    - Capacitor
+  - CapacitorCamera (7.0.2):
     - Capacitor
   - CapacitorCommunityContacts (6.1.1):
     - Capacitor
-  - CapacitorCordova (7.4.0)
-  - CapacitorHaptics (7.0.1):
+  - CapacitorCordova (7.4.3)
+  - CapacitorHaptics (7.0.2):
     - Capacitor
-  - CapacitorKeyboard (7.0.1):
+  - CapacitorKeyboard (7.0.2):
     - Capacitor
-  - CapacitorSplashScreen (7.0.1):
+  - CapacitorSplashScreen (7.0.2):
     - Capacitor
-  - CapacitorStatusBar (7.0.1):
+  - CapacitorStatusBar (7.0.2):
     - Capacitor
   - FirebaseAppCheckInterop (11.10.0)
   - FirebaseAuth (11.10.0):
@@ -85,15 +87,16 @@ PODS:
     - GoogleSignIn
 
 DEPENDENCIES:
-  - "Capacitor (from `../../node_modules/.pnpm/@capacitor+ios@7.4.0_@capacitor+core@7.4.0/node_modules/@capacitor/ios`)"
-  - "CapacitorApp (from `../../node_modules/.pnpm/@capacitor+app@7.0.1_@capacitor+core@7.4.0/node_modules/@capacitor/app`)"
-  - "CapacitorCommunityContacts (from `../../node_modules/.pnpm/@capacitor-community+contacts@6.1.1_@capacitor+core@7.4.0/node_modules/@capacitor-community/contacts`)"
-  - "CapacitorCordova (from `../../node_modules/.pnpm/@capacitor+ios@7.4.0_@capacitor+core@7.4.0/node_modules/@capacitor/ios`)"
-  - "CapacitorHaptics (from `../../node_modules/.pnpm/@capacitor+haptics@7.0.1_@capacitor+core@7.4.0/node_modules/@capacitor/haptics`)"
-  - "CapacitorKeyboard (from `../../node_modules/.pnpm/@capacitor+keyboard@7.0.1_@capacitor+core@7.4.0/node_modules/@capacitor/keyboard`)"
-  - "CapacitorSplashScreen (from `../../node_modules/.pnpm/@capacitor+splash-screen@7.0.1_@capacitor+core@7.4.0/node_modules/@capacitor/splash-screen`)"
-  - "CapacitorStatusBar (from `../../node_modules/.pnpm/@capacitor+status-bar@7.0.1_@capacitor+core@7.4.0/node_modules/@capacitor/status-bar`)"
-  - "ZeenomCapacitorSocialLogin (from `../../node_modules/.pnpm/zeenom-capacitor-social-login@0.0.6_@capacitor+core@7.4.0/node_modules/zeenom-capacitor-social-login`)"
+  - "Capacitor (from `../../node_modules/.pnpm/@capacitor+ios@7.4.3_@capacitor+core@7.4.3/node_modules/@capacitor/ios`)"
+  - "CapacitorApp (from `../../node_modules/.pnpm/@capacitor+app@7.0.2_@capacitor+core@7.4.3/node_modules/@capacitor/app`)"
+  - "CapacitorCamera (from `../../node_modules/.pnpm/@capacitor+camera@7.0.2_@capacitor+core@7.4.3/node_modules/@capacitor/camera`)"
+  - "CapacitorCommunityContacts (from `../../node_modules/.pnpm/@capacitor-community+contacts@6.1.1_@capacitor+core@7.4.3/node_modules/@capacitor-community/contacts`)"
+  - "CapacitorCordova (from `../../node_modules/.pnpm/@capacitor+ios@7.4.3_@capacitor+core@7.4.3/node_modules/@capacitor/ios`)"
+  - "CapacitorHaptics (from `../../node_modules/.pnpm/@capacitor+haptics@7.0.2_@capacitor+core@7.4.3/node_modules/@capacitor/haptics`)"
+  - "CapacitorKeyboard (from `../../node_modules/.pnpm/@capacitor+keyboard@7.0.2_@capacitor+core@7.4.3/node_modules/@capacitor/keyboard`)"
+  - "CapacitorSplashScreen (from `../../node_modules/.pnpm/@capacitor+splash-screen@7.0.2_@capacitor+core@7.4.3/node_modules/@capacitor/splash-screen`)"
+  - "CapacitorStatusBar (from `../../node_modules/.pnpm/@capacitor+status-bar@7.0.2_@capacitor+core@7.4.3/node_modules/@capacitor/status-bar`)"
+  - "ZeenomCapacitorSocialLogin (from `../../node_modules/.pnpm/zeenom-capacitor-social-login@0.0.6_@capacitor+core@7.4.3/node_modules/zeenom-capacitor-social-login`)"
 
 SPEC REPOS:
   trunk:
@@ -114,35 +117,38 @@ SPEC REPOS:
 
 EXTERNAL SOURCES:
   Capacitor:
-    :path: "../../node_modules/.pnpm/@capacitor+ios@7.4.0_@capacitor+core@7.4.0/node_modules/@capacitor/ios"
+    :path: "../../node_modules/.pnpm/@capacitor+ios@7.4.3_@capacitor+core@7.4.3/node_modules/@capacitor/ios"
   CapacitorApp:
-    :path: "../../node_modules/.pnpm/@capacitor+app@7.0.1_@capacitor+core@7.4.0/node_modules/@capacitor/app"
+    :path: "../../node_modules/.pnpm/@capacitor+app@7.0.2_@capacitor+core@7.4.3/node_modules/@capacitor/app"
+  CapacitorCamera:
+    :path: "../../node_modules/.pnpm/@capacitor+camera@7.0.2_@capacitor+core@7.4.3/node_modules/@capacitor/camera"
   CapacitorCommunityContacts:
-    :path: "../../node_modules/.pnpm/@capacitor-community+contacts@6.1.1_@capacitor+core@7.4.0/node_modules/@capacitor-community/contacts"
+    :path: "../../node_modules/.pnpm/@capacitor-community+contacts@6.1.1_@capacitor+core@7.4.3/node_modules/@capacitor-community/contacts"
   CapacitorCordova:
-    :path: "../../node_modules/.pnpm/@capacitor+ios@7.4.0_@capacitor+core@7.4.0/node_modules/@capacitor/ios"
+    :path: "../../node_modules/.pnpm/@capacitor+ios@7.4.3_@capacitor+core@7.4.3/node_modules/@capacitor/ios"
   CapacitorHaptics:
-    :path: "../../node_modules/.pnpm/@capacitor+haptics@7.0.1_@capacitor+core@7.4.0/node_modules/@capacitor/haptics"
+    :path: "../../node_modules/.pnpm/@capacitor+haptics@7.0.2_@capacitor+core@7.4.3/node_modules/@capacitor/haptics"
   CapacitorKeyboard:
-    :path: "../../node_modules/.pnpm/@capacitor+keyboard@7.0.1_@capacitor+core@7.4.0/node_modules/@capacitor/keyboard"
+    :path: "../../node_modules/.pnpm/@capacitor+keyboard@7.0.2_@capacitor+core@7.4.3/node_modules/@capacitor/keyboard"
   CapacitorSplashScreen:
-    :path: "../../node_modules/.pnpm/@capacitor+splash-screen@7.0.1_@capacitor+core@7.4.0/node_modules/@capacitor/splash-screen"
+    :path: "../../node_modules/.pnpm/@capacitor+splash-screen@7.0.2_@capacitor+core@7.4.3/node_modules/@capacitor/splash-screen"
   CapacitorStatusBar:
-    :path: "../../node_modules/.pnpm/@capacitor+status-bar@7.0.1_@capacitor+core@7.4.0/node_modules/@capacitor/status-bar"
+    :path: "../../node_modules/.pnpm/@capacitor+status-bar@7.0.2_@capacitor+core@7.4.3/node_modules/@capacitor/status-bar"
   ZeenomCapacitorSocialLogin:
-    :path: "../../node_modules/.pnpm/zeenom-capacitor-social-login@0.0.6_@capacitor+core@7.4.0/node_modules/zeenom-capacitor-social-login"
+    :path: "../../node_modules/.pnpm/zeenom-capacitor-social-login@0.0.6_@capacitor+core@7.4.3/node_modules/zeenom-capacitor-social-login"
 
 SPEC CHECKSUMS:
   AppAuth: d4f13a8fe0baf391b2108511793e4b479691fb73
   AppCheckCore: cc8fd0a3a230ddd401f326489c99990b013f0c4f
-  Capacitor: 10feab36396883c55373328124a677f118cd4b5f
-  CapacitorApp: febecbb9582cb353aed037e18ec765141f880fe9
+  Capacitor: 28d6c01026a9a3f7156529498ec1f389a2a28dbc
+  CapacitorApp: 1f6922c9c5c8b1c538d7fbe92ebe44a81b34bed3
+  CapacitorCamera: f9e54db0a18bb218a8dc360907d63aaefe9209ff
   CapacitorCommunityContacts: 9cde99c2cd212f6594677aae542436e2174c4ef2
-  CapacitorCordova: 723e017d8a80ab2ede9959fbe37556c35ac860d5
-  CapacitorHaptics: 1f1e17041f435d8ead9ff2a34edd592c6aa6a8d6
-  CapacitorKeyboard: 09fd91dcde4f8a37313e7f11bde553ad1ed52036
-  CapacitorSplashScreen: 1d67815a422a9b61539c94f283c08ed56667c0fc
-  CapacitorStatusBar: 6e7af040d8fc4dd655999819625cae9c2d74c36f
+  CapacitorCordova: 435121e81a2df4d0034f0fb11fcefab5104cfdb5
+  CapacitorHaptics: b3fb2869e72c4466e18ce9ccbeb60a3d8723b3d4
+  CapacitorKeyboard: a86aa9e4741b6444a802df26440a92ae041b34a6
+  CapacitorSplashScreen: 157947576b59d913792063a8d442a79e6d283ee5
+  CapacitorStatusBar: e04d05e121d5a5979c29eb4249186a4e4a84cacb
   FirebaseAppCheckInterop: 9664c858489710f682766ef54e2b6741d3b62070
   FirebaseAuth: c4146bdfdc87329f9962babd24dae89373f49a32
   FirebaseAuthInterop: 01a804fb074424fd58b92dd50dd0272277199356
@@ -157,6 +163,6 @@ SPEC CHECKSUMS:
   RecaptchaInterop: 11e0b637842dfb48308d242afc3f448062325aba
   ZeenomCapacitorSocialLogin: 8f1320eb9030bc6e7022c81987435536b5e09f34
 
-PODFILE CHECKSUM: 025f281ea4e25d34f06c6aeec4a583e736effbd0
+PODFILE CHECKSUM: 5734e2a8c855d9b8f797b661af378d4d542a8431
 
 COCOAPODS: 1.16.2

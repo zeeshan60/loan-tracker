@@ -192,3 +192,12 @@ ion-alert.danger-alert {
 .alert-button.alert-button-role-confirm.danger {
   color: var(--ion-color-danger);
 }
+
+.md {
+  ion-header {
+    padding-top: 24px;
+  }
+  ion-tab-bar {
+    padding-bottom: 24px;
+  }
+}
