@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { IonApp, IonRouterOutlet, Platform } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -32,6 +32,9 @@ import { AuthStore } from './login/auth.store';
 import { StorageService } from './services/storage.service';
 import { Capacitor } from '@capacitor/core';
 import { StatusBar } from '@capacitor/status-bar';
+import { SafeArea } from 'capacitor-plugin-safe-area';
+import { JsonPipe } from '@angular/common';
+import { isAndroid, platform } from './utils';
 
 @Component({
   selector: 'mr-root',
@@ -40,7 +43,8 @@ import { StatusBar } from '@capacitor/status-bar';
   imports: [
     IonApp,
     IonRouterOutlet,
-    IonicStorageModule
+    IonicStorageModule,
+    JsonPipe
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -49,6 +53,7 @@ export class AppComponent implements OnInit {
   readonly storageService = inject(StorageService);
   readonly friendsStore = inject(FriendsStore);
   readonly platform = inject(Platform);
+  insets = signal({});
 
   constructor() {
     addIcons({
@@ -85,6 +90,11 @@ export class AppComponent implements OnInit {
 
     await this.platform.ready();
 
+    if (isAndroid) {
+      await this.setSafeAreaInsects();
+      this.handleSafeAreaChanges();
+    }
+
     // ✅ Prevent header overlap with status bar
     // await StatusBar.setOverlaysWebView({ overlay: false });
     // await StatusBar.setBackgroundColor({ color: '#00000000' });
@@ -103,6 +113,25 @@ export class AppComponent implements OnInit {
       if(this.authStore.apiKey()) {
         await this.friendsStore.loadFriends()
       }
+    });
+  }
+
+  private async setSafeAreaInsects() {
+    try {
+      const { insets } = await SafeArea.getSafeAreaInsets();
+      document.documentElement.style.setProperty('--ion-safe-area-top', `${insets.top}px`);
+      document.documentElement.style.setProperty('--ion-safe-area-right', `${insets.right}px`);
+      document.documentElement.style.setProperty('--ion-safe-area-bottom', `${insets.bottom}px`);
+      document.documentElement.style.setProperty('--ion-safe-area-left', `${insets.left}px`);
+    } catch (e) {
+      console.error('Error getting safe area insets:', e);
+    }
+  }
+
+  private handleSafeAreaChanges() {
+    SafeArea.addListener('safeAreaChanged', ({ insets }) => {
+      document.documentElement.style.setProperty('--ion-safe-area-top', `${insets.top}px`);
+      document.documentElement.style.setProperty('--ion-safe-area-bottom', `${insets.bottom}px`);
     });
   }
 }
