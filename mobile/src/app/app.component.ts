@@ -30,8 +30,6 @@ import { FriendsStore } from './friends/friends.store';
 import { IonicStorageModule } from '@ionic/storage-angular';
 import { AuthStore } from './login/auth.store';
 import { StorageService } from './services/storage.service';
-import { Capacitor } from '@capacitor/core';
-import { StatusBar } from '@capacitor/status-bar';
 import { SafeArea } from 'capacitor-plugin-safe-area';
 import { JsonPipe } from '@angular/common';
 import { isAndroid, platform } from './utils';
