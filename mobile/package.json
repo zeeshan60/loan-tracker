@@ -27,7 +27,6 @@
     "@capacitor-community/contacts": "^7.0.0",
     "@capacitor/android": "latest",
     "@capacitor/app": "latest",
-    "@capacitor/camera": "latest",
     "@capacitor/core": "latest",
     "@capacitor/haptics": "latest",
     "@capacitor/ios": "latest",

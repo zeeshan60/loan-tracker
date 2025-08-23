@@ -13,8 +13,6 @@ PODS:
     - CapacitorCordova
   - CapacitorApp (7.0.1):
     - Capacitor
-  - CapacitorCamera (7.0.2):
-    - Capacitor
   - CapacitorCommunityContacts (7.0.0):
     - Capacitor
   - CapacitorCordova (7.3.0)
@@ -25,8 +23,6 @@ PODS:
   - CapacitorPluginSafeArea (4.0.0):
     - Capacitor
   - CapacitorSplashScreen (7.0.1):
-    - Capacitor
-  - CapacitorStatusBar (7.0.1):
     - Capacitor
   - FirebaseAppCheckInterop (11.10.0)
   - FirebaseAuth (11.10.0):
@@ -91,14 +87,12 @@ PODS:
 DEPENDENCIES:
   - "Capacitor (from `../../node_modules/@capacitor/ios`)"
   - "CapacitorApp (from `../../node_modules/@capacitor/app`)"
-  - "CapacitorCamera (from `../../node_modules/@capacitor/camera`)"
   - "CapacitorCommunityContacts (from `../../node_modules/@capacitor-community/contacts`)"
   - "CapacitorCordova (from `../../node_modules/@capacitor/ios`)"
   - "CapacitorHaptics (from `../../node_modules/@capacitor/haptics`)"
   - "CapacitorKeyboard (from `../../node_modules/@capacitor/keyboard`)"
   - CapacitorPluginSafeArea (from `../../node_modules/capacitor-plugin-safe-area`)
   - "CapacitorSplashScreen (from `../../node_modules/@capacitor/splash-screen`)"
-  - "CapacitorStatusBar (from `../../node_modules/@capacitor/status-bar`)"
   - ZeenomCapacitorSocialLogin (from `../../node_modules/zeenom-capacitor-social-login`)
 
 SPEC REPOS:
@@ -123,8 +117,6 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor/ios"
   CapacitorApp:
     :path: "../../node_modules/@capacitor/app"
-  CapacitorCamera:
-    :path: "../../node_modules/@capacitor/camera"
   CapacitorCommunityContacts:
     :path: "../../node_modules/@capacitor-community/contacts"
   CapacitorCordova:
@@ -137,8 +129,6 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/capacitor-plugin-safe-area"
   CapacitorSplashScreen:
     :path: "../../node_modules/@capacitor/splash-screen"
-  CapacitorStatusBar:
-    :path: "../../node_modules/@capacitor/status-bar"
   ZeenomCapacitorSocialLogin:
     :path: "../../node_modules/zeenom-capacitor-social-login"
 
@@ -147,14 +137,12 @@ SPEC CHECKSUMS:
   AppCheckCore: cc8fd0a3a230ddd401f326489c99990b013f0c4f
   Capacitor: 8585c18a230122906e114ba5f6325ec65ee1371f
   CapacitorApp: febecbb9582cb353aed037e18ec765141f880fe9
-  CapacitorCamera: f9e54db0a18bb218a8dc360907d63aaefe9209ff
   CapacitorCommunityContacts: aaa9f95f2da72b5de15d5fa935d736d07c644db2
   CapacitorCordova: 2685f5c43675793b5f06dfd66b3b26268f003b97
   CapacitorHaptics: 1f1e17041f435d8ead9ff2a34edd592c6aa6a8d6
   CapacitorKeyboard: 09fd91dcde4f8a37313e7f11bde553ad1ed52036
   CapacitorPluginSafeArea: 22031c3436269ca80fac90ec2c94bc7c1e59a81d
   CapacitorSplashScreen: 1d67815a422a9b61539c94f283c08ed56667c0fc
-  CapacitorStatusBar: 6e7af040d8fc4dd655999819625cae9c2d74c36f
   FirebaseAppCheckInterop: 9664c858489710f682766ef54e2b6741d3b62070
   FirebaseAuth: c4146bdfdc87329f9962babd24dae89373f49a32
   FirebaseAuthInterop: 01a804fb074424fd58b92dd50dd0272277199356
@@ -169,6 +157,6 @@ SPEC CHECKSUMS:
   RecaptchaInterop: 11e0b637842dfb48308d242afc3f448062325aba
   ZeenomCapacitorSocialLogin: 8f1320eb9030bc6e7022c81987435536b5e09f34
 
-PODFILE CHECKSUM: 3d8f45b89553a882cffbf7cff1980eec195fec72
+PODFILE CHECKSUM: 9e44fb2cda6d153c80fc5adba32b1b3662ff3149
 
 COCOAPODS: 1.16.2
