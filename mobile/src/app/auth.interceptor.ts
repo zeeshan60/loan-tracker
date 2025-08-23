@@ -22,7 +22,7 @@ import {
   timer,
 } from 'rxjs';
 import { AuthStore, IS_PUBLIC_API } from './login/auth.store';
-import { DEFAULT_TOAST_DURATION } from './constants';
+import { DEFAULT_TOAST_DURATION, PUBLIC_API } from './constants';
 import { ToastController } from '@ionic/angular/standalone';
 import { HelperService } from './helper.service';
 
@@ -49,17 +49,6 @@ export class AuthInterceptor implements HttpInterceptor {
      */
     return reqHandler
       .pipe(
-        mergeMap((response: any) => {
-          // if (response.url?.endsWith('/friends')) {
-          //   return throwError(() => new HttpErrorResponse({
-          //     error: 'Unauthorized',
-          //     status: 401,
-          //     statusText: 'Unauthorized',
-          //     url: 'abc/url'
-          //   }))
-          // }
-          return of(response);
-        }),
         retry({
           count: 2,
           delay: (error) => {
@@ -75,7 +64,11 @@ export class AuthInterceptor implements HttpInterceptor {
           }
         }),
         catchError((error: HttpErrorResponse) => {
-          if (error.status === HttpStatusCode.Unauthorized) {
+          if (
+            // sometimes status is 0 so we need to logout. todo: later figure out why 0
+            (!error.status && error.url.includes(PUBLIC_API))
+            || error.status === HttpStatusCode.Unauthorized
+          ) {
             if (!this.isUnauthorizedHandlingInProgress) {
               this.isUnauthorizedHandlingInProgress = true; // Set flag to prevent re-entry
               this.authStore.signOut();
