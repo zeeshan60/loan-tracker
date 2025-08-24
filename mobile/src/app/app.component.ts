@@ -93,10 +93,6 @@ export class AppComponent implements OnInit {
       this.handleSafeAreaChanges();
     }
 
-    // ✅ Prevent header overlap with status bar
-    // await StatusBar.setOverlaysWebView({ overlay: false });
-    // await StatusBar.setBackgroundColor({ color: '#00000000' });
-
     this.storageService.storageReady$.subscribe(async () => {
       await Promise.all([
         this.authStore.setApiKey(),
