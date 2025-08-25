@@ -33,9 +33,9 @@ interface SyncableEventHandler<M : SyncableModel, E : IEventAble<M>> {
     fun eventRepository(): SyncableEventRepository<E>
 
     /**
-     * Synchronize the user model with the user events.
-     * This method is called to ensure that the user model is up-to-date with the latest user events.
-     * It can be used to handle any discrepancies between the user model and the user events.
+     * Synchronize the model with the events.
+     * This method is called to ensure that the model is up-to-date with the latest events.
+     * It can be used to handle any discrepancies between the model and the events.
      *
      * NOTE: This method assumes number of events are small since it loads all un-synchronized events into memory.
      *      like less than 1000. Otherwise, please use migration script to form models rather than this method.
@@ -45,7 +45,7 @@ interface SyncableEventHandler<M : SyncableModel, E : IEventAble<M>> {
         val eventRepository = eventRepository()
         val latestModel = modelRepository.findFirstSortByIdDescending()
         if (latestModel == null) {
-            logger.warn("No user model found, skipping synchronization")
+            logger.warn("No model found, skipping synchronization")
         }
         val eventsAfter = (latestModel?.let {
             eventRepository.findAllSinceStreamIdAndVersion(
@@ -56,7 +56,7 @@ interface SyncableEventHandler<M : SyncableModel, E : IEventAble<M>> {
             .map { it.toEvent() }
         if (eventsAfter.isEmpty()) {
             logger.debug(
-                "No new events found after user model with stream id {} and version {}",
+                "No new events found after model with stream id {} and version {}",
                 latestModel?.streamId,
                 latestModel?.version
             )
@@ -75,7 +75,7 @@ interface SyncableEventHandler<M : SyncableModel, E : IEventAble<M>> {
                     event.applyEvent(model)
                 }
             } ?: run {
-                logger.warn("No user model found for stream id ${entry.key}, this should not have happened")
+                logger.warn("No model found for stream id ${entry.key}, this should not have happened")
                 null
             }
         }
@@ -83,7 +83,7 @@ interface SyncableEventHandler<M : SyncableModel, E : IEventAble<M>> {
     }
     suspend fun rehydrateModels() {
         modelRepository().deleteAll()
-        logger.info("Rehydrating user models from events")
+        logger.info("Rehydrating models from events")
         synchronize()
         logger.info("Rehydration complete")
     }
