@@ -31,17 +31,13 @@ data class TransactionDto(
     val deleted: Boolean = false,
     val history: List<ChangeSummaryDto> = emptyList(),
     val groupId: UUID?,
+    val groupAmountSplit: GroupAmountSplit?
 ) : CommandPayloadDto
 
 data class AmountDto(
     val amount: BigDecimal,
     val currency: Currency,
     val isOwed: Boolean
-)
-
-data class TimedAmountDto(
-    val amountDto: AmountDto,
-    val lastUpdated: Instant,
 )
 
 data class ChangeSummaryDto(

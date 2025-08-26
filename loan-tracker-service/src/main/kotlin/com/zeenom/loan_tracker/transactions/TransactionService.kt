@@ -34,29 +34,59 @@ class TransactionService(
             recipientId = transactionDto.friendSummaryDto.friendId
                 ?: throw IllegalArgumentException("Recipient id is required to add new transaction")
         )
-        val event = TransactionCreated(
-            id = null,
-            userId = userUid,
-            recipientId = transactionDto.friendSummaryDto.friendId,
-            description = transactionDto.description,
-            transactionDate = transactionDto.transactionDate,
-            currency = transactionDto.currency.toString(),
-            splitType = transactionDto.splitType,
-            totalAmount = transactionDto.originalAmount,
-            createdAt = Instant.now(),
-            createdBy = userUid,
-            streamId = transactionDto.transactionStreamId,
-            version = 1,
-            groupId = transactionDto.groupId,
-        )
-        transactionEventHandler.addEvent(event)
-        addDefaultCurrencyIfNotSet(existingUser, userUid, transactionDto.currency)
-        if (friendUser != null && userStreamId != null) transactionEventHandler.addEvent(
-            event.crossTransaction(
-                friendUser.uid ?: throw IllegalArgumentException("Friend user not found"),
-                userStreamId
+        if (transactionDto.groupId == null) {
+            val event = TransactionCreated(
+                id = null,
+                userId = userUid,
+                recipientId = transactionDto.friendSummaryDto.friendId,
+                description = transactionDto.description,
+                transactionDate = transactionDto.transactionDate,
+                currency = transactionDto.currency.toString(),
+                splitType = transactionDto.splitType,
+                totalAmount = transactionDto.originalAmount,
+                createdAt = Instant.now(),
+                createdBy = userUid,
+                streamId = transactionDto.transactionStreamId,
+                version = 1,
+                groupId = null,
             )
-        )
+            transactionEventHandler.addEvent(event)
+            addDefaultCurrencyIfNotSet(existingUser, userUid, transactionDto.currency)
+            if (friendUser != null && userStreamId != null) transactionEventHandler.addEvent(
+                event.crossTransaction(
+                    friendUser.uid ?: throw IllegalArgumentException("Friend user not found"),
+                    userStreamId
+                )
+            )
+        } else {
+            requireNotNull(transactionDto.groupAmountSplit) { "Group amount split is required for group transactions" }
+
+            transactionDto.groupAmountSplit.userAmounts.forEach {userAmount ->
+                val event = TransactionCreated(
+                    id = null,
+                    userId = userUid,
+                    recipientId = userAmount.userId,
+                    description = transactionDto.description,
+                    transactionDate = transactionDto.transactionDate,
+                    currency = transactionDto.currency.toString(),
+                    splitType = SplitType.SpecificAmounts,
+                    totalAmount = transactionDto.originalAmount,
+                    createdAt = Instant.now(),
+                    createdBy = userUid,
+                    streamId = transactionDto.transactionStreamId,
+                    version = 1,
+                    groupId = transactionDto.groupId,
+                )
+                transactionEventHandler.addEvent(event)
+                addDefaultCurrencyIfNotSet(existingUser, userUid, transactionDto.currency)
+                if (friendUser != null && userStreamId != null) transactionEventHandler.addEvent(
+                    event.crossTransaction(
+                        friendUser.uid ?: throw IllegalArgumentException("Friend user not found"),
+                        userStreamId
+                    )
+                )
+            }
+        }
     }
 
     /**
@@ -389,6 +419,7 @@ class TransactionService(
             transactionDate = transactionDate,
             defaultCurrency = baseCurrency,
             groupId = groupId,
+            groupAmountSplit = null, // TODO implement group amount split
             amountInDefaultCurrency = allTimeBalanceStrategy.convertCurrency(
                 amount = totalAmount,
                 currentCurrency = currency,

@@ -25,8 +25,9 @@ data class TransactionCreated(
     override val recipientId: UUID,
     val description: String,
     val currency: String,
-    val splitType: SplitType,
+    val splitType: SplitType?,
     val totalAmount: BigDecimal,
+    val amount: AmountDto? = null, //TODO remove null
     val transactionDate: Instant,
     override val groupId: UUID?,
     override val createdAt: Instant,

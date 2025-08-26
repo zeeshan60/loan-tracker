@@ -210,7 +210,7 @@ class TransactionsController(
             ),
             defaultCurrency = null,
             amountInDefaultCurrency = null,
-            groupId = transactionRequest.groupId,
+            groupId = if (transactionRequest is TransactionCreateRequest) transactionRequest.groupId else null
         )
 }
 
@@ -221,7 +221,7 @@ interface TransactionBaseRequest {
     val currency: String
     val type: SplitType
     val description: String
-    val groupId: UUID?
+    val groupAmountSplit: GroupAmountSplit?
 }
 
 data class TransactionCreateRequest(
@@ -229,9 +229,10 @@ data class TransactionCreateRequest(
     override val amount: BigDecimal,
     override val currency: String,
     override val type: SplitType,
-    override val groupId: UUID?,
     val recipientId: UUID?,
     override val description: String,
+    val groupId: UUID?,
+    override val groupAmountSplit: GroupAmountSplit?
 ) : TransactionBaseRequest
 
 data class TransactionUpdateRequest(
@@ -240,8 +241,18 @@ data class TransactionUpdateRequest(
     override val currency: String,
     override val type: SplitType,
     override val description: String,
-    override val groupId: UUID?
+    override val groupAmountSplit: GroupAmountSplit?
 ) : TransactionBaseRequest
+
+data class GroupAmountSplit(
+    val userAmounts: List<UserAmount>
+)
+
+data class UserAmount(
+    val userId: UUID,
+    val paidAmount: BigDecimal,
+    val owedAmount: BigDecimal,
+)
 
 enum class SplitType {
     YouPaidSplitEqually,
@@ -249,7 +260,8 @@ enum class SplitType {
     TheyOweYouAll,
     YouOweThemAll,
     TheyPaidToSettle,
-    YouPaidToSettle
+    YouPaidToSettle,
+    SpecificAmounts
 }
 
 data class TransactionsResponse(
