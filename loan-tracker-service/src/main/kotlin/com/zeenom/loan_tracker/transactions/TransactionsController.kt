@@ -210,7 +210,8 @@ class TransactionsController(
             ),
             defaultCurrency = null,
             amountInDefaultCurrency = null,
-            groupId = if (transactionRequest is TransactionCreateRequest) transactionRequest.groupId else null
+            groupId = if (transactionRequest is TransactionCreateRequest) transactionRequest.groupId else null,
+            groupAmountSplit = null
         )
 }
 

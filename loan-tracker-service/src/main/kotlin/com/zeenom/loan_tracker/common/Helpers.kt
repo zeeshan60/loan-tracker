@@ -143,6 +143,7 @@ fun SplitType.reverse(): SplitType {
         SplitType.TheyPaidSplitEqually -> SplitType.YouPaidSplitEqually
         SplitType.TheyPaidToSettle -> SplitType.YouPaidToSettle
         SplitType.YouPaidToSettle -> SplitType.TheyPaidToSettle
+        SplitType.SpecificAmounts -> TODO()
     }
 }
 
@@ -154,6 +155,7 @@ fun SplitType.apply(amount: BigDecimal): BigDecimal {
         SplitType.TheyPaidSplitEqually -> splitWithScaleOf1(amount)
         SplitType.TheyPaidToSettle -> amount
         SplitType.YouPaidToSettle -> amount
+        SplitType.SpecificAmounts -> TODO()
     }
 }
 
@@ -168,5 +170,6 @@ fun SplitType.isOwed(): Boolean {
         SplitType.TheyPaidSplitEqually -> false
         SplitType.TheyPaidToSettle -> false
         SplitType.YouPaidToSettle -> true
+        SplitType.SpecificAmounts -> TODO()
     }
 }

@@ -1,5 +1,7 @@
 package com.zeenom.loan_tracker.groups
 
+import com.fasterxml.jackson.core.type.TypeReference
+import com.zeenom.loan_tracker.common.Paginated
 import com.zeenom.loan_tracker.friends.FriendEventRepository
 import com.zeenom.loan_tracker.friends.FriendModelRepository
 import com.zeenom.loan_tracker.integration.BaseIntegration
@@ -11,7 +13,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Order
 import org.springframework.beans.factory.annotation.Autowired
-import java.util.UUID
+import java.util.*
 import kotlin.test.Test
 
 class GroupsControllerIntegrationTest : BaseIntegration() {
@@ -203,6 +205,30 @@ class GroupsControllerIntegrationTest : BaseIntegration() {
     }
 
     @Test
+    @Order(5)
+    fun `get groups should return the created group`() {
+        val groupsResponse = webTestClient.get()
+            .uri("/api/v1/groups")
+            .header("Authorization", "Bearer $zeeToken")
+            .exchange()
+            .expectStatus().isOk
+            .expectBody(String::class.java)
+            .returnResult().responseBody!!.let {
+                objectMapper.readValue(
+                    it,
+                    object : TypeReference<Paginated<GroupSummariesResponse>>() {})
+            }
+
+        assertThat(groupsResponse.data.groups).hasSize(1)
+        val groupResponse = groupsResponse.data.groups[0]
+        assertThat(groupResponse.id).isEqualTo(groupId)
+        assertThat(groupResponse.name).isEqualTo("Updated Test Group")
+        assertThat(groupResponse.description).isEqualTo("This is an updated test group")
+        assertThat(groupResponse.memberCount).isEqualTo(1)
+        assertThat(groupResponse.balance).isNull()
+    }
+
+    @Test
     @Order(6)
     fun `delete group and than get groups should return 404`() {
         webTestClient.delete()
@@ -215,5 +241,23 @@ class GroupsControllerIntegrationTest : BaseIntegration() {
             .header("Authorization", "Bearer $zeeToken")
             .exchange()
             .expectStatus().isNotFound
+    }
+
+    @Test
+    @Order(7)
+    fun `get groups should return no group after deletion`() {
+        val groupsResponse = webTestClient.get()
+            .uri("/api/v1/groups")
+            .header("Authorization", "Bearer $zeeToken")
+            .exchange()
+            .expectStatus().isOk
+            .expectBody(String::class.java)
+            .returnResult().responseBody!!.let {
+                objectMapper.readValue(
+                    it,
+                    object : TypeReference<Paginated<GroupSummariesResponse>>() {})
+            }
+
+        assertThat(groupsResponse.data.groups).hasSize(0)
     }
 }

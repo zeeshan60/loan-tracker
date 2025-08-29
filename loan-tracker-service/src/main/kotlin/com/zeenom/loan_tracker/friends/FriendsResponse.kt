@@ -16,6 +16,9 @@ data class FriendResponse(
     val settled: Boolean = false,
     val email: String?,
     val phone: String?,
+    @Deprecated("Should not use this property anymore, use balance.main instead")
     val mainBalance: AmountResponse?,
+    @Deprecated("Should not use this property anymore, use balance.other instead")
     val otherBalances: List<OtherBalanceResponse>,
+    val balance: BalanceResponse,
 )

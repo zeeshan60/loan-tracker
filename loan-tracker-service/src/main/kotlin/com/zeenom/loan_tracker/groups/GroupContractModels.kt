@@ -39,5 +39,5 @@ data class GroupSummaryResponse(
     val name: String,
     val description: String?,
     val memberCount: Int,
-    val balance: BalanceResponse
+    val balance: BalanceResponse?
 )

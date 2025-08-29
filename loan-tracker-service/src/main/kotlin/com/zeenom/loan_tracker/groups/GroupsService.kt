@@ -100,9 +100,16 @@ class GroupsService(private val eventHandler: GroupEventHandler, val userEventHa
         eventHandler.synchronize()
     }
 
-    suspend fun getGroupSummaries(): GroupSummariesResponse {
-        // Logic to fetch all group summaries
-        TODO("Implement fetching group summaries logic")
+    suspend fun getGroupSummaries(userId: UUID): GroupSummariesResponse {
+        return eventHandler.getAllModels(userId = userId).map { model ->
+            GroupSummaryResponse(
+                id = model.streamId,
+                name = model.name,
+                description = model.description,
+                memberCount = model.memberIds?.ids?.size ?: 0,
+                balance = null
+            )
+        }.let { GroupSummariesResponse(it) }
     }
 
     suspend fun updateGroup(groupId: UUID, request: GroupCreateRequest, userId: UUID) {

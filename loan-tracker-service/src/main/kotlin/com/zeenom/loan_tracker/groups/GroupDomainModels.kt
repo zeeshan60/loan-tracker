@@ -35,6 +35,7 @@ interface GroupModelRepository : CoroutineCrudRepository<GroupModel, UUID>, Sync
     override suspend fun findByStreamId(streamId: UUID): GroupModel?
     suspend fun findByStreamIdAndDeletedIsFalse(streamId: UUID): GroupModel?
     override fun saveAll(models: List<GroupModel>): Flow<GroupModel>
+    suspend fun findAllByDeletedIsFalse(): Flow<GroupModel>
 }
 
 enum class GroupEventType {

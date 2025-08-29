@@ -95,7 +95,8 @@ class TransactionsDeleteAllBugTest: BaseIntegration() {
                     recipientId = johnFriendId,
                     description = "Sample transaction",
                     transactionDate = Instant.parse("2025-02-26T00:00:00Z"),
-                    groupId = null
+                    groupId = null,
+                    groupAmountSplit = null
                 )
             )
             .exchange()

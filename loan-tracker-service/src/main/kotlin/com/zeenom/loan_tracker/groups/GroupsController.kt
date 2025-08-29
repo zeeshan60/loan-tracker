@@ -1,17 +1,12 @@
 package com.zeenom.loan_tracker.groups
 
 import com.zeenom.loan_tracker.common.MessageResponse
+import com.zeenom.loan_tracker.common.Paginated
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import org.slf4j.LoggerFactory
 import org.springframework.security.core.annotation.AuthenticationPrincipal
-import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.util.*
 
 @RestController
@@ -37,6 +32,19 @@ class GroupsController(val groupsService: GroupsService) {
         @AuthenticationPrincipal userId: UUID
     ): GroupResponse {
         return groupsService.getGroupResponseById(groupId)
+    }
+
+    @Operation(summary = "Get all groups")
+    @GetMapping
+    suspend fun getGroupsByUserId(
+        @Parameter(description = "Pagination token for the next set of results")
+        @RequestParam next: String? = null,
+        @AuthenticationPrincipal userId: UUID
+    ): Paginated<GroupSummariesResponse> {
+        return Paginated(
+            data = groupsService.getGroupSummaries(userId),
+            next = null
+        )
     }
 
     @Operation(summary = "Update a existing group", description = "Updates a existing group")
