@@ -214,7 +214,7 @@ export class DefineExpenseComponent extends ComponentDestroyedMixin() implements
         const updatedExpense = await this.friendsStore.addUpdateExpense(
           this.friend()!,
           this.defineExpenseForm.getRawValue(),
-          this.isUpdating() ? this.transaction() : undefined,
+          this.isUpdating() ? this.transaction().transactionId : undefined,
         );
         await this.helperService.showToast('Expense added successfully.');
         this.modalService.dismiss(this.modalIndex(), updatedExpense, 'confirm');

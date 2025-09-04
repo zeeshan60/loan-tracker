@@ -16,6 +16,8 @@ import { DefineExpenseComponent, SplitOptionsEnum } from '../../define-expense/d
 import { FriendsStore } from '../friends.store';
 import { HelperService } from '../../helper.service';
 import { ModalService } from '../../modal.service';
+import { isSettlement } from '../../utility-functions';
+import { SettleUpComponent } from '../friend-transactions/settle-up/settle-up.component';
 
 const historyChangeType = {
   [HistoryChangeTypeEnum.DESCRIPTION]: "description",
@@ -100,13 +102,23 @@ export class TransactionDetailsComponent {
   }
 
   async updateTransaction() {
-    this.modalService.showModal({
-      component: DefineExpenseComponent,
-      componentProps: {
-        friend: this.friend(),
-        isUpdating: true,
-        transaction: this.latestTransaction(),
-      }
-    })
+    if(isSettlement(this.latestTransaction())) {
+      this.modalService.showModal({
+        component: SettleUpComponent,
+        componentProps: {
+          friend: this.friend(),
+          transaction: this.latestTransaction(),
+        }
+      })
+    } else {
+      this.modalService.showModal({
+        component: DefineExpenseComponent,
+        componentProps: {
+          friend: this.friend(),
+          isUpdating: true,
+          transaction: this.latestTransaction(),
+        }
+      })
+    }
   }
 }

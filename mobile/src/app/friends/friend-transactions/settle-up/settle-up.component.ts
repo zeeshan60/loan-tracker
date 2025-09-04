@@ -9,7 +9,7 @@ import {
   IonIcon,
 } from '@ionic/angular/standalone';
 import { FriendsStore } from '../../friends.store';
-import { FriendWithBalance } from '../../model';
+import { FriendWithBalance, Transaction } from '../../model';
 import { ShortenNamePipe } from '../../../pipes/shorten-name.pipe';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { SplitOptionsEnum } from '../../../define-expense/define-expense.component';
@@ -51,10 +51,14 @@ export class SettleUpComponent implements OnInit {
   modalService = inject(ModalService);
   friendsStore = inject(FriendsStore);
   friend = input.required<FriendWithBalance>();
+  transaction = input<Transaction>();
   readonly loading = signal(false);
   readonly http = inject(HttpClient);
   readonly helperService = inject<HelperService>(HelperService);
   readonly formBuilder = inject(FormBuilder);
+  readonly isEditing = computed(() => {
+    return !!this.transaction();
+  })
   readonly otherBalances = computed(() => {
     const obj: { [key: string]: { isOwed: boolean, amount: number } } = {};
     this.friend().otherBalances?.forEach(({amount: balance}) => {
@@ -69,17 +73,30 @@ export class SettleUpComponent implements OnInit {
   });
 
   ngOnInit() {
+    console.log(this.transaction());
     this.settleUpForm.get('balance')?.valueChanges
       .pipe(
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe((balance) => {
-        this.settleUpForm.get('amount')?.setValue(this.otherBalances()[balance.currency].amount)
+        if (this.isEditing()) {
+          this.settleUpForm.get('amount')?.setValue(this.transaction().amount.amount)
+        } else {
+          this.settleUpForm.get('amount')?.setValue(this.otherBalances()[balance.currency].amount)
+        }
         this.settleUpForm.get('amount').clearValidators()
         this.settleUpForm.get('amount').addValidators([Validators.required, Validators.min(1), Validators.max(balance.amount)])
         this.settleUpForm.get('amount').updateValueAndValidity();
       });
-    this.settleUpForm.get('balance')?.setValue(this.friend().otherBalances?.[0]?.amount || { currency: 'PKR', isOwed: true, amount: 0})
+    if (this.isEditing()) {
+      const matchingBalance = this.friend().otherBalances.find(balance => balance.amount.currency === this.transaction().amount.currency);
+      if (matchingBalance) {
+        matchingBalance.amount.amount += this.transaction().amount.amount;
+        this.settleUpForm.get('balance')?.setValue(matchingBalance.amount)
+      }
+    } else {
+      this.settleUpForm.get('balance')?.setValue(this.friend().otherBalances?.[0]?.amount || { currency: 'PKR', isOwed: true, amount: 0})
+    }
   }
 
   async closePopup() {
@@ -94,7 +111,7 @@ export class SettleUpComponent implements OnInit {
     }
 
     const confirmation = await this.helperService.showConfirmAlert(
-      `You are going to settle up everything with ${this.friend().name}.`, 'Yes'
+      this.isEditing() ? `You are going to update the transaction` : `You are going to settle up with ${this.friend().name}.`, 'Yes'
     )
     if (confirmation.role == 'confirm') {
       const transaction = {
@@ -104,7 +121,11 @@ export class SettleUpComponent implements OnInit {
         transactionDate: (new Date()).toISOString(),
         description: 'settlement'
       }
-      await this.friendsStore.settleUp(this.friend(), transaction);
+      if (this.isEditing()) {
+        await this.friendsStore.addUpdateExpense(this.friend(), transaction, this.transaction().transactionId);
+      } else {
+        await this.friendsStore.settleUp(this.friend(), transaction);
+      }
       this.modalService.dismiss(this.modalIndex(), 'done', 'confirm');
     }
   }

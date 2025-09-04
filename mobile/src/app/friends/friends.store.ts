@@ -260,14 +260,14 @@ export const FriendsStore = signalStore(
     async addUpdateExpense(
       friend: FriendWithBalance,
       formValue: AddUpdateExpenseFormValue,
-      updatingTransaction?: Transaction,
+      transactionId?: string,
     ) {
       formValue.transactionDate = (new Date(formValue.transactionDate)).toISOString().split('.')[0] + 'Z';
       let transactionAddUpdateResponse;
       try {
-        if (updatingTransaction) {
+        if (transactionId) {
           transactionAddUpdateResponse = await firstValueFrom(
-            http.put<Transaction>(`${PRIVATE_API}/transactions/update/transactionId/${updatingTransaction.transactionId}`, {
+            http.put<Transaction>(`${PRIVATE_API}/transactions/update/transactionId/${transactionId}`, {
               ...formValue,
             })
           );
@@ -278,7 +278,7 @@ export const FriendsStore = signalStore(
           }));
         }
       } catch (e) {
-        await helperService.showToast('Unable to add/update expense at the moment');
+        await helperService.showToast(`Unable to ${transactionId ? 'update': 'add'} expense at the moment`);
         throw e;
       }
 

@@ -4,7 +4,7 @@
       <ion-icon name="close-outline" (click)="closePopup()"></ion-icon>
     </ion-buttons>
     <ion-title>
-      Settle up with {{this.friend().name | shortenName}}
+      {{(isEditing()? 'Update ': '')}}Settle up with {{this.friend().name | shortenName}}
     </ion-title>
   </ion-toolbar>
 </ion-header>
@@ -44,7 +44,14 @@
   </form>
 
   <ion-buttons class="btn-group">
-    <ion-button class="btn-ghost green" type="submit" form="settle-up-form" [strong]="true">Settle Now</ion-button>
+    <ion-button
+      class="btn-ghost green"
+      type="submit"
+      form="settle-up-form"
+      [strong]="true"
+    >
+      {{isEditing() ? 'Update Transaction' : 'Settle Now' }}
+    </ion-button>
   </ion-buttons>
 
 </ion-content>

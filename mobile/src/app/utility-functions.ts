@@ -1,4 +1,5 @@
 import parsePhoneNumber, {CountryCode} from 'libphonenumber-js';
+import { Transaction } from './friends/model';
 
 export function shortName(name: string): string {
   const parts = name.trim().split(" ");
@@ -41,3 +42,7 @@ export const extractFirebaseErrorMessage = (errorCode: string): string => {
   const message = parts[1] || '';
   return message.replace(/-/g, ' ');
 };
+
+export const isSettlement = (transaction: Transaction) => {
+  return transaction.splitType.toLowerCase().endsWith('settle');
+}
