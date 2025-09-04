@@ -19,25 +19,41 @@
   @if (latestTransaction()) {
     <div class="top-section">
       <div class="details-wrapper">
-        <h5>{{ latestTransaction().description }}</h5>
+        @if (latestTransaction().splitType === SplitOptionsEnum.YouPaidToSettle) {
+          <h5>
+            You paid them:
+          </h5>
+        } @else if (latestTransaction().splitType === SplitOptionsEnum.TheyPaidToSettle) {
+          <h5>
+            {{ friend().name | shortenName }} paid you:
+          </h5>
+        } @else {
+          <h5>{{ latestTransaction().description }}</h5>
+        }
         <div class="details-card">
           <div class="summary-balance">
             <div>
               <ion-label>Bal. in ({{latestTransaction().defaultCurrencyAmount.currency}})</ion-label>
-              <h3 [ngClass]="latestTransaction().amount.isOwed ? 'success': 'danger'">
-                {{ latestTransaction().defaultCurrencyAmount.amount | currency: latestTransaction().defaultCurrencyAmount.currency: 'symbol' }}
-                @if (latestTransaction().amount.isOwed) {
-                  <img
-                    class="arrow"
-                    src="assets/images/arrow-green-downward.svg" alt="wallet"
-                  />
-                } @else () {
-                  <img
-                    class="arrow"
-                    src="assets/images/arrow-red-upword.svg" alt="wallet"
-                  />
-                }
-              </h3>
+              @if (!isSettlement(latestTransaction().splitType)) {
+                <h3 [ngClass]="latestTransaction().amount.isOwed ? 'success': 'danger'">
+                  {{ latestTransaction().defaultCurrencyAmount.amount | currency: latestTransaction().defaultCurrencyAmount.currency: 'symbol' }}
+                  @if (latestTransaction().amount.isOwed) {
+                    <img
+                      class="arrow"
+                      src="assets/images/arrow-green-downward.svg" alt="wallet"
+                    />
+                  } @else () {
+                    <img
+                      class="arrow"
+                      src="assets/images/arrow-red-upword.svg" alt="wallet"
+                    />
+                  }
+                </h3>
+              } @else {
+                <h3>
+                  {{ latestTransaction().defaultCurrencyAmount.amount | currency: latestTransaction().defaultCurrencyAmount.currency: 'symbol' }}
+                </h3>
+              }
             </div>
             @if (latestTransaction().defaultCurrencyAmount.currency !== latestTransaction().amount.currency) {
               <div class="text-right">
@@ -47,40 +63,41 @@
                 </h4>
               </div>
             }
-
           </div>
 
-          <div class="other-details">
-            <ion-list>
-              <ion-item>
-                <h6>
-                  @switch (latestTransaction().splitType) {
-                    @case (SplitOptions.YouOweThemAll) {
-                      {{ latestTransaction().friend.name|shortenName }} paid {{ latestTransaction().totalAmount|currency: latestTransaction().amount.currency: 'symbol' }}.
-                      <p>You owe {{ latestTransaction().friend.name|shortenName }} the full amount.</p>
+          @if (!isSettlement(latestTransaction().splitType)) {
+            <div class="other-details">
+              <ion-list>
+                <ion-item>
+                  <h6>
+                    @switch (latestTransaction().splitType) {
+                      @case (SplitOptions.YouOweThemAll) {
+                        {{ latestTransaction().friend.name|shortenName }} paid {{ latestTransaction().totalAmount|currency: latestTransaction().amount.currency: 'symbol' }}.
+                        <p>You owe {{ latestTransaction().friend.name|shortenName }} the full amount.</p>
+                      }
+                      @case (SplitOptions.TheyOweYouAll) {
+                        You paid {{ latestTransaction().totalAmount|currency: latestTransaction().amount.currency: 'symbol' }}.
+                        <p>{{ latestTransaction().friend.name|shortenName }} owe you the full amount.</p>
+                      }
+                      @case (SplitOptions.TheyPaidSplitEqually) {
+                        {{ latestTransaction().friend.name|shortenName }} paid {{ latestTransaction().totalAmount|currency: latestTransaction().amount.currency: 'symbol' }}.
+                        <p>You owe {{ latestTransaction().friend.name|shortenName }}
+                          {{ latestTransaction().amount.amount|currency: latestTransaction().amount.currency: 'symbol' }}
+                          .</p>
+                      }
+                      @case (SplitOptions.YouPaidSplitEqually) {
+                        You paid {{ latestTransaction().totalAmount|currency: latestTransaction().amount.currency: 'symbol' }}.
+                        <p>{{ latestTransaction().friend.name|shortenName }} owe
+                          you {{ latestTransaction().amount.amount|currency: latestTransaction().amount.currency: 'symbol' }}
+                          .</p>
+                      }
                     }
-                    @case (SplitOptions.TheyOweYouAll) {
-                      You paid {{ latestTransaction().totalAmount|currency: latestTransaction().amount.currency: 'symbol' }}.
-                      <p>{{ latestTransaction().friend.name|shortenName }} owe you the full amount.</p>
-                    }
-                    @case (SplitOptions.TheyPaidSplitEqually) {
-                      {{ latestTransaction().friend.name|shortenName }} paid {{ latestTransaction().totalAmount|currency: latestTransaction().amount.currency: 'symbol' }}.
-                      <p>You owe {{ latestTransaction().friend.name|shortenName }}
-                        {{ latestTransaction().amount.amount|currency: latestTransaction().amount.currency: 'symbol' }}
-                        .</p>
-                    }
-                    @case (SplitOptions.YouPaidSplitEqually) {
-                      You paid {{ latestTransaction().totalAmount|currency: latestTransaction().amount.currency: 'symbol' }}.
-                      <p>{{ latestTransaction().friend.name|shortenName }} owe
-                        you {{ latestTransaction().amount.amount|currency: latestTransaction().amount.currency: 'symbol' }}
-                        .</p>
-                    }
-                  }
-                </h6>
-              </ion-item>
+                  </h6>
+                </ion-item>
+              </ion-list>
+            </div>
+          }
 
-            </ion-list>
-          </div>
         </div>
       </div>
     </div>

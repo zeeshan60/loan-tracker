@@ -12,7 +12,7 @@ import {
 import { FriendWithBalance, HistoryChangeTypeEnum, Transaction } from '../model';
 import { CurrencyPipe, DatePipe, NgClass } from '@angular/common';
 import { ShortenNamePipe } from '../../pipes/shorten-name.pipe';
-import { DefineExpenseComponent, SplitOptionsEnum } from '../../define-expense/define-expense.component';
+import { DefineExpenseComponent, SplitOption, SplitOptionsEnum } from '../../define-expense/define-expense.component';
 import { FriendsStore } from '../friends.store';
 import { HelperService } from '../../helper.service';
 import { ModalService } from '../../modal.service';
@@ -61,6 +61,10 @@ export class TransactionDetailsComponent {
   readonly transactionId = input<string>();
   readonly transaction = input<Transaction>();
   readonly friend = input.required<FriendWithBalance>();
+  readonly isSettlement = (splitType: SplitOption) => (
+    [SplitOptionsEnum.TheyPaidToSettle, SplitOptionsEnum.YouPaidToSettle] as SplitOption[]
+  ).includes(splitType)
+  protected readonly SplitOptionsEnum = SplitOptionsEnum;
   readonly latestTransaction = computed(() => {
     if (this.transaction()) {
       return this.transaction();

@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button></ion-back-button>
     </ion-buttons>
-    <ion-title>With you and {{friend()?.['name'] | shortenName}}</ion-title>
+    <ion-title>With you and {{ friend()?.['name'] | shortenName }}</ion-title>
     <ion-buttons slot="primary">
       <ion-button
         (click)="presentActionSheet()"
@@ -35,51 +35,74 @@
   </div>
 
   <div class="main-list-container">
-    @for(transactionsByMonth of transactions(); track transactionsByMonth.date) {
+    @for (transactionsByMonth of transactions(); track transactionsByMonth.date) {
       <ion-list class="transactions-list">
-        <h6 class="color-grey">{{transactionsByMonth.date | date :'MMM y': 'en-US'}}</h6>
-        @for(transaction of transactionsByMonth.transactions; track transaction.transactionId) {
+        <h6 class="color-grey">{{ transactionsByMonth.date | date :'MMM y': 'en-US' }}</h6>
+        @for (transaction of transactionsByMonth.transactions; track transaction.transactionId) {
           <ion-item class="friend-trans-list" (click)="openTransactionDetails(transaction)" button>
 
             <ion-avatar>
-              <ion-icon color="medium" size="large" name="receipt-outline"></ion-icon>
+              @if (!isSettlement(transaction.splitType)) {
+                <ion-icon color="medium" size="large" name="receipt-outline"></ion-icon>
+              } @else {
+                <ion-icon color="medium" size="large" name="checkmark-outline"></ion-icon>
+              }
             </ion-avatar>
             <ion-label class="description-wrapper">
-              <h2>{{ transaction.description }}</h2>
-              <p>
-                @if (transaction.amount.isOwed) {
-                  You paid:
-                } @else {
-                  {{friend().name | shortenName}} paid:
-                }
+              <ng-template #settlementAmount>
                 {{ transaction.totalAmount | currency: transaction.amount.currency: 'symbol' }}
-              </p>
+              </ng-template>
+              @if (transaction.splitType === SplitOptionsEnum.YouPaidToSettle) {
+                <h2>
+                  You paid them:
+                  <ng-container *ngTemplateOutlet="settlementAmount"></ng-container>
+                </h2>
+              } @else if (transaction.splitType === SplitOptionsEnum.TheyPaidToSettle) {
+                <h2>
+                  {{ friend().name | shortenName }} paid you:
+                  <ng-container *ngTemplateOutlet="settlementAmount"></ng-container>
+                </h2>
+              } @else {
+                <h2>{{ transaction.description }}</h2>
+              }
+              @if (!isSettlement(transaction.splitType)) {
+                <p>
+                  @if (transaction.amount.isOwed) {
+                    You paid:
+                  } @else {
+                    {{ friend().name | shortenName }} paid:
+                  }
+                  {{ transaction.totalAmount | currency: transaction.amount.currency: 'symbol' }}
+                </p>
+              }
               <p class="date-wrapper">
-                {{transaction.date | date :'dd MMM': 'en-US' }}
+                {{ transaction.date | date :'dd MMM': 'en-US' }}
               </p>
             </ion-label>
-            <p class="amount-wrapper">
-              <ion-label class="type" [color]="transaction.amount.isOwed ? 'success': 'danger'">
-                @if (transaction.amount.isOwed) {
-                  You lent
-                } @else {
-                  You borrowed
-                }
-              </ion-label>
-              <ion-label [color]="transaction.defaultCurrencyAmount.isOwed ? 'success': 'danger'">
-                {{ transaction.defaultCurrencyAmount.amount | currency: transaction.defaultCurrencyAmount.currency: 'symbol' }}
-              </ion-label>
-              @if (transaction.defaultCurrencyAmount.currency !== transaction.amount.currency) {
-                <ion-label color="medium" class="actual-amount-label">
-                  {{ transaction.amount.amount | currency: transaction.amount.currency: 'symbol' }}
+            @if (!isSettlement(transaction.splitType)) {
+              <p class="amount-wrapper">
+                <ion-label class="type" [color]="transaction.amount.isOwed ? 'success': 'danger'">
+                  @if (transaction.amount.isOwed) {
+                    You lent
+                  } @else {
+                    You borrowed
+                  }
                 </ion-label>
-              }
-            </p>
+                <ion-label [color]="transaction.defaultCurrencyAmount.isOwed ? 'success': 'danger'">
+                  {{ transaction.defaultCurrencyAmount.amount | currency: transaction.defaultCurrencyAmount.currency: 'symbol' }}
+                </ion-label>
+                @if (transaction.defaultCurrencyAmount.currency !== transaction.amount.currency) {
+                  <ion-label color="medium" class="actual-amount-label">
+                    {{ transaction.amount.amount | currency: transaction.amount.currency: 'symbol' }}
+                  </ion-label>
+                }
+              </p>
+            }
           </ion-item>
         }
       </ion-list>
     } @empty {
-      @if(!isLoading()) {
+      @if (!isLoading()) {
         <div class="empty-transactions-wrapper">
           <p>No transactions yet.</p>
           <ion-button (click)="addExpense()">

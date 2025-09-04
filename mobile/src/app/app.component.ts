@@ -77,7 +77,7 @@ export class AppComponent implements OnInit {
       chevronDownOutline,
       closeOutline,
       ellipsisVerticalOutline,
-      arrowForwardOutline
+      arrowForwardOutline,
     });
   }
 

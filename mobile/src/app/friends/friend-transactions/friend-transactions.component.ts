@@ -1,5 +1,5 @@
 import { Component, computed, inject, input, Signal, signal } from '@angular/core';
-import { CurrencyPipe, DatePipe } from '@angular/common';
+import { CurrencyPipe, DatePipe, NgTemplateOutlet } from '@angular/common';
 import {
   ActionSheetController,
   IonAvatar,
@@ -19,7 +19,7 @@ import {
 import { TransactionDetailsComponent } from '../transaction-details/transaction-details.component';
 import { FriendsStore } from '../friends.store';
 import { ShortenNamePipe } from '../../pipes/shorten-name.pipe';
-import { DefineExpenseComponent } from '../../define-expense/define-expense.component';
+import { DefineExpenseComponent, SplitOption, SplitOptionsEnum } from '../../define-expense/define-expense.component';
 import { SettleUpComponent } from './settle-up/settle-up.component';
 import { AddFriendComponent } from '../../add-friend/add-friend.component';
 import { OverallBalanceComponent } from '../overall-balance/overall-balance.component';
@@ -47,6 +47,7 @@ import { ModalService } from '../../modal.service';
     ShortenNamePipe,
     OverallBalanceComponent,
     DatePipe,
+    NgTemplateOutlet,
   ],
 })
 export class FriendTransactionsComponent {
@@ -57,6 +58,10 @@ export class FriendTransactionsComponent {
   readonly transactions = this.friendsStore.selectedTransactions;
   readonly modalService = inject(ModalService);
   readonly isLoading = computed(() => this.friendsStore.loadingFriends());
+  protected readonly SplitOptionsEnum = SplitOptionsEnum;
+  readonly isSettlement = (splitType: SplitOption) => (
+    [SplitOptionsEnum.TheyPaidToSettle, SplitOptionsEnum.YouPaidToSettle] as SplitOption[]
+  ).includes(splitType)
 
   constructor() {}
 
