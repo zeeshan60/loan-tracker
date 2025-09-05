@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, model, signal } from '@angular/core';
+import { version } from '../../../package.json';
 import {
   IonHeader,
   IonToolbar,
@@ -11,7 +12,7 @@ import {
   IonItem,
   IonLabel,
   ToastController,
-  IonSpinner, LoadingController,
+  IonSpinner, LoadingController, IonFooter,
 } from '@ionic/angular/standalone';
 import { AuthStore } from '../login/auth.store';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -31,7 +32,7 @@ import { firstValueFrom } from 'rxjs';
   templateUrl: 'account.page.html',
   styleUrls: ['account.page.scss'],
   standalone: true,
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonIcon, IonButtons, IonList, IonItem, IonLabel, ReactiveFormsModule, FormsModule, PhoneWithCountryComponent, IonSpinner, PhonePipe, CurrenciesDropdownComponent],
+  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonIcon, IonButtons, IonList, IonItem, IonLabel, ReactiveFormsModule, FormsModule, PhoneWithCountryComponent, IonSpinner, PhonePipe, CurrenciesDropdownComponent, IonFooter],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccountPage {
@@ -54,6 +55,7 @@ export class AccountPage {
     phoneNumber: this.user()?.phoneNumber,
     country: extractCountryCode(this.user()?.phoneNumber)
   }))
+  readonly appVersion = version;
 
   constructor() {
     this.authStore.loadUserData();
